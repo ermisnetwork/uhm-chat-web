@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { client } from '../../client';
+import { client, isUserConnected } from '../../client';
 import {
   AddActiveChannel,
   AddPendingChannel,
@@ -38,7 +38,6 @@ const LeftPanel = () => {
   const { activeChannels, pendingChannels, mutedChannels } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const { all_members } = useSelector(state => state.member);
-  const { projectCurrent } = useSelector(state => state.wallet);
 
   useEffect(() => {
     dispatch(FetchChannels());
@@ -482,8 +481,6 @@ const LeftPanel = () => {
       </>
     );
   }, [tab]);
-
-  if (!projectCurrent) return null;
 
   return (
     <>

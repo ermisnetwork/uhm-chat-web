@@ -995,7 +995,6 @@ const ChatComponent = () => {
         </Box>
       )}
       {isPendingInvite && <ChannelInvitation />}
-      {/* {isGuest && <ChannelTokenGate />} */}
       {deleteMessage.openDialog && <DeleteMessageDialog />}
       {forwardMessage.openDialog && <ForwardMessageDialog />}
       {!isDirect && <BannedBackdrop />}

@@ -4,11 +4,10 @@ import { useTheme } from '@mui/material/styles';
 import { Navigate, Outlet } from 'react-router-dom';
 import SideNav from './SideNav';
 import { useDispatch, useSelector } from 'react-redux';
-import { client, connectUser } from '../../client';
+import { client, connectUser, isUserConnected } from '../../client';
 import { FetchUserProfile } from '../../redux/slices/member';
 import { CHAT_PROJECT_ID } from '../../config';
 import { ClientEvents } from '../../constants/events-const';
-import { FetchProjectCurrent } from '../../redux/slices/wallet';
 import { LocalStorageKey } from '../../constants/localStorage-const';
 import CreateChannel from '../../sections/dashboard/CreateChannel';
 import NewDirectMessage from '../../sections/dashboard/NewDirectMessage';
@@ -73,7 +72,7 @@ const DashboardLayout = () => {
   }, [client, unreadChannels, user_id]);
 
   const fetchDataInitial = async () => {
-    await Promise.all([dispatch(FetchUserProfile()), dispatch(FetchProjectCurrent())]);
+    await Promise.all([dispatch(FetchUserProfile())]);
   };
 
   if (!isLoggedIn) {

@@ -6,7 +6,7 @@ import {
   SidebarType,
   TabValueChannel,
 } from '../../constants/commons-const';
-import { client } from '../../client';
+import { client, isUserConnected } from '../../client';
 import { handleError, myRoleInChannel, splitChannelId } from '../../utils/commons';
 import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
@@ -248,29 +248,18 @@ const loadDataChannel = (channel, dispatch, user_id) => {
 
 export function FetchChannels(params) {
   return async (dispatch, getState) => {
+    console.log('---isUserConnected---', isUserConnected);
+
     if (!client) return;
     const { user_id } = getState().auth;
-    const { projectCurrent } = getState().wallet;
-    const projectId = projectCurrent.project_id;
-    // const filter = {
-    //   roles: tab === TabType.Chat ? [RoleMember.OWNER, RoleMember.MOD, RoleMember.MEMBER] : [RoleMember.PENDING],
-    // };
-
-    // if (params) {
-    //   const { type } = params;
-    //   filter.type = type ? type : ChatType.ALL;
-    // }
 
     const filter = {};
     const sort = [];
     const options = {
-      // limit: 10,
-      // offset: 0,
       message_limit: 25,
-      // presence: true,
-      // watch: true,
     };
     dispatch(slice.actions.fetchChannels({ activeChannels: [], pendingChannels: [] }));
+
     await client
       .queryChannels(filter, sort, options)
       .then(async response => {
