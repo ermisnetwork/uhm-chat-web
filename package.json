@@ -92,5 +92,7 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "terser": "^5.43.1"
+  }
 }
