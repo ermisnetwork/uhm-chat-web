@@ -4,7 +4,6 @@ import { LocalStorageKey } from './constants/localStorage-const';
 
 let client;
 let callClient;
-let isUserConnected = false;
 
 const connectUser = async (projectId, user_id, token, dispatch) => {
   client = ErmisChat.getInstance(API_KEY, projectId, {
@@ -25,11 +24,11 @@ const connectUser = async (projectId, user_id, token, dispatch) => {
     const sessionID =
       window.localStorage.getItem(LocalStorageKey.SessionId) || `cb1a4db8-33f0-43dd-a48a-${user_id.slice(-12)}`;
     callClient = new ErmisDirectCall(client, sessionID);
-    isUserConnected = true;
+    return true;
   } catch (error) {
     handleError(dispatch, error);
-    isUserConnected = false;
+    return false;
   }
 };
 
-export { client, connectUser, callClient, isUserConnected };
+export { client, connectUser, callClient };

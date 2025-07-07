@@ -4,7 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { Navigate, Outlet } from 'react-router-dom';
 import SideNav from './SideNav';
 import { useDispatch, useSelector } from 'react-redux';
-import { client, connectUser, isUserConnected } from '../../client';
+import { client, connectUser } from '../../client';
 import { FetchUserProfile } from '../../redux/slices/member';
 import { CHAT_PROJECT_ID } from '../../config';
 import { ClientEvents } from '../../constants/events-const';
@@ -18,6 +18,7 @@ import useFaviconBadge from '../../hooks/useFaviconBadge';
 import { AddUnreadChannel, RemoveUnreadChannel, UpdateUnreadChannel } from '../../redux/slices/channel';
 import CallDirectDialog2 from '../../sections/dashboard/CallDirectDialog2';
 import Header from './Header';
+import { SetIsUserConnected } from '../../redux/slices/app';
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,11 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      connectUser(CHAT_PROJECT_ID, user_id, accessToken, dispatch);
+      const onConnectUser = async () => {
+        const response = await connectUser(CHAT_PROJECT_ID, user_id, accessToken, dispatch);
+        dispatch(SetIsUserConnected(response));
+      };
+      onConnectUser();
       fetchDataInitial();
     }
   }, [isLoggedIn]);

@@ -6,7 +6,7 @@ import {
   SidebarType,
   TabValueChannel,
 } from '../../constants/commons-const';
-import { client, isUserConnected } from '../../client';
+import { client } from '../../client';
 import { handleError, myRoleInChannel, splitChannelId } from '../../utils/commons';
 import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
@@ -248,8 +248,6 @@ const loadDataChannel = (channel, dispatch, user_id) => {
 
 export function FetchChannels(params) {
   return async (dispatch, getState) => {
-    console.log('---isUserConnected---', isUserConnected);
-
     if (!client) return;
     const { user_id } = getState().auth;
 

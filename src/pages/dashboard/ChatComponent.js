@@ -66,7 +66,6 @@ import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../../config';
 import MessagesHistoryDialog from '../../sections/dashboard/MessagesHistoryDialog';
 import { SetMessagesHistoryDialog } from '../../redux/slices/dialog';
-import ChannelTokenGate from '../../sections/dashboard/ChannelTokenGate';
 import ForwardMessageDialog from '../../sections/dashboard/ForwardMessageDialog';
 import PinnedMessages from '../../components/PinnedMessages';
 import UploadFilesDialog from '../../sections/dashboard/UploadFilesDialog';

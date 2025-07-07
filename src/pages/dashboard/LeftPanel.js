@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { client, isUserConnected } from '../../client';
+import { client } from '../../client';
 import {
   AddActiveChannel,
   AddPendingChannel,
