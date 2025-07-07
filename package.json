@@ -69,10 +69,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "dev:internal": "vite --mode internal",
+    "dev:example": "vite --mode example",
     "preview": "vite preview",
     "build": "vite build",
-    "build:internal": "vite build --mode internal"
+    "build:example": "vite build --mode example"
   },
   "eslintConfig": {
     "extends": [
