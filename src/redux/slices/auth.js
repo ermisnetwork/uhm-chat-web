@@ -15,7 +15,7 @@ import uuidv4 from '../../utils/uuidv4';
 const initialState = {
   isLoggedIn: false,
   user_id: null,
-  project_id_ermis: null,
+  chat_project_id: null,
   openDialogPlatform: true,
   loginType: '',
 };
@@ -27,14 +27,14 @@ const slice = createSlice({
     logIn(state, action) {
       state.isLoggedIn = action.payload.isLoggedIn;
       state.user_id = action.payload.user_id;
-      state.project_id_ermis = action.payload.project_id_ermis;
+      state.chat_project_id = action.payload.chat_project_id;
       state.openDialogPlatform = action.payload.openDialogPlatform;
       state.loginType = action.payload.loginType;
     },
     signOut(state, action) {
       state.isLoggedIn = false;
       state.user_id = null;
-      state.project_id_ermis = null;
+      state.chat_project_id = null;
       state.openDialogPlatform = true;
       state.loginType = '';
     },
@@ -65,7 +65,7 @@ export function LoginUserByWallet(data) {
             slice.actions.logIn({
               isLoggedIn: true,
               user_id: user_id,
-              project_id_ermis: project_id,
+              chat_project_id: project_id,
               openDialogPlatform: isStagingDomain(),
               loginType: LoginType.Wallet,
             }),
@@ -154,7 +154,7 @@ export function LoginUserByEmail(data) {
             slice.actions.logIn({
               isLoggedIn: true,
               user_id: user_id,
-              project_id_ermis: project_id,
+              chat_project_id: project_id,
               openDialogPlatform: isStagingDomain(),
               loginType: LoginType.Email,
             }),

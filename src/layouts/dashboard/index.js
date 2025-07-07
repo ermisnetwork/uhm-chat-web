@@ -6,7 +6,7 @@ import SideNav from './SideNav';
 import { useDispatch, useSelector } from 'react-redux';
 import { client, connectUser } from '../../client';
 import { FetchUserProfile } from '../../redux/slices/member';
-import { ERMIS_PROJECT_ID } from '../../config';
+import { CHAT_PROJECT_ID } from '../../config';
 import { ClientEvents } from '../../constants/events-const';
 import { FetchProjectCurrent } from '../../redux/slices/wallet';
 import { LocalStorageKey } from '../../constants/localStorage-const';
@@ -36,7 +36,7 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      connectUser(ERMIS_PROJECT_ID, user_id, accessToken, dispatch);
+      connectUser(CHAT_PROJECT_ID, user_id, accessToken, dispatch);
       fetchDataInitial();
     }
   }, [isLoggedIn]);

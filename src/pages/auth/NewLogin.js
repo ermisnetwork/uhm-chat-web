@@ -208,7 +208,7 @@ export default function NewLogin() {
       logIn({
         isLoggedIn: true,
         user_id: user_id,
-        project_id_ermis: project_id,
+        chat_project_id: project_id,
         openDialogPlatform: false,
         loginType: loginType,
       }),

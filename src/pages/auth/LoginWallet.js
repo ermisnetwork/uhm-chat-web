@@ -110,7 +110,7 @@ export default function LoginWallet({ setIsWalletConnected }) {
               logIn({
                 isLoggedIn: true,
                 user_id: user_id,
-                project_id_ermis: project_id,
+                chat_project_id: project_id,
                 openDialogPlatform: isStagingDomain(),
                 loginType: LoginType.Wallet,
               }),
