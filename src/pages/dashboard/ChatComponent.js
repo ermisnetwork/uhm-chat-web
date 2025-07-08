@@ -281,9 +281,14 @@ const MessageList = ({
             .filter(item => !(item.type === MessageType.Signal && ['1', '4'].includes(item.text[0])))
             .map((el, idx) => {
               const messageType = el.type;
+              let sender = el.user;
+              // Nếu thiếu name/avatar thì lấy từ users list
+              if (!sender?.name || !sender?.avatar) {
+                const foundUser = users.find(u => u.id === el.user?.id);
+                if (foundUser) sender = { ...sender, name: foundUser.name, avatar: foundUser.avatar };
+              }
               const isMyMessage = el.user.id === user_id;
-              const name = el.user?.name || el.user?.id;
-              const sender = el.user;
+              const name = sender?.name || sender?.id;
               const isNewestMessage = idx === messages.length - 1;
 
               if (messageType === MessageType.System) {
