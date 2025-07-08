@@ -147,6 +147,7 @@ export default function ChannelAvatar({ channel, width, height, openLightbox, sh
                 name={groupMemberFirst.name}
                 width={getSizeSmallAvatar(width)}
                 height={getSizeSmallAvatar(height)}
+                shape={shape}
               />
             )
           }

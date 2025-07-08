@@ -656,11 +656,11 @@ export const SetFilterWords = payload => {
 
 export const SetMentions = payload => {
   return async (dispatch, getState) => {
-    const { all_members } = getState().member;
+    const users = client.state.users ? Object.values(client.state.users) : [];
 
     const mentionsData = payload
       .map(member => {
-        const memberInfo = all_members.find(it => it.id === member.user_id);
+        const memberInfo = users.find(it => it.id === member.user_id);
         const name = memberInfo ? memberInfo.name : member.user_id;
         const avatar = memberInfo ? memberInfo.avatar : '';
         return {
@@ -680,9 +680,9 @@ export const SetMentions = payload => {
 
 export const AddMention = mentionId => {
   return async (dispatch, getState) => {
-    const { all_members } = getState().member;
+    const users = client.state.users ? Object.values(client.state.users) : [];
 
-    const memberInfo = all_members.find(it => it.id === mentionId);
+    const memberInfo = users.find(it => it.id === mentionId);
     const name = memberInfo ? memberInfo.name : mentionId;
     const mentionData = {
       name,

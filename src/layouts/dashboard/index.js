@@ -35,6 +35,15 @@ const DashboardLayout = () => {
   useFaviconBadge(unreadChannels);
 
   useEffect(() => {
+    // Lưu lại overflow cũ để khôi phục khi unmount
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
     if (isLoggedIn) {
       const onConnectUser = async () => {
         const response = await connectUser(CHAT_PROJECT_ID, user_id, accessToken, dispatch);
