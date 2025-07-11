@@ -123,7 +123,6 @@ const MESSAGE_LIMIT = 25;
 
 const MessageList = ({
   messageListRef,
-  isMobile,
   messages,
   lastReadMessageId,
   targetId,
@@ -139,6 +138,8 @@ const MessageList = ({
   const messageRefs = useRef({});
   const unreadRefs = useRef([]);
   const theme = useTheme();
+  const isLgToXl = useResponsive('between', null, 'lg', 'xl');
+  const isMobileToLg = useResponsive('down', 'lg');
   const { user_id } = useSelector(state => state.auth);
   const { activeChannels, isGuest } = useSelector(state => state.channel);
 
@@ -270,7 +271,7 @@ const MessageList = ({
   if (messages.length === 0) return null;
 
   return (
-    <Box sx={{ padding: isMobile ? '15px' : '20px 90px' }}>
+    <Box sx={{ padding: isMobileToLg ? '20px' : isLgToXl ? '20px 50px' : '20px 90px' }}>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -445,8 +446,6 @@ const MessageList = ({
 const ChatComponent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const isMobile = useResponsive('between', 'md', 'xs', 'sm');
   const theme = useTheme();
   const messageListRef = useRef(null);
   const { currentChannel, isBlocked, isGuest, selectedTabChannel } = useSelector(state => state.channel);
@@ -632,49 +631,17 @@ const ChatComponent = () => {
       };
 
       const handleInviteAccept = async event => {
-        const splitCID = splitChannelId(event.cid);
-        const channelId = splitCID.channelId;
-        const channelType = splitCID.channelType;
-
         if (event.member.user_id === user_id) {
-          dispatch(UpdateTab({ tab: TabType.Chat }));
           setIsPendingInvite(false);
-          dispatch(RemovePendingChannel(channelId));
-          dispatch(RemoveSkippedChannel(channelId));
-          dispatch(AddActiveChannel(event.cid, event.type));
         } else {
-          dispatch(WatchCurrentChannel(channelId, channelType));
           setIsAlertInvitePending(false);
         }
       };
 
-      const handleInviteReject = event => {
-        const splitCID = splitChannelId(event.cid);
-        const channelId = splitCID.channelId;
-        const channelType = splitCID.channelType;
-
-        if (event.member.user_id === user_id) {
-          navigate(`${DEFAULT_PATH}`);
-          dispatch(UpdateTab({ tab: TabType.Chat }));
-          setIsPendingInvite(false);
-          dispatch(RemovePendingChannel(channelId));
-        } else {
-          dispatch(WatchCurrentChannel(channelId, channelType));
-        }
-      };
-
       const handleInviteSkipped = async event => {
-        const splitCID = splitChannelId(event.cid);
-        const channelId = splitCID.channelId;
-        const channelType = splitCID.channelType;
-
         if (event.member.user_id === user_id) {
           navigate(`${DEFAULT_PATH}`);
-          dispatch(UpdateTab({ tab: TabType.Chat }));
           setIsPendingInvite(false);
-          dispatch(AddSkippedChannel(event.cid));
-        } else {
-          dispatch(WatchCurrentChannel(channelId, channelType));
         }
       };
 
@@ -744,7 +711,6 @@ const ChatComponent = () => {
       currentChannel.on(ClientEvents.TypingStart, handleTypingStart);
       currentChannel.on(ClientEvents.TypingStop, handleTypingStop);
       currentChannel.on(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
-      currentChannel.on(ClientEvents.Notification.InviteRejected, handleInviteReject);
       currentChannel.on(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
       currentChannel.on(ClientEvents.ChannelUpdated, handleChannelUpdated);
       currentChannel.on(ClientEvents.MemberJoined, handleMemberJoined);
@@ -764,7 +730,7 @@ const ChatComponent = () => {
         currentChannel.off(ClientEvents.TypingStart, handleTypingStart);
         currentChannel.off(ClientEvents.TypingStop, handleTypingStop);
         currentChannel.off(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
-        currentChannel.off(ClientEvents.Notification.InviteRejected, handleInviteReject);
+        currentChannel.off(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
         currentChannel.off(ClientEvents.ChannelUpdated, handleChannelUpdated);
         currentChannel.off(ClientEvents.MemberJoined, handleMemberJoined);
         currentChannel.off(ClientEvents.MemberAdded, handleMemberAdded);
@@ -894,7 +860,7 @@ const ChatComponent = () => {
   }
 
   return (
-    <Stack sx={{ position: 'relative', width: isMobile ? '100%' : 'auto', height: '100%', overflow: 'hidden' }}>
+    <Stack sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
       <ChatHeader currentChannel={currentChannel} isBlocked={isBlocked} />
 
       {currentChannel && (
@@ -971,7 +937,6 @@ const ChatComponent = () => {
                   {/* <SimpleBarStyle timeout={500} clickOnTrack={false}> */}
                   <MessageList
                     messageListRef={messageListRef}
-                    isMobile={isMobile}
                     messages={addDateLabels(messages)}
                     lastReadMessageId={lastReadMessageId}
                     targetId={targetId}

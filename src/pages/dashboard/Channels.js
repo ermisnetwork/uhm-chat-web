@@ -165,14 +165,14 @@ const Channels = () => {
       <Stack
         className="customScrollbar"
         sx={{
-          flexGrow: 1,
           overflowY: 'auto',
           overflowX: 'hidden',
-          height: 'calc(100% - 167px)',
           marginLeft: '-15px!important',
           marginRight: '-15px!important',
           marginTop: '0px!important',
           padding: '15px',
+          minHeight: 'auto',
+          flex: 1,
         }}
       >
         <Stack spacing={2}>{renderedChannels}</Stack>

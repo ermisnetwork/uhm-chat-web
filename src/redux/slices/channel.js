@@ -422,7 +422,6 @@ export const AddActiveChannel = (cid, eventType) => {
     if (!client) return;
     const { user_id } = getState().auth;
     const channel = client.activeChannels[cid];
-    console.log('AddActiveChannel', channel);
 
     dispatch(slice.actions.addActiveChannel(channel));
 
@@ -661,8 +660,8 @@ export const SetMentions = payload => {
     const mentionsData = payload
       .map(member => {
         const memberInfo = users.find(it => it.id === member.user_id);
-        const name = memberInfo ? memberInfo.name : member.user_id;
-        const avatar = memberInfo ? memberInfo.avatar : '';
+        const name = member.user?.name ? member.user.name : memberInfo ? memberInfo.name : member.user_id;
+        const avatar = member.user?.avatar ? member.user.avatar : memberInfo ? memberInfo.avatar : '';
         return {
           name,
           id: member.user_id,
