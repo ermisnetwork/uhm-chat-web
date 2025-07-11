@@ -1,4 +1,4 @@
-import { Stack, Box, Typography, Chip, Alert, Tooltip } from '@mui/material';
+import { Stack, Box, Typography, Chip, Alert } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { ChatHeader, ChatFooter } from '../../components/Chat';
@@ -34,29 +34,18 @@ import ReactionsMessage from '../../components/ReactionsMessage';
 import ChannelInvitation from '../../sections/dashboard/ChannelInvitation';
 import {
   AddActiveChannel,
-  AddSkippedChannel,
   RemoveActiveChannel,
-  RemovePendingChannel,
-  RemoveSkippedChannel,
   SetCooldownTime,
   SetFilterWords,
   SetIsGuest,
+  SetMarkReadChannel,
   SetMemberCapabilities,
   WatchCurrentChannel,
 } from '../../redux/slices/channel';
 import { Clock, Trash } from 'phosphor-react';
 import ScrollToBottom from '../../components/ScrollToBottom';
 import DeleteMessageDialog from '../../sections/dashboard/DeleteMessageDialog';
-import {
-  ChatType,
-  DefaultLastSend,
-  MessageType,
-  RoleMember,
-  TabType,
-  TabValueChannel,
-  UploadType,
-} from '../../constants/commons-const';
-import { UpdateTab } from '../../redux/slices/app';
+import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '../../constants/commons-const';
 import BannedBackdrop from '../../components/BannedBackdrop';
 import { client } from '../../client';
 import { onFilesMessage, setSearchMessageId } from '../../redux/slices/messages';
@@ -448,7 +437,7 @@ const ChatComponent = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const messageListRef = useRef(null);
-  const { currentChannel, isBlocked, isGuest, selectedTabChannel } = useSelector(state => state.channel);
+  const { currentChannel, isBlocked, isGuest } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
     state => state.messages,
@@ -468,7 +457,6 @@ const ChatComponent = () => {
   const [noMessageTitle, setNoMessageTitle] = useState('');
 
   const isDirect = isChannelDirect(currentChannel);
-  const tabInvite = selectedTabChannel === TabValueChannel.Invite;
   const users = client.state.users ? Object.values(client.state.users) : [];
 
   useEffect(() => {
@@ -538,6 +526,12 @@ const ChatComponent = () => {
               setMessages(prev => {
                 return [...prev, event.message];
               });
+              const myRole = myRoleInChannel(currentChannel);
+              if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
+                setTimeout(() => {
+                  dispatch(SetMarkReadChannel(currentChannel));
+                }, 100);
+              }
             } else {
               setMessages(prev => {
                 if (prev.some(item => item.id === event.message.id)) {
@@ -874,7 +868,7 @@ const ChatComponent = () => {
             </Box>
           )}
 
-          {!tabInvite && <PinnedMessages />}
+          <PinnedMessages />
 
           {(showChipUnread || unreadCount >= MESSAGE_LIMIT) && (
             <Stack direction="row" alignItems="center" justifyContent="center">
@@ -957,7 +951,7 @@ const ChatComponent = () => {
         )}
       </Dropzone>
 
-      {!tabInvite && currentChannel ? <ScrollToBottom messageListRef={messageListRef} /> : null}
+      {currentChannel ? <ScrollToBottom messageListRef={messageListRef} /> : null}
       {!isGuest && (
         <Box
           sx={{

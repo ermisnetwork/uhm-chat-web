@@ -171,7 +171,7 @@ export const TabValueChannel = {
   All: 0,
   Group: 1,
   Unread: 2,
-  Invite: 3,
+  // Invite: 3,
 };
 
 export const AvatarShape = {
