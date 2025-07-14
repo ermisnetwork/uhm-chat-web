@@ -442,8 +442,6 @@ const ChatComponent = () => {
   const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
     state => state.messages,
   );
-  const { tab } = useSelector(state => state.app);
-
   const [messages, setMessages] = useState([]);
   const [usersTyping, setUsersTyping] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -461,9 +459,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     if (currentChannel) {
-      const channelName = currentChannel.data.name
-        ? formatString(currentChannel.data.name)
-        : getChannelName(currentChannel, users);
+      const channelName = currentChannel.data.name ? currentChannel.data.name : getChannelName(currentChannel, users);
       document.title = channelName;
       if (messageListRef.current) {
         messageListRef.current.scrollTop = 0;

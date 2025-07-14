@@ -155,11 +155,7 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
                         fontWeight: 400,
                       }}
                     >
-                      {!isDirect ? (
-                        `${Object.values(currentChannel.state.members).length} members`
-                      ) : (
-                        <>{onlineStatus}</>
-                      )}
+                      {!isDirect ? `${currentChannel.data?.member_count} members` : <>{onlineStatus}</>}
                     </Typography>
                   </Typography>
                 </Button>

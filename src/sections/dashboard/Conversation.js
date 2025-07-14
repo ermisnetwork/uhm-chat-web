@@ -255,7 +255,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
                   <Copy size={18} />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Coppy text"
+                  primary="Coppy"
                   primaryTypographyProps={{
                     fontSize: '14px',
                   }}

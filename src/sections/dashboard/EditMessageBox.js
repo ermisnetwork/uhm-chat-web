@@ -1,13 +1,21 @@
 import React from 'react';
 import { Stack, useTheme, Typography, Box, IconButton } from '@mui/material';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PencilSimple, X } from 'phosphor-react';
 import { onEditMessage } from '../../redux/slices/messages';
 
 const EditMessageBox = ({ editMessage }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const { mentions } = useSelector(state => state.channel);
   const { messageText } = editMessage;
+
+  const replaceMentionsWithNames = inputValue => {
+    mentions.forEach(user => {
+      inputValue = inputValue.replaceAll(user.id, user.name);
+    });
+    return inputValue;
+  };
 
   return (
     <Stack direction="row" justifyContent="space-between" sx={{ padding: '15px 15px 5px' }} gap={1}>
@@ -48,7 +56,7 @@ const EditMessageBox = ({ editMessage }) => {
                 overflow: 'hidden',
               }}
             >
-              {messageText}
+              {replaceMentionsWithNames(messageText)}
             </Typography>
           </Box>
         </Stack>

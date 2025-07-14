@@ -17,7 +17,7 @@ import useMentions from '../../hooks/useMentions';
 import uuidv4 from '../../utils/uuidv4';
 import { client } from '../../client';
 import ActionsChatPopover from '../ActionsChatPopover';
-import { MicrophoneIcon, PictureImageIcon, SendIcon, SmileyStickerIcon } from '../Icons';
+import { MicrophoneIcon, PictureImageIcon, SendIcon } from '../Icons';
 import EmojiPickerPopover from '../EmojiPickerPopover';
 import RecordingAudioBox from '../../sections/dashboard/RecordingAudioBox';
 
@@ -76,7 +76,12 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
       inputRef.current.focus();
 
       if (editMessage) {
-        setValue(editMessage.messageText);
+        // Tìm các mentionId xuất hiện trong editMessage.messageText
+        const foundMentions = mentions.filter(user => editMessage.messageText.includes(user.mentionId));
+        setSelectedMentions(foundMentions);
+
+        // Đổi value từ mentionId sang mentionName để hiển thị đúng
+        setValue(replaceMentionsWithNames(editMessage.messageText));
       } else if (currentChannel || quotesMessage) {
         setValue('');
       }
@@ -281,10 +286,12 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
             setEditMessagesQueue(prevMessages => [...prevMessages, { id: messageId, text: value.trim() }]);
           }
 
+          const textWithMentionIds = replaceMentionsWithIds(value.trim());
+
           setMessages(prev => {
             return prev.map(item => {
               if (item.id === messageId) {
-                const editMsgData = { ...item, text: value.trim() };
+                const editMsgData = { ...item, text: textWithMentionIds };
 
                 if (!isOnline) {
                   editMsgData.status = 'error';
@@ -297,7 +304,7 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
             });
           });
           onResetData();
-          await currentChannel?.editMessage(messageId, value.trim());
+          await currentChannel?.editMessage(messageId, textWithMentionIds);
         } else {
           dispatch(onEditMessage(null));
         }
@@ -399,6 +406,13 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
   const replaceMentionsWithIds = inputValue => {
     mentions.forEach(user => {
       inputValue = inputValue.replaceAll(user.mentionName, user.mentionId);
+    });
+    return inputValue;
+  };
+
+  const replaceMentionsWithNames = inputValue => {
+    mentions.forEach(user => {
+      inputValue = inputValue.replaceAll(user.mentionId, user.mentionName);
     });
     return inputValue;
   };
