@@ -97,6 +97,7 @@ export default function ReactionsMessage({ isMyMessage, message }) {
                     fontWeight: 600,
                     border: `1px solid ${item.isMyReact ? theme.palette.action.active : 'transparent'}`,
                     boxShadow: theme.shadows[6],
+                    color: theme.palette.text.primary,
                   }}
                   onClick={() => onToggleReaction(item)}
                 >
