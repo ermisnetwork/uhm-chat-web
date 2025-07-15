@@ -570,7 +570,7 @@ const ChatComponent = () => {
 
       const handleTypingStart = event => {
         if (user_id !== event.user.id) {
-          const name = formatString(event.user?.name || event.user.id);
+          const name = event.user?.name ? event.user?.name : formatString(event.user.id);
 
           const item = {
             name: name,
