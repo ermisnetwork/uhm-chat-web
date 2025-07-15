@@ -320,7 +320,7 @@ const ChatElement = ({ channel }) => {
         {isPublic ? (
           <AvatarComponent
             name={channel.data.name}
-            url={channel.data.image}
+            url={channel.data?.image || ''}
             width={60}
             height={60}
             isPublic={isPublic}
@@ -389,7 +389,7 @@ const ChatElement = ({ channel }) => {
                 {isBlocked ? 'You have block this user' : lastMessageUpdated ? lastMessageUpdated : lastMessage}
               </Typography>
 
-              {count > 0 ? <Badge variant="dot" color="primary" sx={{ margin: '0 10px 0 15px' }} /> : null}
+              {count > 0 ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
             </Stack>
           )}
         </Box>

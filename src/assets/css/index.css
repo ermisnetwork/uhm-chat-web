@@ -277,3 +277,13 @@ a.linkUrl:last-child {
   width: 100%;
   height: 100%;
 }
+
+.mentionHighlight {
+  font-weight: 700;
+  display: inline-block;
+}
+
+.mentionHighlight.mentionAll,
+.mentionHighlight.mentionMe {
+  color: #ff4842 !important;
+}

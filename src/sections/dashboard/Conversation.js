@@ -29,7 +29,13 @@ import {
   PushPin,
   PushPinSimpleSlash,
 } from 'phosphor-react';
-import { checkPermissionDeleteMessage, downloadFile, formatString, getMemberInfo } from '../../utils/commons';
+import {
+  checkPermissionDeleteMessage,
+  displayMessageWithMentionName,
+  downloadFile,
+  formatString,
+  getMemberInfo,
+} from '../../utils/commons';
 import { CallType, MessageType } from '../../constants/commons-const';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -59,6 +65,22 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   height: '22px',
   padding: '0px',
   color: theme.palette.text.primary,
+}));
+
+const StyledTextLine = styled(Typography)(({ theme }) => ({
+  wordBreak: 'break-word',
+  whiteSpace: 'pre-wrap',
+  fontWeight: 500,
+  '& .mentionHighlight': {
+    padding: '2px 10px',
+    borderRadius: '12px',
+    backgroundColor: '#fff',
+    color: '#212B36',
+    '& .linkUrl': {
+      display: 'inline',
+      color: 'inherit !important',
+    },
+  },
 }));
 
 const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
@@ -392,25 +414,6 @@ const TextLine = ({ message }) => {
   const { mentions } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
 
-  const replaceMentionsWithNames = inputValue => {
-    mentions.forEach(user => {
-      if (user.mentionId === '@all') {
-        inputValue = inputValue.replaceAll(
-          user.mentionId,
-          `<span class="mentionHighlight mentionAll">${user.mentionName}</span>`,
-        );
-      } else if (user.id === user_id) {
-        inputValue = inputValue.replaceAll(
-          user.mentionId,
-          `<span class="mentionHighlight mentionMe">${user.mentionName}</span>`,
-        );
-      } else {
-        inputValue = inputValue.replaceAll(user.mentionId, `<span class="mentionHighlight">${user.mentionName}</span>`);
-      }
-    });
-    return inputValue;
-  };
-
   const isCode = str => {
     // Loại bỏ khoảng trắng đầu/cuối chuỗi
     str = str.trim();
@@ -484,13 +487,9 @@ const TextLine = ({ message }) => {
       );
     } else {
       return (
-        <Typography
-          variant="body2"
-          color={message.isMyMessage ? '#fff' : theme.palette.text}
-          sx={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', fontWeight: 500 }}
-        >
+        <StyledTextLine variant="body2" color={message.isMyMessage ? '#fff' : theme.palette.text}>
           {processMessage(message.text)}
-        </Typography>
+        </StyledTextLine>
       );
     }
   };
@@ -755,21 +754,6 @@ const AttachmentMsg = ({ el, menu, forwardChannelName }) => {
 };
 const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
   const { mentions } = useSelector(state => state.channel);
-  const { user_id } = useSelector(state => state.auth);
-
-  const replaceMentionsWithNames = inputValue => {
-    mentions.forEach(user => {
-      if (user.mentionId === '@all') {
-        inputValue = inputValue.replaceAll(user.mentionId, `<strong>${user.mentionName}</strong>`);
-      } else if (user.id === user_id) {
-        inputValue = inputValue.replaceAll(user.mentionId, `<strong>${user.mentionName}</strong>`);
-      } else {
-        inputValue = inputValue.replaceAll(user.mentionId, `<strong>${user.mentionName}</strong>`);
-      }
-    });
-    return inputValue;
-  };
-
   const theme = useTheme();
   const memberInfo = el.quoted_message?.user;
   const quotedMessage = el.quoted_message;
@@ -879,7 +863,9 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                     }}
-                    dangerouslySetInnerHTML={{ __html: replaceMentionsWithNames(el.quoted_message.text) }}
+                    dangerouslySetInnerHTML={{
+                      __html: displayMessageWithMentionName(el.quoted_message.text, mentions),
+                    }}
                   />
                 </>
               )}

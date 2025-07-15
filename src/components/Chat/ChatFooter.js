@@ -2,7 +2,13 @@ import { Box, IconButton, InputAdornment, TextField } from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { handleError, isChannelDirect, myRoleInChannel } from '../../utils/commons';
+import {
+  handleError,
+  isChannelDirect,
+  myRoleInChannel,
+  replaceMentionsWithIds,
+  replaceMentionsWithNames,
+} from '../../utils/commons';
 import { onEditMessage, onFilesMessage, onReplyMessage, onSetAttachmentsMessage } from '../../redux/slices/messages';
 import ReplyMessageBox from '../../sections/dashboard/ReplyMessageBox';
 import EditMessageBox from '../../sections/dashboard/EditMessageBox';
@@ -81,7 +87,7 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
         setSelectedMentions(foundMentions);
 
         // Đổi value từ mentionId sang mentionName để hiển thị đúng
-        setValue(replaceMentionsWithNames(editMessage.messageText));
+        setValue(replaceMentionsWithNames(editMessage.messageText, mentions));
       } else if (currentChannel || quotesMessage) {
         setValue('');
       }
@@ -90,7 +96,7 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [inputRef, currentChannel, quotesMessage, editMessage]);
+  }, [inputRef, currentChannel, quotesMessage, editMessage, mentions]);
 
   useEffect(() => {
     if (currentChannel) {
@@ -286,7 +292,7 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
             setEditMessagesQueue(prevMessages => [...prevMessages, { id: messageId, text: value.trim() }]);
           }
 
-          const textWithMentionIds = replaceMentionsWithIds(value.trim());
+          const textWithMentionIds = replaceMentionsWithIds(value.trim(), mentions);
 
           setMessages(prev => {
             return prev.map(item => {
@@ -326,11 +332,11 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
           if (mentionIds.includes('all')) {
             payload.mentioned_all = true;
             payload.mentioned_users = [];
-            payload.text = replaceMentionsWithIds(value.trim());
+            payload.text = replaceMentionsWithIds(value.trim(), mentions);
           } else {
             payload.mentioned_all = false;
             payload.mentioned_users = mentionIds;
-            payload.text = replaceMentionsWithIds(value.trim());
+            payload.text = replaceMentionsWithIds(value.trim(), mentions);
           }
         }
 
@@ -401,20 +407,6 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
       return true;
     }
     return false;
-  };
-
-  const replaceMentionsWithIds = inputValue => {
-    mentions.forEach(user => {
-      inputValue = inputValue.replaceAll(user.mentionName, user.mentionId);
-    });
-    return inputValue;
-  };
-
-  const replaceMentionsWithNames = inputValue => {
-    mentions.forEach(user => {
-      inputValue = inputValue.replaceAll(user.mentionId, user.mentionName);
-    });
-    return inputValue;
   };
 
   const onKeyDown = e => {

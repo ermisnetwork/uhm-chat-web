@@ -30,7 +30,7 @@ const ChannelDetailApp = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    if (id && isUserConnected && users.length > 0) {
+    if (id && isUserConnected) {
       const result = splitChannelId(id);
       if (result) {
         dispatch(ConnectCurrentChannel(result.channelId, result.channelType));

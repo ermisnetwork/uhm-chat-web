@@ -96,8 +96,8 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
               <Box sx={{ width: '40px' }}>
                 {isPublic ? (
                   <AvatarComponent
-                    name={currentChannel.data.name}
-                    url={currentChannel.data.image}
+                    name={currentChannel.data?.name}
+                    url={currentChannel.data?.image || ''}
                     width={40}
                     height={40}
                     isPublic={isPublic}

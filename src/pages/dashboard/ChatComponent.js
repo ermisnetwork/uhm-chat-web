@@ -75,25 +75,6 @@ const StyledMessage = styled(motion(Stack))(({ theme }) => ({
       visibility: 'visible',
     },
   },
-  '& .mentionHighlight': {
-    padding: '2px 10px',
-    borderRadius: '12px',
-    backgroundColor: '#fff',
-    color: '#212B36',
-    fontWeight: 700,
-    display: 'inline-block',
-    margin: '0 5px 5px 0',
-    '&.mentionAll': {
-      color: '#FF4842',
-    },
-    '&.mentionMe': {
-      color: '#FF4842',
-    },
-    '& .linkUrl': {
-      display: 'inline',
-      color: 'inherit !important',
-    },
-  },
   '&.myMessage': {
     '& .linkUrl': {
       color: '#f1f1f1',
@@ -352,7 +333,7 @@ const MessageList = ({
                             top: 0,
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            width: 'calc(100% + 80px)',
+                            width: '200%',
                             height: '100%',
                             backgroundColor: 'rgb(1 98 196 / 20%)',
                           }}
@@ -456,6 +437,8 @@ const ChatComponent = () => {
 
   const isDirect = isChannelDirect(currentChannel);
   const users = client.state.users ? Object.values(client.state.users) : [];
+  const isLgToXl = useResponsive('between', null, 'lg', 'xl');
+  const isMobileToLg = useResponsive('down', 'lg');
 
   useEffect(() => {
     if (currentChannel) {
@@ -854,7 +837,15 @@ const ChatComponent = () => {
       <ChatHeader currentChannel={currentChannel} isBlocked={isBlocked} />
 
       {currentChannel && (
-        <Box sx={{ width: '100%', position: 'absolute', top: '75px', zIndex: 2 }}>
+        <Box
+          sx={{
+            width: '100%',
+            position: 'absolute',
+            top: '75px',
+            zIndex: 2,
+            padding: isMobileToLg ? '4px 20px' : isLgToXl ? '4px 50px' : '4px 90px',
+          }}
+        >
           {isAlertInvitePending && (
             <Box sx={{ width: '100%' }}>
               <Alert severity="info" sx={{ fontWeight: 400 }}>
@@ -911,7 +902,12 @@ const ChatComponent = () => {
                 <InfiniteScroll
                   dataLength={messages.length}
                   next={fetchMoreMessages}
-                  style={{ display: 'flex', flexDirection: 'column-reverse', position: 'relative' }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column-reverse',
+                    position: 'relative',
+                    overflowX: 'hidden',
+                  }}
                   inverse={true}
                   hasMore={true}
                   loader={
