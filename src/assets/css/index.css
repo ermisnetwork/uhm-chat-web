@@ -287,3 +287,12 @@ a.linkUrl:last-child {
 .mentionHighlight.mentionMe {
   color: #ff4842 !important;
 }
+
+.yarl__thumbnails_thumbnail {
+  width: 100px;
+  height: 80px;
+}
+
+.yarl__thumbnails_thumbnail.yarl__thumbnails_thumbnail_active {
+  border-color: #7949ec !important;
+}

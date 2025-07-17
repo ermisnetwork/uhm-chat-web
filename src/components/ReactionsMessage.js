@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Stack, Tooltip, Button } from '@mui/material';
-import { EMOJI_QUICK } from '../constants/commons-const';
+import { EMOJI_QUICK, MessageType } from '../constants/commons-const';
 import { handleError } from '../utils/commons';
 import { useDispatch, useSelector } from 'react-redux';
 import QuickReactions from './QuickReactions';
@@ -51,6 +51,8 @@ export default function ReactionsMessage({ isMyMessage, message }) {
       handleError(dispatch, error);
     }
   };
+
+  if (message.type === MessageType.Signal) return null;
 
   return (
     <Stack

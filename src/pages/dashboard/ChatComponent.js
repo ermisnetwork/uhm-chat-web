@@ -243,7 +243,7 @@ const MessageList = ({
   return (
     <Box sx={{ padding: isMobileToLg ? '20px' : isLgToXl ? '20px 50px' : '20px 90px' }}>
       <motion.div
-        initial={{ opacity: 0, y: 50 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
       >
@@ -322,7 +322,7 @@ const MessageList = ({
                         marginBottom: showAvatar ? '32px!important' : '0px!important',
                         marginTop: '0px!important',
                       }}
-                      initial={isNewestMessage ? { opacity: 0, y: 50 } : false}
+                      initial={isNewestMessage ? { opacity: 0, y: 10 } : false}
                       animate={isNewestMessage ? { opacity: 1, y: 0 } : false}
                       transition={isNewestMessage ? { duration: 0.4, type: 'spring', stiffness: 200 } : undefined}
                     >
@@ -369,6 +369,7 @@ const MessageList = ({
                       <Stack
                         sx={{
                           minWidth: 'auto',
+                          maxWidth: '100%',
                           flex: 1,
                           // overflow: 'hidden',
                         }}

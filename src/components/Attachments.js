@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { Box, Stack, Paper, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
 import { downloadFile, formatFileSize } from '../utils/commons';
-import { SlideshowLightbox } from 'lightbox.js-react';
 import { PlayCircle } from 'phosphor-react';
 import { MediaType } from '../constants/commons-const';
 import FileTypeBadge from './FileTypeBadge';
 import ImageCanvas from './ImageCanvas';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
+import LightboxMedia from './LightboxMedia';
 
 const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
   const processedImages = medias.map((item, index) => {
@@ -73,7 +73,7 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
             }}
           >
             <ImageCanvas
-              dataUrl={item.thumbnail}
+              dataUrl={item.type === MediaType.VIDEO ? item.poster : item.src}
               width={'100%'}
               height={'100%'}
               styleCustom={{ borderRadius: '12px' }}
@@ -149,16 +149,22 @@ export default function Attachments({ attachments }) {
           return {
             type: MediaType.IMAGE,
             src: item.image_url,
-            thumbnail: item.image_url,
             alt: item.title,
+            description: item.title,
           };
         } else {
           return {
             type: MediaType.VIDEO,
-            videoSrc: item.asset_url,
-            thumbnail: item.thumb_url,
-            alt: item.title,
-            autoPlay: false,
+            width: 1280,
+            height: 720,
+            poster: item.thumb_url,
+            sources: [
+              {
+                src: item.asset_url,
+                type: item.mime_type,
+              },
+            ],
+            description: item.title,
           };
         }
       });
@@ -177,25 +183,7 @@ export default function Attachments({ attachments }) {
         <QuiltedMediaList medias={medias} setIsOpen={setIsOpen} setIndexMedia={setIndexMedia} />
       </Stack>
 
-      <SlideshowLightbox
-        theme="lightbox"
-        images={medias}
-        startingSlideIndex={indexMedia}
-        showThumbnails={true}
-        open={isOpen}
-        lightboxIdentifier="lbox1"
-        onClose={() => {
-          setIsOpen(false);
-          setIndexMedia(0);
-        }}
-        downloadImages
-        iconColor={theme.palette.grey[400]}
-        imgAnimation="fade"
-        animateThumbnails
-        roundedImages
-        modalClose="clickOutside"
-        lightboxImgClass="slideItem"
-      />
+      <LightboxMedia openLightbox={isOpen} setOpenlightbox={setIsOpen} medias={medias} indexMedia={indexMedia} />
 
       {attachmentsOther.length > 0 && (
         <List>

@@ -481,7 +481,7 @@ const TextLine = ({ message }) => {
     if (isCode(message.text)) {
       const codeContent = message.text.slice(3, -3).trim();
       return (
-        <SyntaxHighlighter language="javascript" style={atomDark} showLineNumbers>
+        <SyntaxHighlighter language="javascript" style={atomDark} showLineNumbers customStyle={{ width: '100%' }}>
           {codeContent}
         </SyntaxHighlighter>
       );
