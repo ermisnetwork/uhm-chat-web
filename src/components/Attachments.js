@@ -96,6 +96,7 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
 export default function Attachments({ attachments }) {
   const theme = useTheme();
   const [medias, setMedias] = useState([]);
+  const [pdfData, setPdfData] = useState(null);
   const [indexMedia, setIndexMedia] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -131,8 +132,11 @@ export default function Attachments({ attachments }) {
       attachment.type !== 'image' &&
       (isAviFile(attachment) ||
         // isMovFileTooLarge(attachment) ||
-        !isThumbVideo(attachment)),
+        !isThumbVideo(attachment)) &&
+      attachment.mime_type !== 'application/pdf',
   );
+
+  const attachmentsPDF = attachments.filter(item => item.type === 'file' && item.mime_type === 'application/pdf');
 
   useEffect(() => {
     // Lọc các tệp đính kèm là hình ảnh hoặc là video không phải tệp AVI và video MOV không vượt quá 10MB
@@ -175,6 +179,27 @@ export default function Attachments({ attachments }) {
     }
   }, [attachments]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setPdfData(null);
+      setIndexMedia(0);
+    }
+  }, [isOpen]);
+
+  const onViewPDF = item => {
+    setPdfData({
+      type: MediaType.PDF,
+      src: item.asset_url,
+      description: item.title,
+    });
+    setIsOpen(true);
+    setIndexMedia(0);
+  };
+
+  const onDownloadFile = (url, fileName) => {
+    downloadFile(url, fileName);
+  };
+
   if (!attachments.length) return null;
 
   return (
@@ -183,7 +208,43 @@ export default function Attachments({ attachments }) {
         <QuiltedMediaList medias={medias} setIsOpen={setIsOpen} setIndexMedia={setIndexMedia} />
       </Stack>
 
-      <LightboxMedia openLightbox={isOpen} setOpenlightbox={setIsOpen} medias={medias} indexMedia={indexMedia} />
+      <LightboxMedia
+        openLightbox={isOpen}
+        setOpenlightbox={setIsOpen}
+        medias={pdfData ? [pdfData] : medias}
+        indexMedia={indexMedia}
+      />
+
+      {attachmentsPDF.length > 0 && (
+        <List>
+          {attachmentsPDF.map((item, index) => {
+            const lastItem = index === attachmentsPDF.length - 1;
+            return (
+              <ListItem key={index} disablePadding sx={{ marginBottom: lastItem ? '0px' : '10px' }}>
+                <Paper elevation={3} sx={{ borderRadius: '12px', width: '100%' }}>
+                  <ListItemButton onClick={() => onViewPDF(item)}>
+                    <FileTypeBadge fileName={item.title} />
+                    <ListItemText
+                      primary={item.title}
+                      secondary={formatFileSize(item.file_size)}
+                      sx={{
+                        width: 'calc(100% - 50px)',
+                        paddingLeft: '15px',
+                      }}
+                      primaryTypographyProps={{
+                        whiteSpace: 'nowrap',
+                        width: '100%',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    />
+                  </ListItemButton>
+                </Paper>
+              </ListItem>
+            );
+          })}
+        </List>
+      )}
 
       {attachmentsOther.length > 0 && (
         <List>
@@ -192,7 +253,7 @@ export default function Attachments({ attachments }) {
             return (
               <ListItem key={index} disablePadding sx={{ marginBottom: lastItem ? '0px' : '10px' }}>
                 <Paper elevation={3} sx={{ borderRadius: '12px', width: '100%' }}>
-                  <ListItemButton onClick={() => downloadFile(item.asset_url, item.title)}>
+                  <ListItemButton onClick={() => onDownloadFile(item.asset_url, item.title)}>
                     <FileTypeBadge fileName={item.title} />
                     <ListItemText
                       primary={item.title}

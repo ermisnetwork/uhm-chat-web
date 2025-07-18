@@ -289,10 +289,27 @@ a.linkUrl:last-child {
 }
 
 .yarl__thumbnails_thumbnail {
-  width: 100px;
-  height: 80px;
+  width: 80px;
+  height: 60px;
 }
 
 .yarl__thumbnails_thumbnail.yarl__thumbnails_thumbnail_active {
   border-color: #7949ec !important;
+}
+
+.pdf-viewer-container.pdfViewer {
+  width: auto;
+  height: auto;
+}
+
+.pdf-viewer-container.pdfViewer .optionBar {
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  width: auto;
+  display: flex;
+}
+
+.pdf-viewer-container.pdfViewer .optionBar .title {
+  display: none;
 }
