@@ -294,7 +294,6 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
             >
               <FriendList
                 searchQuery={searchQuery}
-                showCheckbox={true}
                 selectedUsers={selectedUsers}
                 onCheck={(user, newSelectedUsers) => {
                   setSelectedUsers(newSelectedUsers);

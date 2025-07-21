@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Stack, Typography, Box, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ChatType, ContactType } from '../../constants/commons-const';
 import ContactElement from '../../components/ContactElement';
 import BoxContainer from '../../layouts/dashboard/BoxContainer';
@@ -11,10 +11,13 @@ import useResponsive from '../../hooks/useResponsive';
 import { CaretLeft } from 'phosphor-react';
 import { useNavigate } from 'react-router-dom';
 import FriendList from '../../sections/dashboard/FriendList';
+import { SetSearchQuery } from '../../redux/slices/app';
+import { DEFAULT_PATH } from '../../config';
 
 const Contacts = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const dispatch = useDispatch();
   const { activeChannels, pendingChannels } = useSelector(state => state.channel);
   const { searchQuery } = useSelector(state => state.app);
   const { user_id } = useSelector(state => state.auth);
@@ -23,6 +26,11 @@ const Contacts = () => {
 
   const hash = window.location.hash;
   const currentHash = hash.replace('#', '');
+
+  const onSelectChannel = channel => {
+    navigate(`${DEFAULT_PATH}/${channel.type}:${channel.id}`);
+    dispatch(SetSearchQuery(''));
+  };
 
   const renderedContacts = useMemo(() => {
     let channels = [];
@@ -103,7 +111,13 @@ const Contacts = () => {
               </Typography>
               {grouped[letter].map(item => (
                 <Box key={`channel-${item.id}`} sx={{ marginBottom: '5px' }}>
-                  <ContactElement channel={item} avatarSize={60} primaryFontSize="18px" secondaryFontSize="14px" />
+                  <ContactElement
+                    channel={item}
+                    avatarSize={60}
+                    primaryFontSize="18px"
+                    secondaryFontSize="14px"
+                    onSelect={({ channel, user }) => onSelectChannel(channel)}
+                  />
                 </Box>
               ))}
             </div>
@@ -195,6 +209,7 @@ const Contacts = () => {
               avatarSize={60}
               primaryFontSize="18px"
               secondaryFontSize="14px"
+              onSelect={({ channel, user }) => onSelectChannel(channel)}
             />
           ) : (
             renderedContacts
