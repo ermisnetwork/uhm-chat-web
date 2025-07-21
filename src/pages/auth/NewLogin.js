@@ -4,7 +4,6 @@ import {
   Stack,
   Typography,
   Button,
-  Checkbox,
   InputAdornment,
   FormControlLabel,
   useTheme,
@@ -29,6 +28,7 @@ import { LocalStorageKey } from '../../constants/localStorage-const';
 import uuidv4 from '../../utils/uuidv4';
 import useResponsive from '../../hooks/useResponsive';
 import { LoadingSpinner } from '../../components/animate';
+import CustomCheckbox from '../../components/CustomCheckbox';
 
 // ----------------------------------------------------------------------
 
@@ -293,7 +293,7 @@ export default function NewLogin() {
                 helperText={errors.phone?.message}
               />
               <FormControlLabel
-                control={<Checkbox checked={agree} onChange={e => setAgree(e.target.checked)} color="primary" />}
+                control={<CustomCheckbox checked={agree} onChange={e => setAgree(e.target.checked)} color="primary" />}
                 label={
                   <span>
                     I agree to the{' '}
@@ -345,7 +345,7 @@ export default function NewLogin() {
                 helperText={errors.email?.message}
               />
               <FormControlLabel
-                control={<Checkbox checked={agree} onChange={e => setAgree(e.target.checked)} color="primary" />}
+                control={<CustomCheckbox checked={agree} onChange={e => setAgree(e.target.checked)} color="primary" />}
                 label={
                   <span>
                     I agree to the{' '}

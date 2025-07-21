@@ -9,8 +9,9 @@ import { AvatarShape } from '../constants/commons-const';
 import { isChannelDirect } from '../utils/commons';
 import useOnlineStatus from '../hooks/useOnlineStatus';
 import { SetSearchQuery } from '../redux/slices/app';
+import CustomCheckbox from './CustomCheckbox';
 
-const StyledChatBox = styled(Box)(({ theme }) => ({
+const StyledContactItem = styled(Box)(({ theme }) => ({
   width: '100%',
   borderRadius: '16px',
   position: 'relative',
@@ -24,7 +25,15 @@ const StyledChatBox = styled(Box)(({ theme }) => ({
   },
 }));
 
-const ContactElement = ({ channel }) => {
+const ContactElement = ({
+  channel,
+  avatarSize = 44,
+  primaryFontSize = '14px',
+  secondaryFontSize = '12px',
+  showCheckbox = false,
+  onCheck = () => {},
+  selectedUsers = [],
+}) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -34,20 +43,50 @@ const ContactElement = ({ channel }) => {
   const channelType = channel.data.type;
   const isDirect = isChannelDirect(channel);
 
-  const members = useMemo(() => (isDirect ? Object.values(channel.state.members) : []), [channel, isDirect]);
+  const members = useMemo(() => Object.values(channel.state.members) || [], [channel]);
   const otherMember = useMemo(() => members.find(member => member.user_id !== user_id), [members, user_id]);
-  const otherMemberId = otherMember?.user_id;
-  const onlineStatus = useOnlineStatus(isDirect ? otherMemberId : '');
+  const otherMemberId = otherMember?.user_id || '';
+  const otherMemberName = otherMember?.user?.name || otherMember.user_id || '';
+  const otherMemberAvatar = otherMember?.user?.avatar || '';
+  const onlineStatus = useOnlineStatus(otherMemberId || '');
 
-  const onLeftClick = () => {
-    navigate(`${DEFAULT_PATH}/${channelType}:${channelId}`);
-    dispatch(SetSearchQuery(''));
+  const toggleUser = (user, selectedUsers = []) => {
+    if (!user?.id) return selectedUsers;
+    if (selectedUsers.some(u => u.id === user.id)) {
+      return selectedUsers.filter(u => u.id !== user.id);
+    }
+    return [...selectedUsers, user];
+  };
+
+  const onChangeCheckbox = value => {
+    const userObj = { id: otherMemberId, name: otherMemberName, avatar: otherMemberAvatar };
+    const newSelected = toggleUser(userObj, selectedUsers);
+    onCheck(userObj, newSelected);
+  };
+
+  const onClickContactItem = () => {
+    if (showCheckbox && otherMemberId) {
+      const userObj = { id: otherMemberId, name: otherMemberName, avatar: otherMemberAvatar };
+      const newSelected = toggleUser(userObj, selectedUsers);
+      onCheck(userObj, newSelected);
+    } else {
+      navigate(`${DEFAULT_PATH}/${channelType}:${channelId}`);
+      dispatch(SetSearchQuery(''));
+    }
   };
 
   return (
-    <StyledChatBox onClick={onLeftClick}>
-      <Stack direction="row" alignItems="center" gap={2} sx={{ width: '100%' }}>
-        <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
+    <StyledContactItem onClick={onClickContactItem}>
+      <Stack direction="row" alignItems="center" gap={showCheckbox ? 1 : 2} sx={{ width: '100%' }}>
+        {showCheckbox && (
+          <CustomCheckbox
+            checked={selectedUsers.some(u => u.id === otherMemberId)}
+            onClick={e => e.stopPropagation()}
+            onChange={onChangeCheckbox}
+            sx={{ padding: 0 }}
+          />
+        )}
+        <ChannelAvatar channel={channel} width={avatarSize} height={avatarSize} shape={AvatarShape.Round} />
 
         <Stack sx={{ minWidth: 'auto', flex: 1, overflow: 'hidden', paddingLeft: !isDirect ? '10px' : '0px' }}>
           <Typography
@@ -57,7 +96,7 @@ const ContactElement = ({ channel }) => {
               display: 'block',
               alignItems: 'center',
               justifyContent: 'space-between',
-              fontSize: '18px',
+              fontSize: primaryFontSize,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -70,7 +109,7 @@ const ContactElement = ({ channel }) => {
             variant="caption"
             sx={{
               color: theme.palette.text.secondary,
-              fontSize: '14px',
+              fontSize: secondaryFontSize,
               fontWeight: 400,
             }}
           >
@@ -78,7 +117,7 @@ const ContactElement = ({ channel }) => {
           </Typography>
         </Stack>
       </Stack>
-    </StyledChatBox>
+    </StyledContactItem>
   );
 };
 

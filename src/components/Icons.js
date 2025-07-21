@@ -1711,6 +1711,100 @@ export const FlagIcon = ({ size = 24, color = 'currentColor', ...props }) => (
   </svg>
 );
 
+export const UsersIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M9.16006 10.87C9.06006 10.86 8.94006 10.86 8.83006 10.87C6.45006 10.79 4.56006 8.84 4.56006 6.44C4.56006 3.99 6.54006 2 9.00006 2C11.4501 2 13.4401 3.99 13.4401 6.44C13.4301 8.84 11.5401 10.79 9.16006 10.87Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16.41 4C18.35 4 19.91 5.57 19.91 7.5C19.91 9.39 18.41 10.93 16.54 11C16.46 10.99 16.37 10.99 16.28 11"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4.15997 14.56C1.73997 16.18 1.73997 18.82 4.15997 20.43C6.90997 22.27 11.42 22.27 14.17 20.43C16.59 18.81 16.59 16.17 14.17 14.56C11.43 12.73 6.91997 12.73 4.15997 14.56Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18.3401 20C19.0601 19.85 19.7401 19.56 20.3001 19.13C21.8601 17.96 21.8601 16.03 20.3001 14.86C19.7501 14.44 19.0801 14.16 18.3701 14"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const EditIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M13.2601 3.59924L5.0501 12.2892C4.7401 12.6192 4.4401 13.2692 4.3801 13.7192L4.0101 16.9592C3.8801 18.1292 4.7201 18.9292 5.8801 18.7292L9.1001 18.1792C9.5501 18.0992 10.1801 17.7692 10.4901 17.4292L18.7001 8.73924C20.1201 7.23924 20.7601 5.52924 18.5501 3.43924C16.3501 1.36924 14.6801 2.09924 13.2601 3.59924Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M11.8899 5.05078C12.3199 7.81078 14.5599 9.92078 17.3399 10.2008"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M3 22H21"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const CheckboxIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <rect x="0.5" y="0.5" width={23} height={23} rx="5.5" stroke={color} strokeOpacity="0.3" />
+    <defs>
+      <linearGradient
+        id="paint0_linear_5342_37572"
+        x1={0}
+        y1={0}
+        x2="14.7628"
+        y2="28.7442"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#6C39E7" stopOpacity="0.5" />
+        <stop offset={1} stopColor="#8958FF" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+export const CheckedIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <rect width={24} height={24} rx={6} fill="#7949EC" />
+    <path
+      d="M17.3334 8L10.0001 15.3333L6.66675 12"
+      stroke="white"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default {
   EditProfileIcon,
   ArchiveMinusIcon,
@@ -1741,5 +1835,9 @@ export default {
   DeviceMessageIcon,
   ChatJumpIcon,
   FlagIcon,
+  UsersIcon,
+  EditIcon,
+  CheckboxIcon,
+  CheckedIcon,
   // Add any other icons here as needed
 };

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Box, IconButton, Stack, Typography, Button, Checkbox } from '@mui/material';
+import { Box, IconButton, Stack, Typography, Button } from '@mui/material';
 import { ArrowLeft, Lock } from 'phosphor-react';
-import useResponsive from '../../hooks/useResponsive';
 import { useDispatch, useSelector } from 'react-redux';
 import { UpdateSidebarType } from '../../redux/slices/app';
 import { RoleMember, SidebarType } from '../../constants/commons-const';
@@ -11,6 +10,7 @@ import { MemberElement } from '../../components/MemberElement';
 import { LoadingButton } from '@mui/lab';
 import { ClientEvents } from '../../constants/events-const';
 import { client } from '../../client';
+import CustomCheckbox from '../../components/CustomCheckbox';
 
 const ListMember = ({ setIsShow, members }) => {
   const theme = useTheme();
@@ -107,7 +107,7 @@ const ListMember = ({ setIsShow, members }) => {
                 members.map(member => {
                   return (
                     <Box key={member.user_id} sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Checkbox
+                      <CustomCheckbox
                         sx={{ marginRight: '15px' }}
                         checked={checkedMemberIds.indexOf(member.user_id) !== -1}
                         onChange={() => onChangeMember(member.user_id)}

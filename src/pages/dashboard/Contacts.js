@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Stack, Typography, Box, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
-import { ChatType, ContactType, RoleMember } from '../../constants/commons-const';
+import { ChatType, ContactType } from '../../constants/commons-const';
 import ContactElement from '../../components/ContactElement';
 import BoxContainer from '../../layouts/dashboard/BoxContainer';
 import NoResult from '../../assets/Illustration/NoResult';
@@ -10,6 +10,7 @@ import InviteElement from '../../components/InviteElement';
 import useResponsive from '../../hooks/useResponsive';
 import { CaretLeft } from 'phosphor-react';
 import { useNavigate } from 'react-router-dom';
+import FriendList from '../../sections/dashboard/FriendList';
 
 const Contacts = () => {
   const navigate = useNavigate();
@@ -27,13 +28,7 @@ const Contacts = () => {
     let channels = [];
     const replaceHash = hash.replace('#', '');
 
-    if (replaceHash === ContactType.Friends) {
-      channels = activeChannels.filter(channel => {
-        const isDirect = channel.type === ChatType.MESSAGING;
-        const otherMember = Object.values(channel.state.members).find(member => member.user_id !== user_id);
-        return isDirect && otherMember && otherMember.channel_role === RoleMember.OWNER;
-      });
-    } else if (replaceHash === ContactType.Channels) {
+    if (replaceHash === ContactType.Channels) {
       channels = activeChannels.filter(channel => channel.type === ChatType.TEAM);
     } else if (replaceHash === ContactType.Request) {
       channels = pendingChannels;
@@ -108,7 +103,7 @@ const Contacts = () => {
               </Typography>
               {grouped[letter].map(item => (
                 <Box key={`channel-${item.id}`} sx={{ marginBottom: '5px' }}>
-                  <ContactElement channel={item} />
+                  <ContactElement channel={item} avatarSize={60} primaryFontSize="18px" secondaryFontSize="14px" />
                 </Box>
               ))}
             </div>
@@ -191,7 +186,19 @@ const Contacts = () => {
             padding: '0px 30px',
           }}
         >
-          {renderedContacts}
+          {currentHash === ContactType.Friends ? (
+            <FriendList
+              searchQuery={searchQuery}
+              noResultWidth={300}
+              noResultHeight={300}
+              noResultFontSize="20px"
+              avatarSize={60}
+              primaryFontSize="18px"
+              secondaryFontSize="14px"
+            />
+          ) : (
+            renderedContacts
+          )}
         </Stack>
       </Stack>
     </BoxContainer>
