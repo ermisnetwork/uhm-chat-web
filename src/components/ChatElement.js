@@ -14,7 +14,7 @@ import { convertMessageSystem } from '../utils/messageSystem';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../config';
 import AvatarComponent from './AvatarComponent';
-import { convertLastMessageSignal } from '../utils/messageSignal';
+import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
 import { SpearkerOffIcon } from './Icons';
@@ -82,7 +82,6 @@ const ChatElement = ({ channel }) => {
   const [isRightClick, setIsRightClick] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [lastMessageAt, setLastMessageAt] = useState('');
-  const [lastMessageUpdated, setLastMessageUpdated] = useState(''); // trick fix bug lastMessage ko được lưu khi click sang channel khác
 
   const showItemLeaveChannel = !isDirect && [RoleMember.MOD, RoleMember.MEMBER].includes(myRole);
   const showItemDeleteChannel = !isDirect && [RoleMember.OWNER].includes(myRole);
@@ -95,7 +94,7 @@ const ChatElement = ({ channel }) => {
     return inputValue;
   };
 
-  const getLastMessage = (message, isUpdated) => {
+  const getLastMessage = message => {
     if (message) {
       const date = message.updated_at ? message.updated_at : message.created_at;
       const sender = message.user;
@@ -106,43 +105,31 @@ const ChatElement = ({ channel }) => {
         const messageSystem = convertMessageSystem(message.text, users, isDirect);
         setLastMessage(`${senderName}: ${messageSystem}`);
       } else if (message.type === MessageType.Signal) {
-        const messageSignal = convertLastMessageSignal(message.text);
-        if (isUpdated) {
-          setLastMessageUpdated(messageSignal);
-        } else {
-          setLastMessage(messageSignal);
-        }
+        const messageSignal = convertMessageSignal(message.text);
+        console.log('messageSignal', messageSignal);
+
+        setLastMessage(messageSignal.text || '');
       } else if (message.type === MessageType.Sticker) {
         setLastMessage(`${senderName}: Sticker`);
       } else {
         if (message.attachments) {
           const attachmentFirst = message.attachments[0];
           const isLinkPreview = attachmentFirst.type === 'linkPreview';
-          if (isUpdated) {
-            setLastMessageUpdated(`${senderName}: ${isLinkPreview ? attachmentFirst.link_url : attachmentFirst.title}`);
-          } else {
-            setLastMessage(`${senderName}: ${isLinkPreview ? attachmentFirst.link_url : attachmentFirst.title}`);
-          }
+          setLastMessage(`${senderName}: ${isLinkPreview ? attachmentFirst.link_url : attachmentFirst.title}`);
         } else {
           const messagePreview = replaceMentionsWithNames(message.text);
-          if (isUpdated) {
-            setLastMessageUpdated(`${senderName}: ${messagePreview}`);
-          } else {
-            setLastMessage(`${senderName}: ${messagePreview}`);
-          }
+          setLastMessage(`${senderName}: ${messagePreview}`);
         }
       }
     } else {
-      // setLastMessageAt(dayjs(channel.data.created_at).format('hh:mm A'));
       setLastMessageAt(getDisplayDate(channel.data.created_at));
       setLastMessage('No messages here yet');
     }
   };
 
   useEffect(() => {
-    // get last message
-    let listMessage = channel?.state.messages || [];
-    let lastMsg = listMessage.length > 0 ? listMessage[listMessage.length - 1] : null;
+    const lastMsg =
+      channel.state.messages.length > 0 ? channel.state.messages[channel.state.messages.length - 1] : null;
     getLastMessage(lastMsg);
 
     const membership = channel.state.membership;
@@ -156,38 +143,29 @@ const ChatElement = ({ channel }) => {
 
         if (!(event.message.type === MessageType.Signal && ['1', '4'].includes(event.message.text[0]))) {
           // không cần hiển thị last message với AudioCallStarted (1) hoặc VideoCallStarted (4) khi có cuộc gọi
-          lastMsg = event.message;
-          getLastMessage(event.message, false); // listen last message
-          setLastMessageUpdated('');
+          getLastMessage(event.message);
         }
       }
     };
 
     const handleMessageUpdated = event => {
       if (event.channel_id === channel.data.id) {
-        if (lastMsg.id === event.message.id || event.message.type === MessageType.Signal) {
-          getLastMessage(event.message, true);
-        } else {
-          setLastMessageUpdated(prev => {
-            if (prev === event.message_update.text) {
-              if (event.message.type === MessageType.System) {
-                const messageSystem = convertMessageSystem(event.message.text, users, isDirect);
-                return messageSystem;
-              } else {
-                return event.message.text;
-              }
-            }
-            return prev;
-          });
-        }
+        const lastMsg =
+          channel.state.messages.length > 0 ? channel.state.messages[channel.state.messages.length - 1] : null;
+
+        console.log('----lastMsg----', lastMsg);
+        console.log('----handleMessageUpdated----', event);
+        console.log('----channel----', channel);
+
+        getLastMessage(lastMsg);
       }
     };
 
     const handleMessageDeleted = event => {
       if (event.channel_id === channel.data.id) {
-        listMessage = listMessage.filter(message => message.id !== event.message.id);
-        const newLastMessage = listMessage[listMessage.length - 1];
-        getLastMessage(newLastMessage);
+        const lastMsg =
+          channel.state.messages.length > 0 ? channel.state.messages[channel.state.messages.length - 1] : null;
+        getLastMessage(lastMsg);
       }
     };
 
@@ -373,7 +351,7 @@ const ChatElement = ({ channel }) => {
                   fontWeight: count > 0 ? 600 : 400,
                 }}
               >
-                {isBlocked ? 'You have block this user' : lastMessageUpdated ? lastMessageUpdated : lastMessage}
+                {isBlocked ? 'You have block this user' : lastMessage}
               </Typography>
 
               {count > 0 ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}

@@ -24,9 +24,8 @@ import { ChatType, EMOJI_QUICK, MessageType, TabType } from '../../constants/com
 import { convertMessageSystem } from '../../utils/messageSystem';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-import { convertLastMessageSignal } from '../../utils/messageSignal';
+import { convertMessageSignal } from '../../utils/messageSignal';
 import { UpdateMember } from '../../redux/slices/member';
-import Contacts from './Contacts';
 import Channels from './Channels';
 import SidebarContacts from './SidebarContacts';
 
@@ -191,7 +190,7 @@ const LeftPanel = () => {
           message.type === MessageType.System
             ? convertMessageSystem(message.text, users, isDirect, isNotify)
             : message.type === MessageType.Signal
-              ? convertLastMessageSignal(message.text)
+              ? convertMessageSignal(message.text).text || ''
               : message.text;
         break;
       case ClientEvents.MemberAdded:
