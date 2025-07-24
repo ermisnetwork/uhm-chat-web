@@ -76,6 +76,7 @@ const StyledTextLine = styled(Typography)(({ theme }) => ({
     borderRadius: '12px',
     backgroundColor: '#fff',
     color: '#212B36',
+    marginBottom: '5px',
     '& .linkUrl': {
       display: 'inline',
       color: 'inherit !important',

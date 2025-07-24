@@ -90,7 +90,6 @@ const NewDirectMessage = () => {
               height: '450px',
               marginRight: '-15px!important',
               paddingRight: '12px',
-              paddingBottom: '80px',
             }}
           >
             <FriendList

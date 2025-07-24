@@ -175,6 +175,27 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
     }
   }, [stickerUrl]);
 
+  useEffect(() => {
+    if (!anchorElMention) return;
+
+    const handleClickOutside = event => {
+      // Nếu click không nằm trong box mention hoặc input
+      if (
+        anchorElMention &&
+        !anchorElMention.contains(event.target) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target)
+      ) {
+        setAnchorElMention(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [anchorElMention, setAnchorElMention]);
+
   const onChangeUploadFile = (event, type) => {
     const files = Array.from(event.target.files);
     const isPhotoOrVideo = files.every(
@@ -432,17 +453,16 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
   const onKeyDown = e => {
     if (isComposing) return;
 
+    if (e.key === 'Escape' && anchorElMention) {
+      setAnchorElMention(null);
+      return;
+    }
+
     if (anchorElMention && filteredMentions.length) {
       if (e.key === 'ArrowDown') {
-        // setHighlightedIndex(prevIndex => (prevIndex < filteredMentions.length - 1 ? prevIndex + 1 : prevIndex));
-        // e.preventDefault();
-
         e.preventDefault();
         setHighlightedIndex(prev => (prev + 1) % filteredMentions.length);
       } else if (e.key === 'ArrowUp') {
-        // setHighlightedIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : prevIndex));
-        // e.preventDefault();
-
         e.preventDefault();
         setHighlightedIndex(prev => (prev - 1 + filteredMentions.length) % filteredMentions.length);
       } else if (e.key === 'Enter') {
@@ -472,8 +492,11 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
 
   const onKeyUp = e => {
     if (e.key === 'Delete' || e.key === 'Backspace') {
-      const cursorPosition = inputRef.current.selectionStart;
+      const input = inputRef.current;
+      const cursorPosition = input.selectionStart;
       let newValue = value;
+      let newCursorPos = cursorPosition;
+      let mentionRemoved = false;
 
       mentions.forEach(user => {
         const mentionIndex = newValue.indexOf(user.mentionName);
@@ -483,19 +506,45 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
           cursorPosition <= mentionIndex + user.mentionName.length
         ) {
           newValue = newValue.slice(0, mentionIndex) + newValue.slice(mentionIndex + user.mentionName.length);
-          setValue(newValue);
-
-          // Di chuyển con trỏ về vị trí mới sau khi xoá mention
-          inputRef.current.setSelectionRange(mentionIndex, mentionIndex);
+          newCursorPos = mentionIndex; // Đặt lại vị trí con trỏ tại vị trí vừa xoá mention
+          mentionRemoved = true;
         }
       });
+
+      if (mentionRemoved) {
+        setValue(newValue);
+        setTimeout(() => {
+          input.setSelectionRange(newCursorPos, newCursorPos);
+        }, 0);
+      }
+
       setSelectedMentions(prev => prev.filter(item => newValue.includes(item.mentionName)));
     }
   };
 
   const onSelectMention = mention => {
+    const input = inputRef.current;
+    const cursorPos = input.selectionStart;
+    const value = input.value;
     const mentionText = `@${mention.name.toLowerCase()}`;
-    setValue(prevValue => prevValue.replace(/@\w*$/, mentionText + ' '));
+
+    // Tìm vị trí @ gần nhất trước con trỏ
+    const beforeCursor = value.slice(0, cursorPos);
+    const match = beforeCursor.match(/@\w*$/);
+
+    if (match) {
+      const start = match.index;
+      const end = cursorPos;
+      const newValue = value.slice(0, start) + mentionText + ' ' + value.slice(end);
+
+      setValue(newValue);
+
+      // Đặt lại vị trí con trỏ sau mention vừa thêm
+      setTimeout(() => {
+        input.setSelectionRange(start + mentionText.length + 1, start + mentionText.length + 1);
+      }, 0);
+    }
+
     setSelectedMentions(prev => {
       const updatedMentions = [...prev, mention];
       const uniqueMentions = Array.from(new Map(updatedMentions.map(item => [item.id, item])).values());
@@ -562,7 +611,7 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
             ),
             endAdornment: (
               <InputAdornment position="end" sx={{ position: 'absolute', bottom: '23px', right: '15px' }}>
-                {checkDisabledButton() && (
+                {checkDisabledButton() && !isDialog && (
                   <>
                     <IconButton onClick={() => recordingBoxRef.current?.startRecording()}>
                       <MicrophoneIcon color={theme.palette.text.primary} />
@@ -623,17 +672,17 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
         />
-      </Box>
 
-      {/* --------------------mentions-------------------- */}
-      {!isDirect && (
-        <Mentions
-          filteredMentions={filteredMentions}
-          anchorEl={anchorElMention}
-          onSelectMention={onSelectMention}
-          highlightedIndex={highlightedIndex}
-        />
-      )}
+        {/* --------------------mentions-------------------- */}
+        {!isDirect && (
+          <Mentions
+            filteredMentions={filteredMentions}
+            anchorEl={anchorElMention}
+            onSelectMention={onSelectMention}
+            highlightedIndex={highlightedIndex}
+          />
+        )}
+      </Box>
     </>
   );
 };
