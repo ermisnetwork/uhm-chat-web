@@ -7,7 +7,7 @@ import ChannelAvatar from './ChannelAvatar';
 import { isChannelDirect, isPublicChannel, myRoleInChannel } from '../utils/commons';
 import { ClientEvents } from '../constants/events-const';
 import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
-import { EnvelopeSimpleOpen, PushPin, PushPinSlash, SignOut, Trash } from 'phosphor-react';
+import { EnvelopeSimpleOpen, Play, PushPin, PushPinSlash, SignOut, Trash } from 'phosphor-react';
 import { AvatarShape, ConfirmType, MessageType, RoleMember } from '../constants/commons-const';
 import { setChannelConfirm } from '../redux/slices/dialog';
 import { convertMessageSystem } from '../utils/messageSystem';
@@ -99,23 +99,73 @@ const ChatElement = ({ channel }) => {
       const date = message.updated_at ? message.updated_at : message.created_at;
       const sender = message.user;
       const senderId = sender?.id;
-      const senderName = sender?.name || senderId;
+      const isMe = user_id === senderId;
+      const senderName = isMe ? 'You' : sender?.name || senderId;
       setLastMessageAt(getDisplayDate(date));
       if (message.type === MessageType.System) {
         const messageSystem = convertMessageSystem(message.text, users, isDirect);
         setLastMessage(`${senderName}: ${messageSystem}`);
       } else if (message.type === MessageType.Signal) {
         const messageSignal = convertMessageSignal(message.text);
-        console.log('messageSignal', messageSignal);
-
         setLastMessage(messageSignal.text || '');
       } else if (message.type === MessageType.Sticker) {
         setLastMessage(`${senderName}: Sticker`);
       } else {
         if (message.attachments) {
-          const attachmentFirst = message.attachments[0];
-          const isLinkPreview = attachmentFirst.type === 'linkPreview';
-          setLastMessage(`${senderName}: ${isLinkPreview ? attachmentFirst.link_url : attachmentFirst.title}`);
+          const attachmentLast = message.attachments[message.attachments.length - 1];
+
+          const isLinkPreview = attachmentLast.type === 'linkPreview';
+          const isImage = attachmentLast.type === 'image';
+          const isVideo = attachmentLast.type === 'video';
+
+          if (isImage) {
+            setLastMessage(
+              <>
+                {`${senderName}:`}
+                <img
+                  src={attachmentLast.image_url}
+                  alt={attachmentLast.title || 'image'}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: '5px',
+                    display: 'inline-block',
+                    verticalAlign: 'top',
+                    margin: '0px 4px',
+                  }}
+                />
+                {attachmentLast.title || 'Photo'}
+              </>,
+            );
+          } else if (isVideo) {
+            setLastMessage(
+              <>
+                {`${senderName}:`}
+                <span style={{ position: 'relative', display: 'inline-block', margin: '0px 4px' }}>
+                  <img
+                    src={attachmentLast.thumb_url}
+                    alt={attachmentLast.title || 'video'}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: '5px',
+                      display: 'inline-block',
+                      verticalAlign: 'top',
+                    }}
+                  />
+                  <Play
+                    size={10}
+                    color="#fff"
+                    weight="fill"
+                    style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                  />
+                </span>
+                {attachmentLast.title || 'Video'}
+              </>,
+            );
+          } else {
+            setLastMessage(`${senderName}: ${isLinkPreview ? attachmentLast.link_url : attachmentLast.title}`);
+          }
         } else {
           const messagePreview = replaceMentionsWithNames(message.text);
           setLastMessage(`${senderName}: ${messagePreview}`);
@@ -152,11 +202,6 @@ const ChatElement = ({ channel }) => {
       if (event.channel_id === channel.data.id) {
         const lastMsg =
           channel.state.messages.length > 0 ? channel.state.messages[channel.state.messages.length - 1] : null;
-
-        console.log('----lastMsg----', lastMsg);
-        console.log('----handleMessageUpdated----', event);
-        console.log('----channel----', channel);
-
         getLastMessage(lastMsg);
       }
     };
