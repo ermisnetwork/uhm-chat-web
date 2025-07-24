@@ -37,8 +37,9 @@ const ContactElement = ({
 
   const members = useMemo(() => Object.values(channel.state.members) || [], [channel]);
   const otherMember = useMemo(() => members.find(member => member.user_id !== user_id), [members, user_id]);
+
   const otherMemberId = otherMember?.user_id || '';
-  const otherMemberName = otherMember?.user?.name || otherMember.user_id || '';
+  const otherMemberName = otherMember?.user?.name || otherMember?.user_id || '';
   const otherMemberAvatar = otherMember?.user?.avatar || '';
   const onlineStatus = useOnlineStatus(otherMemberId || '');
 
