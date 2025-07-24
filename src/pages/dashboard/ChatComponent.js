@@ -633,7 +633,7 @@ const ChatComponent = () => {
 
         if (event.member.user_id === user_id) {
           dispatch(SetIsGuest(false));
-          dispatch(AddActiveChannel(event.cid, event.type));
+          dispatch(AddActiveChannel(event.cid));
         } else {
           dispatch(WatchCurrentChannel(channelId, channelType));
         }

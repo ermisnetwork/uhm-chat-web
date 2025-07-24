@@ -68,10 +68,8 @@ const ChatElement = ({ channel }) => {
   const { currentChannel, mutedChannels } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
-
-  const channelIdSelected = currentChannel?.data.id;
-  const channelId = channel.data.id;
-  const channelType = channel.data.type;
+  const channelId = channel?.id || '';
+  const channelType = channel?.type || '';
   const isDirect = isChannelDirect(channel);
   const myRole = myRoleInChannel(channel);
   const isPublic = isPublicChannel(channel);
@@ -101,8 +99,8 @@ const ChatElement = ({ channel }) => {
     if (message) {
       const date = message.updated_at ? message.updated_at : message.created_at;
       const sender = message.user;
-      const senderName = sender ? sender?.name || sender?.id : message.user.id;
-      // setLastMessageAt(dayjs(date).format('hh:mm A'));
+      const senderId = sender?.id;
+      const senderName = sender?.name || senderId;
       setLastMessageAt(getDisplayDate(date));
       if (message.type === MessageType.System) {
         const messageSystem = convertMessageSystem(message.text, users, isDirect);
@@ -141,38 +139,32 @@ const ChatElement = ({ channel }) => {
     }
   };
 
-  // useEffect(() => {
-  //   setCount(channel.countUnread());
-  // }, [channel]);
-
   useEffect(() => {
-    if (channel) {
-      // get last message
-      let listMessage = channel?.state.messages || [];
-      let lastMsg = listMessage.length > 0 ? listMessage[listMessage.length - 1] : null;
-      getLastMessage(lastMsg);
+    // get last message
+    let listMessage = channel?.state.messages || [];
+    let lastMsg = listMessage.length > 0 ? listMessage[listMessage.length - 1] : null;
+    getLastMessage(lastMsg);
 
-      const membership = channel.state.membership;
-      const blocked = membership?.blocked ?? false;
-      setIsBlocked(blocked);
-      setCount(channel.state.unreadCount);
+    const membership = channel.state.membership;
+    const blocked = membership?.blocked ?? false;
+    setIsBlocked(blocked);
+    setCount(channel.state.unreadCount);
 
-      const handleMessageNew = event => {
-        // lastMsg = event.message;
-        // getLastMessage(event.message); // listen last message
+    const handleMessageNew = event => {
+      if (event.channel_id === channel.data.id) {
+        setCount(event.unread_count);
 
         if (!(event.message.type === MessageType.Signal && ['1', '4'].includes(event.message.text[0]))) {
+          // không cần hiển thị last message với AudioCallStarted (1) hoặc VideoCallStarted (4) khi có cuộc gọi
           lastMsg = event.message;
-          getLastMessage(lastMsg, false); // listen last message
+          getLastMessage(event.message, false); // listen last message
           setLastMessageUpdated('');
         }
+      }
+    };
 
-        if (event.channel_id === channel?.data.id) {
-          setCount(channel.state.unreadCount);
-        }
-      };
-
-      const handleMessageUpdated = event => {
+    const handleMessageUpdated = event => {
+      if (event.channel_id === channel.data.id) {
         if (lastMsg.id === event.message.id || event.message.type === MessageType.Signal) {
           getLastMessage(event.message, true);
         } else {
@@ -188,52 +180,53 @@ const ChatElement = ({ channel }) => {
             return prev;
           });
         }
-      };
+      }
+    };
 
-      const handleMessageDeleted = event => {
+    const handleMessageDeleted = event => {
+      if (event.channel_id === channel.data.id) {
         listMessage = listMessage.filter(message => message.id !== event.message.id);
         const newLastMessage = listMessage[listMessage.length - 1];
         getLastMessage(newLastMessage);
-      };
+      }
+    };
 
-      const handleMessageRead = event => {
-        if (event.user.id === user_id) {
-          setCount(0);
-        }
-      };
+    const handleMessageRead = event => {
+      if (event.user.id === user_id && event.channel_id === channel.data.id) {
+        setCount(0);
+      }
+    };
 
-      const handleMemberBlocked = event => {
-        if (event.user.id === user_id) {
-          setIsBlocked(true);
-        }
-      };
+    const handleMemberBlocked = event => {
+      if (event.user.id === user_id && event.channel_id === channel.data.id) {
+        setIsBlocked(true);
+      }
+    };
 
-      const handleMemberUnBlocked = event => {
-        if (event.user.id === user_id) {
-          setIsBlocked(false);
-        }
-      };
+    const handleMemberUnBlocked = event => {
+      if (event.user.id === user_id && event.channel_id === channel.data.id) {
+        setIsBlocked(false);
+      }
+    };
 
-      channel.on(ClientEvents.MessageNew, handleMessageNew);
-      channel.on(ClientEvents.MessageUpdated, handleMessageUpdated);
-      channel.on(ClientEvents.MessageDeleted, handleMessageDeleted);
-      channel.on(ClientEvents.MessageRead, handleMessageRead);
-      channel.on(ClientEvents.MemberBlocked, handleMemberBlocked);
-      channel.on(ClientEvents.MemberUnblocked, handleMemberUnBlocked);
-      return () => {
-        channel.off(ClientEvents.MessageNew, handleMessageNew);
-        channel.off(ClientEvents.MessageUpdated, handleMessageUpdated);
-        channel.off(ClientEvents.MessageDeleted, handleMessageDeleted);
-        channel.off(ClientEvents.MessageRead, handleMessageRead);
-        channel.off(ClientEvents.MemberBlocked, handleMemberBlocked);
-        channel.off(ClientEvents.MemberUnblocked, handleMemberUnBlocked);
-      };
-    }
-  }, [channel, user_id]);
+    client.on(ClientEvents.MessageNew, handleMessageNew);
+    client.on(ClientEvents.MessageUpdated, handleMessageUpdated);
+    client.on(ClientEvents.MessageDeleted, handleMessageDeleted);
+    client.on(ClientEvents.MessageRead, handleMessageRead);
+    client.on(ClientEvents.MemberBlocked, handleMemberBlocked);
+    client.on(ClientEvents.MemberUnblocked, handleMemberUnBlocked);
+    return () => {
+      client.off(ClientEvents.MessageNew, handleMessageNew);
+      client.off(ClientEvents.MessageUpdated, handleMessageUpdated);
+      client.off(ClientEvents.MessageDeleted, handleMessageDeleted);
+      client.off(ClientEvents.MessageRead, handleMessageRead);
+      client.off(ClientEvents.MemberBlocked, handleMemberBlocked);
+      client.off(ClientEvents.MemberUnblocked, handleMemberUnBlocked);
+    };
+  }, [channel, user_id, users.length]);
 
   const onLeftClick = () => {
-    const selectedChatId = channelIdSelected?.toString();
-    if (!isRightClick && selectedChatId !== channelId) {
+    if (!isRightClick && currentChannel?.id !== channelId) {
       navigate(`${DEFAULT_PATH}/${channelType}:${channelId}`);
       dispatch(onReplyMessage(null));
       dispatch(onEditMessage(null));
@@ -290,20 +283,14 @@ const ChatElement = ({ channel }) => {
 
   const onPinChannel = async () => {
     if (isPinned) {
-      await client.unpinChannel(channel.type, channel.id);
+      await client.unpinChannel(channelType, channelId);
     } else {
-      await client.pinChannel(channel.type, channel.id);
+      await client.pinChannel(channelType, channelId);
     }
   };
 
   const isMuted = mutedChannels.some(channel => channel.id === channelId);
-
-  const selectedChatId = channelIdSelected?.toString();
-  let isSelected = selectedChatId === channelId;
-
-  if (!selectedChatId) {
-    isSelected = false;
-  }
+  const isSelectedChannel = currentChannel?.id === channelId;
 
   return (
     <>
@@ -311,7 +298,7 @@ const ChatElement = ({ channel }) => {
         onClick={onLeftClick}
         onContextMenu={onRightClick}
         sx={{
-          backgroundColor: isSelected ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
+          backgroundColor: isSelectedChannel ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
           padding: '6px',
         }}
         gap={2}

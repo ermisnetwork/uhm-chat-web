@@ -82,12 +82,12 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
       inputRef.current.focus();
 
       if (editMessage) {
-        // Tìm các mentionId xuất hiện trong editMessage.messageText
-        const foundMentions = mentions.filter(user => editMessage.messageText.includes(user.mentionId));
+        // Tìm các mentionId xuất hiện trong editMessage.text
+        const foundMentions = mentions.filter(user => editMessage.text.includes(user.mentionId));
         setSelectedMentions(foundMentions);
 
         // Đổi value từ mentionId sang mentionName để hiển thị đúng
-        setValue(replaceMentionsWithNames(editMessage.messageText, mentions));
+        setValue(replaceMentionsWithNames(editMessage.text, mentions));
       } else if (currentChannel || quotesMessage) {
         setValue('');
       }
@@ -144,8 +144,8 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
           async function editSendNext() {
             if (index < editMessagesQueue.length) {
               const id = editMessagesQueue[index].id;
-              const text = editMessagesQueue[index].text;
-              await currentChannel?.editMessage(id, text);
+              const message = editMessagesQueue[index].message;
+              await currentChannel?.editMessage(id, message);
               index++;
               setTimeout(editSendNext, 100);
             } else {
@@ -270,6 +270,26 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
     }
   };
 
+  const getMentionsPayload = () => {
+    const mentionIds = selectedMentions.map(item => item.id);
+    const hasAll = mentionIds.includes('all');
+
+    if (hasAll) {
+      // Lọc ra các mention khác ngoài 'all'
+      const filteredMentionIds = mentionIds.filter(id => id !== 'all');
+      if (filteredMentionIds.length === 0) {
+        // Chỉ có 'all'
+        return { mentioned_all: true, mentioned_users: [] };
+      } else {
+        // Có cả 'all' và các mention khác
+        return { mentioned_all: true, mentioned_users: filteredMentionIds };
+      }
+    } else {
+      // Không có 'all'
+      return { mentioned_all: false, mentioned_users: mentionIds };
+    }
+  };
+
   const sendMessage = async () => {
     try {
       if (!canSendMessage) {
@@ -284,20 +304,27 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
       }
 
       if (editMessage) {
-        const { messageId, messageText } = editMessage;
-        const isNewText = value.trim() !== messageText;
+        const isNewText = value.trim() !== editMessage.text.trim();
 
         if (isNewText) {
-          if (!isOnline) {
-            setEditMessagesQueue(prevMessages => [...prevMessages, { id: messageId, text: value.trim() }]);
+          const payloadEdit = {
+            text: replaceMentionsWithIds(value.trim(), mentions),
+          };
+
+          if (selectedMentions.length > 0) {
+            const mentionsPayload = getMentionsPayload();
+            payloadEdit.mentioned_all = mentionsPayload.mentioned_all;
+            payloadEdit.mentioned_users = mentionsPayload.mentioned_users;
           }
 
-          const textWithMentionIds = replaceMentionsWithIds(value.trim(), mentions);
+          if (!isOnline) {
+            setEditMessagesQueue(prevMessages => [...prevMessages, { id: editMessage.id, message: payloadEdit }]);
+          }
 
           setMessages(prev => {
             return prev.map(item => {
-              if (item.id === messageId) {
-                const editMsgData = { ...item, text: textWithMentionIds };
+              if (item.id === editMessage.id) {
+                const editMsgData = { ...item, ...payloadEdit, updated_at: new Date() };
 
                 if (!isOnline) {
                   editMsgData.status = 'error';
@@ -310,7 +337,7 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
             });
           });
           onResetData();
-          await currentChannel?.editMessage(messageId, textWithMentionIds);
+          await currentChannel?.editMessage(editMessage.id, payloadEdit);
         } else {
           dispatch(onEditMessage(null));
         }
@@ -318,7 +345,7 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
         const attachments = getAttachments();
         const messageId = uuidv4();
         const payload = {
-          text: value.trim(),
+          text: replaceMentionsWithIds(value.trim(), mentions),
           attachments: attachments,
           id: messageId,
         };
@@ -328,16 +355,9 @@ const ChatFooter = ({ currentChannel, setMessages, isDialog }) => {
         }
 
         if (selectedMentions.length > 0) {
-          const mentionIds = selectedMentions.map(item => item.id);
-          if (mentionIds.includes('all')) {
-            payload.mentioned_all = true;
-            payload.mentioned_users = [];
-            payload.text = replaceMentionsWithIds(value.trim(), mentions);
-          } else {
-            payload.mentioned_all = false;
-            payload.mentioned_users = mentionIds;
-            payload.text = replaceMentionsWithIds(value.trim(), mentions);
-          }
+          const mentionsPayload = getMentionsPayload();
+          payload.mentioned_all = mentionsPayload.mentioned_all;
+          payload.mentioned_users = mentionsPayload.mentioned_users;
         }
 
         if (stickerUrl) {

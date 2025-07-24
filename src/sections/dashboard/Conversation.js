@@ -137,7 +137,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
       return;
     }
 
-    dispatch(onEditMessage({ channelType, channelId, messageId, messageText }));
+    dispatch(onEditMessage(message));
     dispatch(onReplyMessage(null));
     dispatch(SetCooldownTime(null));
     setAnchorEl(null);
