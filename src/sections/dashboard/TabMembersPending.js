@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
-import { MemberElement } from '../../components/MemberElement';
+import MemberElement from '../../components/MemberElement';
 import { TabMembers } from '../../constants/commons-const';
 
 function CustomTabPanel(props) {

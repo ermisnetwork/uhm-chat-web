@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Stack } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { MemberElement } from '../../components/MemberElement';
+import MemberElement from '../../components/MemberElement';
 import { myRoleInChannel } from '../../utils/commons';
 import { ConfirmType, RoleMember, TabMembers } from '../../constants/commons-const';
 import { setChannelConfirm } from '../../redux/slices/dialog';

@@ -48,25 +48,46 @@ import { DOMAIN_APP } from '../../config';
 import AntSwitch from '../../components/AntSwitch';
 import ChannelNotificationDialog from './ChannelNotificationDialog';
 import { AddMutedChannel, RemoveMutedChannel } from '../../redux/slices/channel';
+import useOnlineStatus from '../../hooks/useOnlineStatus';
+import { BellIcon, LinkIcon, LogoutIcon, TrashIcon, UserOctagonIcon } from '../../components/Icons';
+import ChannelInfoTab from './ChannelInfoTab';
 
 const StyledDivider = styled(Divider)(({ theme }) => ({
   marginTop: '10px !important',
 }));
 
 const StyledStackItem = styled(Stack)(({ theme }) => ({
-  marginTop: '10px !important',
+  width: '100%',
+  padding: '5px',
+  '& .MuiTypography-root': {
+    fontSize: '14px',
+    fontWeight: 600,
+  },
 }));
 
-const styleChannelName = {
-  display: '-webkit-box',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  WebkitLineClamp: 2,
-  lineClamp: 2,
-  WebkitBoxOrient: 'vertical',
-  wordBreak: 'break-word',
-  textAlign: 'center',
-};
+const StyledActionItem = styled(Stack)(({ theme }) => ({
+  width: '100%',
+  borderRadius: '10px',
+  transition: 'background-color 0.2s ease-in-out',
+  display: 'flex',
+  alignItems: 'center',
+  flexDirection: 'row',
+  padding: '5px',
+  gap: '8px',
+  '&:hover': {
+    cursor: 'pointer',
+    backgroundColor: theme.palette.divider,
+  },
+
+  '& .MuiTypography-root': {
+    fontSize: '14px',
+    fontWeight: 600,
+    minWidth: 'auto',
+    overflow: 'hidden',
+    flex: 1,
+    color: theme.palette.error.main,
+  },
+}));
 
 const EditChannel = ({ setIsEdit }) => {
   const theme = useTheme();
@@ -260,7 +281,6 @@ const styleDescription = {
 const ChannelInfo = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
-  const isDesktop = useResponsive('up', 'md');
   const { currentChannel, mutedChannels } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const myRole = myRoleInChannel(currentChannel);
@@ -272,16 +292,15 @@ const ChannelInfo = () => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [openDialogMuted, setOpenDialogMuted] = useState(false);
+  const onlineStatus = useOnlineStatus(otherMemberId || '');
 
   useEffect(() => {
     if (currentChannel) {
-      // const watchChannel = async () => {
-      //   await currentChannel.watch();
-      // };
-      // watchChannel();
-      const members = Object.keys(currentChannel.state.members);
-      const otherMemberId = members.find(member => member !== user_id);
-      setOtherMemberId(otherMemberId);
+      if (isDirect) {
+        const members = Object.keys(currentChannel.state.members);
+        const otherMemberId = members.find(member => member !== user_id);
+        setOtherMemberId(otherMemberId);
+      }
 
       setIsMuted(mutedChannels.some(item => item.id === currentChannel.id));
 
@@ -302,7 +321,6 @@ const ChannelInfo = () => {
       const handleMemberUpdated = event => {
         if (event.user.id === user_id) {
           const channelId = event.channel_id;
-          const channelType = event.channel_type;
           if (event.member.muted) {
             dispatch(AddMutedChannel(event.cid));
             dispatch(showSnackbar({ severity: 'success', message: 'Notifications have been muted' }));
@@ -326,7 +344,7 @@ const ChannelInfo = () => {
         currentChannel.off(ClientEvents.MemberUpdated, handleMemberUpdated);
       };
     }
-  }, [currentChannel, user_id, mutedChannels]);
+  }, [currentChannel, user_id, mutedChannels, isDirect]);
 
   const onChangeMute = async event => {
     const checked = event.target.checked;
@@ -337,6 +355,46 @@ const ChannelInfo = () => {
     }
   };
 
+  const onToogleBlockUser = async () => {
+    const payload = {
+      openDialog: true,
+      channel: currentChannel,
+      userId: user_id,
+      type: isBlocked ? ConfirmType.UNBLOCK : ConfirmType.BLOCK,
+    };
+    dispatch(setChannelConfirm(payload));
+  };
+
+  const onDeleteChat = () => {
+    const payload = {
+      openDialog: true,
+      channel: currentChannel,
+      userId: user_id,
+      type: ConfirmType.DELETE,
+    };
+    dispatch(setChannelConfirm(payload));
+  };
+
+  const onLeaveChannel = () => {
+    const payload = {
+      openDialog: true,
+      channel: currentChannel,
+      userId: user_id,
+      type: ConfirmType.LEAVE,
+    };
+    dispatch(setChannelConfirm(payload));
+  };
+
+  const onDeleteChannel = () => {
+    const payload = {
+      openDialog: true,
+      channel: currentChannel,
+      userId: user_id,
+      type: ConfirmType.DELETE,
+    };
+    dispatch(setChannelConfirm(payload));
+  };
+
   const fullUrl = `${DOMAIN_APP}/channels/${currentChannel?.cid}`;
   const showItemMembers = !isDirect;
   const showItemAdministrators = !isDirect && myRole === RoleMember.OWNER;
@@ -345,8 +403,9 @@ const ChannelInfo = () => {
   const showEditChannel = !isDirect && [RoleMember.OWNER, RoleMember.MOD].includes(myRole);
   const showItemLeaveChannel = !isDirect && [RoleMember.MOD, RoleMember.MEMBER].includes(myRole);
   const showItemDeleteChannel = !isDirect && [RoleMember.OWNER].includes(myRole);
-  const showItemDeleteConversation = isDirect;
+  const showItemDeleteChat = isDirect;
   const showItemKeywordFiltering = !isDirect && [RoleMember.OWNER, RoleMember.MOD].includes(myRole);
+  const showItemBlockUser = isDirect;
 
   if (!currentChannel) return null;
 
@@ -355,347 +414,259 @@ const ChannelInfo = () => {
       {isEdit ? (
         <EditChannel setIsEdit={setIsEdit} />
       ) : (
-        <>
-          <Box
-            sx={{
-              width: '100%',
-              height: '74px',
-            }}
-          >
-            <Stack
-              sx={{ height: '100%', p: 2 }}
-              direction="row"
-              alignItems={'center'}
-              justifyContent="space-between"
-              spacing={3}
+        <Stack sx={{ width: '100%', height: '100%', position: 'relative' }}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ padding: '10px 15px' }}>
+            <IconButton
+              onClick={() => {
+                dispatch(ToggleSidebar());
+              }}
             >
-              <Typography variant="subtitle2">Channel Info</Typography>
-              <IconButton
-                onClick={() => {
-                  dispatch(ToggleSidebar());
-                }}
-              >
-                <X />
+              <X size={20} color={theme.palette.text.primary} />
+            </IconButton>
+
+            {showEditChannel && (
+              <IconButton onClick={() => setIsEdit(true)}>
+                <PencilSimple size={20} color={theme.palette.text.primary} />
               </IconButton>
-            </Stack>
-          </Box>
+            )}
+          </Stack>
+
           <Stack
             className="customScrollbar"
             sx={{
-              height: 'calc(100% - 74px)',
-              position: 'relative',
-              flexGrow: 1,
               overflowY: 'auto',
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              padding: '0 24px 24px',
             }}
-            p={3}
             spacing={3}
           >
-            <Stack alignItems="center" direction="column" spacing={2} sx={{ position: 'relative' }}>
-              {showEditChannel && (
-                <IconButton
-                  aria-label="edit"
-                  sx={{ position: 'absolute', top: '-15px', right: '-15px' }}
-                  onClick={() => setIsEdit(true)}
-                >
-                  <PencilSimple size={20} />
-                </IconButton>
-              )}
-              {isPublic ? (
-                <AvatarComponent
-                  name={currentChannel.data?.name}
-                  url={currentChannel.data?.image || ''}
-                  width={80}
-                  height={80}
-                  isPublic={isPublic}
-                  openLightbox={true}
-                  shape={AvatarShape.Round}
-                />
-              ) : (
-                <ChannelAvatar
-                  channel={currentChannel}
-                  width={80}
-                  height={80}
-                  openLightbox={true}
-                  shape={AvatarShape.Round}
-                />
-              )}
-              <Stack direction="column" alignItems="center">
-                <Typography variant="article" fontWeight={600} sx={styleChannelName}>
-                  {formatString(currentChannel.data.name)}
-                </Typography>
-
-                {isPublic && (
-                  <Typography style={{ fontSize: '12px', color: theme.palette.secondary.main }} title={fullUrl}>
-                    {formatString(fullUrl, 8, 8)}
-                    <ClipboardCopy text={fullUrl} />
-                  </Typography>
-                )}
-                {isDirect ? (
-                  <Typography style={{ fontSize: '12px', color: '#666' }} title={otherMemberId}>
-                    {formatString(otherMemberId)} <ClipboardCopy text={otherMemberId} />
-                  </Typography>
+            <Stack alignItems="center" direction="column" spacing={1}>
+              {/* --------------------avatar-------------------- */}
+              <>
+                {isPublic ? (
+                  <AvatarComponent
+                    name={currentChannel.data?.name}
+                    url={currentChannel.data?.image || ''}
+                    width={130}
+                    height={130}
+                    isPublic={isPublic}
+                    openLightbox={true}
+                    shape={AvatarShape.Round}
+                  />
                 ) : (
-                  <Typography style={{ fontSize: '12px', color: '#666', wordBreak: 'break-all', ...styleDescription }}>
-                    {currentChannel.data.description}
-                  </Typography>
+                  <ChannelAvatar
+                    channel={currentChannel}
+                    width={130}
+                    height={130}
+                    openLightbox={true}
+                    shape={AvatarShape.Round}
+                  />
                 )}
-              </Stack>
+              </>
+              {/* --------------------channel name-------------------- */}
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  width: '100%',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  fontSize: '18px',
+                  fontWeight: 600,
+                  textAlign: 'center',
+                }}
+                title={currentChannel.data.name}
+              >
+                {currentChannel.data.name}
+              </Typography>
+              {/* --------------------onlineStatus or member_count-------------------- */}
+              <Typography
+                variant="caption"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontSize: '14px',
+                  textAlign: 'center',
+                  marginTop: '0px !important',
+                }}
+              >
+                {isDirect ? onlineStatus : `${currentChannel.data.member_count} members`}
+              </Typography>
+              {/* --------------------channel description-------------------- */}
+              {!isDirect && currentChannel.data.description && (
+                <Typography style={{ fontSize: '16px', textAlign: 'center', ...styleDescription }}>
+                  {currentChannel.data.description}
+                </Typography>
+              )}
+              {/* --------------------public URL or user ID-------------------- */}
+              {(isPublic || otherMemberId) && (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={1}
+                  sx={{
+                    borderRadius: '8px',
+                    padding: '10px',
+                    backgroundColor: theme.palette.background.neutral,
+                    width: '100%',
+                    marginTop: '20px !important',
+                  }}
+                >
+                  <LinkIcon color={theme.palette.text.primary} />
+                  <Typography
+                    title={isPublic ? fullUrl : otherMemberId}
+                    sx={{
+                      minWidth: 'auto',
+                      overflow: 'hidden',
+                      flex: 1,
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      fontSize: '14px',
+                      color: theme.palette.text.primary,
+                    }}
+                  >
+                    {isPublic ? fullUrl : otherMemberId}
+                  </Typography>
+                  <ClipboardCopy text={isPublic ? fullUrl : otherMemberId} />
+                </Stack>
+              )}
             </Stack>
-            <StyledDivider />
 
-            {/* ------------Mute Notifications--------------- */}
-            <>
+            <Stack spacing={2}>
+              {/* ------------Mute Notifications--------------- */}
               <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  {isMuted ? <BellSlash size={21} /> : <Bell size={21} />}
-
+                  <BellIcon color={theme.palette.text.primary} />
                   <Typography variant="subtitle2">{isMuted ? 'Unmute' : 'Mute'} Notifications</Typography>
                 </Stack>
 
-                <AntSwitch sx={{ margin: '8px 0' }} onChange={onChangeMute} checked={isMuted} />
+                <AntSwitch onChange={onChangeMute} checked={isMuted} />
               </StyledStackItem>
-              <StyledDivider />
-            </>
 
-            {/* ------------Members--------------- */}
-            {showItemMembers && (
-              <>
-                <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Users size={21} />
+              {/* ------------Block User--------------- */}
+              {showItemBlockUser && (
+                <StyledActionItem onClick={onToogleBlockUser}>
+                  <UserOctagonIcon color={theme.palette.text.primary} colorUser={theme.palette.error.main} />
+                  <Typography variant="subtitle2">{isBlocked ? 'Unblock User' : 'Block User'}</Typography>
+                </StyledActionItem>
+              )}
 
-                    <Typography variant="subtitle2">Members</Typography>
-                  </Stack>
+              {/* ------------Delete chat--------------- */}
+              {showItemDeleteChat && (
+                <StyledActionItem onClick={onDeleteChat}>
+                  <TrashIcon color={theme.palette.text.primary} />
+                  <Typography variant="subtitle2">Delete chat</Typography>
+                </StyledActionItem>
+              )}
 
-                  <IconButton
-                    onClick={() => {
-                      dispatch(UpdateSidebarType(SidebarType.Members));
-                    }}
-                  >
-                    <CaretRight />
-                  </IconButton>
-                </StyledStackItem>
-                <StyledDivider />
-              </>
-            )}
+              {/* ------------Leave channel--------------- */}
+              {showItemLeaveChannel && (
+                <StyledActionItem onClick={onLeaveChannel}>
+                  <LogoutIcon color={theme.palette.text.primary} />
+                  <Typography variant="subtitle2">Leave channel</Typography>
+                </StyledActionItem>
+              )}
 
-            {/* ------------Media & Files--------------- */}
-            <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Link size={21} />
+              {/* ------------Delete channel--------------- */}
+              {showItemDeleteChannel && (
+                <StyledActionItem onClick={onDeleteChannel}>
+                  <TrashIcon color={theme.palette.text.primary} />
+                  <Typography variant="subtitle2">Delete channel</Typography>
+                </StyledActionItem>
+              )}
 
-                <Typography variant="subtitle2">Media & Files</Typography>
-              </Stack>
-              <IconButton
-                onClick={() => {
-                  dispatch(UpdateSidebarType(SidebarType.Media));
-                }}
-              >
-                <CaretRight />
-              </IconButton>
-            </StyledStackItem>
-            <StyledDivider />
+              {/* ------------Permissions--------------- */}
+              {/* {showItemPermissions && (
+                <>
+                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <UserCircleGear size={21} />
 
-            {/* ------------Permissions--------------- */}
-            {showItemPermissions && (
-              <>
-                <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <UserCircleGear size={21} />
-
-                    <Typography variant="subtitle2">Permissions</Typography>
-                  </Stack>
-                  <IconButton
-                    onClick={() => {
-                      dispatch(UpdateSidebarType(SidebarType.Permissions));
-                    }}
-                  >
-                    <CaretRight />
-                  </IconButton>
-                </StyledStackItem>
-                <StyledDivider />
-              </>
-            )}
-
-            {/* ------------Administrators--------------- */}
-            {showItemAdministrators && (
-              <>
-                <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <LockKey size={21} />
-
-                    <Typography variant="subtitle2">Administrators</Typography>
-                  </Stack>
-                  <IconButton
-                    onClick={() => {
-                      dispatch(UpdateSidebarType(SidebarType.Administrators));
-                    }}
-                  >
-                    <CaretRight />
-                  </IconButton>
-                </StyledStackItem>
-                <StyledDivider />
-              </>
-            )}
-
-            {/* ------------Banned members--------------- */}
-            {showItemBanned && (
-              <>
-                <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <MinusCircle size={21} color="red" />
-
-                    <Typography variant="subtitle2">Banned members</Typography>
-                  </Stack>
-                  <IconButton
-                    onClick={() => {
-                      dispatch(UpdateSidebarType(SidebarType.BannedUsers));
-                    }}
-                  >
-                    <CaretRight />
-                  </IconButton>
-                </StyledStackItem>
-                <StyledDivider />
-              </>
-            )}
-
-            {/* ------------Keyword filtering--------------- */}
-            {showItemKeywordFiltering && (
-              <>
-                <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Funnel size={21} />
-                    <Typography variant="subtitle2">Keyword filtering</Typography>
-                  </Stack>
-                  <IconButton
-                    onClick={() => {
-                      dispatch(UpdateSidebarType(SidebarType.KeywordFiltering));
-                    }}
-                  >
-                    <CaretRight />
-                  </IconButton>
-                </StyledStackItem>
-                <StyledDivider />
-              </>
-            )}
-
-            {/* ------------Actions--------------- */}
-
-            {isDirect && (
-              <>
-                {!isBlocked && (
-                  <Stack direction="row" alignItems={'center'} spacing={2}>
-                    <Button
+                      <Typography variant="subtitle2">Permissions</Typography>
+                    </Stack>
+                    <IconButton
                       onClick={() => {
-                        const payload = {
-                          openDialog: true,
-                          channel: currentChannel,
-                          userId: user_id,
-                          type: ConfirmType.BLOCK,
-                        };
-                        dispatch(setChannelConfirm(payload));
+                        dispatch(UpdateSidebarType(SidebarType.Permissions));
                       }}
-                      fullWidth
-                      startIcon={<Prohibit />}
-                      variant="outlined"
-                      color="error"
                     >
-                      Block
-                    </Button>
-                  </Stack>
-                )}
+                      <CaretRight />
+                    </IconButton>
+                  </StyledStackItem>
+                  <StyledDivider />
+                </>
+              )} */}
 
-                {isBlocked && (
-                  <Stack direction="row" alignItems={'center'} spacing={2}>
-                    <Button
+              {/* ------------Administrators--------------- */}
+              {/* {showItemAdministrators && (
+                <>
+                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <LockKey size={21} />
+
+                      <Typography variant="subtitle2">Administrators</Typography>
+                    </Stack>
+                    <IconButton
                       onClick={() => {
-                        const payload = {
-                          openDialog: true,
-                          channel: currentChannel,
-                          userId: user_id,
-                          type: ConfirmType.UNBLOCK,
-                        };
-                        dispatch(setChannelConfirm(payload));
+                        dispatch(UpdateSidebarType(SidebarType.Administrators));
                       }}
-                      fullWidth
-                      startIcon={<ProhibitInset />}
-                      variant="outlined"
-                      color="error"
                     >
-                      Unblock
-                    </Button>
-                  </Stack>
-                )}
-              </>
-            )}
+                      <CaretRight />
+                    </IconButton>
+                  </StyledStackItem>
+                  <StyledDivider />
+                </>
+              )} */}
 
-            {showItemLeaveChannel && (
-              <Stack direction="row" alignItems={'center'} spacing={2}>
-                <Button
-                  onClick={() => {
-                    const payload = {
-                      openDialog: true,
-                      channel: currentChannel,
-                      userId: user_id,
-                      type: ConfirmType.LEAVE,
-                    };
-                    dispatch(setChannelConfirm(payload));
-                  }}
-                  fullWidth
-                  startIcon={<SignOut />}
-                  variant="outlined"
-                  color="error"
-                >
-                  Leave channel
-                </Button>
-              </Stack>
-            )}
+              {/* ------------Banned members--------------- */}
+              {/* {showItemBanned && (
+                <>
+                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <MinusCircle size={21} color="red" />
 
-            {showItemDeleteChannel && (
-              <Stack direction="row" alignItems={'center'} spacing={2}>
-                <Button
-                  onClick={() => {
-                    const payload = {
-                      openDialog: true,
-                      channel: currentChannel,
-                      userId: user_id,
-                      type: ConfirmType.DELETE,
-                    };
-                    dispatch(setChannelConfirm(payload));
-                  }}
-                  fullWidth
-                  startIcon={<Trash />}
-                  variant="outlined"
-                  color="error"
-                >
-                  Delete channel
-                </Button>
-              </Stack>
-            )}
+                      <Typography variant="subtitle2">Banned members</Typography>
+                    </Stack>
+                    <IconButton
+                      onClick={() => {
+                        dispatch(UpdateSidebarType(SidebarType.BannedUsers));
+                      }}
+                    >
+                      <CaretRight />
+                    </IconButton>
+                  </StyledStackItem>
+                  <StyledDivider />
+                </>
+              )} */}
 
-            {showItemDeleteConversation && (
-              <Stack direction="row" alignItems={'center'} spacing={2}>
-                <Button
-                  onClick={() => {
-                    const payload = {
-                      openDialog: true,
-                      channel: currentChannel,
-                      userId: user_id,
-                      type: ConfirmType.TRUNCATE,
-                    };
-                    dispatch(setChannelConfirm(payload));
-                  }}
-                  fullWidth
-                  startIcon={<Trash />}
-                  variant="outlined"
-                  color="error"
-                >
-                  Delete chat
-                </Button>
-              </Stack>
-            )}
+              {/* ------------Keyword filtering--------------- */}
+              {/* {showItemKeywordFiltering && (
+                <>
+                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Funnel size={21} />
+                      <Typography variant="subtitle2">Keyword filtering</Typography>
+                    </Stack>
+                    <IconButton
+                      onClick={() => {
+                        dispatch(UpdateSidebarType(SidebarType.KeywordFiltering));
+                      }}
+                    >
+                      <CaretRight />
+                    </IconButton>
+                  </StyledStackItem>
+                  <StyledDivider />
+                </>
+              )} */}
+            </Stack>
+
+            {/* ------------Channel info tab--------------- */}
+            <Stack>
+              <ChannelInfoTab />
+            </Stack>
           </Stack>
-        </>
+        </Stack>
       )}
 
       <ChannelNotificationDialog openDialogMuted={openDialogMuted} setOpenDialogMuted={setOpenDialogMuted} />

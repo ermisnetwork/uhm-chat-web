@@ -55,7 +55,7 @@ export const ArchiveMinusIcon = ({ size = 24, color = 'currentColor', ...props }
   </svg>
 );
 
-export const UserOctagonIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+export const UserOctagonIcon = ({ size = 24, color = 'currentColor', colorUser = '#7949EC', ...props }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
     <path
       d="M21.0799 8.58003V15.42C21.0799 16.54 20.4799 17.58 19.5099 18.15L13.5699 21.58C12.5999 22.14 11.3999 22.14 10.4199 21.58L4.47991 18.15C3.50991 17.59 2.90991 16.55 2.90991 15.42V8.58003C2.90991 7.46003 3.50991 6.41999 4.47991 5.84999L10.4199 2.42C11.3899 1.86 12.5899 1.86 13.5699 2.42L19.5099 5.84999C20.4799 6.41999 21.0799 7.45003 21.0799 8.58003Z"
@@ -66,14 +66,14 @@ export const UserOctagonIcon = ({ size = 24, color = 'currentColor', ...props })
     />
     <path
       d="M11.9999 10.9998C13.2867 10.9998 14.3299 9.95662 14.3299 8.6698C14.3299 7.38298 13.2867 6.33984 11.9999 6.33984C10.7131 6.33984 9.66992 7.38298 9.66992 8.6698C9.66992 9.95662 10.7131 10.9998 11.9999 10.9998Z"
-      stroke="#7949EC"
+      stroke={colorUser}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M16 16.6603C16 14.8603 14.21 13.4004 12 13.4004C9.79 13.4004 8 14.8603 8 16.6603"
-      stroke="#7949EC"
+      stroke={colorUser}
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1805,6 +1805,88 @@ export const CheckedIcon = ({ size = 24, color = 'currentColor', ...props }) => 
   </svg>
 );
 
+export const LinkIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M15.9641 6.03575C17.3451 4.65475 19.5831 4.65475 20.9641 6.03575V6.03575C22.3451 7.41675 22.3451 9.65475 20.9641 11.0357L15.0851 16.9148C13.7041 18.2958 11.4661 18.2958 10.0851 16.9148V16.9148C8.70407 15.5338 8.70407 13.2958 10.0851 11.9148L10.9641 11.0357"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8.03624 18.9636C6.65524 20.3446 4.41724 20.3446 3.03624 18.9636V18.9636C1.65524 17.5826 1.65524 15.3446 3.03624 13.9636L8.91524 8.08458C10.2962 6.70358 12.5342 6.70358 13.9152 8.08458V8.08458C15.2962 9.46558 15.2962 11.7036 13.9152 13.0846L13.0002 13.9996"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const BellIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M15.3299 18.8203C15.3299 20.6503 13.8299 22.1503 11.9999 22.1503C11.0899 22.1503 10.2499 21.7703 9.64992 21.1703C9.04992 20.5703 8.66992 19.7303 8.66992 18.8203"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+    />
+    <path d="M12 6.43945V9.76945" stroke="#7949EC" strokeWidth="1.5" strokeMiterlimit={10} strokeLinecap="round" />
+    <path
+      d="M12.0199 2C8.3399 2 5.3599 4.98 5.3599 8.66V10.76C5.3599 11.44 5.0799 12.46 4.7299 13.04L3.4599 15.16C2.6799 16.47 3.2199 17.93 4.6599 18.41C9.4399 20 14.6099 20 19.3899 18.41C20.7399 17.96 21.3199 16.38 20.5899 15.16L19.3199 13.04C18.9699 12.46 18.6899 11.43 18.6899 10.76V8.66C18.6799 5 15.6799 2 12.0199 2Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+export const TrashIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M15.543 21.0022H8.45722C7.28103 21.0022 6.30313 20.0966 6.21292 18.9239L5.24731 6.37109H18.7529L17.7873 18.9239C17.6971 20.0966 16.7192 21.0022 15.543 21.0022V21.0022Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path d="M20.0035 6.3713H3.99683" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M9.1865 2.99609H14.8138C15.4354 2.99609 15.9393 3.49998 15.9393 4.12156V6.3725H8.06104V4.12156C8.06104 3.82307 8.17961 3.5368 8.39068 3.32574C8.60174 3.11467 8.88801 2.99609 9.1865 2.99609Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9.99927 17.0022H14.0009"
+      stroke="#EB0000"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const CrownIcon = ({ size = 18, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 18 18" fill="none" {...props}>
+    <path
+      d="M12.75 16.5H5.25C4.9425 16.5 4.6875 16.245 4.6875 15.9375C4.6875 15.63 4.9425 15.375 5.25 15.375H12.75C13.0575 15.375 13.3125 15.63 13.3125 15.9375C13.3125 16.245 13.0575 16.5 12.75 16.5Z"
+      fill="#7949EC"
+    />
+    <path
+      d="M15.2624 4.1393L12.2624 6.2843C11.8649 6.5693 11.2949 6.3968 11.1224 5.9393L9.70492 2.1593C9.46492 1.5068 8.54242 1.5068 8.30242 2.1593L6.87742 5.9318C6.70492 6.3968 6.14242 6.5693 5.74492 6.2768L2.74492 4.1318C2.14492 3.7118 1.34992 4.3043 1.59742 5.0018L4.71742 13.7393C4.82242 14.0393 5.10742 14.2343 5.42242 14.2343H12.5699C12.8849 14.2343 13.1699 14.0318 13.2749 13.7393L16.3949 5.0018C16.6499 4.3043 15.8549 3.7118 15.2624 4.1393ZM10.8749 11.0618H7.12492C6.81742 11.0618 6.56242 10.8068 6.56242 10.4993C6.56242 10.1918 6.81742 9.9368 7.12492 9.9368H10.8749C11.1824 9.9368 11.4374 10.1918 11.4374 10.4993C11.4374 10.8068 11.1824 11.0618 10.8749 11.0618Z"
+      fill="#7949EC"
+    />
+  </svg>
+);
+
 export default {
   EditProfileIcon,
   ArchiveMinusIcon,
@@ -1839,5 +1921,9 @@ export default {
   EditIcon,
   CheckboxIcon,
   CheckedIcon,
+  LinkIcon,
+  BellIcon,
+  TrashIcon,
+  CrownIcon,
   // Add any other icons here as needed
 };

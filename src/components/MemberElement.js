@@ -1,16 +1,22 @@
 import React from 'react';
-import { Box, Stack, Typography, IconButton, Menu, MenuItem } from '@mui/material';
+import { Box, Stack, Typography, Menu } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import { DotsThreeVertical, LockOpen, Trash } from 'phosphor-react';
 import MemberAvatar from './MemberAvatar';
-import { formatString } from '../utils/commons';
-import { LocalStorageKey } from '../constants/localStorage-const';
 import { AvatarShape, RoleMember } from '../constants/commons-const';
+import { CrownIcon } from './Icons';
 
-const user_id = window.localStorage.getItem(LocalStorageKey.UserId);
-
-const StyledChatBox = styled(Box)(({ theme }) => ({
-  cursor: 'default',
+const StyledMemberItem = styled(Box)(({ theme }) => ({
+  width: '100%',
+  borderRadius: '16px',
+  position: 'relative',
+  transition: 'background-color 0.2s ease-in-out',
+  display: 'flex',
+  alignItems: 'center',
+  padding: '5px',
+  '&:hover': {
+    cursor: 'pointer',
+    backgroundColor: theme.palette.divider,
+  },
 }));
 
 const StyledMenu = styled(props => (
@@ -39,11 +45,20 @@ const StyledMenu = styled(props => (
   },
 }));
 
-const MemberElement = ({ data, onRemoveMember, onUnbanMember, showMenu }) => {
+const MemberElement = ({
+  member,
+  avatarSize = 44,
+  primaryFontSize = '14px',
+  secondaryFontSize = '12px',
+  data,
+  onRemoveMember,
+  onUnbanMember,
+  showMenu,
+}) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const name = data.name ? data.name : data.id;
+  const isOwner = member.channel_role === RoleMember.OWNER;
 
   const onOpenMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -69,32 +84,54 @@ const MemberElement = ({ data, onRemoveMember, onUnbanMember, showMenu }) => {
         return 'Owner';
       case RoleMember.MOD:
         return 'Mod';
+      case RoleMember.MEMBER:
+        return 'Member';
       default:
         return '';
     }
   };
 
   return (
-    <StyledChatBox
-      sx={{
-        width: '100%',
-        borderRadius: 1,
-        backgroundColor: theme.palette.background.paper,
-      }}
-      p={2}
-    >
-      <Stack direction="row" alignItems={'center'} justifyContent="space-between">
-        <Stack direction="row" alignItems={'center'} spacing={2}>
-          <MemberAvatar member={data} width={40} height={40} openLightbox={true} shape={AvatarShape.Round} />
-          <Stack spacing={0.3}>
-            <Typography variant="subtitle2">{formatString(name)}</Typography>
-            <Typography variant="subtitle2" sx={{ fontSize: '12px', color: theme.palette.grey[500], fontWeight: 400 }}>
-              {textRoleMember(data.channel_role)}
+    <StyledMemberItem>
+      <Stack direction="row" alignItems="center" gap={1} sx={{ width: '100%' }}>
+        <MemberAvatar
+          member={member.user}
+          width={avatarSize}
+          height={avatarSize}
+          openLightbox={true}
+          shape={AvatarShape.Round}
+        />
+        <Stack sx={{ minWidth: 'auto', flex: 1, overflow: 'hidden' }}>
+          <Stack direction="row" alignItems="center" gap={1}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                minWidth: 'auto',
+                overflow: 'hidden',
+                fontSize: primaryFontSize,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {member.user.name}
             </Typography>
+            {isOwner && <CrownIcon />}
           </Stack>
+
+          <Typography
+            variant="caption"
+            sx={{
+              color: isOwner ? theme.palette.primary.main : theme.palette.text.secondary,
+              fontSize: secondaryFontSize,
+              fontWeight: 400,
+            }}
+          >
+            {textRoleMember(member.channel_role)}
+          </Typography>
         </Stack>
 
-        {showMenu && (
+        {/* {showMenu && (
           <Stack direction={'row'} spacing={2} alignItems={'center'}>
             <IconButton onClick={onOpenMenu}>
               <DotsThreeVertical size={22} />
@@ -116,10 +153,10 @@ const MemberElement = ({ data, onRemoveMember, onUnbanMember, showMenu }) => {
               )}
             </StyledMenu>
           </Stack>
-        )}
+        )} */}
       </Stack>
-    </StyledChatBox>
+    </StyledMemberItem>
   );
 };
 
-export { MemberElement };
+export default MemberElement;

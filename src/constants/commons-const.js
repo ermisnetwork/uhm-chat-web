@@ -185,3 +185,10 @@ export const ContactType = {
   Channels: 'channels',
   Request: 'requests',
 };
+
+export const TabValueChannelInfo = {
+  Members: 0,
+  Media: 1,
+  Links: 2,
+  Files: 3,
+};

@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { UpdateSidebarType } from '../../redux/slices/app';
 import { RoleMember, SidebarType } from '../../constants/commons-const';
 import { getChannelMembers, getMemberInfoInChannel, handleError } from '../../utils/commons';
-import { MemberElement } from '../../components/MemberElement';
+import MemberElement from '../../components/MemberElement';
 import { LoadingButton } from '@mui/lab';
 import { ClientEvents } from '../../constants/events-const';
 import { client } from '../../client';
