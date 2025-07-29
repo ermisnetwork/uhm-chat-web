@@ -116,6 +116,7 @@ export const MessageType = {
 
 export const SidebarType = {
   Channel: 'CHANNEL',
+  ChannelType: 'CHANNEL_TYPE',
   Members: 'MEMBERS',
   Media: 'MEDIA',
   Permissions: 'PERMISSIONS',

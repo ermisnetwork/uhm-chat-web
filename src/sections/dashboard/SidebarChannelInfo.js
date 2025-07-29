@@ -1,32 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Button, Divider, IconButton, InputAdornment, Stack, Typography } from '@mui/material';
-import {
-  CaretRight,
-  X,
-  Users,
-  Link,
-  UserCircleGear,
-  LockKey,
-  MinusCircle,
-  PencilSimple,
-  ArrowLeft,
-  SignOut,
-  Trash,
-  Prohibit,
-  ProhibitInset,
-  Funnel,
-  Bell,
-  BellSlash,
-} from 'phosphor-react';
-import useResponsive from '../../hooks/useResponsive';
+import { IconButton, InputAdornment, Stack, Typography } from '@mui/material';
+import { CaretRight, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ToggleSidebar, UpdateSidebarType, showSnackbar } from '../../redux/slices/app';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import {
   checkDirectBlock,
   processImageFile,
-  formatString,
   handleError,
   isChannelDirect,
   isPublicChannel,
@@ -37,12 +18,11 @@ import ClipboardCopy from '../../components/ClipboardCopy';
 import { LoadingButton } from '@mui/lab';
 import FormProvider from '../../components/hook-form/FormProvider';
 import { RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
-import { set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { setChannelConfirm, SetOpenInviteFriendDialog } from '../../redux/slices/dialog';
 import { ClientEvents } from '../../constants/events-const';
-import RHFRadio from '../../components/hook-form/RHFRadio';
 import AvatarComponent from '../../components/AvatarComponent';
 import { DOMAIN_APP } from '../../config';
 import AntSwitch from '../../components/AntSwitch';
@@ -53,7 +33,6 @@ import {
   AdministratorsIcon,
   BannedIcon,
   BellIcon,
-  CrownIcon,
   DeviceMessageIcon,
   DocumentFilterIcon,
   EditIcon,
@@ -214,9 +193,6 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
   }, [formSubmitRef, handleSubmit, onSubmit]);
 
   useEffect(() => {
-    // const isImageObject = typeof watchValues().image === 'object';
-    // const noChanges = JSON.stringify(defaultValues) === JSON.stringify(watchValues());
-
     const noChanges =
       watchValues().name === defaultValues.name &&
       watchValues().description === defaultValues.description &&
@@ -413,7 +389,7 @@ const styleDescription = {
   wordBreak: 'break-word',
 };
 
-const ChannelInfo = () => {
+const SidebarChannelInfo = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const formSubmitRef = useRef(null);
@@ -687,6 +663,9 @@ const ChannelInfo = () => {
                 alignItems="center"
                 justifyContent={'space-between'}
                 className="hoverItem"
+                onClick={() => {
+                  dispatch(UpdateSidebarType(SidebarType.ChannelType));
+                }}
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <DeviceMessageIcon color={theme.palette.text.primary} />
@@ -920,4 +899,4 @@ const ChannelInfo = () => {
   );
 };
 
-export default ChannelInfo;
+export default SidebarChannelInfo;

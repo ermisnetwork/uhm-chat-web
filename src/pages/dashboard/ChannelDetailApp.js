@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import ChatComponent from './ChatComponent';
 import { useDispatch, useSelector } from 'react-redux';
-import ChannelInfo from '../../sections/dashboard/ChannelInfo';
 import Members from '../../sections/dashboard/Members';
 import { CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
 import ChannelPermissions from '../../sections/dashboard/ChannelPermissions';
@@ -18,6 +17,8 @@ import ChannelNotFound from '../../sections/dashboard/ChannelNotFound';
 import SidebarPanel from './SidebarPanel';
 import BoxContainer from '../../layouts/dashboard/BoxContainer';
 import { client } from '../../client';
+import SidebarChannelInfo from '../../sections/dashboard/SidebarChannelInfo';
+import SidebarChannelType from '../../sections/dashboard/SidebarChannelType';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();
@@ -52,7 +53,14 @@ const ChannelDetailApp = () => {
             case SidebarType.Channel:
               return (
                 <SidebarPanel>
-                  <ChannelInfo />
+                  <SidebarChannelInfo />
+                </SidebarPanel>
+              );
+
+            case SidebarType.ChannelType:
+              return (
+                <SidebarPanel>
+                  <SidebarChannelType />
                 </SidebarPanel>
               );
 
