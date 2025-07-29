@@ -47,7 +47,6 @@ import {
   UsersIcon,
 } from '../../components/Icons';
 import ChannelInfoTab from './ChannelInfoTab';
-import InviteFriendDialog from './InviteFriendDialog';
 
 const StyledStackItem = styled(Stack)(({ theme }) => ({
   width: '100%',
@@ -692,6 +691,9 @@ const SidebarChannelInfo = () => {
                 alignItems="center"
                 justifyContent={'space-between'}
                 className="hoverItem"
+                onClick={() => {
+                  dispatch(UpdateSidebarType(SidebarType.Members));
+                }}
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <PeopleIcon color={theme.palette.text.primary} />
@@ -894,7 +896,6 @@ const SidebarChannelInfo = () => {
       </Stack>
 
       <ChannelNotificationDialog openDialogMuted={openDialogMuted} setOpenDialogMuted={setOpenDialogMuted} />
-      <InviteFriendDialog />
     </>
   );
 };

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Stack, Typography, Menu } from '@mui/material';
+import { Box, Stack, Typography, Menu, IconButton } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import MemberAvatar from './MemberAvatar';
 import { AvatarShape, RoleMember } from '../constants/commons-const';
 import { CrownIcon } from './Icons';
+import { X } from 'phosphor-react';
 
 const StyledMemberItem = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -70,7 +71,6 @@ const MemberElement = ({
 
   const onRemove = data => {
     onRemoveMember(data);
-    onCloseMenu();
   };
 
   const onUnban = data => {
@@ -147,6 +147,17 @@ const MemberElement = ({
             {textRoleMember(member.channel_role)}
           </Typography>
         </Stack>
+
+        {!isOwner && onRemoveMember && (
+          <IconButton
+            onClick={e => {
+              e.stopPropagation();
+              onRemove(member);
+            }}
+          >
+            <X size={20} />
+          </IconButton>
+        )}
 
         {/* {showMenu && (
           <Stack direction={'row'} spacing={2} alignItems={'center'}>

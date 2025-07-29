@@ -193,3 +193,8 @@ export const TabValueChannelInfo = {
   Links: 2,
   Files: 3,
 };
+
+export const TabValueMembers = {
+  Members: 0,
+  InvitedMembers: 1,
+};
