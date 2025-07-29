@@ -20,6 +20,7 @@ const FriendList = ({
   onCheck = null,
   onSelect = () => {},
   enableUserSearch = false,
+  excludedUserIds = [],
 }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -31,9 +32,14 @@ const FriendList = ({
     return activeChannels.filter(channel => {
       const isDirect = channel.type === ChatType.MESSAGING;
       const otherMember = Object.values(channel.state.members).find(member => member.user_id !== user_id);
-      return isDirect && otherMember && otherMember.channel_role === RoleMember.OWNER;
+      return (
+        isDirect &&
+        otherMember &&
+        otherMember.channel_role === RoleMember.OWNER &&
+        !excludedUserIds.includes(otherMember.user_id)
+      );
     });
-  }, [activeChannels, user_id]);
+  }, [activeChannels, user_id, excludedUserIds]);
 
   // Gọi API tìm user nếu không có filteredChannels và enableUserSearch=true
   useEffect(() => {

@@ -57,18 +57,17 @@ const TabMembers = () => {
     owner: 1,
     moder: 2,
     member: 3,
+    pending: 4,
   };
 
-  const filteredMembers = members
-    .filter(item => item.channel_role !== RoleMember.PENDING)
-    .sort((a, b) => {
-      // So sánh theo thứ tự role trước
-      if (rolePriority[a.channel_role] !== rolePriority[b.channel_role]) {
-        return rolePriority[a.channel_role] - rolePriority[b.channel_role];
-      }
-      // Nếu role giống nhau, so sánh theo tên (alphabetical order)
-      return a.user.name.localeCompare(b.user.name);
-    });
+  const filteredMembers = members.sort((a, b) => {
+    // So sánh theo thứ tự role trước
+    if (rolePriority[a.channel_role] !== rolePriority[b.channel_role]) {
+      return rolePriority[a.channel_role] - rolePriority[b.channel_role];
+    }
+    // Nếu role giống nhau, so sánh theo tên (alphabetical order)
+    return a.user.name.localeCompare(b.user.name);
+  });
 
   return (
     <Stack spacing={1}>

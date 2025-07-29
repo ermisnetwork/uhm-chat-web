@@ -40,7 +40,7 @@ import { RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { setChannelConfirm } from '../../redux/slices/dialog';
+import { setChannelConfirm, SetOpenInviteFriendDialog } from '../../redux/slices/dialog';
 import { ClientEvents } from '../../constants/events-const';
 import RHFRadio from '../../components/hook-form/RHFRadio';
 import AvatarComponent from '../../components/AvatarComponent';
@@ -49,12 +49,9 @@ import AntSwitch from '../../components/AntSwitch';
 import ChannelNotificationDialog from './ChannelNotificationDialog';
 import { AddMutedChannel, RemoveMutedChannel } from '../../redux/slices/channel';
 import useOnlineStatus from '../../hooks/useOnlineStatus';
-import { BellIcon, LinkIcon, LogoutIcon, TrashIcon, UserOctagonIcon } from '../../components/Icons';
+import { BellIcon, LinkIcon, LogoutIcon, ProfileAddIcon, TrashIcon, UserOctagonIcon } from '../../components/Icons';
 import ChannelInfoTab from './ChannelInfoTab';
-
-const StyledDivider = styled(Divider)(({ theme }) => ({
-  marginTop: '10px !important',
-}));
+import InviteFriendDialog from './InviteFriendDialog';
 
 const StyledStackItem = styled(Stack)(({ theme }) => ({
   width: '100%',
@@ -85,7 +82,6 @@ const StyledActionItem = styled(Stack)(({ theme }) => ({
     minWidth: 'auto',
     overflow: 'hidden',
     flex: 1,
-    color: theme.palette.error.main,
   },
 }));
 
@@ -395,6 +391,10 @@ const ChannelInfo = () => {
     dispatch(setChannelConfirm(payload));
   };
 
+  const onInviteFriend = () => {
+    dispatch(SetOpenInviteFriendDialog(true));
+  };
+
   const fullUrl = `${DOMAIN_APP}/channels/${currentChannel?.cid}`;
   const showItemMembers = !isDirect;
   const showItemAdministrators = !isDirect && myRole === RoleMember.OWNER;
@@ -406,6 +406,7 @@ const ChannelInfo = () => {
   const showItemDeleteChat = isDirect;
   const showItemKeywordFiltering = !isDirect && [RoleMember.OWNER, RoleMember.MOD].includes(myRole);
   const showItemBlockUser = isDirect;
+  const showItemInviteFriend = !isDirect;
 
   if (!currentChannel) return null;
 
@@ -545,11 +546,23 @@ const ChannelInfo = () => {
                 <AntSwitch onChange={onChangeMute} checked={isMuted} />
               </StyledStackItem>
 
+              {/* ------------Invite Friend--------------- */}
+              {showItemInviteFriend && (
+                <StyledActionItem onClick={onInviteFriend}>
+                  <ProfileAddIcon color={theme.palette.text.primary} />
+                  <Typography variant="subtitle2" color={theme.palette.text.primary}>
+                    Invite Friend
+                  </Typography>
+                </StyledActionItem>
+              )}
+
               {/* ------------Block User--------------- */}
               {showItemBlockUser && (
                 <StyledActionItem onClick={onToogleBlockUser}>
                   <UserOctagonIcon color={theme.palette.text.primary} colorUser={theme.palette.error.main} />
-                  <Typography variant="subtitle2">{isBlocked ? 'Unblock User' : 'Block User'}</Typography>
+                  <Typography variant="subtitle2" color={theme.palette.error.main}>
+                    {isBlocked ? 'Unblock User' : 'Block User'}
+                  </Typography>
                 </StyledActionItem>
               )}
 
@@ -557,7 +570,9 @@ const ChannelInfo = () => {
               {showItemDeleteChat && (
                 <StyledActionItem onClick={onDeleteChat}>
                   <TrashIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Delete chat</Typography>
+                  <Typography variant="subtitle2" color={theme.palette.error.main}>
+                    Delete chat
+                  </Typography>
                 </StyledActionItem>
               )}
 
@@ -565,7 +580,9 @@ const ChannelInfo = () => {
               {showItemLeaveChannel && (
                 <StyledActionItem onClick={onLeaveChannel}>
                   <LogoutIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Leave channel</Typography>
+                  <Typography variant="subtitle2" color={theme.palette.error.main}>
+                    Leave channel
+                  </Typography>
                 </StyledActionItem>
               )}
 
@@ -573,7 +590,9 @@ const ChannelInfo = () => {
               {showItemDeleteChannel && (
                 <StyledActionItem onClick={onDeleteChannel}>
                   <TrashIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Delete channel</Typography>
+                  <Typography variant="subtitle2" color={theme.palette.error.main}>
+                    Delete channel
+                  </Typography>
                 </StyledActionItem>
               )}
 
@@ -670,6 +689,7 @@ const ChannelInfo = () => {
       )}
 
       <ChannelNotificationDialog openDialogMuted={openDialogMuted} setOpenDialogMuted={setOpenDialogMuted} />
+      <InviteFriendDialog />
     </>
   );
 };

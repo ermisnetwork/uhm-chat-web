@@ -86,8 +86,25 @@ const MemberElement = ({
         return 'Mod';
       case RoleMember.MEMBER:
         return 'Member';
+      case RoleMember.PENDING:
+        return 'Pending';
       default:
         return '';
+    }
+  };
+
+  const getColorRole = channel_role => {
+    switch (channel_role) {
+      case RoleMember.OWNER:
+        return theme.palette.primary.main;
+      case RoleMember.MOD:
+        return theme.palette.primary.main;
+      case RoleMember.MEMBER:
+        return theme.palette.text.secondary;
+      case RoleMember.PENDING:
+        return theme.palette.info.main;
+      default:
+        return theme.palette.text.primary;
     }
   };
 
@@ -122,7 +139,7 @@ const MemberElement = ({
           <Typography
             variant="caption"
             sx={{
-              color: isOwner ? theme.palette.primary.main : theme.palette.text.secondary,
+              color: getColorRole(member.channel_role),
               fontSize: secondaryFontSize,
               fontWeight: 400,
             }}
