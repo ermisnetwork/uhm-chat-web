@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Box, Stack, Typography, Menu, IconButton } from '@mui/material';
+import React from 'react';
+import { Box, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import MemberAvatar from './MemberAvatar';
 import { AvatarShape, RoleMember } from '../constants/commons-const';
-import { CrownIcon } from './Icons';
+import { CrownIcon, MinusCircleIcon } from './Icons';
 import { X } from 'phosphor-react';
 import CustomCheckbox from './CustomCheckbox';
 import { useSelector } from 'react-redux';
@@ -28,19 +28,19 @@ const MemberElement = ({
   avatarSize = 44,
   primaryFontSize = '14px',
   secondaryFontSize = '12px',
-  onRemoveMember,
-  onUnbanMember,
+  onRemoveMember = null,
+  onUnbanMember = null,
   onCheck = null,
   selectedMembers = [],
 }) => {
   const theme = useTheme();
-  const { user_id } = useSelector(state => state.auth);
   const { currentChannel } = useSelector(state => state.channel);
   const myRole = myRoleInChannel(currentChannel);
-  const [anchorEl, setAnchorEl] = useState(null);
 
   const isVisibleCrown = [RoleMember.OWNER, RoleMember.MOD].includes(member.channel_role);
-  const canShowRemove =
+  const canCheck = onCheck !== null;
+  const canUnban = onUnbanMember !== null;
+  const canRemove =
     onRemoveMember &&
     ((myRole === RoleMember.OWNER && member.channel_role !== RoleMember.OWNER) ||
       (myRole === RoleMember.MOD && ![RoleMember.OWNER, RoleMember.MOD].includes(member.channel_role)));
@@ -67,9 +67,13 @@ const MemberElement = ({
   };
 
   const onClickMemberItem = () => {
-    if (onCheck) {
+    if (canCheck) {
       const newSelected = toggleMember(member, selectedMembers);
       onCheck(member, newSelected);
+    } else if (canRemove) {
+      onRemove(member);
+    } else if (canUnban) {
+      onUnban(member);
     } else {
       onSelect(member);
     }
@@ -117,6 +121,8 @@ const MemberElement = ({
           />
         )}
 
+        {onUnbanMember && <MinusCircleIcon />}
+
         <MemberAvatar
           member={member.user}
           width={avatarSize}
@@ -154,40 +160,7 @@ const MemberElement = ({
           </Typography>
         </Stack>
 
-        {canShowRemove && (
-          <IconButton
-            onClick={e => {
-              e.stopPropagation();
-              onRemove(member);
-            }}
-          >
-            <X size={20} />
-          </IconButton>
-        )}
-
-        {/* {showMenu && (
-          <Stack direction={'row'} spacing={2} alignItems={'center'}>
-            <IconButton onClick={onOpenMenu}>
-              <DotsThreeVertical size={22} />
-            </IconButton>
-
-            <StyledMenu anchorEl={anchorEl} open={open} onClose={onCloseMenu}>
-              {onRemoveMember && (
-                <MenuItem onClick={() => onRemove(data)} sx={{ color: theme.palette.error.main }}>
-                  <Trash size={18} style={{ marginRight: 10 }} />
-                  Remove
-                </MenuItem>
-              )}
-
-              {onUnbanMember && (
-                <MenuItem onClick={() => onUnban(data)} sx={{ color: theme.palette.error.main }}>
-                  <LockOpen size={18} style={{ marginRight: 10 }} />
-                  Unban
-                </MenuItem>
-              )}
-            </StyledMenu>
-          </Stack>
-        )} */}
+        {canRemove && <X size={18} />}
       </Stack>
     </StyledMemberItem>
   );

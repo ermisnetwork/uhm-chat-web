@@ -96,6 +96,7 @@ export const ConfirmType = {
   TRUNCATE: 'truncate', // tất cả tin nhắn trong cuộc trò chuyện sẽ bị xoá, chỉ sử dụng cho channel direct
   BLOCK: 'block',
   UNBLOCK: 'unblock',
+  UNBANNED: 'unbanned',
 };
 
 export const TabType = {

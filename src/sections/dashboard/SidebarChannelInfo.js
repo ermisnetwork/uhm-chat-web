@@ -751,6 +751,9 @@ const SidebarChannelInfo = () => {
                 alignItems="center"
                 justifyContent={'space-between'}
                 className="hoverItem"
+                onClick={() => {
+                  dispatch(UpdateSidebarType(SidebarType.BannedUsers));
+                }}
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <BannedIcon color={theme.palette.text.primary} />
