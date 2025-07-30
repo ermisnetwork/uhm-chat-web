@@ -10,6 +10,7 @@ import MemberElement from '../../components/MemberElement';
 import { LoadingButton } from '@mui/lab';
 import { setChannelConfirm } from '../../redux/slices/dialog';
 import { BannedIcon } from '../../components/Icons';
+import NoResult from '../../assets/Illustration/NoResult';
 
 const ListMembers = ({ selectedMembers, setSelectedMembers }) => {
   const { currentChannel } = useSelector(state => state.channel);
@@ -41,6 +42,7 @@ const ListMembers = ({ selectedMembers, setSelectedMembers }) => {
 
 const ListBanned = ({}) => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
   const members = Object.values(currentChannel?.state?.members || {}) || [];
 
@@ -62,9 +64,40 @@ const ListBanned = ({}) => {
 
   return (
     <Stack spacing={1}>
-      {filteredAdministrators.map(member => {
-        return <MemberElement key={member.user_id} member={member} onUnbanMember={onUnbanMember} />;
-      })}
+      {filteredAdministrators.length > 0 ? (
+        filteredAdministrators.map(member => {
+          return <MemberElement key={member.user_id} member={member} onUnbanMember={onUnbanMember} />;
+        })
+      ) : (
+        <Stack
+          sx={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', mt: '30px!important' }}
+        >
+          <NoResult width={180} height={180} />
+          <Typography
+            variant="subtitle2"
+            sx={{
+              textAlign: 'center',
+              fontSize: 16,
+              color: theme.palette.text.primary,
+              fontWeight: 600,
+              marginTop: 2,
+            }}
+          >
+            No banned member!
+          </Typography>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              textAlign: 'center',
+              fontSize: 14,
+              color: theme.palette.text.secondary,
+              fontWeight: 400,
+            }}
+          >
+            Good vibes only - No ban here.
+          </Typography>
+        </Stack>
+      )}
     </Stack>
   );
 };
