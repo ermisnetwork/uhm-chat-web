@@ -617,7 +617,7 @@ const SidebarChannelInfo = () => {
                 >
                   {isPublic ? fullUrl : otherMemberId}
                 </Typography>
-                <ClipboardCopy text={isPublic ? fullUrl : otherMemberId} />
+                <ClipboardCopy text={isPublic ? fullUrl : otherMemberId} message="Copied to clipboard" />
               </Stack>
             )}
           </Stack>
