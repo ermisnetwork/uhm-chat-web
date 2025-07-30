@@ -2022,6 +2022,41 @@ export const MinusCircleIcon = ({ size = 24, color = '#EB0000', ...props }) => (
   </svg>
 );
 
+export const SmallCapsIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M1.98828 5.93031V4.42031C1.98828 3.40031 2.81828 2.57031 3.83828 2.57031H16.7583C17.7783 2.57031 18.6083 3.40031 18.6083 4.42031V5.93031"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path d="M10.3008 18.1003V3.32031" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M6.89844 18.0996H12.4784" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path
+      d="M13.6797 10.3398H20.6897C21.4197 10.3398 22.0097 10.9298 22.0097 11.6598V12.4598"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16.0781 21.4291V10.8691"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M13.9414 21.4297H18.2214"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default {
   EditProfileIcon,
   ArchiveMinusIcon,
@@ -2067,5 +2102,6 @@ export default {
   BannedIcon,
   DocumentFilterIcon,
   MinusCircleIcon,
+  SmallCapsIcon,
   // Add any other icons here as needed
 };
