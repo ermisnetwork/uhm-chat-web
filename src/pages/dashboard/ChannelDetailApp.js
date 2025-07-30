@@ -3,7 +3,6 @@ import ChatComponent from './ChatComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
 import ChannelSearch from '../../sections/dashboard/ChannelSearch';
-import ChannelKeywordFiltering from '../../sections/dashboard/ChannelKeywordFiltering';
 import { useParams, useNavigate } from 'react-router-dom';
 import { splitChannelId } from '../../utils/commons';
 import { ConnectCurrentChannel } from '../../redux/slices/channel';
@@ -19,6 +18,7 @@ import InviteFriendDialog from '../../sections/dashboard/InviteFriendDialog';
 import SidebarPermissions from '../../sections/dashboard/SidebarPermissions';
 import SidebarAdministrators from '../../sections/dashboard/SidebarAdministrators';
 import SidebarBanned from '../../sections/dashboard/SidebarBanned';
+import SidebarKeywords from '../../sections/dashboard/SidebarKeywords';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();
@@ -103,7 +103,7 @@ const ChannelDetailApp = () => {
             case SidebarType.KeywordFiltering:
               return (
                 <SidebarPanel>
-                  <ChannelKeywordFiltering />
+                  <SidebarKeywords />
                 </SidebarPanel>
               );
 

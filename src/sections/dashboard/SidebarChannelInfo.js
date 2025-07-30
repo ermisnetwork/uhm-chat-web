@@ -771,6 +771,9 @@ const SidebarChannelInfo = () => {
                 alignItems="center"
                 justifyContent={'space-between'}
                 className="hoverItem"
+                onClick={() => {
+                  dispatch(UpdateSidebarType(SidebarType.KeywordFiltering));
+                }}
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <DocumentFilterIcon color={theme.palette.text.primary} />
@@ -810,89 +813,6 @@ const SidebarChannelInfo = () => {
                 </Typography>
               </StyledActionItem>
             )}
-
-            {/* ------------Permissions--------------- */}
-            {/* {showItemPermissions && (
-                <>
-                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <UserCircleGear size={21} />
-
-                      <Typography variant="subtitle2">Permissions</Typography>
-                    </Stack>
-                    <IconButton
-                      onClick={() => {
-                        dispatch(UpdateSidebarType(SidebarType.Permissions));
-                      }}
-                    >
-                      <CaretRight />
-                    </IconButton>
-                  </StyledStackItem>
-                  <StyledDivider />
-                </>
-              )} */}
-
-            {/* ------------Administrators--------------- */}
-            {/* {showItemAdministrators && (
-                <>
-                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <LockKey size={21} />
-
-                      <Typography variant="subtitle2">Administrators</Typography>
-                    </Stack>
-                    <IconButton
-                      onClick={() => {
-                        dispatch(UpdateSidebarType(SidebarType.Administrators));
-                      }}
-                    >
-                      <CaretRight />
-                    </IconButton>
-                  </StyledStackItem>
-                  <StyledDivider />
-                </>
-              )} */}
-
-            {/* ------------Banned members--------------- */}
-            {/* {showItemBanned && (
-                <>
-                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <MinusCircle size={21} color="red" />
-
-                      <Typography variant="subtitle2">Banned members</Typography>
-                    </Stack>
-                    <IconButton
-                      onClick={() => {
-                        dispatch(UpdateSidebarType(SidebarType.BannedUsers));
-                      }}
-                    >
-                      <CaretRight />
-                    </IconButton>
-                  </StyledStackItem>
-                  <StyledDivider />
-                </>
-              )} */}
-
-            {/* ------------Keyword filtering--------------- */}
-            {/* {showItemKeywordFiltering && (
-                <>
-                  <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <Funnel size={21} />
-                      <Typography variant="subtitle2">Keyword filtering</Typography>
-                    </Stack>
-                    <IconButton
-                      onClick={() => {
-                        dispatch(UpdateSidebarType(SidebarType.KeywordFiltering));
-                      }}
-                    >
-                      <CaretRight />
-                    </IconButton>
-                  </StyledStackItem>
-                  <StyledDivider />
-                </>
-              )} */}
           </Stack>
 
           {/* ------------Channel info tab--------------- */}
