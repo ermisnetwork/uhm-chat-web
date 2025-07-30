@@ -117,7 +117,7 @@ const SidebarChannelType = () => {
             width: '100%',
             height: '100%',
             position: 'relative',
-            padding: '0 24px 24px',
+            padding: '24px',
           }}
           spacing={3}
         >

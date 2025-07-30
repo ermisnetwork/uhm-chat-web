@@ -711,6 +711,9 @@ const SidebarChannelInfo = () => {
                 alignItems="center"
                 justifyContent={'space-between'}
                 className="hoverItem"
+                onClick={() => {
+                  dispatch(UpdateSidebarType(SidebarType.Permissions));
+                }}
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <FlashCircleIcon color={theme.palette.text.primary} />

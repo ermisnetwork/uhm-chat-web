@@ -187,72 +187,70 @@ const SidebarMembers = () => {
   if (!currentChannel) return null;
 
   return (
-    <>
-      <Stack sx={{ width: '100%', height: '100%' }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ padding: '10px 15px' }}>
-          <IconButton
-            onClick={() => {
-              dispatch(UpdateSidebarType(SidebarType.Channel));
-            }}
-          >
-            <CaretLeft size={20} color={theme.palette.text.primary} />
-          </IconButton>
+    <Stack sx={{ width: '100%', height: '100%' }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ padding: '10px 15px' }}>
+        <IconButton
+          onClick={() => {
+            dispatch(UpdateSidebarType(SidebarType.Channel));
+          }}
+        >
+          <CaretLeft size={20} color={theme.palette.text.primary} />
+        </IconButton>
 
-          <Typography variant="subtitle2" sx={{ flex: 1, textAlign: 'center', fontSize: '18px' }}>
-            Members
-          </Typography>
+        <Typography variant="subtitle2" sx={{ flex: 1, textAlign: 'center', fontSize: '18px' }}>
+          Members
+        </Typography>
 
-          <IconButton
-            onClick={() => {
-              dispatch(SetOpenInviteFriendDialog(true));
-            }}
-          >
-            <ProfileAddIcon size={20} color={theme.palette.text.primary} />
-          </IconButton>
-        </Stack>
+        <IconButton
+          onClick={() => {
+            dispatch(SetOpenInviteFriendDialog(true));
+          }}
+        >
+          <ProfileAddIcon size={20} color={theme.palette.text.primary} />
+        </IconButton>
+      </Stack>
 
-        <Stack sx={{ padding: '0 24px 24px', flex: 1, minHeight: 'auto', overflow: 'hidden' }} gap={2}>
-          <Search>
-            <SearchIconWrapper>{<MagnifyingGlass size={18} />}</SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search"
-              inputProps={{ 'aria-label': 'search' }}
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              sx={{ height: '48px' }}
-              autoFocus
-            />
-          </Search>
+      <Stack sx={{ padding: '24px', flex: 1, minHeight: 'auto', overflow: 'hidden' }} gap={2}>
+        <Search>
+          <SearchIconWrapper>{<MagnifyingGlass size={18} />}</SearchIconWrapper>
+          <StyledInputBase
+            placeholder="Search"
+            inputProps={{ 'aria-label': 'search' }}
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            sx={{ height: '48px' }}
+            autoFocus
+          />
+        </Search>
 
-          <StyledTabs
-            value={tabSeledected}
-            onChange={(event, newValue) => {
-              setTabSelected(newValue);
-            }}
-            variant="standard"
-          >
-            {LIST_TAB.map((item, index) => {
-              return <Tab key={index} value={item.value} label={item.label} />;
-            })}
-          </StyledTabs>
+        <StyledTabs
+          value={tabSeledected}
+          onChange={(event, newValue) => {
+            setTabSelected(newValue);
+          }}
+          variant="standard"
+        >
+          {LIST_TAB.map((item, index) => {
+            return <Tab key={index} value={item.value} label={item.label} />;
+          })}
+        </StyledTabs>
 
-          <Stack
-            className="customScrollbar"
-            sx={{
-              overflowY: 'auto',
-              overflowX: 'hidden',
-              marginLeft: '-24px!important',
-              marginRight: '-24px!important',
-              padding: '0 24px',
-              minHeight: 'auto',
-              flex: 1,
-            }}
-          >
-            <Stack spacing={2}>{renderTabContent()}</Stack>
-          </Stack>
+        <Stack
+          className="customScrollbar"
+          sx={{
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            marginLeft: '-24px!important',
+            marginRight: '-24px!important',
+            padding: '0 24px',
+            minHeight: 'auto',
+            flex: 1,
+          }}
+        >
+          <Stack spacing={2}>{renderTabContent()}</Stack>
         </Stack>
       </Stack>
-    </>
+    </Stack>
   );
 };
 
