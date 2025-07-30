@@ -397,7 +397,7 @@ const SidebarChannelInfo = () => {
   const myRole = myRoleInChannel(currentChannel);
   const isDirect = isChannelDirect(currentChannel);
   const isPublic = isPublicChannel(currentChannel);
-  const members = isDirect ? Object.keys(currentChannel.state?.members) || [] : [];
+  const members = isDirect ? Object.keys(currentChannel.state?.members || {}) || [] : [];
   const otherMemberId = isDirect ? members.find(member => member !== user_id) : '';
 
   const [isBlocked, setIsBlocked] = useState(false);
@@ -731,6 +731,9 @@ const SidebarChannelInfo = () => {
                 alignItems="center"
                 justifyContent={'space-between'}
                 className="hoverItem"
+                onClick={() => {
+                  dispatch(UpdateSidebarType(SidebarType.Administrators));
+                }}
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <AdministratorsIcon color={theme.palette.text.primary} />

@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Stack, Typography, Menu, IconButton } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import MemberAvatar from './MemberAvatar';
 import { AvatarShape, RoleMember } from '../constants/commons-const';
 import { CrownIcon } from './Icons';
 import { X } from 'phosphor-react';
+import CustomCheckbox from './CustomCheckbox';
+import { useSelector } from 'react-redux';
+import { myRoleInChannel } from '../utils/commons';
 
 const StyledMemberItem = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -20,54 +23,27 @@ const StyledMemberItem = styled(Box)(({ theme }) => ({
   },
 }));
 
-const StyledMenu = styled(props => (
-  <Menu
-    elevation={0}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'right',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'right',
-    }}
-    {...props}
-  />
-))(({ theme }) => ({
-  '& .MuiPaper-root': {
-    borderRadius: 6,
-    marginTop: theme.spacing(1),
-    minWidth: 180,
-    boxShadow:
-      'rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
-    '& .MuiMenu-list': {
-      padding: '4px 0',
-    },
-  },
-}));
-
 const MemberElement = ({
   member,
   avatarSize = 44,
   primaryFontSize = '14px',
   secondaryFontSize = '12px',
-  data,
   onRemoveMember,
   onUnbanMember,
-  showMenu,
+  onCheck = null,
+  selectedMembers = [],
 }) => {
   const theme = useTheme();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
-  const isOwner = member.channel_role === RoleMember.OWNER;
+  const { user_id } = useSelector(state => state.auth);
+  const { currentChannel } = useSelector(state => state.channel);
+  const myRole = myRoleInChannel(currentChannel);
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const onOpenMenu = event => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const onCloseMenu = () => {
-    setAnchorEl(null);
-  };
+  const isVisibleCrown = [RoleMember.OWNER, RoleMember.MOD].includes(member.channel_role);
+  const canShowRemove =
+    onRemoveMember &&
+    ((myRole === RoleMember.OWNER && member.channel_role !== RoleMember.OWNER) ||
+      (myRole === RoleMember.MOD && ![RoleMember.OWNER, RoleMember.MOD].includes(member.channel_role)));
 
   const onRemove = data => {
     onRemoveMember(data);
@@ -75,7 +51,28 @@ const MemberElement = ({
 
   const onUnban = data => {
     onUnbanMember(data);
-    onCloseMenu();
+  };
+
+  const toggleMember = (member, selectedMembers = []) => {
+    if (!member?.user_id) return selectedMembers;
+    if (selectedMembers.some(m => m.user_id === member.user_id)) {
+      return selectedMembers.filter(m => m.user_id !== member.user_id);
+    }
+    return [...selectedMembers, member];
+  };
+
+  const onChangeCheckbox = value => {
+    const newSelected = toggleMember(member, selectedMembers);
+    onCheck(member, newSelected);
+  };
+
+  const onClickMemberItem = () => {
+    if (onCheck) {
+      const newSelected = toggleMember(member, selectedMembers);
+      onCheck(member, newSelected);
+    } else {
+      onSelect(member);
+    }
   };
 
   const textRoleMember = channel_role => {
@@ -83,7 +80,7 @@ const MemberElement = ({
       case RoleMember.OWNER:
         return 'Owner';
       case RoleMember.MOD:
-        return 'Mod';
+        return 'Moderator';
       case RoleMember.MEMBER:
         return 'Member';
       case RoleMember.PENDING:
@@ -109,8 +106,17 @@ const MemberElement = ({
   };
 
   return (
-    <StyledMemberItem>
+    <StyledMemberItem onClick={onClickMemberItem}>
       <Stack direction="row" alignItems="center" gap={1} sx={{ width: '100%' }}>
+        {onCheck && (
+          <CustomCheckbox
+            checked={selectedMembers.some(m => m.user_id === member.user_id)}
+            onClick={e => e.stopPropagation()}
+            onChange={onChangeCheckbox}
+            sx={{ padding: 0 }}
+          />
+        )}
+
         <MemberAvatar
           member={member.user}
           width={avatarSize}
@@ -133,7 +139,7 @@ const MemberElement = ({
             >
               {member.user.name}
             </Typography>
-            {isOwner && <CrownIcon />}
+            {isVisibleCrown && <CrownIcon />}
           </Stack>
 
           <Typography
@@ -148,7 +154,7 @@ const MemberElement = ({
           </Typography>
         </Stack>
 
-        {!isOwner && onRemoveMember && (
+        {canShowRemove && (
           <IconButton
             onClick={e => {
               e.stopPropagation();

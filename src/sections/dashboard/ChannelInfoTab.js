@@ -51,7 +51,7 @@ const StyledTabs = styled(Tabs)(({ theme }) => ({
 
 const TabMembers = () => {
   const { currentChannel } = useSelector(state => state.channel);
-  const members = Object.values(currentChannel.state?.members) || [];
+  const members = Object.values(currentChannel?.state?.members || {}) || [];
 
   const rolePriority = {
     owner: 1,

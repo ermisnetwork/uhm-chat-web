@@ -55,7 +55,7 @@ const TabMembers = ({ searchQuery }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
-  const members = Object.values(currentChannel.state?.members) || [];
+  const members = Object.values(currentChannel?.state?.members || {}) || [];
 
   const rolePriority = {
     owner: 1,
@@ -118,7 +118,7 @@ const TabInvitedMembers = ({ searchQuery }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
-  const members = Object.values(currentChannel.state?.members) || [];
+  const members = Object.values(currentChannel?.state?.members || {}) || [];
 
   const filteredInvitedMembers = members
     .filter(
