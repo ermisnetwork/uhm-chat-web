@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import ChatComponent from './ChatComponent';
 import { useDispatch, useSelector } from 'react-redux';
 import { CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
-import ChannelSearch from '../../sections/dashboard/ChannelSearch';
 import { useParams, useNavigate } from 'react-router-dom';
 import { splitChannelId } from '../../utils/commons';
 import { ConnectCurrentChannel } from '../../redux/slices/channel';
@@ -19,6 +18,7 @@ import SidebarPermissions from '../../sections/dashboard/SidebarPermissions';
 import SidebarAdministrators from '../../sections/dashboard/SidebarAdministrators';
 import SidebarBanned from '../../sections/dashboard/SidebarBanned';
 import SidebarKeywords from '../../sections/dashboard/SidebarKeywords';
+import SidebarSearchMessage from '../../sections/dashboard/SidebarSearchMessage';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();
@@ -96,7 +96,7 @@ const ChannelDetailApp = () => {
             case SidebarType.SearchMessage:
               return (
                 <SidebarPanel>
-                  <ChannelSearch />
+                  <SidebarSearchMessage />
                 </SidebarPanel>
               );
 
