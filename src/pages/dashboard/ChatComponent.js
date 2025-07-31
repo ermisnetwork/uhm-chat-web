@@ -254,7 +254,7 @@ const MessageList = ({
   if (messages.length === 0) return null;
 
   return (
-    <Box sx={{ padding: isMobileToLg ? '20px' : isLgToXl ? '20px 50px' : '20px 90px' }}>
+    <Box sx={{ padding: isMobileToLg ? '20px' : isLgToXl ? '40px 50px' : '40px 90px' }}>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -422,9 +422,9 @@ const MessageList = ({
                 );
               }
             })}
-          {!isGuest && <ReadBy />}
         </Stack>
       </motion.div>
+      {!isGuest && <ReadBy />}
     </Box>
   );
 };
@@ -535,12 +535,16 @@ const ChatComponent = () => {
                   return [...prev, event.message];
                 }
               });
+
+              // messageListRef.current.scrollTop = 0;
+              if (messageListRef.current) {
+                messageListRef.current.scrollTop = 0;
+              }
             }
 
             setLastReadMessageId('');
             setUnreadCount(0);
             // messageListRef.current.scrollTop = messageListRef.current?.scrollHeight;
-            messageListRef.current.scrollTop = 0;
             onSetCooldownTime(event);
             setNoMessageTitle('');
             break;

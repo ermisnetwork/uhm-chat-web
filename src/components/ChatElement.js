@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Badge, Box, Stack, Typography, Menu, MenuItem } from '@mui/material';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { SetMarkReadChannel } from '../redux/slices/channel';
+import {
+  AddUnreadChannel,
+  RemoveUnreadChannel,
+  SetMarkReadChannel,
+  UpdateUnreadChannel,
+} from '../redux/slices/channel';
 import ChannelAvatar from './ChannelAvatar';
 import { isChannelDirect, isPublicChannel, myRoleInChannel } from '../utils/commons';
 import { ClientEvents } from '../constants/events-const';
@@ -65,7 +70,7 @@ const ChatElement = ({ channel }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { currentChannel, mutedChannels } = useSelector(state => state.channel);
+  const { currentChannel, mutedChannels, unreadChannels } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
   const channelId = channel?.id || '';
@@ -195,6 +200,15 @@ const ChatElement = ({ channel }) => {
           // không cần hiển thị last message với AudioCallStarted (1) hoặc VideoCallStarted (4) khi có cuộc gọi
           getLastMessage(event.message);
         }
+
+        if (event.user.id !== user_id && unreadChannels) {
+          const existingChannel = unreadChannels.find(item => item.id === event.channel_id);
+          dispatch(
+            existingChannel && event.unread_count > 0
+              ? UpdateUnreadChannel(event.channel_id, event.unread_count, event.channel_type)
+              : AddUnreadChannel(event.channel_id, event.unread_count, event.channel_type),
+          );
+        }
       }
     };
 
@@ -217,6 +231,10 @@ const ChatElement = ({ channel }) => {
     const handleMessageRead = event => {
       if (event.user.id === user_id && event.channel_id === channel.data.id) {
         setCount(0);
+
+        if (unreadChannels.some(item => item.id === event.channel_id)) {
+          dispatch(RemoveUnreadChannel(event.channel_id));
+        }
       }
     };
 
@@ -246,7 +264,7 @@ const ChatElement = ({ channel }) => {
       client.off(ClientEvents.MemberBlocked, handleMemberBlocked);
       client.off(ClientEvents.MemberUnblocked, handleMemberUnBlocked);
     };
-  }, [channel, user_id, users.length]);
+  }, [channel, user_id, users.length, unreadChannels]);
 
   const onLeftClick = () => {
     if (!isRightClick && currentChannel?.id !== channelId) {
