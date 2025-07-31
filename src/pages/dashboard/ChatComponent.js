@@ -72,6 +72,7 @@ import { motion } from 'framer-motion';
 import UsersTyping from '../../components/UsersTyping';
 import NoMessageBox from '../../components/NoMessageBox';
 import { setSidebar, SetUserInfo } from '../../redux/slices/app';
+import TopicPanel from './TopicPanel';
 
 const StyledMessage = styled(motion(Stack))(({ theme }) => ({
   '&:hover': {
@@ -852,138 +853,144 @@ const ChatComponent = () => {
     });
   }
 
+  console.log('---currentChannel---', currentChannel);
+
   return (
-    <Stack sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
-      <ChatHeader currentChannel={currentChannel} isBlocked={isBlocked} />
+    <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+      {!isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
 
-      {currentChannel && (
-        <Box
-          sx={{
-            width: '100%',
-            position: 'absolute',
-            top: '75px',
-            zIndex: 2,
-            padding: isMobileToLg ? '4px 20px' : isLgToXl ? '4px 50px' : '4px 90px',
-          }}
-        >
-          {isAlertInvitePending && (
-            <Box sx={{ width: '100%' }}>
-              <Alert severity="info" sx={{ fontWeight: 400 }}>
-                <strong>{formatString(currentChannel?.data.name)}</strong>
-                &nbsp;needs to accept your invitation to see the messages you've sent
-              </Alert>
-            </Box>
-          )}
+      <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
+        <ChatHeader currentChannel={currentChannel} isBlocked={isBlocked} />
 
-          <PinnedMessages />
-
-          {(showChipUnread || unreadCount >= MESSAGE_LIMIT) && (
-            <Stack direction="row" alignItems="center" justifyContent="center">
-              <Chip
-                label={`${unreadCount} Unread messages`}
-                color="primary"
-                onClick={onScrollToFirstUnread}
-                onDelete={onDeleteUnread}
-              />
-            </Stack>
-          )}
-        </Box>
-      )}
-
-      <Dropzone onDrop={onDropFiles} noClick noKeyboard noDragEventsBubbling>
-        {({ getRootProps, isDragActive }) => (
+        {currentChannel && (
           <Box
-            {...getRootProps()}
             sx={{
-              position: 'relative',
-              overflow: 'hidden',
-              display: 'flex',
-              minWidth: 'auto',
-              minHeight: 'auto',
-              flex: 1,
+              width: '100%',
+              position: 'absolute',
+              top: '75px',
+              zIndex: 2,
+              padding: isMobileToLg ? '4px 20px' : isLgToXl ? '4px 50px' : '4px 90px',
             }}
-            className={`${isDragActive ? 'isDragActive' : ''}`}
           >
-            <Box
-              id="scrollableDiv"
-              className="customScrollbar"
-              ref={messageListRef}
-              width={'100%'}
-              sx={{
-                position: 'relative',
-                flexGrow: 1,
-                overflowY: isBlocked ? 'hidden' : 'auto',
-                overflowX: 'hidden',
-                display: 'flex',
-                flexDirection: 'column-reverse',
-              }}
-            >
-              {currentChannel && (
-                <InfiniteScroll
-                  dataLength={messages.length}
-                  next={fetchMoreMessages}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column-reverse',
-                    position: 'relative',
-                    overflowX: 'hidden',
-                  }}
-                  inverse={true}
-                  hasMore={true}
-                  loader={
-                    loadingMore && (
-                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-                        <LoadingSpinner />
-                      </div>
-                    )
-                  }
-                  scrollableTarget="scrollableDiv"
-                  scrollThreshold={0.95}
-                >
-                  {/* <SimpleBarStyle timeout={500} clickOnTrack={false}> */}
-                  <MessageList
-                    messageListRef={messageListRef}
-                    messages={addDateLabels(messages)}
-                    lastReadMessageId={lastReadMessageId}
-                    targetId={targetId}
-                    setTargetId={setTargetId}
-                    isDirect={isDirect}
-                    setShowChipUnread={setShowChipUnread}
-                    onScrollToReplyMsg={onScrollToReplyMsg}
-                    highlightMsg={highlightMsg}
-                    setHighlightMsg={setHighlightMsg}
-                  />
-                  {/* </SimpleBarStyle> */}
-                </InfiniteScroll>
-              )}
+            {isAlertInvitePending && (
+              <Box sx={{ width: '100%' }}>
+                <Alert severity="info" sx={{ fontWeight: 400 }}>
+                  <strong>{formatString(currentChannel?.data.name)}</strong>
+                  &nbsp;needs to accept your invitation to see the messages you've sent
+                </Alert>
+              </Box>
+            )}
 
-              {noMessageTitle && <NoMessageBox channel={currentChannel} />}
-            </Box>
+            <PinnedMessages />
+
+            {(showChipUnread || unreadCount >= MESSAGE_LIMIT) && (
+              <Stack direction="row" alignItems="center" justifyContent="center">
+                <Chip
+                  label={`${unreadCount} Unread messages`}
+                  color="primary"
+                  onClick={onScrollToFirstUnread}
+                  onDelete={onDeleteUnread}
+                />
+              </Stack>
+            )}
           </Box>
         )}
-      </Dropzone>
 
-      {currentChannel ? <ScrollToBottom messageListRef={messageListRef} /> : null}
-      {!isGuest && (
-        <Box
-          sx={{
-            padding: '15px',
-            position: 'relative',
-          }}
-        >
-          {usersTyping && usersTyping.length > 0 && <UsersTyping usersTyping={usersTyping} />}
-          <ChatFooter currentChannel={currentChannel} setMessages={setMessages} isDialog={false} />
-        </Box>
-      )}
-      {isPendingInvite && <ChannelInvitation />}
-      {deleteMessage.openDialog && <DeleteMessageDialog />}
-      {forwardMessage.openDialog && <ForwardMessageDialog />}
-      {!isDirect && <BannedBackdrop />}
-      {isDirect && <BlockedBackdrop />}
-      <MessagesHistoryDialog />
-      {filesMessage.openDialog && <UploadFilesDialog setMessages={setMessages} />}
-      <CreatePollDialog />
-      <PollResultDialog />
+        <Dropzone onDrop={onDropFiles} noClick noKeyboard noDragEventsBubbling>
+          {({ getRootProps, isDragActive }) => (
+            <Box
+              {...getRootProps()}
+              sx={{
+                position: 'relative',
+                overflow: 'hidden',
+                display: 'flex',
+                minWidth: 'auto',
+                minHeight: 'auto',
+                flex: 1,
+              }}
+              className={`${isDragActive ? 'isDragActive' : ''}`}
+            >
+              <Box
+                id="scrollableDiv"
+                className="customScrollbar"
+                ref={messageListRef}
+                width={'100%'}
+                sx={{
+                  position: 'relative',
+                  flexGrow: 1,
+                  overflowY: isBlocked ? 'hidden' : 'auto',
+                  overflowX: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column-reverse',
+                }}
+              >
+                {currentChannel && (
+                  <InfiniteScroll
+                    dataLength={messages.length}
+                    next={fetchMoreMessages}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column-reverse',
+                      position: 'relative',
+                      overflowX: 'hidden',
+                    }}
+                    inverse={true}
+                    hasMore={true}
+                    loader={
+                      loadingMore && (
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+                          <LoadingSpinner />
+                        </div>
+                      )
+                    }
+                    scrollableTarget="scrollableDiv"
+                    scrollThreshold={0.95}
+                  >
+                    {/* <SimpleBarStyle timeout={500} clickOnTrack={false}> */}
+                    <MessageList
+                      messageListRef={messageListRef}
+                      messages={addDateLabels(messages)}
+                      lastReadMessageId={lastReadMessageId}
+                      targetId={targetId}
+                      setTargetId={setTargetId}
+                      isDirect={isDirect}
+                      setShowChipUnread={setShowChipUnread}
+                      onScrollToReplyMsg={onScrollToReplyMsg}
+                      highlightMsg={highlightMsg}
+                      setHighlightMsg={setHighlightMsg}
+                    />
+                    {/* </SimpleBarStyle> */}
+                  </InfiniteScroll>
+                )}
+
+                {noMessageTitle && <NoMessageBox channel={currentChannel} />}
+              </Box>
+            </Box>
+          )}
+        </Dropzone>
+
+        {currentChannel ? <ScrollToBottom messageListRef={messageListRef} /> : null}
+        {!isGuest && (
+          <Box
+            sx={{
+              padding: '15px',
+              position: 'relative',
+            }}
+          >
+            {usersTyping && usersTyping.length > 0 && <UsersTyping usersTyping={usersTyping} />}
+            <ChatFooter currentChannel={currentChannel} setMessages={setMessages} isDialog={false} />
+          </Box>
+        )}
+        {isPendingInvite && <ChannelInvitation />}
+        {deleteMessage.openDialog && <DeleteMessageDialog />}
+        {forwardMessage.openDialog && <ForwardMessageDialog />}
+        {!isDirect && <BannedBackdrop />}
+        {isDirect && <BlockedBackdrop />}
+        <MessagesHistoryDialog />
+        {filesMessage.openDialog && <UploadFilesDialog setMessages={setMessages} />}
+        <CreatePollDialog />
+        <PollResultDialog />
+      </Stack>
     </Stack>
   );
 };

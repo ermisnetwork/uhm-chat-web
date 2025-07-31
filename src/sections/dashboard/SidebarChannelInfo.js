@@ -42,6 +42,7 @@ import {
   LogoutIcon,
   PeopleIcon,
   ProfileAddIcon,
+  StickyNoteIcon,
   TrashIcon,
   UserOctagonIcon,
   UsersIcon,
@@ -405,6 +406,7 @@ const SidebarChannelInfo = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
+  const enableTopics = currentChannel?.data?.topics_enabled;
 
   useEffect(() => {
     if (currentChannel) {
@@ -526,6 +528,7 @@ const SidebarChannelInfo = () => {
   const showItemBlockUser = isDirect;
   const showItemInviteFriend = !isDirect && !isEditing;
   const showItemChannelType = !isDirect && isEditing;
+  const showItemChannelTopics = !isDirect && isEditing;
 
   if (!currentChannel) return null;
 
@@ -677,6 +680,35 @@ const SidebarChannelInfo = () => {
                     sx={{ fontWeight: `400 !important` }}
                   >
                     {isPublic ? 'Public' : 'Private'}
+                  </Typography>
+                  <CaretRight size={20} />
+                </Stack>
+              </StyledStackItem>
+            )}
+
+            {/* ------------Channel Topics--------------- */}
+            {showItemChannelTopics && (
+              <StyledStackItem
+                direction="row"
+                alignItems="center"
+                justifyContent={'space-between'}
+                className="hoverItem"
+                onClick={() => {
+                  dispatch(UpdateSidebarType(SidebarType.ChannelTopics));
+                }}
+              >
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <StickyNoteIcon color={theme.palette.text.primary} />
+                  <Typography variant="subtitle2">Channel Topics</Typography>
+                </Stack>
+
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Typography
+                    variant="subtitle2"
+                    color={theme.palette.text.secondary}
+                    sx={{ fontWeight: `400 !important` }}
+                  >
+                    {enableTopics ? 'Enabled' : 'Disabled'}
                   </Typography>
                   <CaretRight size={20} />
                 </Stack>

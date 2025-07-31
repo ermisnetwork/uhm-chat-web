@@ -126,6 +126,7 @@ export const SidebarType = {
   SearchMessage: 'SEARCH_MESSAGE',
   KeywordFiltering: 'KEYWORD_FILTERING',
   UserInfo: 'USER_INFO',
+  ChannelTopics: 'CHANNEL_TOPICS',
 };
 
 export const TabMembers = {

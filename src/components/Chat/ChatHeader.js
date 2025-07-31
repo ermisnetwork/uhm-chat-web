@@ -93,13 +93,13 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
                 </IconButton>
               )}
 
-              <Box sx={{ width: '40px' }}>
+              <Box sx={{ width: '60px' }}>
                 {isPublic ? (
                   <AvatarComponent
                     name={currentChannel.data?.name}
                     url={currentChannel.data?.image || ''}
-                    width={40}
-                    height={40}
+                    width={60}
+                    height={60}
                     isPublic={isPublic}
                     openLightbox={true}
                     shape={AvatarShape.Round}
@@ -107,8 +107,8 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
                 ) : (
                   <ChannelAvatar
                     channel={currentChannel}
-                    width={40}
-                    height={40}
+                    width={60}
+                    height={60}
                     openLightbox={true}
                     shape={AvatarShape.Round}
                   />

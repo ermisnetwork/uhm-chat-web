@@ -2087,6 +2087,124 @@ export const IdentityIcon = ({ size = 24, color = 'currentColor', ...props }) =>
   </svg>
 );
 
+export const StickyNoteIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M7 10.5H15"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7 14.5H12"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M15 21.5H9C4 21.5 3 19.44 3 15.32V9.15C3 4.45 4.67 3.19 8 3H16C19.33 3.18 21 4.45 21 9.15V15.5"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeMiterlimit={10}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M21 15.5L15 21.5V18.5C15 16.5 16 15.5 18 15.5H21Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const DotsThreeIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M11.5628 12.0017C11.5628 12.2432 11.7588 12.4392 12.0003 12.4368C12.2418 12.4368 12.4378 12.2408 12.4378 11.9993C12.4378 11.7578 12.2418 11.5618 12.0003 11.5618C11.7588 11.563 11.5628 11.759 11.5628 12.0017"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M11.5628 7.3337C11.5628 7.5752 11.7588 7.7712 12.0003 7.76887C12.2418 7.76887 12.4378 7.57287 12.4378 7.33137C12.4378 7.08987 12.2418 6.89387 12.0003 6.89387C11.7588 6.89504 11.5628 7.09104 11.5628 7.3337"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M11.5628 16.6677C11.5628 16.9092 11.7588 17.1052 12.0003 17.1029C12.2418 17.1029 12.4378 16.9069 12.4378 16.6654C12.4378 16.4239 12.2418 16.2279 12.0003 16.2279C11.7588 16.229 11.5628 16.425 11.5628 16.6677"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M22.5 6.16667V17.8333C22.5 20.4105 20.4105 22.5 17.8333 22.5H6.16667C3.5895 22.5 1.5 20.4105 1.5 17.8333V6.16667C1.5 3.5895 3.5895 1.5 6.16667 1.5H17.8333C20.4105 1.5 22.5 3.5895 22.5 6.16667Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const InfoIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M16.0015 21.0036H7.99818C5.23603 21.0036 2.99609 18.7637 2.99609 16.0015V7.99818C2.99609 5.23603 5.23603 2.99609 7.99818 2.99609H16.0015C18.7637 2.99609 21.0036 5.23603 21.0036 7.99818V16.0015C21.0036 18.7637 18.7637 21.0036 16.0015 21.0036Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M11.9992 7.99815C11.8612 7.99815 11.7491 8.1102 11.7501 8.24826C11.7501 8.38631 11.8622 8.49836 12.0002 8.49836C12.1383 8.49836 12.2503 8.38631 12.2503 8.24826C12.2503 8.1102 12.1383 7.99815 11.9992 7.99815"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12.2504 16.1856V11.4336H11.25"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const SearchIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M19 19.0009L15.71 15.7109"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M15.7138 6.8382C18.1647 9.28913 18.1647 13.2629 15.7138 15.7138C13.2629 18.1647 9.28913 18.1647 6.8382 15.7138C4.38727 13.2629 4.38727 9.28913 6.8382 6.8382C9.28913 4.38727 13.2629 4.38727 15.7138 6.8382"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default {
   EditProfileIcon,
   ArchiveMinusIcon,
@@ -2134,5 +2252,9 @@ export default {
   MinusCircleIcon,
   SmallCapsIcon,
   IdentityIcon,
+  StickyNoteIcon,
+  DotsThreeIcon,
+  InfoIcon,
+  SearchIcon,
   // Add any other icons here as needed
 };

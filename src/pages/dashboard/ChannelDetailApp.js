@@ -20,6 +20,7 @@ import SidebarBanned from '../../sections/dashboard/SidebarBanned';
 import SidebarKeywords from '../../sections/dashboard/SidebarKeywords';
 import SidebarSearchMessage from '../../sections/dashboard/SidebarSearchMessage';
 import SidebarUserInfo from '../../sections/dashboard/SidebarUserInfo';
+import SidebarChannelTopic from '../../sections/dashboard/SidebarChannelTopic';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();
@@ -111,6 +112,12 @@ const ChannelDetailApp = () => {
               return (
                 <SidebarPanel>
                   <SidebarUserInfo />
+                </SidebarPanel>
+              );
+            case SidebarType.ChannelTopics:
+              return (
+                <SidebarPanel>
+                  <SidebarChannelTopic />
                 </SidebarPanel>
               );
 
