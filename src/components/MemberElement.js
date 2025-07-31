@@ -30,11 +30,14 @@ const MemberElement = ({
   secondaryFontSize = '12px',
   onRemoveMember = null,
   onUnbanMember = null,
+  onSelectMember = null,
   onCheck = null,
   selectedMembers = [],
 }) => {
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
+  const { user_id } = useSelector(state => state.auth);
+
   const myRole = myRoleInChannel(currentChannel);
 
   const isVisibleCrown = [RoleMember.OWNER, RoleMember.MOD].includes(member.channel_role);
@@ -74,8 +77,8 @@ const MemberElement = ({
       onRemove(member);
     } else if (canUnban) {
       onUnban(member);
-    } else {
-      onSelect(member);
+    } else if (onSelectMember && user_id !== member.user_id) {
+      onSelectMember(member.user);
     }
   };
 

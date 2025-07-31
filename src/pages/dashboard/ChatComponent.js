@@ -45,7 +45,14 @@ import {
 import { Clock, Trash } from 'phosphor-react';
 import ScrollToBottom from '../../components/ScrollToBottom';
 import DeleteMessageDialog from '../../sections/dashboard/DeleteMessageDialog';
-import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '../../constants/commons-const';
+import {
+  ChatType,
+  DefaultLastSend,
+  MessageType,
+  RoleMember,
+  SidebarType,
+  UploadType,
+} from '../../constants/commons-const';
 import BannedBackdrop from '../../components/BannedBackdrop';
 import { client } from '../../client';
 import { onFilesMessage, setSearchMessageId } from '../../redux/slices/messages';
@@ -64,6 +71,7 @@ import PollResultDialog from '../../sections/dashboard/PollResultDialog';
 import { motion } from 'framer-motion';
 import UsersTyping from '../../components/UsersTyping';
 import NoMessageBox from '../../components/NoMessageBox';
+import { setSidebar, SetUserInfo } from '../../redux/slices/app';
 
 const StyledMessage = styled(motion(Stack))(({ theme }) => ({
   '&:hover': {
@@ -238,6 +246,11 @@ const MessageList = ({
     }
   };
 
+  const onSelectMember = user => {
+    dispatch(setSidebar({ type: SidebarType.UserInfo, open: true }));
+    dispatch(SetUserInfo(user));
+  };
+
   if (messages.length === 0) return null;
 
   return (
@@ -344,7 +357,9 @@ const MessageList = ({
                         <Box
                           sx={{
                             position: 'relative',
+                            cursor: 'pointer',
                           }}
+                          onClick={() => onSelectMember(sender)}
                         >
                           <Typography
                             variant="subtitle1"
@@ -362,7 +377,7 @@ const MessageList = ({
                           >
                             {name}
                           </Typography>
-                          <MemberAvatar member={sender} width={36} height={36} openLightbox={true} />
+                          <MemberAvatar member={sender} width={36} height={36} />
                         </Box>
                       )}
 

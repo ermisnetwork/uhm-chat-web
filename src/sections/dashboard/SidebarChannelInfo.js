@@ -327,7 +327,6 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
 
 const DirectChannelInfo = ({}) => {
   const theme = useTheme();
-  const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const memberIds = Object.keys(currentChannel.state.members);
@@ -462,7 +461,7 @@ const SidebarChannelInfo = () => {
     }
   };
 
-  const onToogleBlockUser = async () => {
+  const onToogleBlockUser = () => {
     const payload = {
       openDialog: true,
       channel: currentChannel,

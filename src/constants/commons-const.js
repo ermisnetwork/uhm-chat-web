@@ -1,4 +1,4 @@
-import { Phone } from 'phosphor-react';
+import { Phone, User } from 'phosphor-react';
 
 export const ChatType = {
   ALL: [],
@@ -125,6 +125,7 @@ export const SidebarType = {
   BannedUsers: 'BANNED_USERS',
   SearchMessage: 'SEARCH_MESSAGE',
   KeywordFiltering: 'KEYWORD_FILTERING',
+  UserInfo: 'USER_INFO',
 };
 
 export const TabMembers = {

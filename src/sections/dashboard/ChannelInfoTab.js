@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Stack, Tabs, Tab, alpha, Grid } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
-import { MediaType, RoleMember, TabValueChannelInfo } from '../../constants/commons-const';
+import { Box, Stack, Tabs, Tab, alpha } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { MediaType, SidebarType, TabValueChannelInfo } from '../../constants/commons-const';
 import { isChannelDirect } from '../../utils/commons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MemberElement from '../../components/MemberElement';
 import { PlayCircle } from 'phosphor-react';
 import LightboxMedia from '../../components/LightboxMedia';
 import FileElement from '../../components/FileElement';
 import NoFile from '../../assets/Illustration/NoFile';
 import LinkElement from '../../components/LinkElement';
+import { SetUserInfo, UpdateSidebarType } from '../../redux/slices/app';
+import ImageCanvas from '../../components/ImageCanvas';
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({
   minHeight: 'auto',
@@ -50,8 +52,14 @@ const StyledTabs = styled(Tabs)(({ theme }) => ({
 }));
 
 const TabMembers = () => {
+  const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
   const members = Object.values(currentChannel?.state?.members || {}) || [];
+
+  const onSelectMember = user => {
+    dispatch(UpdateSidebarType(SidebarType.UserInfo));
+    dispatch(SetUserInfo(user));
+  };
 
   const rolePriority = {
     owner: 1,
@@ -72,7 +80,7 @@ const TabMembers = () => {
   return (
     <Stack spacing={1}>
       {filteredMembers.map(member => (
-        <MemberElement key={member.user_id} member={member} />
+        <MemberElement key={member.user_id} member={member} onSelectMember={onSelectMember} />
       ))}
     </Stack>
   );
@@ -84,26 +92,31 @@ const TabMedia = ({ medias }) => {
     <>
       {medias.length > 0 ? (
         <Box sx={{ margin: '0px -24px -24px', borderRadius: '0px 0px 16px 16px', overflow: 'hidden' }}>
-          <Grid container>
+          <Stack direction="row" flexWrap="wrap">
             {medias.map((item, index) => {
               const isVideo = item.type === MediaType.VIDEO;
 
               return (
-                <Grid
+                <Box
                   key={index}
-                  item
-                  xs={4}
-                  sx={{ position: 'relative', cursor: 'pointer', aspectRatio: '1 / 1' }}
+                  sx={{
+                    width: '33.3333%',
+                    aspectRatio: '1 / 1',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    border: '1px solid transparent',
+                  }}
                   onClick={() => {
                     setIsOpenLightBox(true);
                     setIndexMedia(index);
                   }}
                 >
-                  <img
+                  {/* <img
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     src={isVideo ? item.poster : item.src}
-                  />
-                  {/* <ImageCanvas dataUrl={isVideo ? item.poster : item.src} width={'100%'} height={'100%'} /> */}
+                  /> */}
+                  <ImageCanvas dataUrl={isVideo ? item.poster : item.src} width={'100%'} height={'100%'} />
                   {isVideo && (
                     <PlayCircle
                       style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
@@ -112,10 +125,10 @@ const TabMedia = ({ medias }) => {
                       color="#fff"
                     />
                   )}
-                </Grid>
+                </Box>
               );
             })}
-          </Grid>
+          </Stack>
         </Box>
       ) : (
         <NoFile />
@@ -162,7 +175,6 @@ const TabFiles = ({ files }) => {
 };
 
 const ChannelInfoTab = ({}) => {
-  const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
   const [listTab, setListTab] = useState([
     { label: 'Media', value: TabValueChannelInfo.Media },
