@@ -856,8 +856,6 @@ const ChatComponent = () => {
     });
   }
 
-  console.log('---currentChannel---', currentChannel);
-
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
       {!isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
