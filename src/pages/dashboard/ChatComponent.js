@@ -34,6 +34,7 @@ import ReactionsMessage from '../../components/ReactionsMessage';
 import ChannelInvitation from '../../sections/dashboard/ChannelInvitation';
 import {
   AddActiveChannel,
+  AddMention,
   RemoveActiveChannel,
   SetCooldownTime,
   SetFilterWords,
@@ -628,6 +629,7 @@ const ChatComponent = () => {
           setIsPendingInvite(false);
         } else {
           setIsAlertInvitePending(false);
+          dispatch(AddMention(event.member.user_id));
         }
       };
 
@@ -655,6 +657,7 @@ const ChatComponent = () => {
           dispatch(AddActiveChannel(event.cid));
         } else {
           dispatch(WatchCurrentChannel(channelId, channelType));
+          dispatch(AddMention(event.member.user_id));
         }
       };
 

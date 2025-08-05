@@ -135,7 +135,10 @@ const slice = createSlice({
       state.mentions = action.payload;
     },
     addMention(state, action) {
-      state.mentions.push(action.payload);
+      const exists = state.mentions.some(item => item.id === action.payload.id);
+      if (!exists) {
+        state.mentions.push(action.payload);
+      }
     },
     removeMention(state, action) {
       state.mentions = state.mentions.filter(item => item.id !== action.payload);
