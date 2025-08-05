@@ -410,7 +410,7 @@ const SidebarChannelInfo = () => {
 
   useEffect(() => {
     if (currentChannel) {
-      setIsMuted(mutedChannels.some(item => item.id === currentChannel.id));
+      setIsMuted(!!(mutedChannels && mutedChannels.some(item => item.id === currentChannel.id)));
 
       setIsBlocked(checkDirectBlock(currentChannel));
 
