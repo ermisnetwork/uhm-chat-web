@@ -10,6 +10,7 @@ import {
   Popover,
   Stack,
   Typography,
+  styled,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,6 +20,68 @@ import { AvatarShape, SidebarType } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
 import AvatarComponent from '../../components/AvatarComponent';
 import ChannelAvatar from '../../components/ChannelAvatar';
+import NoTopic from '../../assets/Illustration/NoTopic';
+import AvatarDefault from '../../components/AvatarDefault';
+import GeneralElement from '../../components/GeneralElement';
+import NewTopicDialog from '../../sections/dashboard/NewTopicDialog';
+import { SetOpenNewTopicDialog } from '../../redux/slices/dialog';
+
+const StyledTopicItem = styled(Stack)(({ theme }) => ({
+  width: '100%',
+  borderRadius: '16px',
+  position: 'relative',
+  transition: 'background-color 0.2s ease-in-out',
+  display: 'flex',
+  '&:hover': {
+    cursor: 'pointer',
+    backgroundColor: theme.palette.divider,
+  },
+}));
+
+const TopicEmpty = () => {
+  const theme = useTheme();
+  const dispatch = useDispatch();
+
+  return (
+    <Stack sx={{ flex: 1, width: '100%', minHeight: 'auto', alignItems: 'center', justifyContent: 'center' }}>
+      <NoTopic />
+      <Typography
+        variant="subtitle2"
+        sx={{
+          textAlign: 'center',
+          fontSize: 16,
+          color: theme.palette.text.primary,
+          fontWeight: 600,
+          marginTop: 2,
+        }}
+      >
+        Topic Is Waiting!
+      </Typography>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          textAlign: 'center',
+          fontSize: 14,
+          color: theme.palette.text.secondary,
+          fontWeight: 400,
+        }}
+      >
+        We moved older messages to “General.” Kick off a new topic anytime!
+      </Typography>
+
+      <Button
+        variant="contained"
+        size="large"
+        sx={{ marginTop: 3, width: '200px' }}
+        onClick={() => {
+          dispatch(SetOpenNewTopicDialog(true));
+        }}
+      >
+        NEW TOPIC
+      </Button>
+    </Stack>
+  );
+};
 
 const TopicHeader = () => {
   const theme = useTheme();
@@ -167,10 +230,22 @@ const TopicPanel = () => {
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
 
+  console.log('---- currentChannel:', currentChannel);
+  if (!currentChannel?.data?.topics_enabled) return null;
+
   return (
-    <Stack sx={{ width: '300px', height: '100%', borderRight: `1px solid ${theme.palette.divider}` }}>
-      <TopicHeader />
-    </Stack>
+    <>
+      <Stack sx={{ width: '300px', height: '100%', borderRight: `1px solid ${theme.palette.divider}` }}>
+        <TopicHeader />
+
+        <Stack sx={{ flex: 1, overflowY: 'auto', minHeight: 'auto', padding: '16px' }} className="customScrollbar">
+          <GeneralElement />
+          <TopicEmpty />
+        </Stack>
+      </Stack>
+
+      <NewTopicDialog />
+    </>
   );
 };
 

@@ -2205,6 +2205,23 @@ export const SearchIcon = ({ size = 24, color = 'currentColor', ...props }) => (
   </svg>
 );
 
+export const ChatPurpleIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M11 0.286133H13C18.9173 0.286133 23.7139 5.08266 23.7139 11V13C23.7139 18.9173 18.9173 23.7139 13 23.7139H3C1.50094 23.7139 0.286133 22.4991 0.286133 21V11C0.286133 5.08266 5.08266 0.286133 11 0.286133Z"
+      fill="url(#paint0_linear_7253_69199)"
+      stroke="#5027B1"
+      strokeWidth="0.571429"
+    />
+    <defs>
+      <linearGradient id="paint0_linear_7253_69199" x1={12} y1={0} x2={12} y2={24} gradientUnits="userSpaceOnUse">
+        <stop stopColor="#9265FF" />
+        <stop offset={1} stopColor="#5027B1" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
 export default {
   EditProfileIcon,
   ArchiveMinusIcon,
@@ -2256,5 +2273,6 @@ export default {
   DotsThreeIcon,
   InfoIcon,
   SearchIcon,
+  ChatPurpleIcon,
   // Add any other icons here as needed
 };
