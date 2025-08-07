@@ -8,7 +8,7 @@ import { client } from '../../client';
 import { UpdateIsLoading } from '../../redux/slices/app';
 import UserElement from '../../components/UserElement';
 
-const FriendList = ({
+const AddFriend = ({
   searchQuery = '',
   noResultWidth = 150,
   noResultHeight = 150,
@@ -199,4 +199,4 @@ const FriendList = ({
   return <>{renderedFriends}</>;
 };
 
-export default FriendList;
+export default AddFriend;

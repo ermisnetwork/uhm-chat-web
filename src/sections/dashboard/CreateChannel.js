@@ -162,6 +162,17 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
                   p: '0px 15px',
                 }}
               />
+              <Typography
+                sx={{
+                  fontSize: '12px',
+                  color: theme => theme.palette.text.secondary,
+                  marginTop: '5px',
+                }}
+              >
+                {methods.watch('public') === 'true'
+                  ? 'Public channel is open for anyone to search, view its content, and join.'
+                  : 'Only invited members can find and join a private channel.'}
+              </Typography>
             </Box>
 
             <Box>

@@ -14,6 +14,8 @@ const initialState = {
     questions: '',
     results: [],
   },
+  openInviteFriendDialog: false,
+  openAddFriendDialog: false,
 };
 
 const slice = createSlice({
@@ -62,6 +64,16 @@ const slice = createSlice({
     setPollResult(state, action) {
       state.pollResult = action.payload;
     },
+    setOpenInviteFriendDialog(state, action) {
+      state.openInviteFriendDialog = action.payload;
+    },
+
+    openAddFriendDialog(state) {
+      state.openAddFriendDialog = true;
+    },
+    closeAddFriendDialog(state) {
+      state.openAddFriendDialog = false;
+    },
   },
 });
 
@@ -100,3 +112,16 @@ export const SetMessagesHistoryDialog = payload => async (dispatch, getState) =>
   const messages = [...payload.messages].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   dispatch(slice.actions.setMessagesHistoryDialog({ ...payload, messages }));
 };
+
+export const SetOpenInviteFriendDialog = payload => (dispatch, getState) => {
+  dispatch(slice.actions.setOpenInviteFriendDialog(payload));
+};
+
+export const OpenAddFriendDialog = () => async (dispatch, getState) => {
+  dispatch(slice.actions.openAddFriendDialog());
+};
+
+export const CloseAddFriendDialog = () => async (dispatch, getState) => {
+  dispatch(slice.actions.closeAddFriendDialog());
+};
+

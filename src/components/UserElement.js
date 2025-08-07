@@ -73,8 +73,6 @@ const UserElement = ({
             sx={{
               width: '100%',
               display: 'block',
-              alignItems: 'center',
-              justifyContent: 'space-between',
               fontSize: primaryFontSize,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
