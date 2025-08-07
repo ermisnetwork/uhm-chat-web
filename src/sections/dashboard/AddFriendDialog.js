@@ -20,7 +20,6 @@ import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../../config';
 import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
 import { MagnifyingGlass, X } from 'phosphor-react';
-import AddFriend from './AddFriend';
 import { LoadingSpinner } from '../../components/animate';
 import NoResult from '../../assets/Illustration/NoResult';
 import UserElement from '../../components/UserElement';
