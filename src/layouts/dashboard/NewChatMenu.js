@@ -2,13 +2,13 @@ import React from 'react';
 import { Box, Button, Fade, IconButton, Menu, MenuItem, Stack, useTheme } from '@mui/material';
 import { NewChat_Menu } from '../../data';
 import { useDispatch } from 'react-redux';
-import { OpenDialogCreateChannel, OpenDialogNewDirectMessage, OpenAddFriendDialog  } from '../../redux/slices/dialog';
+import { OpenDialogCreateChannel, OpenDialogNewDirectMessage, OpenAddFriendDialog } from '../../redux/slices/dialog';
 import Iconify from '../../components/Iconify';
 import useResponsive from '../../hooks/useResponsive';
-import { NewChatIcon,ProfileAddIcon } from '../../components/Icons';
+import { NewChatIcon, ProfileAddIcon } from '../../components/Icons';
 
 const NewChatMenu = () => {
-  const isMobileToMd = useResponsive('down', 'md');
+  const isMobileToLg = useResponsive('down', 'lg');
   const theme = useTheme();
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -39,23 +39,21 @@ const NewChatMenu = () => {
 
   return (
     <>
-      {isMobileToMd ? (
+      {isMobileToLg ? (
         <IconButton onClick={handleAddFriend}>
-          <NewChatIcon size={30} />
+          <ProfileAddIcon size={30} />
         </IconButton>
       ) : (
         <Button
           size="large"
-          variant="contained"
-          // color={theme.palette.primary.main}
-          startIcon={<ProfileAddIcon width={25} height={25} color={theme.palette.primary.main} />}
-          sx={{ marginRight: '15px!important',backgroundColor: 'white', color: '#7949ec', border: '1px solid #7949ec' }}
+          variant="outlined"
+          startIcon={<ProfileAddIcon size={24} color={theme.palette.primary.main} />}
           onClick={handleAddFriend}
         >
           ADD FRIEND
         </Button>
       )}
-      {isMobileToMd ? (
+      {isMobileToLg ? (
         <IconButton onClick={handleClick}>
           <NewChatIcon size={30} />
         </IconButton>
