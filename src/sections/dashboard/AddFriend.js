@@ -42,44 +42,44 @@ const AddFriend = ({
   }, [activeChannels, user_id, excludedUserIds]);
 
   // Gọi API tìm user nếu không có filteredChannels và enableUserSearch=true
-  useEffect(() => {
-    let ignore = false;
-    let debounceTimer;
+  // useEffect(() => {
+  //   let ignore = false;
+  //   let debounceTimer;
 
-    const filteredChannels = directChannels.filter(channel => {
-      const name = channel.data?.name || '';
-      return name.toLowerCase().includes(searchQuery.toLowerCase());
-    });
+  //   const filteredChannels = directChannels.filter(channel => {
+  //     const name = channel.data?.name || '';
+  //     return name.toLowerCase().includes(searchQuery.toLowerCase());
+  //   });
 
-    if (enableUserSearch && searchQuery && filteredChannels.length === 0) {
-      dispatch(UpdateIsLoading({ isLoading: true }));
+  //   if (enableUserSearch && searchQuery && filteredChannels.length === 0) {
+  //     dispatch(UpdateIsLoading({ isLoading: true }));
 
-      const fetchUsers = async () => {
-        try {
-          const name = searchQuery;
-          const page = 1;
-          const page_size = 10;
-          const result = await client.searchUsers(page, page_size, name);
+  //     const fetchUsers = async () => {
+  //       try {
+  //         const name = searchQuery;
+  //         const page = 1;
+  //         const page_size = 10;
+  //         const result = await client.searchUsers(page, page_size, name);
 
-          if (!ignore) setSearchedUser(result.data[0]);
-        } catch (e) {
-          if (!ignore) setSearchedUser(null);
-        } finally {
-          dispatch(UpdateIsLoading({ isLoading: false }));
-        }
-      };
+  //         if (!ignore) setSearchedUser(result.data[0]);
+  //       } catch (e) {
+  //         if (!ignore) setSearchedUser(null);
+  //       } finally {
+  //         dispatch(UpdateIsLoading({ isLoading: false }));
+  //       }
+  //     };
 
-      debounceTimer = setTimeout(fetchUsers, 400);
-    } else {
-      setSearchedUser(null);
-      dispatch(UpdateIsLoading({ isLoading: false }));
-    }
+  //     debounceTimer = setTimeout(fetchUsers, 400);
+  //   } else {
+  //     setSearchedUser(null);
+  //     dispatch(UpdateIsLoading({ isLoading: false }));
+  //   }
 
-    return () => {
-      ignore = true;
-      clearTimeout(debounceTimer);
-    };
-  }, [searchQuery, enableUserSearch]);
+  //   return () => {
+  //     ignore = true;
+  //     clearTimeout(debounceTimer);
+  //   };
+  // }, [searchQuery, enableUserSearch]);
 
   const renderedFriends = useMemo(() => {
     const filteredChannels = directChannels.filter(channel => {
@@ -161,8 +161,22 @@ const AddFriend = ({
       );
     } else {
       return (
-        <Stack key="no-channels" sx={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-          <NoResult width={noResultWidth} height={noResultHeight} />
+        <Stack
+          sx={{
+            alignItems: 'center',
+          }}
+        >
+          <Typography
+            variant="contained"
+            sx={{
+              fontSize: '14px',
+              padding: '5px',
+              color: theme.palette.text.secondary,
+            }}
+          >
+            Search for new contact by entering their phone number or email address.
+          </Typography>
+          <NoResult width={160} height={300} />
           <Typography
             variant="subtitle2"
             sx={{
@@ -174,7 +188,20 @@ const AddFriend = ({
           >
             No result {searchQuery ? `for "${searchQuery}"` : ''}
           </Typography>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              textAlign: 'center',
+              fontSize: 14,
+              color: theme.palette.text.secondary,
+              fontWeight: 400,
+              marginTop: 1,
+            }}
+          >
+            Looks like no one matches your search.
+          </Typography>
         </Stack>
+        
       );
     }
   }, [

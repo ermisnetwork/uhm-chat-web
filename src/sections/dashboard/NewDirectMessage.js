@@ -44,6 +44,9 @@ const NewDirectMessage = () => {
   };
 
   const onSelectChannel = async (channel, user) => {
+    console.log(channel);
+    console.log(user);
+    
     if (channel) {
       navigate(`${DEFAULT_PATH}/${channel.type}:${channel.id}`);
       dispatch(SetSearchQuery(''));

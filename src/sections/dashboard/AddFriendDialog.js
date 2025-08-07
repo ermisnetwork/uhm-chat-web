@@ -9,6 +9,7 @@ import {
   useTheme,
   Button,
   IconButton,
+  Box,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { client } from '../../client';
@@ -22,12 +23,15 @@ import { MagnifyingGlass, X } from 'phosphor-react';
 import AddFriend from './AddFriend';
 import { LoadingSpinner } from '../../components/animate';
 import NoResult from '../../assets/Illustration/NoResult';
+import UserElement from '../../components/UserElement';
+import { use } from 'react';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const AddFriendDialog = () => {
+const AddFriendDialog = ({
+}) => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -61,7 +65,7 @@ const AddFriendDialog = () => {
           const page_size = 10;
           const result = await client.searchUsers(page, page_size, name);
 
-          if (!ignore) setSearchedUser(result.data[0]);
+          if (!ignore) setSearchedUser(result.data[0] || null);
         } catch (e) {
           if (!ignore) setSearchedUser(null);
         } finally {
@@ -69,7 +73,7 @@ const AddFriendDialog = () => {
         }
       };
 
-      debounceTimer = setTimeout(fetchUsers, 400);
+      debounceTimer = setTimeout(fetchUsers, 500);
     } else {
       setSearchedUser(null);
       dispatch(UpdateIsLoading({ isLoading: false }));
@@ -81,9 +85,11 @@ const AddFriendDialog = () => {
     };
   }, [searchQuery]);
 
+
   const onCloseAddFriendDialog = () => {
     dispatch(CloseAddFriendDialog());
   };
+
 
   const onCreateDirectChannel = async user => {
     try {
@@ -101,8 +107,10 @@ const AddFriendDialog = () => {
   };
 
   const onSelectChannel = async (channel, user) => {
-    if (channel && user) {
-      navigate(`${DEFAULT_PATH}/${channel.type}:${channel.id}`);
+    const existDirectChannel = directChannels.find((channel) => channel.state.members[user.id])
+    
+    if (existDirectChannel) {
+      navigate(`${DEFAULT_PATH}/${existDirectChannel.type}:${existDirectChannel.id}`);
       dispatch(SetSearchQuery(''));
       onCloseAddFriendDialog();
       return;
@@ -110,7 +118,7 @@ const AddFriendDialog = () => {
       onCreateDirectChannel(user);
       return;
     }
-  };
+  };  
 
   return (
     <Dialog
@@ -154,12 +162,29 @@ const AddFriendDialog = () => {
               paddingRight: '12px',
             }}
           >
-            {searchQuery ? (
-              <AddFriend
-                searchQuery={searchQuery}
-                enableUserSearch
-                onSelect={({ channel, user }) => onSelectChannel(channel, user)}
-              />
+            {searchQuery && searchedUser ? (
+              <Stack>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '20px',
+                    color: theme.palette.text.primary,
+                    mb: 1,
+                  }}
+                >
+                  {searchedUser.name.charAt(0).toUpperCase()}
+                </Typography>
+                <Box sx={{ marginBottom: '5px' }}>
+                  <UserElement
+                    user={searchedUser}
+                    avatarSize={44}
+                    primaryFontSize={14}
+                    secondaryFontSize={12}
+                    onSelect={({ channel, user }) => onSelectChannel(channel, user)}
+                  />
+                </Box>
+              </Stack>
             ) : (
               <Stack
                 sx={{
@@ -177,17 +202,31 @@ const AddFriendDialog = () => {
                   Search for new contact by entering their phone number or email address.
                 </Typography>
                 <NoResult width={160} height={300} />
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    textAlign: 'center',
-                    fontSize: 16,
-                    color: theme.palette.text.primary,
-                    fontWeight: 600,
-                  }}
-                >
-                  Oops! Nothing here
-                </Typography>
+                {searchQuery ? (
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      textAlign: 'center',
+                      fontSize: '14px',
+                      color: theme.palette.text.primary,
+                      fontWeight: 600,
+                    }}
+                  >
+                    No result {searchQuery ? `for "${searchQuery}"` : ''}
+                  </Typography>
+                ) : (
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      textAlign: 'center',
+                      fontSize: 16,
+                      color: theme.palette.text.primary,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Oops! Nothing here
+                  </Typography>
+                )}
                 <Typography
                   variant="subtitle2"
                   sx={{

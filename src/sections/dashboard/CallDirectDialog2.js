@@ -338,7 +338,6 @@ const CallDirectDialog2 = () => {
       await callClient.startScreenShare();
     }
   };
-  console.log(callDirectStatus);
   
 
   const renderButton = () => {
