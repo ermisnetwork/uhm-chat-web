@@ -49,7 +49,7 @@ const NewChatMenu = () => {
           variant="contained"
           // color={theme.palette.primary.main}
           startIcon={<ProfileAddIcon width={25} height={25} color={theme.palette.primary.main} />}
-          sx={{ marginRight: '15px!important',backgroundColor: 'white', color: '#7949ec' }}
+          sx={{ marginRight: '15px!important',backgroundColor: 'white', color: '#7949ec', border: '1px solid #7949ec' }}
           onClick={handleAddFriend}
         >
           ADD FRIEND
