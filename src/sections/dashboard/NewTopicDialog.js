@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { GlobalStyles } from '@mui/material';
 import * as Yup from 'yup';
 import {
   Box,
-  Button,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -37,7 +36,6 @@ const NewTopicDialog = () => {
   const dispatch = useDispatch();
   const { openNewTopicDialog } = useSelector(state => state.dialog);
   const { currentChannel } = useSelector(state => state.channel);
-  const { user_id } = useSelector(state => state.auth);
   const [loadingButton, setLoadingButton] = useState(false);
 
   const onCloseDialog = () => {
@@ -191,7 +189,7 @@ const NewTopicDialog = () => {
               </Box>
 
               <Stack spacing={2} direction={'row'} alignItems="center">
-                <LoadingButton size="large" type="submit" variant="contained" sx={{ flex: 1 }}>
+                <LoadingButton size="large" type="submit" variant="contained" sx={{ flex: 1 }} loading={loadingButton}>
                   CREATE
                 </LoadingButton>
               </Stack>

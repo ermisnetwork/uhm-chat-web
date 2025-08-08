@@ -34,6 +34,7 @@ export const ClientEvents = {
   ChannelUnPinned: 'channel.unpinned',
   ChannelTopicEnabled: 'channel.topic.enabled',
   ChannelTopicDisabled: 'channel.topic.disabled',
+  ChannelTopicCreated: 'channel.topic.created',
   ConnectionChanged: 'connection.changed',
   UserWatchingStart: 'user.watching.start',
   UserWatchingStop: 'user.watching.stop',

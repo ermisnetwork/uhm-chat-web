@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Box, Stack, Typography } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled, useTheme, alpha } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddUnreadChannel, RemoveUnreadChannel, UpdateUnreadChannel } from '../redux/slices/channel';
+import ChannelAvatar from './ChannelAvatar';
 import { ClientEvents } from '../constants/events-const';
-import { Play } from 'phosphor-react';
-import { MessageType } from '../constants/commons-const';
+import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
+import { Play, PushPin } from 'phosphor-react';
+import { AvatarShape, MessageType } from '../constants/commons-const';
 import { convertMessageSystem } from '../utils/messageSystem';
+import { useNavigate } from 'react-router-dom';
+import { DEFAULT_PATH } from '../config';
 import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
-import AvatarGeneralDefault from './AvatarGeneralDefault';
+import TopicAvatar from './TopicAvatar';
 
-const StyledGeneralItem = styled(Box)(({ theme }) => ({
+const StyledTopicItem = styled(Box)(({ theme }) => ({
   width: '100%',
   borderRadius: '16px',
   position: 'relative',
@@ -26,12 +30,16 @@ const StyledGeneralItem = styled(Box)(({ theme }) => ({
   },
 }));
 
-const GeneralElement = () => {
+const TopicElement = ({ topic }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const navigate = useNavigate();
   const { currentChannel, unreadChannels } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
+  const channelId = topic?.id || '';
+  const channelType = topic?.type || '';
+  const isPinned = topic.data?.is_pinned;
 
   const [lastMessage, setLastMessage] = useState('');
   const [count, setCount] = useState(0);
@@ -122,21 +130,19 @@ const GeneralElement = () => {
         }
       }
     } else {
-      setLastMessageAt(getDisplayDate(channel.data.created_at));
+      setLastMessageAt(getDisplayDate(topic.data.created_at));
       setLastMessage('No messages here yet');
     }
   };
 
   useEffect(() => {
-    const lastMsg =
-      currentChannel.state.messages.length > 0
-        ? currentChannel.state.messages[currentChannel.state.messages.length - 1]
-        : null;
+    const lastMsg = topic.state.messages.length > 0 ? topic.state.messages[topic.state.messages.length - 1] : null;
     getLastMessage(lastMsg);
-    setCount(currentChannel.state.unreadCount);
+
+    setCount(topic.state.unreadCount);
 
     const handleMessageNew = event => {
-      if (event.channel_id === currentChannel.data.id) {
+      if (event.channel_id === topic.data.id) {
         setCount(event.unread_count);
 
         if (!(event.message.type === MessageType.Signal && ['1', '4'].includes(event.message.text[0]))) {
@@ -156,27 +162,21 @@ const GeneralElement = () => {
     };
 
     const handleMessageUpdated = event => {
-      if (event.channel_id === currentChannel.data.id) {
-        const lastMsg =
-          currentChannel.state.messages.length > 0
-            ? currentChannel.state.messages[currentChannel.state.messages.length - 1]
-            : null;
+      if (event.channel_id === topic.data.id) {
+        const lastMsg = topic.state.messages.length > 0 ? topic.state.messages[topic.state.messages.length - 1] : null;
         getLastMessage(lastMsg);
       }
     };
 
     const handleMessageDeleted = event => {
-      if (event.channel_id === currentChannel.data.id) {
-        const lastMsg =
-          currentChannel.state.messages.length > 0
-            ? currentChannel.state.messages[currentChannel.state.messages.length - 1]
-            : null;
+      if (event.channel_id === topic.data.id) {
+        const lastMsg = topic.state.messages.length > 0 ? topic.state.messages[topic.state.messages.length - 1] : null;
         getLastMessage(lastMsg);
       }
     };
 
     const handleMessageRead = event => {
-      if (event.user.id === user_id && event.channel_id === currentChannel.data.id) {
+      if (event.user.id === user_id && event.channel_id === topic.data.id) {
         setCount(0);
 
         if (unreadChannels.some(item => item.id === event.channel_id)) {
@@ -195,78 +195,93 @@ const GeneralElement = () => {
       client.off(ClientEvents.MessageDeleted, handleMessageDeleted);
       client.off(ClientEvents.MessageRead, handleMessageRead);
     };
-  }, [currentChannel, user_id, users.length, unreadChannels]);
+  }, [topic, user_id, users.length, unreadChannels]);
+
+  const onLeftClick = () => {
+    if (currentChannel?.id !== channelId) {
+      navigate(`${DEFAULT_PATH}/${channelType}:${channelId}`);
+      dispatch(onReplyMessage(null));
+      dispatch(onEditMessage(null));
+    }
+  };
+
+  const isSelectedChannel = currentChannel?.id === channelId;
 
   return (
-    <StyledGeneralItem
-      sx={
-        {
-          // backgroundColor: isSelectedChannel ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
+    <>
+      <StyledTopicItem
+        onClick={onLeftClick}
+        sx={
+          {
+            // backgroundColor: isSelectedChannel ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
+          }
         }
-      }
-      gap={1}
-    >
-      {/* -------------------------------avatar------------------------------- */}
-      <AvatarGeneralDefault />
+        gap={1}
+      >
+        {/* -------------------------------avatar------------------------------- */}
+        <TopicAvatar url={topic.data?.image || ''} name={topic.data?.name || ''} size={40} shape={AvatarShape.Round} />
 
-      {/* -------------------------------content------------------------------- */}
-      <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
-        {/* -------------------------------name------------------------------- */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-          <Typography
-            variant="subtitle2"
-            sx={{
-              flex: 1,
-              minWidth: 'auto',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontSize: '14px',
-            }}
-          >
-            General
-          </Typography>
-
-          <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+        {/* -------------------------------content------------------------------- */}
+        <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
+          {/* -------------------------------topic name------------------------------- */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
             <Typography
+              variant="subtitle2"
               sx={{
-                color: theme.palette.text.secondary,
-                minWidth: 'auto',
                 flex: 1,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                fontSize: '10px',
+                textOverflow: 'ellipsis',
+                fontSize: '14px',
               }}
-              variant="caption"
             >
-              {lastMessageAt}
+              {topic.data.name}
             </Typography>
+
+            <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+              {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
+
+              <Typography
+                sx={{
+                  color: theme.palette.text.secondary,
+                  minWidth: 'auto',
+                  flex: 1,
+                  overflow: 'hidden',
+                  fontSize: '10px',
+                }}
+                variant="caption"
+              >
+                {lastMessageAt}
+              </Typography>
+            </Stack>
           </Stack>
-        </Stack>
 
-        {/* -------------------------------last message------------------------------- */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-          <Typography
-            variant="caption"
-            sx={{
-              color: count > 0 ? 'inherit' : theme.palette.text.secondary,
-              flex: 1,
-              minWidth: 'auto',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              fontSize: '14px',
-              display: 'block',
-              fontWeight: count > 0 ? 600 : 400,
-            }}
-          >
-            {lastMessage}
-          </Typography>
+          {/* -------------------------------last message------------------------------- */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: count > 0 ? 'inherit' : theme.palette.text.secondary,
+                flex: 1,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '14px',
+                display: 'block',
+                fontWeight: count > 0 ? 600 : 400,
+              }}
+            >
+              {lastMessage}
+            </Typography>
 
-          {count > 0 ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
-        </Stack>
-      </Box>
-    </StyledGeneralItem>
+            {count > 0 ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+          </Stack>
+        </Box>
+      </StyledTopicItem>
+    </>
   );
 };
 
-export default GeneralElement;
+export default TopicElement;

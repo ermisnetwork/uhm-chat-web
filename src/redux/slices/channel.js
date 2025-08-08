@@ -234,14 +234,14 @@ export function FetchChannels(params) {
       .then(async response => {
         dispatch(FetchAllMembers());
 
-        const sortedArray = response.sort((a, b) => {
-          const dateA = a.state.last_message_at ? new Date(a.state.last_message_at) : new Date(a.data.created_at);
-          const dateB = b.state.last_message_at ? new Date(b.state.last_message_at) : new Date(b.data.created_at);
-          return dateB - dateA;
-        });
+        // const sortedArray = response.sort((a, b) => {
+        //   const dateA = a.state.last_message_at ? new Date(a.state.last_message_at) : new Date(a.data.created_at);
+        //   const dateB = b.state.last_message_at ? new Date(b.state.last_message_at) : new Date(b.data.created_at);
+        //   return dateB - dateA;
+        // });
 
         const { activeChannels, pendingChannels, mutedChannels, unreadChannels, skippedChannels, pinnedChannels } =
-          sortedArray.reduce(
+          response.reduce(
             (acc, channel) => {
               if (channel.state.membership.channel_role === RoleMember.PENDING) {
                 acc.pendingChannels.push(channel);

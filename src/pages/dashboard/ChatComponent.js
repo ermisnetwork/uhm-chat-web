@@ -700,6 +700,20 @@ const ChatComponent = () => {
         dispatch(WatchCurrentChannel(channelId, channelType));
       };
 
+      const handleChannelTopicEnabled = event => {
+        const splitCID = splitChannelId(event.cid);
+        const channelId = splitCID.channelId;
+        const channelType = splitCID.channelType;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+      };
+
+      const handleChannelTopicDisabled = event => {
+        const splitCID = splitChannelId(event.cid);
+        const channelId = splitCID.channelId;
+        const channelType = splitCID.channelType;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+      };
+
       currentChannel.on(ClientEvents.MessageNew, handleMessages);
       currentChannel.on(ClientEvents.ReactionNew, handleMessages);
       currentChannel.on(ClientEvents.ReactionDeleted, handleMessages);
@@ -717,6 +731,8 @@ const ChatComponent = () => {
       currentChannel.on(ClientEvents.MemberDemoted, handleMemberDemoted);
       currentChannel.on(ClientEvents.PollChoiceNew, handleMessages);
       currentChannel.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
+      currentChannel.on(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
+      currentChannel.on(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
 
       return () => {
         currentChannel.off(ClientEvents.MessageNew, handleMessages);
@@ -735,7 +751,9 @@ const ChatComponent = () => {
         currentChannel.off(ClientEvents.MemberPromoted, handleMemberPromoted);
         currentChannel.off(ClientEvents.MemberDemoted, handleMemberDemoted);
         currentChannel.off(ClientEvents.PollChoiceNew, handleMessages);
-        currentChannel.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
+        currentChannel.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
+        currentChannel.off(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
+        currentChannel.off(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
       };
     } else {
       if (messageListRef.current) {
