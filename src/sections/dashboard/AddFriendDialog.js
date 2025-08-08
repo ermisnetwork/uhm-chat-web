@@ -1,20 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Slide,
-  Stack,
-  Typography,
-  useTheme,
-  Button,
-  IconButton,
-  Box,
-} from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Slide, Stack, Typography, useTheme, IconButton, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { client } from '../../client';
 import { ChatType, RoleMember } from '../../constants/commons-const';
-import { SetSearchQuery, showSnackbar, UpdateIsLoading } from '../../redux/slices/app';
+import { showSnackbar, UpdateIsLoading } from '../../redux/slices/app';
 import { CloseAddFriendDialog } from '../../redux/slices/dialog';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../../config';
@@ -23,21 +12,19 @@ import { MagnifyingGlass, X } from 'phosphor-react';
 import { LoadingSpinner } from '../../components/animate';
 import NoResult from '../../assets/Illustration/NoResult';
 import UserElement from '../../components/UserElement';
-import { use } from 'react';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const AddFriendDialog = ({
-}) => {
+const AddFriendDialog = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
   const { openAddFriendDialog } = useSelector(state => state.dialog);
   const { isLoading } = useSelector(state => state.app);
   const { user_id } = useSelector(state => state.auth);
-  const { activeChannels } = useSelector(state => state.channel);
+  const { activeChannels, skippedChannels, pendingChannels } = useSelector(state => state.channel);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchedUser, setSearchedUser] = useState(null);
@@ -46,7 +33,7 @@ const AddFriendDialog = ({
     return activeChannels.filter(channel => {
       const isDirect = channel.type === ChatType.MESSAGING;
       const otherMember = Object.values(channel.state.members).find(member => member.user_id !== user_id);
-      return isDirect && otherMember && otherMember.channel_role === RoleMember.OWNER;
+      return isDirect && otherMember && [RoleMember.OWNER, RoleMember.PENDING].includes(otherMember.channel_role);
     });
   }, [activeChannels, user_id]);
 
@@ -84,11 +71,9 @@ const AddFriendDialog = ({
     };
   }, [searchQuery]);
 
-
   const onCloseAddFriendDialog = () => {
     dispatch(CloseAddFriendDialog());
   };
-
 
   const onCreateDirectChannel = async user => {
     try {
@@ -98,7 +83,6 @@ const AddFriendDialog = ({
 
       await channel.create();
       dispatch(showSnackbar({ severity: 'success', message: 'Invitation sent' }));
-      dispatch(SetSearchQuery(''));
       onCloseAddFriendDialog();
     } catch (error) {
       dispatch(showSnackbar({ severity: 'error', message: 'Failed to send invite. Please retry' }));
@@ -106,18 +90,19 @@ const AddFriendDialog = ({
   };
 
   const onSelectChannel = async (channel, user) => {
-    const existDirectChannel = directChannels.find((channel) => channel.state.members[user.id])
-    
-    if (existDirectChannel) {
-      navigate(`${DEFAULT_PATH}/${existDirectChannel.type}:${existDirectChannel.id}`);
-      dispatch(SetSearchQuery(''));
+    const existChannel = [...directChannels, ...skippedChannels, ...pendingChannels].find(
+      channel => channel.state.members[user.id],
+    );
+
+    if (existChannel) {
+      navigate(`${DEFAULT_PATH}/${existChannel.type}:${existChannel.id}`);
       onCloseAddFriendDialog();
       return;
     } else if (user) {
       onCreateDirectChannel(user);
       return;
     }
-  };  
+  };
 
   return (
     <Dialog
