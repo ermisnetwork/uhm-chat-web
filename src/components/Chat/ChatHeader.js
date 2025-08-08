@@ -15,6 +15,9 @@ import useOnlineStatus from '../../hooks/useOnlineStatus';
 import { callClient } from '../../client';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../../config';
+import AvatarGeneralDefault from '../AvatarGeneralDefault';
+import TopicAvatar from '../TopicAvatar';
+import { DotsThreeIcon } from '../Icons';
 
 const ChatHeader = ({ currentChannel, isBlocked }) => {
   const navigate = useNavigate();
@@ -23,8 +26,11 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
   const theme = useTheme();
   const { user_id } = useSelector(state => state.auth);
   const { isGuest } = useSelector(state => state.channel);
+  const { currentTopic } = useSelector(state => state.topic);
+
   const isDirect = isChannelDirect(currentChannel);
   const isPublic = isPublicChannel(currentChannel);
+  const isEnabledTopics = currentChannel?.data?.topics_enabled;
 
   const [loadingJoin, setLoadingJoin] = useState(false);
 
@@ -63,6 +69,93 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
     }
   };
 
+  const renderAvatar = () => {
+    if (isEnabledTopics) {
+      return (
+        <>
+          {currentTopic ? (
+            <TopicAvatar
+              url={currentTopic.data?.image || ''}
+              name={currentTopic.data?.name || ''}
+              size={40}
+              shape={AvatarShape.Round}
+            />
+          ) : (
+            <AvatarGeneralDefault size={40} />
+          )}
+        </>
+      );
+    } else {
+      return (
+        <>
+          {isPublic ? (
+            <AvatarComponent
+              name={currentChannel.data?.name}
+              url={currentChannel.data?.image || ''}
+              width={60}
+              height={60}
+              isPublic={isPublic}
+              openLightbox={true}
+              shape={AvatarShape.Round}
+            />
+          ) : (
+            <ChannelAvatar
+              channel={currentChannel}
+              width={60}
+              height={60}
+              openLightbox={true}
+              shape={AvatarShape.Round}
+            />
+          )}
+        </>
+      );
+    }
+  };
+
+  const renderName = () => {
+    if (isEnabledTopics) {
+      if (currentTopic) {
+        return currentTopic.data?.name;
+      } else {
+        return 'General';
+      }
+    } else {
+      return currentChannel.data?.name;
+    }
+  };
+
+  const renderCaption = () => {
+    if (isEnabledTopics) {
+      return currentChannel.data?.name;
+    } else {
+      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} members`;
+    }
+  };
+
+  const renderIconAction = () => {
+    if (isEnabledTopics) {
+      return (
+        <IconButton>
+          <DotsThreeIcon color={theme.palette.text.primary} />
+        </IconButton>
+      );
+    } else {
+      if (!isGuest && !isBlocked) {
+        return (
+          <IconButton
+            onClick={() => {
+              dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+            }}
+          >
+            <MagnifyingGlass />
+          </IconButton>
+        );
+      } else {
+        return null;
+      }
+    }
+  };
+
   return (
     <>
       <Box
@@ -93,27 +186,7 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
                 </IconButton>
               )}
 
-              <Box sx={{ width: '60px' }}>
-                {isPublic ? (
-                  <AvatarComponent
-                    name={currentChannel.data?.name}
-                    url={currentChannel.data?.image || ''}
-                    width={60}
-                    height={60}
-                    isPublic={isPublic}
-                    openLightbox={true}
-                    shape={AvatarShape.Round}
-                  />
-                ) : (
-                  <ChannelAvatar
-                    channel={currentChannel}
-                    width={60}
-                    height={60}
-                    openLightbox={true}
-                    shape={AvatarShape.Round}
-                  />
-                )}
-              </Box>
+              {renderAvatar()}
 
               <Box
                 sx={{
@@ -145,7 +218,7 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
                       width: '100%',
                     }}
                   >
-                    {currentChannel.data.name}
+                    {renderName()}
                     <Typography
                       variant="caption"
                       sx={{
@@ -155,7 +228,7 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
                         fontWeight: 400,
                       }}
                     >
-                      {!isDirect ? `${currentChannel.data?.member_count} members` : <>{onlineStatus}</>}
+                      {renderCaption()}
                     </Typography>
                   </Typography>
                 </Button>
@@ -177,16 +250,7 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
               </>
             )}
 
-            {!isGuest && (
-              <IconButton
-                onClick={() => {
-                  dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
-                }}
-                disabled={isBlocked}
-              >
-                <MagnifyingGlass />
-              </IconButton>
-            )}
+            {renderIconAction()}
 
             {isGuest && (
               <LoadingButton variant="contained" onClick={onJoinChannel} loading={loadingJoin}>

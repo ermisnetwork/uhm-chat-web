@@ -222,7 +222,9 @@ export function FetchChannels(params) {
     if (!client) return;
     const { user_id } = getState().auth;
 
-    const filter = {};
+    const filter = {
+      type: ['messaging', 'team'],
+    };
     const sort = [];
     const options = {
       message_limit: 25,

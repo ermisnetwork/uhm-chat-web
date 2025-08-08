@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge, Box, Stack, Typography } from '@mui/material';
-import { styled, useTheme, alpha } from '@mui/material/styles';
+import { alpha, styled, useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddUnreadChannel, RemoveUnreadChannel, UpdateUnreadChannel } from '../redux/slices/channel';
-import ChannelAvatar from './ChannelAvatar';
 import { ClientEvents } from '../constants/events-const';
 import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
 import { Play, PushPin } from 'phosphor-react';
@@ -30,15 +29,15 @@ const StyledTopicItem = styled(Box)(({ theme }) => ({
   },
 }));
 
-const TopicElement = ({ topic }) => {
+const TopicElement = ({ topic, idSelected }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
   const { currentChannel, unreadChannels } = useSelector(state => state.channel);
+  const { currentTopic } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
-  const channelId = topic?.id || '';
-  const channelType = topic?.type || '';
+  const topicId = topic?.id || '';
   const isPinned = topic.data?.is_pinned;
 
   const [lastMessage, setLastMessage] = useState('');
@@ -198,24 +197,21 @@ const TopicElement = ({ topic }) => {
   }, [topic, user_id, users.length, unreadChannels]);
 
   const onLeftClick = () => {
-    if (currentChannel?.id !== channelId) {
-      navigate(`${DEFAULT_PATH}/${channelType}:${channelId}`);
-      dispatch(onReplyMessage(null));
-      dispatch(onEditMessage(null));
-    }
+    navigate(`${DEFAULT_PATH}/${currentChannel?.cid}?topicId=${topicId}`);
+    dispatch(onReplyMessage(null));
+    dispatch(onEditMessage(null));
   };
 
-  const isSelectedChannel = currentChannel?.id === channelId;
+  const isSelectedTopic = currentTopic && currentTopic?.id === topicId;
 
   return (
     <>
       <StyledTopicItem
         onClick={onLeftClick}
-        sx={
-          {
-            // backgroundColor: isSelectedChannel ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
-          }
-        }
+        sx={{
+          backgroundColor:
+            idSelected === topicId ? `${alpha(theme.palette.primary.main, 0.1)} !important` : 'transparent',
+        }}
         gap={1}
       >
         {/* -------------------------------avatar------------------------------- */}

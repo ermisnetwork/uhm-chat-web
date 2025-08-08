@@ -5,6 +5,7 @@ export const ChatType = {
   TEAM: 'team',
   MESSAGING: 'messaging',
   GENERAL: 'general',
+  TOPIC: 'topic',
 };
 
 // This function converts the string to lowercase, then perform the conversion

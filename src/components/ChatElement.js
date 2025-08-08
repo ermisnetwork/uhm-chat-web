@@ -268,7 +268,7 @@ const ChatElement = ({ channel }) => {
 
   const onLeftClick = () => {
     if (!isRightClick && currentChannel?.id !== channelId) {
-      navigate(`${DEFAULT_PATH}/${channelType}:${channelId}`);
+      navigate(`${DEFAULT_PATH}/${channel.cid}`);
       dispatch(onReplyMessage(null));
       dispatch(onEditMessage(null));
     }

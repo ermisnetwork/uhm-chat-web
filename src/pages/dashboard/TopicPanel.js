@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Box,
   Button,
   IconButton,
   ListItemIcon,
@@ -10,36 +9,33 @@ import {
   Popover,
   Stack,
   Typography,
+  Box,
   styled,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { isPublicChannel, splitChannelId } from '../../utils/commons';
-import { setSidebar } from '../../redux/slices/app';
-import { AvatarShape, SidebarType } from '../../constants/commons-const';
+import { AvatarShape } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
 import AvatarComponent from '../../components/AvatarComponent';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import NoTopic from '../../assets/Illustration/NoTopic';
-import AvatarDefault from '../../components/AvatarDefault';
 import GeneralElement from '../../components/GeneralElement';
 import NewTopicDialog from '../../sections/dashboard/NewTopicDialog';
 import { SetOpenNewTopicDialog } from '../../redux/slices/dialog';
 import FlipMove from 'react-flip-move';
-import ChatElement from '../../components/ChatElement';
 import TopicElement from '../../components/TopicElement';
 import { ClientEvents } from '../../constants/events-const';
 import { WatchCurrentChannel } from '../../redux/slices/channel';
+import { useSearchParams } from 'react-router-dom';
+import { ConnectCurrentTopic, SetCurrentTopic } from '../../redux/slices/topic';
 
-const StyledTopicItem = styled(Stack)(({ theme }) => ({
-  width: '100%',
-  borderRadius: '16px',
-  position: 'relative',
-  transition: 'background-color 0.2s ease-in-out',
-  display: 'flex',
-  '&:hover': {
-    cursor: 'pointer',
-    backgroundColor: theme.palette.divider,
+const StyledTopicItem = styled(Box)(({ theme }) => ({
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  margin: '0px -15px',
+  padding: '5px 10px',
+  '&:last-child': {
+    borderBottom: 'none',
   },
 }));
 
@@ -235,9 +231,14 @@ const TopicPanel = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
+  const { currentTopic } = useSelector(state => state.topic);
   const topics = currentChannel?.state?.topics || [];
+  const [searchParams] = useSearchParams();
+  const topicID = searchParams.get('topicId');
+  const [idSelected, setIdSelected] = useState('');
 
   useEffect(() => {
+    console.log('--currentChannel--', currentChannel);
     const handleChannelTopicCreated = event => {
       const splitCID = splitChannelId(event.cid);
       const channelId = splitCID.channelId;
@@ -251,7 +252,20 @@ const TopicPanel = () => {
     };
   }, [currentChannel]);
 
-  console.log('----topics----', topics);
+  useEffect(() => {
+    if (topicID) {
+      dispatch(ConnectCurrentTopic(topicID));
+      setIdSelected(topicID);
+    } else {
+      dispatch(SetCurrentTopic(null));
+      setIdSelected(currentChannel.id);
+    }
+  }, [topicID, currentChannel]);
+
+  useEffect(() => {
+    console.log('--currentTopic--', currentTopic);
+  }, [currentTopic]);
+
   if (!currentChannel?.data?.topics_enabled) return null;
 
   return (
@@ -265,20 +279,21 @@ const TopicPanel = () => {
             overflowY: 'auto',
             overflowX: 'hidden',
             minHeight: 'auto',
-            padding: '15px',
+            padding: '0 15px',
           }}
           className="customScrollbar"
-          spacing={2}
         >
-          <GeneralElement />
+          <StyledTopicItem key={`topic-general`}>
+            <GeneralElement idSelected={idSelected} />
+          </StyledTopicItem>
 
           {topics.length > 0 ? (
             <FlipMove duration={200}>
               {topics.map(item => {
                 return (
-                  <div className="channelItem" key={`topic-${item.id}`}>
-                    <TopicElement topic={item} />
-                  </div>
+                  <StyledTopicItem key={`topic-${item.id}`}>
+                    <TopicElement topic={item} idSelected={idSelected} />
+                  </StyledTopicItem>
                 );
               })}
             </FlipMove>

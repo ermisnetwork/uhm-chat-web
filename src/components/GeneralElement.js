@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Badge, Box, Stack, Typography } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
+import { alpha, styled, useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { AddUnreadChannel, RemoveUnreadChannel, UpdateUnreadChannel } from '../redux/slices/channel';
 import { ClientEvents } from '../constants/events-const';
@@ -11,6 +11,9 @@ import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
+import { useNavigate } from 'react-router-dom';
+import { DEFAULT_PATH } from '../config';
+import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
 
 const StyledGeneralItem = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -26,7 +29,8 @@ const StyledGeneralItem = styled(Box)(({ theme }) => ({
   },
 }));
 
-const GeneralElement = () => {
+const GeneralElement = ({ idSelected }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel, unreadChannels } = useSelector(state => state.channel);
@@ -197,13 +201,19 @@ const GeneralElement = () => {
     };
   }, [currentChannel, user_id, users.length, unreadChannels]);
 
+  const onLeftClick = () => {
+    navigate(`${DEFAULT_PATH}/${currentChannel?.cid}`);
+    dispatch(onReplyMessage(null));
+    dispatch(onEditMessage(null));
+  };
+
   return (
     <StyledGeneralItem
-      sx={
-        {
-          // backgroundColor: isSelectedChannel ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
-        }
-      }
+      onClick={onLeftClick}
+      sx={{
+        backgroundColor:
+          idSelected === currentChannel.id ? `${alpha(theme.palette.primary.main, 0.1)} !important` : 'transparent',
+      }}
       gap={1}
     >
       {/* -------------------------------avatar------------------------------- */}
