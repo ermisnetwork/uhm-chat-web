@@ -9,6 +9,8 @@ import useOnlineStatus from '../hooks/useOnlineStatus';
 import ImageCanvas from './ImageCanvas';
 import AvatarDefault from './AvatarDefault';
 import { Box } from '@mui/material';
+import { isPublicChannel } from '../utils/commons';
+import AvatarComponent from './AvatarComponent';
 
 const StyledBadgeOnline = styled(Badge)(({ theme, status }) => ({
   '& .MuiBadge-badge': {
@@ -80,6 +82,7 @@ export default function ChannelAvatar({ channel, width, height, openLightbox, sh
 
   const isDirect = channel?.type === ChatType.MESSAGING;
   const channelAvatar = channel.data?.image || '';
+  const isPublic = isPublicChannel(channel);
 
   const directMembers = useMemo(
     () => (isDirect ? Object.values(channel.state.members) : []),
@@ -132,6 +135,20 @@ export default function ChannelAvatar({ channel, width, height, openLightbox, sh
   };
 
   if (!channel) return null;
+
+  if (isPublic) {
+    return (
+      <AvatarComponent
+        name={channel.data?.name}
+        url={channel.data?.image || ''}
+        width={width}
+        height={height}
+        isPublic={isPublic}
+        openLightbox={openLightbox}
+        shape={AvatarShape.Round}
+      />
+    );
+  }
 
   return (
     <Stack direction="row" spacing={2} sx={{ position: 'relative' }}>

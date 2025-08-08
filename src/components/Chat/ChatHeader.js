@@ -6,11 +6,10 @@ import useResponsive from '../../hooks/useResponsive';
 import { setSidebar, showSnackbar } from '../../redux/slices/app';
 import { useDispatch, useSelector } from 'react-redux';
 import ChannelAvatar from '../ChannelAvatar';
-import { handleError, isChannelDirect, isPublicChannel } from '../../utils/commons';
+import { handleError, isChannelDirect } from '../../utils/commons';
 import { AvatarShape, CallType, CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
 import { LoadingButton } from '@mui/lab';
 import { setCurrentChannel, setCurrentChannelStatus, SetIsGuest } from '../../redux/slices/channel';
-import AvatarComponent from '../AvatarComponent';
 import useOnlineStatus from '../../hooks/useOnlineStatus';
 import { callClient } from '../../client';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +28,6 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
   const { currentTopic } = useSelector(state => state.topic);
 
   const isDirect = isChannelDirect(currentChannel);
-  const isPublic = isPublicChannel(currentChannel);
   const isEnabledTopics = currentChannel?.data?.topics_enabled;
 
   const [loadingJoin, setLoadingJoin] = useState(false);
@@ -87,27 +85,7 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
       );
     } else {
       return (
-        <>
-          {isPublic ? (
-            <AvatarComponent
-              name={currentChannel.data?.name}
-              url={currentChannel.data?.image || ''}
-              width={60}
-              height={60}
-              isPublic={isPublic}
-              openLightbox={true}
-              shape={AvatarShape.Round}
-            />
-          ) : (
-            <ChannelAvatar
-              channel={currentChannel}
-              width={60}
-              height={60}
-              openLightbox={true}
-              shape={AvatarShape.Round}
-            />
-          )}
-        </>
+        <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
       );
     }
   };

@@ -171,7 +171,6 @@ const HomeSearch = ({ channels }) => {
                 <Stack spacing={1}>
                   {filteredLocalChannels.map(channel => {
                     const dataChannel = channels.find(it => it.data.id === channel.id);
-                    const isPublic = channel.type === ChatType.TEAM && channel.public;
                     const channelId = channel.id;
                     const channelType = channel.type;
                     return (
@@ -188,18 +187,7 @@ const HomeSearch = ({ channels }) => {
                           justifyContent="space-between"
                           sx={{ padding: '12px' }}
                         >
-                          {isPublic ? (
-                            <AvatarComponent
-                              name={channel.name}
-                              url={channel.image}
-                              width={40}
-                              height={40}
-                              isPublic={isPublic}
-                              shape={AvatarShape.Round}
-                            />
-                          ) : (
-                            <ChannelAvatar channel={dataChannel} width={40} height={40} />
-                          )}
+                          <ChannelAvatar channel={dataChannel} width={40} height={40} shape={AvatarShape.Round} />
                           <Stack sx={{ width: 'calc(100% - 40px)', paddingLeft: '15px' }}>
                             <Typography
                               variant="subtitle2"

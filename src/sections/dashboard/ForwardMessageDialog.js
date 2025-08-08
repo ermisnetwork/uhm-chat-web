@@ -3,11 +3,10 @@ import { Dialog, DialogContent, DialogTitle, Slide, Box, Stack, Typography, Icon
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
 import { onForwardMessage } from '../../redux/slices/messages';
-import AvatarComponent from '../../components/AvatarComponent';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import { MagnifyingGlass, X } from 'phosphor-react';
 import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { AvatarShape, ChatType } from '../../constants/commons-const';
+import { AvatarShape } from '../../constants/commons-const';
 import { showSnackbar } from '../../redux/slices/app';
 import { formatString } from '../../utils/commons';
 
@@ -140,7 +139,6 @@ const ForwardMessageDialog = () => {
           <Stack spacing={2}>
             {filteredChannels.length ? (
               filteredChannels.map(channel => {
-                const isPublic = channel.type === ChatType.TEAM && channel.data.public;
                 const channelId = channel.id;
                 const status = forwardStatus[channelId] || 'idle';
                 const isDisabled = status === 'sent';
@@ -152,18 +150,7 @@ const ForwardMessageDialog = () => {
                       alignItems="center"
                       sx={{ width: 'calc(100% - 60px)', paddingRight: '15px' }}
                     >
-                      {isPublic ? (
-                        <AvatarComponent
-                          name={channel.data.name}
-                          url={channel.data?.image || ''}
-                          width={30}
-                          height={30}
-                          isPublic={isPublic}
-                          shape={AvatarShape.Round}
-                        />
-                      ) : (
-                        <ChannelAvatar channel={channel} width={30} height={30} shape={AvatarShape.Round} />
-                      )}
+                      <ChannelAvatar channel={channel} width={30} height={30} shape={AvatarShape.Round} />
                       <Typography
                         variant="subtitle2"
                         sx={{

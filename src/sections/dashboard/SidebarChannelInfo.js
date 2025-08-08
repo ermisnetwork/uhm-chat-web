@@ -23,7 +23,6 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { setChannelConfirm, SetOpenInviteFriendDialog } from '../../redux/slices/dialog';
 import { ClientEvents } from '../../constants/events-const';
-import AvatarComponent from '../../components/AvatarComponent';
 import { DOMAIN_APP } from '../../config';
 import AntSwitch from '../../components/AntSwitch';
 import ChannelNotificationDialog from './ChannelNotificationDialog';
@@ -93,7 +92,6 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
-  const isPublic = isPublicChannel(currentChannel);
 
   const channelInfo = {
     name: currentChannel.data.name || '',
@@ -213,27 +211,13 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
             {isEditing ? (
               <RHFUploadAvatar name="image" onDrop={handleDrop} />
             ) : (
-              <>
-                {isPublic ? (
-                  <AvatarComponent
-                    name={channelInfo?.name}
-                    url={channelInfo?.image || ''}
-                    width={130}
-                    height={130}
-                    isPublic={isPublic}
-                    openLightbox={true}
-                    shape={AvatarShape.Round}
-                  />
-                ) : (
-                  <ChannelAvatar
-                    channel={currentChannel}
-                    width={130}
-                    height={130}
-                    openLightbox={true}
-                    shape={AvatarShape.Round}
-                  />
-                )}
-              </>
+              <ChannelAvatar
+                channel={currentChannel}
+                width={130}
+                height={130}
+                openLightbox={true}
+                shape={AvatarShape.Round}
+              />
             )}
             {/* --------------------channel name-------------------- */}
             <Typography

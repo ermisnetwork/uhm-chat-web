@@ -14,10 +14,9 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { isPublicChannel, splitChannelId } from '../../utils/commons';
+import { splitChannelId } from '../../utils/commons';
 import { AvatarShape } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
-import AvatarComponent from '../../components/AvatarComponent';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import NoTopic from '../../assets/Illustration/NoTopic';
 import GeneralElement from '../../components/GeneralElement';
@@ -88,7 +87,6 @@ const TopicHeader = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
-  const isPublic = isPublicChannel(currentChannel);
   const [anchorEl, setAnchorEl] = useState(null);
 
   const ACTIONS = [
@@ -142,19 +140,7 @@ const TopicHeader = () => {
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
-      {isPublic ? (
-        <AvatarComponent
-          name={currentChannel.data?.name}
-          url={currentChannel.data?.image || ''}
-          width={60}
-          height={60}
-          isPublic={isPublic}
-          openLightbox={true}
-          shape={AvatarShape.Round}
-        />
-      ) : (
-        <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
-      )}
+      <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
 
       <Typography
         variant="h6"

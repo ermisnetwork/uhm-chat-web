@@ -441,6 +441,7 @@ const ChatComponent = () => {
   const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
     state => state.messages,
   );
+  const { currentTopic } = useSelector(state => state.topic);
   const [messages, setMessages] = useState([]);
   const [usersTyping, setUsersTyping] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -457,6 +458,7 @@ const ChatComponent = () => {
   const users = client.state.users ? Object.values(client.state.users) : [];
   const isLgToXl = useResponsive('between', null, 'lg', 'xl');
   const isMobileToLg = useResponsive('down', 'lg');
+  const currentChat = currentTopic ? currentTopic : currentChannel;
 
   useEffect(() => {
     if (currentChannel) {

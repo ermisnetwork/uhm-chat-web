@@ -9,7 +9,7 @@ import {
   UpdateUnreadChannel,
 } from '../redux/slices/channel';
 import ChannelAvatar from './ChannelAvatar';
-import { isChannelDirect, isPublicChannel, myRoleInChannel } from '../utils/commons';
+import { isChannelDirect, myRoleInChannel } from '../utils/commons';
 import { ClientEvents } from '../constants/events-const';
 import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
 import { EnvelopeSimpleOpen, Play, PushPin, PushPinSlash, SignOut, Trash } from 'phosphor-react';
@@ -18,7 +18,6 @@ import { setChannelConfirm } from '../redux/slices/dialog';
 import { convertMessageSystem } from '../utils/messageSystem';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../config';
-import AvatarComponent from './AvatarComponent';
 import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
@@ -77,7 +76,6 @@ const ChatElement = ({ channel }) => {
   const channelType = channel?.type || '';
   const isDirect = isChannelDirect(channel);
   const myRole = myRoleInChannel(channel);
-  const isPublic = isPublicChannel(channel);
   const isPinned = channel.data.is_pinned;
 
   const [lastMessage, setLastMessage] = useState('');
@@ -345,18 +343,7 @@ const ChatElement = ({ channel }) => {
         gap={2}
       >
         {/* -------------------------------avatar------------------------------- */}
-        {isPublic ? (
-          <AvatarComponent
-            name={channel.data.name}
-            url={channel.data?.image || ''}
-            width={60}
-            height={60}
-            isPublic={isPublic}
-            shape={AvatarShape.Round}
-          />
-        ) : (
-          <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
-        )}
+        <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
 
         {/* -------------------------------content------------------------------- */}
         <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
