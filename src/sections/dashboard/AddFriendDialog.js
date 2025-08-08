@@ -116,7 +116,7 @@ const AddFriendDialog = () => {
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {'Add Friend'}
         <IconButton onClick={onCloseAddFriendDialog}>
-          <X size={25} />
+          <X />
         </IconButton>
       </DialogTitle>
 
