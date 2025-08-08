@@ -12,6 +12,7 @@ import {
   Box,
   Paper,
 } from '@mui/material';
+// import { Minus, Rectangle } from '@phosphor-icons/react';
 import { LoadingButton } from '@mui/lab';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatString } from '../../utils/commons';
@@ -28,10 +29,14 @@ import {
   Screencast,
   VideoCamera,
   VideoCameraSlash,
-  X,
+  X,Minus, Rectangle
 } from 'phosphor-react';
 import { Howl } from 'howler';
 import { showSnackbar } from '../../redux/slices/app';
+import avatarBefore from '../../assets/Images/bg-avatar-before.png';
+import avatarAfter from '../../assets/Images/bg-avatar-after.png';
+import  PhoneDis  from '../../assets/Images/phone-disconnect.png';
+import  PhoneConn  from '../../assets/Images/phone-connect.png';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -40,9 +45,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const StyledCallDirectDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialog-container': {
     '& .MuiPaper-root': {
-      width: '500px',
-      height: '550px',
-      background: theme.palette.mode === 'light' ? '#F0F4FA' : theme.palette.background.paper,
+      width: '600px',
+      height: '450px',
+      background: theme.palette.mode === 'light' ? 'rgba(121, 73, 236, 1)' : theme.palette.background.paper,
       '&:hover .hoverShow': {
         opacity: 1,
       },
@@ -69,12 +74,19 @@ const StyledCallDirectDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
+const CallDirectDialogMini = styled(Dialog)(({theme}) => ({
+  '& .MuiDialog-container': {
+    
+  },
+}));
+
+
 const StyledButton = styled(Box)(({ theme }) => ({
   textAlign: 'center',
   width: '70px',
   '& .MuiButton-root': {
-    minWidth: '45px',
-    height: '45px',
+    minWidth: '55px',
+    height: '55px',
     borderRadius: '50%',
     padding: 0,
     color: '#fff',
@@ -121,7 +133,7 @@ const CallDirectDialog2 = () => {
   const [remoteMicOn, setRemoteMicOn] = useState(true);
   const [minimized, setMinimized] = useState(false);
   const [isUpgradeCall, setIsUpgradeCall] = useState(false);
-
+  
   const onCancelCall = () => {
     setMicOn(true);
     setIsScreenShare(false);
@@ -326,11 +338,12 @@ const CallDirectDialog2 = () => {
       await callClient.startScreenShare();
     }
   };
+  
 
   const renderButton = () => {
     return (
       <>
-        <StyledButton>
+        {/* <StyledButton>
           <Button
             className={`moreButton`}
             variant="contained"
@@ -341,41 +354,9 @@ const CallDirectDialog2 = () => {
             <ChatCircleDots weight="fill" size={20} />
           </Button>
           <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>chat</span>
-        </StyledButton>
-        <StyledButton>
-          <Button
-            className={`moreButton ${micOn && callDirectStatus === CallStatus.CONNECTED ? 'active' : ''}`}
-            variant="contained"
-            color="inherit"
-            onClick={onToggleMic}
-            disabled={callDirectStatus !== CallStatus.CONNECTED}
-          >
-            {micOn ? (
-              <Microphone size={20} weight="fill" />
-            ) : (
-              <MicrophoneSlash size={20} weight="fill" color={theme.palette.error.main} />
-            )}
-          </Button>
-          <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{micOn ? 'mute' : 'unmute'}</span>
-        </StyledButton>
-        <StyledButton>
-          <Button
-            className={`moreButton ${localCameraOn && callDirectStatus === CallStatus.CONNECTED ? 'active' : ''}`}
-            variant="contained"
-            color="inherit"
-            onClick={onToggleCamera}
-            disabled={callDirectStatus !== CallStatus.CONNECTED}
-          >
-            {localCameraOn ? (
-              <VideoCamera weight="fill" size={20} />
-            ) : (
-              <VideoCameraSlash weight="fill" size={20} color={theme.palette.error.main} />
-            )}
-          </Button>
-          <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>
-            {localCameraOn ? 'stop video' : 'start video'}
-          </span>
-        </StyledButton>
+        </StyledButton> */}
+        
+        
 
         {localCameraOn && (
           <StyledButton>
@@ -395,25 +376,62 @@ const CallDirectDialog2 = () => {
           <>
             <StyledButton>
               <Button onClick={onSendRejectCall} variant="contained" color="error">
-                <PhoneDisconnect weight="fill" size={20} />
+                <PhoneDisconnect weight="fill" size={35} />
               </Button>
-              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>decline</span>
+              {/* <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>decline</span> */}
             </StyledButton>
             <StyledButton>
               <LoadingButton onClick={onSendAcceptCall} variant="contained" color="success" loading={loadingButton}>
-                <Phone weight="fill" size={20} />
+                <Phone weight="fill" size={35} />
               </LoadingButton>
-              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>accept</span>
+              {/* <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>accept</span> */}
             </StyledButton>
           </>
         )}
-
+        {(callDirectData?.type === 'outgoing' || [CallStatus.CONNECTED].includes(callDirectStatus)) && (
+          <StyledButton>
+            <Button
+              className={`moreButton ${micOn && callDirectStatus === CallStatus.CONNECTED ? 'active' : ''}`}
+              variant="contained"
+              color="inherit"
+              onClick={onToggleMic}
+              disabled={callDirectStatus !== CallStatus.CONNECTED}
+            >
+              {micOn ? (
+                <Microphone size={20} weight="fill" />
+              ) : (
+                <MicrophoneSlash size={20} weight="fill" color={theme.palette.error.main} />
+              )}
+            </Button>
+            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{micOn ? 'mute' : 'unmute'}</span>
+          </StyledButton>
+        )}
         {(callDirectData?.type === 'outgoing' || [CallStatus.CONNECTED].includes(callDirectStatus)) && (
           <StyledButton>
             <Button onClick={onSendEndCall} variant="contained" color="error">
               <PhoneDisconnect weight="fill" size={20} />
             </Button>
             <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>end call</span>
+          </StyledButton>
+        )}
+        {(callDirectData?.type === 'outgoing' || [CallStatus.CONNECTED].includes(callDirectStatus)) && (
+          <StyledButton>
+            <Button
+              className={`moreButton ${localCameraOn && callDirectStatus === CallStatus.CONNECTED ? 'active' : ''}`}
+              variant="contained"
+              color="inherit"
+              onClick={onToggleCamera}
+              disabled={callDirectStatus !== CallStatus.CONNECTED}
+            >
+              {localCameraOn ? (
+                <VideoCamera weight="fill" size={20} />
+              ) : (
+                <VideoCameraSlash weight="fill" size={20} color={theme.palette.error.main} />
+              )}
+            </Button>
+            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>
+              {localCameraOn ? 'stop video' : 'start video'}
+            </span>
           </StyledButton>
         )}
 
@@ -434,85 +452,119 @@ const CallDirectDialog2 = () => {
 
   return (
     <>
-      <StyledCallDirectDialog
+      {callDirectData?.type === 'incoming' && callDirectStatus === CallStatus.RINGING &&(
+        <CallDirectDialogMini
         open={openCallDirectDialog}
         TransitionComponent={Transition}
         keepMounted
-        sx={{ visibility: minimized ? 'hidden' : '' }}
+        BackdropProps={{
+          style: { background: 'transparent' }
+        }}
+        // sx={{ visibility: minimized ? 'hidden' : '' }}
+        sx={{
+          visibility: minimized ? 'hidden' : '',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          alignItems: 'flex-end',
+          bottom: '0',
+        }}
       >
-        <DialogContent sx={{ padding: 0 }}>
-          <Typography
+        <Box
+          sx={{
+            width: '400px',
+            height: '300px',
+            backgroundColor: 'rgba(121, 73, 236, 1)',
+            position: 'fixed',
+            zIndex: '10',
+            bottom: '15px',
+            right: '15px',
+            borderRadius: '30px',
+          }}
+        >
+        <Box
             variant="body1"
             sx={{
-              fontSize: '22px',
-              fontWeight: 600,
-              padding: '15px 40px',
-              textAlign: 'center',
-              position: 'relative',
-              zIndex: 3,
-              transition: 'all .1s',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              color: callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? '#fff' : 'inherit',
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              zIndex: 2,
+              display: 'flex',
             }}
-            className={callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? 'hoverShow' : ''}
           >
-            {user_id === callerInfo?.id ? formatString(receiverInfo?.name) : formatString(callerInfo?.name)}
-          </Typography>
-
-          {callDirectStatus === CallStatus.CONNECTED && !remoteMicOn && (
-            <MicrophoneSlash
-              weight="fill"
-              size={18}
-              style={{
-                position: 'absolute',
-                top: '15px',
-                left: '15px',
-                zIndex: 2,
-                color: theme.palette.error.main,
-              }}
-            />
-          )}
-
-          {callDirectStatus === CallStatus.CONNECTED && (
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', backgroundColor: 'rgba(121, 73, 236, 1)', boxShadow: 'none', borderRadius: '0px' }}
+            >
+              <Minus  size={14} onClick={() => setMinimized(true)} />
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', backgroundColor: 'rgba(121, 73, 236, 1)', boxShadow: 'none', borderRadius: '0px' }}
+            >
+              <Rectangle size={14} />
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', backgroundColor: 'rgba(121, 73, 236, 1)', boxShadow: 'none', borderRadius: '0px' }}
+            >
+              <X weight="fill" size={14} onClick={onSendRejectCall} />
+            </Button>
+          </Box>
+          <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '85%',
+              flexDirection: 'column'
+            }}
+            >
+            <div >
+              <MemberAvatar
+                member={
+                  user_id === callerInfo?.id
+                    ? { name: receiverInfo?.name, avatar: receiverInfo?.avatar }
+                    : { name: callerInfo?.name, avatar: callerInfo?.avatar }
+                }
+                width={100}
+                height={100}
+              />
+              <img src={avatarBefore} style={{ left: 135, top: 30,height: 125, width: 130, position: 'absolute', }} alt="logo" />
+              <img src={avatarAfter} style={{ left: 135, top: 30,height: 125, width: 130, position: 'absolute', }} alt="logo" />
+            </div>
             <Typography
               variant="body1"
               sx={{
-                fontSize: '20px',
-                fontWeight: 500,
-                margin: '0 15px',
+                fontSize: '18px',
+                fontWeight: 600,
+                padding: '10px 40px',
                 textAlign: 'center',
                 position: 'relative',
                 zIndex: 3,
-                color: theme.palette.success.main,
+                transition: 'all .1s',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                color: callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? '#fff' : '#fff',
               }}
+              className={callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? 'hoverShow' : ''}
             >
-              {formatTime(time)}
+              {user_id === callerInfo?.id ? formatString(receiverInfo?.name) : formatString(callerInfo?.name)}
             </Typography>
-          )}
-
-          <div className="receiverAvatar">
-            <MemberAvatar
-              member={
-                user_id === callerInfo?.id
-                  ? { name: receiverInfo?.name, avatar: receiverInfo?.avatar }
-                  : { name: callerInfo?.name, avatar: callerInfo?.avatar }
-              }
-              width={200}
-              height={200}
-            />
-          </div>
-          <div
+            <div
             style={{
               textAlign: 'center',
               fontWeight: 600,
-              marginTop: '15px',
+              marginTop: '5px',
               fontSize: '14px',
-              color: theme.palette.text.secondary,
+              lineHeight: '0px',
+              color: theme.palette.success.main,
             }}
           >
             {callDirectStatus === CallStatus.RINGING ? (
-              'ringing'
+              'is calling you'
             ) : (
               <span style={{ color: theme.palette.success.main }}>Connected</span>
             )}
@@ -527,108 +579,270 @@ const CallDirectDialog2 = () => {
               </>
             )}
           </div>
+          </Box>
+          <Box 
+            sx={{
+              display: 'flex',
+              bottom: '20px',
+              position: 'absolute',
+              width: '100%',
+              justifyContent: 'center'
+            }}
+          >
+            <StyledButton sx={{ marginRight: '25px'}}>
+              <Button onClick={onSendRejectCall } variant="contained" color="error">
+                {/* <PhoneDisconnect weight="fill" size={35} /> */}
+                {/* <PhoneDis size={35} /> */}
+                <img src={PhoneDis} style={{ width: 35, height: 35}} />
+              </Button>
+              {/* <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>decline</span> */}
+            </StyledButton>
+            <StyledButton>
+              <LoadingButton onClick={onSendAcceptCall} variant="contained" color="success" loading={loadingButton}>
+                {/* <Phone weight="fill" size={35} /> */}
+                <img src={PhoneConn} style={{ width: 35, height: 35}} />
 
-          {connectionStatus && (
-            <span
-              style={{
-                color: remoteCameraOn ? '#fff' : '#919EAB',
+              </LoadingButton>
+              {/* <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>accept</span> */}
+            </StyledButton>
+          </Box>
+        </Box>
+        </CallDirectDialogMini>
+      )}
+
+      {(callDirectData?.type === 'outgoing' || [CallStatus.CONNECTED].includes(callDirectStatus)) && (
+        <StyledCallDirectDialog
+          open={openCallDirectDialog}
+          TransitionComponent={Transition}
+          keepMounted
+          BackdropProps={{
+            style: { background: 'transparent' }
+          }}
+          sx={{ visibility: minimized ? 'hidden' : '' }}
+        >
+          <DialogContent sx={{ padding: 0 }}>
+            <Box
+              variant="body1"
+              sx={{
                 position: 'absolute',
-                top: '110px',
-                left: '50%',
-                transform: 'translateX(-50%)',
+                top: '15px',
+                right: '15px',
                 zIndex: 2,
-                fontSize: '14px',
-                width: '100%',
-                padding: '0 15px',
-                textAlign: 'center',
+                display: 'flex',
               }}
             >
-              {connectionStatus}
-            </span>
-          )}
-
-          <Stack
-            sx={{
-              width: '150px',
-              height: '100px',
-              position: 'absolute',
-              bottom: '90px',
-              right: '15px',
-              borderRadius: '6px',
-              overflow: 'hidden',
-              zIndex: 2,
-            }}
-          >
-            <video
-              ref={localVideoRef}
-              playsInline
-              autoPlay
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: localCameraOn ? 'block' : 'none' }}
-              muted
-            />
-            <audio ref={localAudioRef} autoPlay muted />
-          </Stack>
-          <Stack
-            sx={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              zIndex: 1,
-            }}
-          >
-            {requestVideoCall && (
-              <Stack
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  zIndex: 2,
-                  backgroundColor: '#000',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  color: '#fff',
-                  fontSize: '14px',
-                  padding: '0 15px',
-                  color: '#DFE3E8',
-                }}
+              <Button
+                variant="contained"
+                color="error"
+                sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', backgroundColor: 'rgba(121, 73, 236, 1)', boxShadow: 'none', borderRadius: '0px' }}
               >
-                Request to switch to a video call
-              </Stack>
+                <Minus  size={14} onClick={() => setMinimized(true)} />
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', backgroundColor: 'rgba(121, 73, 236, 1)', boxShadow: 'none', borderRadius: '0px' }}
+              >
+                <Rectangle size={14} />
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', backgroundColor: 'rgba(121, 73, 236, 1)', boxShadow: 'none', borderRadius: '0px' }}
+              >
+                <X weight="fill" size={14} onClick={onSendRejectCall} />
+              </Button>
+            </Box>
+            <div className="receiverAvatar">
+              <MemberAvatar
+                member={
+                  user_id === callerInfo?.id
+                    ? { name: receiverInfo?.name, avatar: receiverInfo?.avatar }
+                    : { name: callerInfo?.name, avatar: callerInfo?.avatar }
+                }
+                width={100}
+                height={100}
+              />
+            </div>
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: '18px',
+                fontWeight: 600,
+                padding: '15px 40px',
+                textAlign: 'center',
+                position: 'relative',
+                zIndex: 3,
+                transition: 'all .1s',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                color: callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? '#fff' : '#fff',
+              }}
+              className={callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? 'hoverShow' : ''}
+            >
+              {user_id === callerInfo?.id ? formatString(receiverInfo?.name) : formatString(callerInfo?.name)}
+            </Typography>
+
+            {callDirectStatus === CallStatus.CONNECTED && !remoteMicOn && (
+              <MicrophoneSlash
+                weight="fill"
+                size={18}
+                style={{
+                  position: 'absolute',
+                  top: '15px',
+                  left: '15px',
+                  zIndex: 2,
+                  color: theme.palette.error.main,
+                }}
+              />
             )}
 
-            <video
-              ref={remoteVideoRef}
-              playsInline
-              autoPlay
+            {callDirectStatus === CallStatus.CONNECTED && (
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: '20px',
+                  fontWeight: 500,
+                  margin: '0 15px',
+                  textAlign: 'center',
+                  position: 'relative',
+                  zIndex: 3,
+                  color: theme.palette.success.main,
+                }}
+              >
+                {formatTime(time)}
+              </Typography>
+            )}
+
+            
+            <div
               style={{
+                textAlign: 'center',
+                fontWeight: 600,
+                marginTop: '15px',
+                fontSize: '14px',
+                lineHeight: '0px',
+                color: theme.palette.success.main,
+              }}
+            >
+              {callDirectStatus === CallStatus.RINGING ? (
+                'is calling you'
+              ) : (
+                <span style={{ color: theme.palette.success.main }}></span>
+              )}
+              {[CallStatus.RINGING].includes(callDirectStatus) && (
+                <>
+                  &nbsp;&nbsp;
+                  <div className="loader">
+                    <div className="dot" style={{ backgroundColor: theme.palette.text.secondary }} />
+                    <div className="dot" style={{ backgroundColor: theme.palette.text.secondary }} />
+                    <div className="dot" style={{ backgroundColor: theme.palette.text.secondary }} />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {connectionStatus && (
+              <span
+                style={{
+                  color: remoteCameraOn ? '#fff' : '#919EAB',
+                  position: 'absolute',
+                  top: '110px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 2,
+                  fontSize: '14px',
+                  width: '100%',
+                  padding: '0 15px',
+                  textAlign: 'center',
+                }}
+              >
+                {connectionStatus}
+              </span>
+            )}
+
+            <Stack
+              sx={{
+                width: '150px',
+                height: '100px',
+                position: 'absolute',
+                bottom: '90px',
+                right: '15px',
+                borderRadius: '6px',
+                overflow: 'hidden',
+                zIndex: 2,
+              }}
+            >
+              <video
+                ref={localVideoRef}
+                playsInline
+                autoPlay
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: localCameraOn ? 'block' : 'none' }}
+                muted
+              />
+              <audio ref={localAudioRef} autoPlay muted />
+            </Stack>
+            <Stack
+              sx={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover',
-                display: remoteCameraOn && !requestVideoCall ? 'block' : 'none',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                zIndex: 1,
               }}
-            />
-            <audio ref={remoteAudioRef} autoPlay />
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
-          {requestVideoCall ? (
-            <StyledButton>
-              <LoadingButton onClick={onSwitchToVideoCall} variant="contained" color="success">
-                <Phone weight="fill" size={20} />
-              </LoadingButton>
-              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>accept</span>
-            </StyledButton>
-          ) : (
-            renderButton()
-          )}
-        </DialogActions>
-      </StyledCallDirectDialog>
+            >
+              {requestVideoCall && (
+                <Stack
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: 2,
+                    backgroundColor: '#000',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    color: '#fff',
+                    fontSize: '14px',
+                    padding: '0 15px',
+                    color: '#DFE3E8',
+                  }}
+                >
+                  Request to switch to a video call
+                </Stack>
+              )}
 
+              <video
+                ref={remoteVideoRef}
+                playsInline
+                autoPlay
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: remoteCameraOn && !requestVideoCall ? 'block' : 'none',
+                }}
+              />
+              <audio ref={remoteAudioRef} autoPlay />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'center' }}>
+            {requestVideoCall ? (
+              <StyledButton>
+                <LoadingButton onClick={onSwitchToVideoCall} variant="contained" color="success">
+                  <Phone weight="fill" size={20} />
+                </LoadingButton>
+                <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>accept</span>
+              </StyledButton>
+            ) : (
+              renderButton()
+            )}
+          </DialogActions>
+        </StyledCallDirectDialog>
+      )}
       {minimized && (
         <Paper
           elevation={3}
