@@ -16,6 +16,7 @@ const initialState = {
   },
   openInviteFriendDialog: false,
   openNewTopicDialog: false,
+  openAddFriendDialog: false,
 };
 
 const slice = createSlice({
@@ -67,6 +68,13 @@ const slice = createSlice({
     setOpenInviteFriendDialog(state, action) {
       state.openInviteFriendDialog = action.payload;
     },
+
+    openAddFriendDialog(state) {
+      state.openAddFriendDialog = true;
+    },
+    closeAddFriendDialog(state) {
+      state.openAddFriendDialog = false;
+    },
     setOpenNewTopicDialog(state, action) {
       state.openNewTopicDialog = action.payload;
     },
@@ -115,4 +123,11 @@ export const SetOpenInviteFriendDialog = payload => (dispatch, getState) => {
 
 export const SetOpenNewTopicDialog = payload => (dispatch, getState) => {
   dispatch(slice.actions.setOpenNewTopicDialog(payload));
+};
+export const OpenAddFriendDialog = () => async (dispatch, getState) => {
+  dispatch(slice.actions.openAddFriendDialog());
+};
+
+export const CloseAddFriendDialog = () => async (dispatch, getState) => {
+  dispatch(slice.actions.closeAddFriendDialog());
 };

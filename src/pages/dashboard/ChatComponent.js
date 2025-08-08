@@ -626,6 +626,11 @@ const ChatComponent = () => {
       };
 
       const handleInviteAccept = async event => {
+        const splitCID = splitChannelId(event.cid);
+        const channelId = splitCID.channelId;
+        const channelType = splitCID.channelType;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+
         if (event.member.user_id === user_id) {
           setIsPendingInvite(false);
         } else {
