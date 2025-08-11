@@ -15,7 +15,7 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { splitChannelId } from '../../utils/commons';
-import { AvatarShape } from '../../constants/commons-const';
+import { AvatarShape, SidebarType } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import NoTopic from '../../assets/Illustration/NoTopic';
@@ -28,6 +28,7 @@ import { ClientEvents } from '../../constants/events-const';
 import { WatchCurrentChannel } from '../../redux/slices/channel';
 import { useSearchParams } from 'react-router-dom';
 import { ConnectCurrentTopic, SetCurrentTopic } from '../../redux/slices/topic';
+import { setSidebar } from '../../redux/slices/app';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -95,8 +96,7 @@ const TopicHeader = () => {
       icon: <InfoIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        // Handle channel info action
-        console.log('Channel Info clicked');
+        dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
       },
     },
     {

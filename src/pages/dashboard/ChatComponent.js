@@ -461,32 +461,32 @@ const ChatComponent = () => {
   const currentChat = currentTopic ? currentTopic : currentChannel;
 
   useEffect(() => {
-    if (currentChannel) {
-      const channelName = currentChannel.data.name ? currentChannel.data.name : getChannelName(currentChannel, users);
+    if (currentChat) {
+      const channelName = currentChat.data.name ? currentChat.data.name : getChannelName(currentChat, users);
       document.title = channelName;
       if (messageListRef.current) {
         messageListRef.current.scrollTop = 0;
       }
-      const listMessage = currentChannel.state.messages || [];
-      const members = Object.values(currentChannel.state.members);
+      const listMessage = currentChat.state.messages || [];
+      const members = Object.values(currentChat.state.members);
       const receiverInfo = members.find(member => member.user_id !== user_id);
       setIsAlertInvitePending(
         isDirect && [RoleMember.PENDING, RoleMember.SKIPPED].includes(receiverInfo?.channel_role),
       );
       setMessages(listMessage);
-      setIsPendingInvite(checkPendingInvite(currentChannel));
-      setUnreadCount(currentChannel.state.unreadCount);
-      dispatch(SetIsGuest(isGuestInPublicChannel(currentChannel)));
+      setIsPendingInvite(checkPendingInvite(currentChat));
+      setUnreadCount(currentChat.state.unreadCount);
+      dispatch(SetIsGuest(isGuestInPublicChannel(currentChat)));
       setNoMessageTitle(listMessage.length ? '' : 'No messages here yet...');
 
-      const read = currentChannel.state.read[user_id];
+      const read = currentChat.state.read[user_id];
       const lastReadMsgId = read.unread_messages ? read.last_read_message_id : '';
       setLastReadMessageId(lastReadMsgId);
       let lastSend = read.last_send || DefaultLastSend;
-      let duration = currentChannel.data.member_message_cooldown || 0;
+      let duration = currentChat.data.member_message_cooldown || 0;
 
       const onSetCooldownTime = event => {
-        const myRole = myRoleInChannel(currentChannel);
+        const myRole = myRoleInChannel(currentChat);
         if (event.type === ClientEvents.MessageNew) {
           if (event.user.id === user_id && event.channel_type === ChatType.TEAM && myRole === RoleMember.MEMBER) {
             lastSend = event.message.created_at;
@@ -525,10 +525,10 @@ const ChatComponent = () => {
               setMessages(prev => {
                 return [...prev, event.message];
               });
-              const myRole = myRoleInChannel(currentChannel);
+              const myRole = myRoleInChannel(currentChat);
               if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
                 setTimeout(() => {
-                  dispatch(SetMarkReadChannel(currentChannel));
+                  dispatch(SetMarkReadChannel(currentChat));
                 }, 100);
               }
             } else {
@@ -721,46 +721,46 @@ const ChatComponent = () => {
         dispatch(WatchCurrentChannel(channelId, channelType));
       };
 
-      currentChannel.on(ClientEvents.MessageNew, handleMessages);
-      currentChannel.on(ClientEvents.ReactionNew, handleMessages);
-      currentChannel.on(ClientEvents.ReactionDeleted, handleMessages);
-      currentChannel.on(ClientEvents.MessageDeleted, handleMessages);
-      currentChannel.on(ClientEvents.MessageUpdated, handleMessages);
-      currentChannel.on(ClientEvents.TypingStart, handleTypingStart);
-      currentChannel.on(ClientEvents.TypingStop, handleTypingStop);
-      currentChannel.on(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
-      currentChannel.on(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
-      currentChannel.on(ClientEvents.ChannelUpdated, handleChannelUpdated);
-      currentChannel.on(ClientEvents.MemberJoined, handleMemberJoined);
-      currentChannel.on(ClientEvents.MemberAdded, handleMemberAdded);
-      currentChannel.on(ClientEvents.MemberRemoved, handleMemberRemoved);
-      currentChannel.on(ClientEvents.MemberPromoted, handleMemberPromoted);
-      currentChannel.on(ClientEvents.MemberDemoted, handleMemberDemoted);
-      currentChannel.on(ClientEvents.PollChoiceNew, handleMessages);
-      currentChannel.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
-      currentChannel.on(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
-      currentChannel.on(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
+      currentChat.on(ClientEvents.MessageNew, handleMessages);
+      currentChat.on(ClientEvents.ReactionNew, handleMessages);
+      currentChat.on(ClientEvents.ReactionDeleted, handleMessages);
+      currentChat.on(ClientEvents.MessageDeleted, handleMessages);
+      currentChat.on(ClientEvents.MessageUpdated, handleMessages);
+      currentChat.on(ClientEvents.TypingStart, handleTypingStart);
+      currentChat.on(ClientEvents.TypingStop, handleTypingStop);
+      currentChat.on(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
+      currentChat.on(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
+      currentChat.on(ClientEvents.ChannelUpdated, handleChannelUpdated);
+      currentChat.on(ClientEvents.MemberJoined, handleMemberJoined);
+      currentChat.on(ClientEvents.MemberAdded, handleMemberAdded);
+      currentChat.on(ClientEvents.MemberRemoved, handleMemberRemoved);
+      currentChat.on(ClientEvents.MemberPromoted, handleMemberPromoted);
+      currentChat.on(ClientEvents.MemberDemoted, handleMemberDemoted);
+      currentChat.on(ClientEvents.PollChoiceNew, handleMessages);
+      currentChat.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
+      currentChat.on(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
+      currentChat.on(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
 
       return () => {
-        currentChannel.off(ClientEvents.MessageNew, handleMessages);
-        currentChannel.off(ClientEvents.ReactionNew, handleMessages);
-        currentChannel.off(ClientEvents.ReactionDeleted, handleMessages);
-        currentChannel.off(ClientEvents.MessageDeleted, handleMessages);
-        currentChannel.off(ClientEvents.MessageUpdated, handleMessages);
-        currentChannel.off(ClientEvents.TypingStart, handleTypingStart);
-        currentChannel.off(ClientEvents.TypingStop, handleTypingStop);
-        currentChannel.off(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
-        currentChannel.off(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
-        currentChannel.off(ClientEvents.ChannelUpdated, handleChannelUpdated);
-        currentChannel.off(ClientEvents.MemberJoined, handleMemberJoined);
-        currentChannel.off(ClientEvents.MemberAdded, handleMemberAdded);
-        currentChannel.off(ClientEvents.MemberRemoved, handleMemberRemoved);
-        currentChannel.off(ClientEvents.MemberPromoted, handleMemberPromoted);
-        currentChannel.off(ClientEvents.MemberDemoted, handleMemberDemoted);
-        currentChannel.off(ClientEvents.PollChoiceNew, handleMessages);
-        currentChannel.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
-        currentChannel.off(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
-        currentChannel.off(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
+        currentChat.off(ClientEvents.MessageNew, handleMessages);
+        currentChat.off(ClientEvents.ReactionNew, handleMessages);
+        currentChat.off(ClientEvents.ReactionDeleted, handleMessages);
+        currentChat.off(ClientEvents.MessageDeleted, handleMessages);
+        currentChat.off(ClientEvents.MessageUpdated, handleMessages);
+        currentChat.off(ClientEvents.TypingStart, handleTypingStart);
+        currentChat.off(ClientEvents.TypingStop, handleTypingStop);
+        currentChat.off(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
+        currentChat.off(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
+        currentChat.off(ClientEvents.ChannelUpdated, handleChannelUpdated);
+        currentChat.off(ClientEvents.MemberJoined, handleMemberJoined);
+        currentChat.off(ClientEvents.MemberAdded, handleMemberAdded);
+        currentChat.off(ClientEvents.MemberRemoved, handleMemberRemoved);
+        currentChat.off(ClientEvents.MemberPromoted, handleMemberPromoted);
+        currentChat.off(ClientEvents.MemberDemoted, handleMemberDemoted);
+        currentChat.off(ClientEvents.PollChoiceNew, handleMessages);
+        currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
+        currentChat.off(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
+        currentChat.off(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
       };
     } else {
       if (messageListRef.current) {
@@ -769,7 +769,7 @@ const ChatComponent = () => {
       setMessages([]);
       setUsersTyping([]);
     }
-  }, [currentChannel, user_id, messageListRef]);
+  }, [currentChat, user_id, messageListRef]);
 
   useEffect(() => {
     if (messageIdError) {
@@ -794,7 +794,7 @@ const ChatComponent = () => {
       setLoadingMore(true);
       const msgId = messages[0]?.id;
 
-      const response = await currentChannel.queryMessagesLessThanId(msgId);
+      const response = await currentChat.queryMessagesLessThanId(msgId);
 
       if (response && Array.isArray(response) && response.length > 0) {
         setMessages(prev => {
@@ -809,8 +809,8 @@ const ChatComponent = () => {
   };
 
   const queryMessages = async msgId => {
-    const channelType = currentChannel.data.type;
-    const channelId = currentChannel.data.id;
+    const channelType = currentChat.data.type;
+    const channelId = currentChat.data.id;
     const channel = client.channel(channelType, channelId);
 
     const response = await channel.query({
@@ -886,9 +886,9 @@ const ChatComponent = () => {
       {!isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
 
       <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
-        <ChatHeader currentChannel={currentChannel} isBlocked={isBlocked} />
+        <ChatHeader currentChat={currentChat} isBlocked={isBlocked} />
 
-        {currentChannel && (
+        {currentChat && (
           <Box
             sx={{
               width: '100%',
@@ -901,7 +901,7 @@ const ChatComponent = () => {
             {isAlertInvitePending && (
               <Box sx={{ width: '100%' }}>
                 <Alert severity="info" sx={{ fontWeight: 400 }}>
-                  <strong>{formatString(currentChannel?.data.name)}</strong>
+                  <strong>{formatString(currentChat?.data.name)}</strong>
                   &nbsp;needs to accept your invitation to see the messages you've sent
                 </Alert>
               </Box>
@@ -950,7 +950,7 @@ const ChatComponent = () => {
                   flexDirection: 'column-reverse',
                 }}
               >
-                {currentChannel && (
+                {currentChat && (
                   <InfiniteScroll
                     dataLength={messages.length}
                     next={fetchMoreMessages}
@@ -989,13 +989,13 @@ const ChatComponent = () => {
                   </InfiniteScroll>
                 )}
 
-                {noMessageTitle && <NoMessageBox channel={currentChannel} />}
+                {noMessageTitle && <NoMessageBox channel={currentChat} />}
               </Box>
             </Box>
           )}
         </Dropzone>
 
-        {currentChannel ? <ScrollToBottom messageListRef={messageListRef} /> : null}
+        {currentChat ? <ScrollToBottom messageListRef={messageListRef} /> : null}
         {!isGuest && (
           <Box
             sx={{
@@ -1004,7 +1004,7 @@ const ChatComponent = () => {
             }}
           >
             {usersTyping && usersTyping.length > 0 && <UsersTyping usersTyping={usersTyping} />}
-            <ChatFooter currentChannel={currentChannel} setMessages={setMessages} isDialog={false} />
+            <ChatFooter currentChannel={currentChat} setMessages={setMessages} isDialog={false} />
           </Box>
         )}
         {isPendingInvite && <ChannelInvitation />}

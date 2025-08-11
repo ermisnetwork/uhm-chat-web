@@ -27,7 +27,7 @@ export const ConnectCurrentTopic = topicId => {
   return async (dispatch, getState) => {
     try {
       if (!client) return;
-      dispatch(slice.actions.setCurrentTopic(null));
+      // dispatch(slice.actions.setCurrentTopic(null));
       const { user_id } = getState().auth;
       const topic = client.channel('topic', topicId);
       const messages = { limit: 25 };

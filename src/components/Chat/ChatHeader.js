@@ -14,11 +14,9 @@ import useOnlineStatus from '../../hooks/useOnlineStatus';
 import { callClient } from '../../client';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../../config';
-import AvatarGeneralDefault from '../AvatarGeneralDefault';
-import TopicAvatar from '../TopicAvatar';
 import { DotsThreeIcon } from '../Icons';
 
-const ChatHeader = ({ currentChannel, isBlocked }) => {
+const ChatHeader = ({ currentChat, isBlocked }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobileToMd = useResponsive('down', 'md');
@@ -27,15 +25,12 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
   const { isGuest } = useSelector(state => state.channel);
   const { currentTopic } = useSelector(state => state.topic);
 
-  const isDirect = isChannelDirect(currentChannel);
-  const isEnabledTopics = currentChannel?.data?.topics_enabled;
+  const isDirect = isChannelDirect(currentChat);
+  const isEnabledTopics = currentChat?.data?.topics_enabled;
 
   const [loadingJoin, setLoadingJoin] = useState(false);
 
-  const members = useMemo(
-    () => (isDirect ? Object.values(currentChannel.state.members) : []),
-    [currentChannel, isDirect],
-  );
+  const members = useMemo(() => (isDirect ? Object.values(currentChat.state.members) : []), [currentChat, isDirect]);
 
   const otherMember = useMemo(() => members.find(member => member.user_id !== user_id), [members, user_id]);
 
@@ -44,13 +39,13 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
   const onlineStatus = useOnlineStatus(isDirect ? otherMemberId : '');
 
   const onStartCall = async callType => {
-    await callClient.createCall(callType, currentChannel.cid);
+    await callClient.createCall(callType, currentChat.cid);
   };
 
   const onJoinChannel = async () => {
     try {
       setLoadingJoin(true);
-      const response = await currentChannel.acceptInvite('join');
+      const response = await currentChat.acceptInvite('join');
 
       if (response) {
         setLoadingJoin(false);
@@ -67,29 +62,6 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
     }
   };
 
-  const renderAvatar = () => {
-    if (isEnabledTopics) {
-      return (
-        <>
-          {currentTopic ? (
-            <TopicAvatar
-              url={currentTopic.data?.image || ''}
-              name={currentTopic.data?.name || ''}
-              size={40}
-              shape={AvatarShape.Round}
-            />
-          ) : (
-            <AvatarGeneralDefault size={40} />
-          )}
-        </>
-      );
-    } else {
-      return (
-        <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
-      );
-    }
-  };
-
   const renderName = () => {
     if (isEnabledTopics) {
       if (currentTopic) {
@@ -98,15 +70,15 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
         return 'General';
       }
     } else {
-      return currentChannel.data?.name;
+      return currentChat.data?.name;
     }
   };
 
   const renderCaption = () => {
     if (isEnabledTopics) {
-      return currentChannel.data?.name;
+      return currentChat.data?.name;
     } else {
-      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} members`;
+      return isDirect ? onlineStatus : `${currentChat.data?.member_count} members`;
     }
   };
 
@@ -150,7 +122,7 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
           sx={{ width: '100%', height: '100%' }}
           justifyContent="space-between"
         >
-          {currentChannel ? (
+          {currentChat ? (
             <Stack spacing={1} direction="row" alignItems="center" sx={{ flex: 1, overflow: 'hidden' }}>
               {isMobileToMd && (
                 <IconButton
@@ -164,7 +136,14 @@ const ChatHeader = ({ currentChannel, isBlocked }) => {
                 </IconButton>
               )}
 
-              {renderAvatar()}
+              <ChannelAvatar
+                channel={currentChat}
+                width={isEnabledTopics || currentTopic ? 40 : 60}
+                height={isEnabledTopics || currentTopic ? 40 : 60}
+                openLightbox={true}
+                shape={AvatarShape.Round}
+                showGeneralDefault={true}
+              />
 
               <Box
                 sx={{

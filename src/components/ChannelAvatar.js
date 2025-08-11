@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
@@ -11,6 +10,8 @@ import AvatarDefault from './AvatarDefault';
 import { Box } from '@mui/material';
 import { isPublicChannel } from '../utils/commons';
 import AvatarComponent from './AvatarComponent';
+import TopicAvatar from './TopicAvatar';
+import AvatarGeneralDefault from './AvatarGeneralDefault';
 
 const StyledBadgeOnline = styled(Badge)(({ theme, status }) => ({
   '& .MuiBadge-badge': {
@@ -74,7 +75,14 @@ function TeamAvatarBox({ member1, member2, width = 48, height = 48, shape = 'cir
   );
 }
 
-export default function ChannelAvatar({ channel, width, height, openLightbox, shape = 'circle' }) {
+export default function ChannelAvatar({
+  channel,
+  width,
+  height,
+  openLightbox,
+  shape = 'circle',
+  showGeneralDefault = false,
+}) {
   const theme = useTheme();
   const { user_id } = useSelector(state => state.auth);
   const [groupMemberFirst, setGroupMemberFirst] = useState({ name: '', avatar: null });
@@ -83,6 +91,7 @@ export default function ChannelAvatar({ channel, width, height, openLightbox, sh
   const isDirect = channel?.type === ChatType.MESSAGING;
   const channelAvatar = channel.data?.image || '';
   const isPublic = isPublicChannel(channel);
+  const isChannelTopic = channel?.type === ChatType.TOPIC;
 
   const directMembers = useMemo(
     () => (isDirect ? Object.values(channel.state.members) : []),
@@ -134,25 +143,9 @@ export default function ChannelAvatar({ channel, width, height, openLightbox, sh
     border: `1px solid ${theme.palette.background.paper}`,
   };
 
-  if (!channel) return null;
-
-  if (isPublic) {
-    return (
-      <AvatarComponent
-        name={channel.data?.name}
-        url={channel.data?.image || ''}
-        width={width}
-        height={height}
-        isPublic={isPublic}
-        openLightbox={openLightbox}
-        shape={AvatarShape.Round}
-      />
-    );
-  }
-
-  return (
-    <Stack direction="row" spacing={2} sx={{ position: 'relative' }}>
-      {isDirect ? (
+  const renderAvatar = () => {
+    if (isDirect) {
+      return (
         <StyledBadgeOnline
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -178,24 +171,66 @@ export default function ChannelAvatar({ channel, width, height, openLightbox, sh
             <AvatarDefault name={otherMemberInDirect.user?.name} width={width} height={height} shape={shape} />
           )}
         </StyledBadgeOnline>
-      ) : channelAvatar ? (
-        <ImageCanvas
-          dataUrl={channelAvatar}
-          width={width}
-          height={height}
-          styleCustom={styleCustom}
-          openLightbox={openLightbox}
-        />
-      ) : (
-        <TeamAvatarBox
-          member1={groupMemberFirst}
-          member2={groupMemberSecond}
-          width={width}
-          height={height}
-          shape={shape}
-          styleCustom={styleCustom}
-        />
-      )}
+      );
+    } else {
+      if (isChannelTopic) {
+        return (
+          <TopicAvatar
+            url={channel.data?.image}
+            name={channel.data?.name}
+            size={width}
+            shape={shape}
+            openLightbox={openLightbox}
+          />
+        );
+      } else if (showGeneralDefault) {
+        return <AvatarGeneralDefault size={width} />;
+      } else {
+        if (isPublic) {
+          return (
+            <AvatarComponent
+              name={channel.data?.name}
+              url={channel.data?.image || ''}
+              width={width}
+              height={height}
+              isPublic={isPublic}
+              openLightbox={openLightbox}
+              shape={shape}
+            />
+          );
+        } else {
+          if (channelAvatar) {
+            return (
+              <ImageCanvas
+                dataUrl={channelAvatar}
+                width={width}
+                height={height}
+                styleCustom={styleCustom}
+                openLightbox={openLightbox}
+              />
+            );
+          } else {
+            return (
+              <TeamAvatarBox
+                member1={groupMemberFirst}
+                member2={groupMemberSecond}
+                width={width}
+                height={height}
+                shape={shape}
+                styleCustom={styleCustom}
+              />
+            );
+          }
+        }
+      }
+    }
+  };
+
+  if (!channel) return null;
+
+  return (
+    <Stack direction="row" spacing={2} sx={{ position: 'relative' }}>
+      {renderAvatar()}
     </Stack>
   );
 }
