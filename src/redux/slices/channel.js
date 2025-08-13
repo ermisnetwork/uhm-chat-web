@@ -160,10 +160,6 @@ const slice = createSlice({
       state.isGuest = action.payload;
     },
     addUnreadChannel(state, action) {
-      // const exists = state.unreadChannels.some(c => c.id === action.payload.id);
-      // if (!exists) {
-      //   state.unreadChannels.push(action.payload);
-      // }
       const channel = action.payload;
       const channelIdx = state.unreadChannels.findIndex(c => c.id === channel.id);
 
@@ -568,12 +564,6 @@ export const RemovePinnedChannel = cid => {
   };
 };
 
-// export const AddUnreadChannel = (channelId, unreadCount, topic) => {
-//   return async (dispatch, getState) => {
-//     dispatch(slice.actions.addUnreadChannel({ id: channelId, unreadCount, topic }));
-//   };
-// };
-
 export const AddUnreadChannel = channel => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.addUnreadChannel(channel));
@@ -585,12 +575,6 @@ export const RemoveUnreadChannel = (channelId, topicId) => {
     dispatch(slice.actions.removeUnreadChannel({ channelId, topicId }));
   };
 };
-
-// export const UpdateUnreadChannel = (channelId, unreadCount, topic) => {
-//   return async (dispatch, getState) => {
-//     dispatch(slice.actions.updateUnreadChannel({ id: channelId, unreadCount, topic }));
-//   };
-// };
 
 export const UpdateUnreadChannel = channel => {
   return async (dispatch, getState) => {

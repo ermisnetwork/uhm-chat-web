@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Badge, Box, Stack, Typography } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { AddUnreadChannel, RemoveUnreadChannel, UpdateUnreadChannel } from '../redux/slices/channel';
 import { ClientEvents } from '../constants/events-const';
 import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
 import { Play, PushPin } from 'phosphor-react';
@@ -41,7 +40,6 @@ const TopicElement = ({ topic, idSelected }) => {
   const isPinned = topic.data?.is_pinned;
 
   const [lastMessage, setLastMessage] = useState('');
-  const [count, setCount] = useState(0);
   const [lastMessageAt, setLastMessageAt] = useState('');
 
   const replaceMentionsWithNames = inputValue => {
@@ -138,25 +136,12 @@ const TopicElement = ({ topic, idSelected }) => {
     const lastMsg = topic.state.messages.length > 0 ? topic.state.messages[topic.state.messages.length - 1] : null;
     getLastMessage(lastMsg);
 
-    setCount(topic.state.unreadCount);
-
     const handleMessageNew = event => {
       if (event.channel_id === topic.data.id) {
-        setCount(event.unread_count);
-
         if (!(event.message.type === MessageType.Signal && ['1', '4'].includes(event.message.text[0]))) {
           // không cần hiển thị last message với AudioCallStarted (1) hoặc VideoCallStarted (4) khi có cuộc gọi
           getLastMessage(event.message);
         }
-
-        // if (event.user.id !== user_id && unreadChannels) {
-        //   const existingChannel = unreadChannels.find(item => item.id === event.channel_id);
-        //   dispatch(
-        //     existingChannel && event.unread_count > 0
-        //       ? UpdateUnreadChannel(event.channel_id, event.unread_count, event.channel_type)
-        //       : AddUnreadChannel(event.channel_id, event.unread_count, event.channel_type),
-        //   );
-        // }
       }
     };
 
@@ -174,27 +159,15 @@ const TopicElement = ({ topic, idSelected }) => {
       }
     };
 
-    const handleMessageRead = event => {
-      if (event.user.id === user_id && event.channel_id === topic.data.id) {
-        setCount(0);
-
-        // if (unreadChannels.some(item => item.id === event.channel_id)) {
-        //   dispatch(RemoveUnreadChannel(event.channel_id));
-        // }
-      }
-    };
-
     client.on(ClientEvents.MessageNew, handleMessageNew);
     client.on(ClientEvents.MessageUpdated, handleMessageUpdated);
     client.on(ClientEvents.MessageDeleted, handleMessageDeleted);
-    client.on(ClientEvents.MessageRead, handleMessageRead);
     return () => {
       client.off(ClientEvents.MessageNew, handleMessageNew);
       client.off(ClientEvents.MessageUpdated, handleMessageUpdated);
       client.off(ClientEvents.MessageDeleted, handleMessageDeleted);
-      client.off(ClientEvents.MessageRead, handleMessageRead);
     };
-  }, [topic, user_id, users.length, unreadChannels]);
+  }, [topic, user_id, users.length]);
 
   const onLeftClick = () => {
     navigate(`${DEFAULT_PATH}/${currentChannel?.cid}?topicId=${topicId}`);
@@ -202,7 +175,15 @@ const TopicElement = ({ topic, idSelected }) => {
     dispatch(onEditMessage(null));
   };
 
-  const isSelectedTopic = currentTopic && currentTopic?.id === topicId;
+  const hasUnread = (() => {
+    if (!unreadChannels) return false;
+    // Tìm channel chứa topic này
+    const channel = unreadChannels.find(ch => ch.id === currentChannel?.id);
+    if (!channel || !channel.unreadTopics) return false;
+    // Tìm topic trong channel
+    const topicUnread = channel.unreadTopics.find(tp => tp.id === topicId);
+    return topicUnread && topicUnread.unreadCount > 0;
+  })();
 
   return (
     <>
@@ -258,7 +239,7 @@ const TopicElement = ({ topic, idSelected }) => {
             <Typography
               variant="caption"
               sx={{
-                color: count > 0 ? 'inherit' : theme.palette.text.secondary,
+                color: hasUnread ? 'inherit' : theme.palette.text.secondary,
                 flex: 1,
                 minWidth: 'auto',
                 whiteSpace: 'nowrap',
@@ -266,13 +247,13 @@ const TopicElement = ({ topic, idSelected }) => {
                 textOverflow: 'ellipsis',
                 fontSize: '14px',
                 display: 'block',
-                fontWeight: count > 0 ? 600 : 400,
+                fontWeight: hasUnread ? 600 : 400,
               }}
             >
               {lastMessage}
             </Typography>
 
-            {count > 0 ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+            {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
           </Stack>
         </Box>
       </StyledTopicItem>

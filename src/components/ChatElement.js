@@ -126,7 +126,6 @@ const ChatElement = ({ channel }) => {
   const isPinned = channel.data.is_pinned;
 
   const [lastMessage, setLastMessage] = useState('');
-  const [count, setCount] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
   const [isRightClick, setIsRightClick] = useState(false);
@@ -230,8 +229,6 @@ const ChatElement = ({ channel }) => {
   };
 
   useEffect(() => {
-    console.log('--unreadChannels--', unreadChannels);
-
     const lastMsg =
       channel.state.messages.length > 0 ? channel.state.messages[channel.state.messages.length - 1] : null;
     getLastMessage(lastMsg);
@@ -239,12 +236,14 @@ const ChatElement = ({ channel }) => {
     const membership = channel.state.membership;
     const blocked = membership?.blocked ?? false;
     setIsBlocked(blocked);
-    // setCount(channel.state.unreadCount);
 
     const handleMessageNew = event => {
+      const isCurrentChannel = event.channel_id === channel.data.id;
+
       if (event.user.id !== user_id) {
         // Kiểm tra channel_id là topic hay channel
         const topicInChannel = channel.state.topics && channel.state.topics.find(t => t.id === event.channel_id);
+
         if (topicInChannel) {
           // Là topic
           const existingChannel = unreadChannels && unreadChannels.find(item => item.id === channel.data.id);
@@ -260,10 +259,7 @@ const ChatElement = ({ channel }) => {
               ...existingChannel,
               unreadTopics: existingChannel.unreadTopics.map(t => (t.id === topicInChannel.id ? topic : t)),
             };
-            console.log('----event---', event);
-            console.log('--existingTopic--', existingTopic);
-            console.log('--topic--', topic);
-            console.log('--unreadChannel--', unreadChannel);
+
             dispatch(UpdateUnreadChannel(unreadChannel));
           } else {
             // Thêm topic mới vào danh sách unreadChannels
@@ -271,19 +267,16 @@ const ChatElement = ({ channel }) => {
               id: topicInChannel.id,
               unreadCount: event.unread_count,
             };
-            console.log('--topic--', topic);
-            console.log('--event--', event);
 
             const unreadChannel = {
               id: channel.data.id,
               unreadCount: existingChannel ? existingChannel.unreadCount : 0,
               unreadTopics: [...(existingChannel ? existingChannel.unreadTopics : []), topic],
             };
-            console.log('--unreadChannel--', unreadChannel);
 
             dispatch(AddUnreadChannel(unreadChannel));
           }
-        } else if (event.channel_id === channel.data.id) {
+        } else if (isCurrentChannel) {
           // Là channel
           const existingChannel = unreadChannels && unreadChannels.find(item => item.id === event.channel_id);
 
@@ -306,9 +299,7 @@ const ChatElement = ({ channel }) => {
         }
       }
 
-      if (event.channel_id === channel.data.id) {
-        // setCount(event.unread_count);
-
+      if (isCurrentChannel) {
         if (!(event.message.type === MessageType.Signal && ['1', '4'].includes(event.message.text[0]))) {
           // không cần hiển thị last message với AudioCallStarted (1) hoặc VideoCallStarted (4) khi có cuộc gọi
           getLastMessage(event.message);
@@ -334,6 +325,8 @@ const ChatElement = ({ channel }) => {
 
     const handleMessageRead = event => {
       if (event.user.id === user_id) {
+        const isCurrentChannel = event.channel_id === channel.data.id;
+
         // Kiểm tra channel_id là topic hay channel
         const topicInChannel = channel.state.topics && channel.state.topics.find(t => t.id === event.channel_id);
 
@@ -346,10 +339,9 @@ const ChatElement = ({ channel }) => {
               dispatch(RemoveUnreadChannel(channel.data.id, topicInChannel.id));
             }
           }
-        } else if (event.channel_id === channel.data.id) {
+        } else if (isCurrentChannel) {
           // Là channel
           if (unreadChannels.some(item => item.id === event.channel_id)) {
-            // setCount(0);
             dispatch(RemoveUnreadChannel(event.channel_id));
           }
         }
@@ -452,7 +444,7 @@ const ChatElement = ({ channel }) => {
   const isBoldLastMsg = unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadCount > 0);
   const isShowDot = unreadChannels && unreadChannels.some(item => item.id === channelId);
   const isBoldTopics =
-    unreadChannels && unreadChannels.some(item => item.id === channelId && item.topicsUnread?.length > 0);
+    unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadTopics?.length > 0);
 
   return (
     <>
@@ -531,7 +523,6 @@ const ChatElement = ({ channel }) => {
                 {isBlocked ? 'You have block this user' : lastMessage}
               </Typography>
 
-              {/* {count > 0 ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null} */}
               {isShowDot ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
             </Stack>
           )}
