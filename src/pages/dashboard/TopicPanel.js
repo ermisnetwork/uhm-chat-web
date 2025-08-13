@@ -104,8 +104,7 @@ const TopicHeader = () => {
       icon: <SearchIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        // Handle search messages action
-        console.log('Search Messages clicked');
+        // dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
       },
     },
     {
