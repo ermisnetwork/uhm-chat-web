@@ -6,6 +6,7 @@ import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
 import { ClientEvents } from '../../constants/events-const';
 import { FetchAllMembers } from './member';
+import { SetTopics } from './topic';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created
@@ -159,22 +160,72 @@ const slice = createSlice({
       state.isGuest = action.payload;
     },
     addUnreadChannel(state, action) {
-      const exists = state.unreadChannels.some(c => c.id === action.payload.id);
-      if (!exists) {
-        state.unreadChannels.push(action.payload);
+      // const exists = state.unreadChannels.some(c => c.id === action.payload.id);
+      // if (!exists) {
+      //   state.unreadChannels.push(action.payload);
+      // }
+      const channel = action.payload;
+      const channelIdx = state.unreadChannels.findIndex(c => c.id === channel.id);
+
+      if (channelIdx === -1) {
+        // Channel chưa tồn tại, thêm mới
+        state.unreadChannels.push({
+          id: channel.id,
+          unreadCount: channel.unreadCount || 0,
+          unreadTopics: channel.unreadTopics || [],
+        });
+      } else {
+        // Channel đã tồn tại, cập nhật unreadCount và merge unreadTopics nếu có
+        const existing = state.unreadChannels[channelIdx];
+        if (typeof channel.unreadCount === 'number') {
+          existing.unreadCount = channel.unreadCount;
+        }
+        if (Array.isArray(channel.unreadTopics) && channel.unreadTopics.length > 0) {
+          // Merge unreadTopics, tránh trùng lặp topic id
+          const existingTopics = existing.unreadTopics || [];
+          channel.unreadTopics.forEach(newTopic => {
+            const idx = existingTopics.findIndex(t => t.id === newTopic.id);
+            if (idx === -1) {
+              existingTopics.push(newTopic);
+            } else if (typeof newTopic.unreadCount === 'number') {
+              existingTopics[idx].unreadCount = newTopic.unreadCount;
+            }
+          });
+          existing.unreadTopics = existingTopics;
+        }
       }
     },
     removeUnreadChannel(state, action) {
-      state.unreadChannels = state.unreadChannels.filter(item => item.id !== action.payload);
+      // state.unreadChannels = state.unreadChannels.filter(item => item.id !== action.payload);
+      const { channelId, topicId } = action.payload;
+      if (topicId) {
+        // Xóa topic trong channel
+        state.unreadChannels = state.unreadChannels.map(item => {
+          if (item.id === channelId) {
+            return {
+              ...item,
+              unreadTopics: item.unreadTopics.filter(topic => topic.id !== topicId),
+            };
+          }
+          return item;
+        });
+      } else {
+        // Xóa channel hoặc chỉ set unreadCount = 0 nếu còn topic
+        const channelIdx = state.unreadChannels.findIndex(item => item.id === channelId);
+        if (channelIdx === -1) return; // Không tìm thấy channel để xóa
+        const channel = state.unreadChannels[channelIdx];
+        if (channel.unreadTopics && channel.unreadTopics.length > 0) {
+          // Nếu còn topic, chỉ set unreadCount = 0
+          state.unreadChannels[channelIdx].unreadCount = 0;
+        } else {
+          // Không còn topic, xóa channel
+          state.unreadChannels = state.unreadChannels.filter(item => item.id !== channelId);
+        }
+      }
     },
     updateUnreadChannel(state, action) {
-      state.unreadChannels = state.unreadChannels.map(item => {
-        if (item.id === action.payload.id) {
-          return action.payload;
-        } else {
-          return item;
-        }
-      });
+      const channel = action.payload;
+      state.unreadChannels = state.unreadChannels.map(item => (item.id === channel.id ? channel : item));
     },
     setLoadingChannels(state, action) {
       state.loadingChannels = action.payload;
@@ -210,6 +261,11 @@ const loadDataChannel = (channel, dispatch, user_id) => {
     dispatch(SetFilterWords(channel.data.filter_words || []));
     if (myRole === RoleMember.MEMBER && duration > 0) {
       dispatch(SetCooldownTime({ duration, lastSend }));
+    }
+
+    if (channel.data?.topics_enabled) {
+      const topics = channel.state?.topics || [];
+      dispatch(SetTopics(topics));
     }
   } else {
     const membership = channel.state.membership;
@@ -258,8 +314,25 @@ export function FetchChannels(params) {
 
                 const read = channel.state.read[user_id];
                 const unreadMessage = read.unread_messages;
-                if (unreadMessage > 0) {
-                  acc.unreadChannels.push({ id: channel.id, unreadCount: unreadMessage, type: channel.type });
+                let unreadTopics = [];
+                if (channel.type === ChatType.TEAM && channel.data?.topics_enabled && channel.state.topics) {
+                  channel.state.topics.forEach(topic => {
+                    const topicRead = topic.state.read?.[user_id];
+                    const topicUnread = topicRead?.unread_messages;
+                    if (topicUnread > 0) {
+                      unreadTopics.push({
+                        id: topic.id,
+                        unreadCount: topicUnread,
+                      });
+                    }
+                  });
+                }
+                if (unreadMessage > 0 || unreadTopics.length > 0) {
+                  acc.unreadChannels.push({
+                    id: channel.id,
+                    unreadCount: unreadMessage,
+                    unreadTopics,
+                  });
                 }
               }
 
@@ -277,6 +350,8 @@ export function FetchChannels(params) {
               pinnedChannels: [],
             },
           );
+
+        console.log('---unreadChannels---', unreadChannels);
 
         dispatch(
           slice.actions.fetchChannels({
@@ -485,27 +560,50 @@ export const RemovePinnedChannel = cid => {
   };
 };
 
-export const AddUnreadChannel = (channelId, unreadCount, channelType) => {
+// export const AddUnreadChannel = (channelId, unreadCount, topic) => {
+//   return async (dispatch, getState) => {
+//     dispatch(slice.actions.addUnreadChannel({ id: channelId, unreadCount, topic }));
+//   };
+// };
+
+export const AddUnreadChannel = channel => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.addUnreadChannel({ id: channelId, unreadCount, type: channelType }));
+    dispatch(slice.actions.addUnreadChannel(channel));
   };
 };
 
-export const RemoveUnreadChannel = channelId => {
+export const RemoveUnreadChannel = (channelId, topicId) => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.removeUnreadChannel(channelId));
+    dispatch(slice.actions.removeUnreadChannel({ channelId, topicId }));
   };
 };
 
-export const UpdateUnreadChannel = (channelId, unreadCount, channelType) => {
+// export const UpdateUnreadChannel = (channelId, unreadCount, topic) => {
+//   return async (dispatch, getState) => {
+//     dispatch(slice.actions.updateUnreadChannel({ id: channelId, unreadCount, topic }));
+//   };
+// };
+
+export const UpdateUnreadChannel = channel => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.updateUnreadChannel({ id: channelId, unreadCount, type: channelType }));
+    dispatch(slice.actions.updateUnreadChannel(channel));
   };
 };
 
 export const MoveChannelToTop = channelId => {
   return async (dispatch, getState) => {
     const { activeChannels, pinnedChannels } = getState().channel;
+    const { topics } = getState().topic;
+
+    if (topics.length > 0) {
+      const topicIndex = topics.findIndex(topic => topic.id === channelId);
+      if (topicIndex > -1) {
+        const topicToMove = topics[topicIndex];
+        const updatedTopics = [topicToMove, ...topics.slice(0, topicIndex), ...topics.slice(topicIndex + 1)];
+        dispatch(SetTopics(updatedTopics));
+        return;
+      }
+    }
 
     // Xử lý activeChannels
     const channelIndex = activeChannels.findIndex(channel => channel.id === channelId);

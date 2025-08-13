@@ -92,7 +92,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const membership = currentChannel.state.membership;
+  const membership = currentChannel.state?.membership;
   const channelType = currentChannel.type;
   const channelId = currentChannel.id;
   const messageId = message.id;

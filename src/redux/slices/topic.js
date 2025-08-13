@@ -7,6 +7,7 @@ import { SetMarkReadChannel } from './channel';
 
 const initialState = {
   currentTopic: null,
+  topics: [],
 };
 
 const slice = createSlice({
@@ -15,6 +16,9 @@ const slice = createSlice({
   reducers: {
     setCurrentTopic(state, action) {
       state.currentTopic = action.payload;
+    },
+    setTopics(state, action) {
+      state.topics = action.payload;
     },
   },
 });
@@ -53,5 +57,11 @@ export const ConnectCurrentTopic = topicId => {
 export const SetCurrentTopic = payload => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.setCurrentTopic(payload));
+  };
+};
+
+export const SetTopics = topics => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setTopics(topics));
   };
 };

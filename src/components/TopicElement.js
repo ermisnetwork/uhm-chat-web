@@ -149,14 +149,14 @@ const TopicElement = ({ topic, idSelected }) => {
           getLastMessage(event.message);
         }
 
-        if (event.user.id !== user_id && unreadChannels) {
-          const existingChannel = unreadChannels.find(item => item.id === event.channel_id);
-          dispatch(
-            existingChannel && event.unread_count > 0
-              ? UpdateUnreadChannel(event.channel_id, event.unread_count, event.channel_type)
-              : AddUnreadChannel(event.channel_id, event.unread_count, event.channel_type),
-          );
-        }
+        // if (event.user.id !== user_id && unreadChannels) {
+        //   const existingChannel = unreadChannels.find(item => item.id === event.channel_id);
+        //   dispatch(
+        //     existingChannel && event.unread_count > 0
+        //       ? UpdateUnreadChannel(event.channel_id, event.unread_count, event.channel_type)
+        //       : AddUnreadChannel(event.channel_id, event.unread_count, event.channel_type),
+        //   );
+        // }
       }
     };
 
@@ -178,9 +178,9 @@ const TopicElement = ({ topic, idSelected }) => {
       if (event.user.id === user_id && event.channel_id === topic.data.id) {
         setCount(0);
 
-        if (unreadChannels.some(item => item.id === event.channel_id)) {
-          dispatch(RemoveUnreadChannel(event.channel_id));
-        }
+        // if (unreadChannels.some(item => item.id === event.channel_id)) {
+        //   dispatch(RemoveUnreadChannel(event.channel_id));
+        // }
       }
     };
 

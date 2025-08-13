@@ -217,8 +217,7 @@ const TopicPanel = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
-  const { currentTopic } = useSelector(state => state.topic);
-  const topics = currentChannel?.state?.topics || [];
+  const { currentTopic, topics } = useSelector(state => state.topic);
   const [searchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
   const [idSelected, setIdSelected] = useState('');

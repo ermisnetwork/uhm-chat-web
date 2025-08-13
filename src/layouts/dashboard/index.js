@@ -24,9 +24,13 @@ const DashboardLayout = () => {
   const theme = useTheme();
 
   const { isLoggedIn, user_id } = useSelector(state => state.auth);
-  const { openDialogNewDirectMessage, openAddFriendDialog, openDialogCreateChannel, openDialogProfile, channelConfirm } = useSelector(
-    state => state.dialog,
-  );
+  const {
+    openDialogNewDirectMessage,
+    openAddFriendDialog,
+    openDialogCreateChannel,
+    openDialogProfile,
+    channelConfirm,
+  } = useSelector(state => state.dialog);
   const { unreadChannels } = useSelector(state => state.channel);
 
   const accessToken = localStorage.getItem(LocalStorageKey.AccessToken);
