@@ -468,11 +468,11 @@ const ChatElement = ({ channel }) => {
           </MenuItem>
         )}
 
-        {/* --------------------Delete chat---------------- */}
+        {/* --------------------Clear chat history---------------- */}
         {showItemDeleteConversation && (
           <MenuItem sx={{ color: theme.palette.error.main }} onClick={onTruncate}>
             <Trash color={theme.palette.error.main} />
-            Delete chat
+            Clear chat history
           </MenuItem>
         )}
       </StyledMenu>

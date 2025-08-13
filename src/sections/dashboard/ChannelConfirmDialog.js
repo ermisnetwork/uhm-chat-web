@@ -178,7 +178,7 @@ const ChannelConfirmDialog = () => {
       case ConfirmType.REMOVE_MODER:
         return 'Remove this moderator';
       case ConfirmType.TRUNCATE:
-        return 'Delete chat';
+        return 'Clear chat history';
       case ConfirmType.BLOCK:
         return 'Block this user';
       case ConfirmType.UNBLOCK:
@@ -201,7 +201,7 @@ const ChannelConfirmDialog = () => {
       case ConfirmType.REMOVE_MODER:
         return 'Remove';
       case ConfirmType.TRUNCATE:
-        return 'Delete';
+        return 'Clear';
       case ConfirmType.BLOCK:
         return 'Block';
       case ConfirmType.UNBLOCK:
