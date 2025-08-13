@@ -457,12 +457,12 @@ const SidebarChannelInfo = () => {
     dispatch(setChannelConfirm(payload));
   };
 
-  const onDeleteChat = () => {
+  const onClearChatHistory = () => {
     const payload = {
       openDialog: true,
       channel: currentChannel,
       userId: user_id,
-      type: ConfirmType.DELETE,
+      type: ConfirmType.TRUNCATE,
     };
     dispatch(setChannelConfirm(payload));
   };
@@ -799,12 +799,12 @@ const SidebarChannelInfo = () => {
               </StyledStackItem>
             )}
 
-            {/* ------------Delete chat--------------- */}
+            {/* ------------Clear chat history--------------- */}
             {showItemDeleteChat && (
-              <StyledActionItem onClick={onDeleteChat}>
+              <StyledActionItem onClick={onClearChatHistory}>
                 <TrashIcon color={theme.palette.text.primary} />
                 <Typography variant="subtitle2" color={theme.palette.error.main}>
-                  Delete chat
+                  Clear chat history
                 </Typography>
               </StyledActionItem>
             )}

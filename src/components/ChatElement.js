@@ -428,7 +428,7 @@ const ChatElement = ({ channel }) => {
     dispatch(setChannelConfirm(payload));
   };
 
-  const onTruncate = () => {
+  const onClearChatHistory = () => {
     const payload = {
       openDialog: true,
       channel,
@@ -583,11 +583,11 @@ const ChatElement = ({ channel }) => {
           </MenuItem>
         )}
 
-        {/* --------------------Delete chat---------------- */}
+        {/* --------------------Clear chat history---------------- */}
         {showItemDeleteConversation && (
-          <MenuItem sx={{ color: theme.palette.error.main }} onClick={onTruncate}>
+          <MenuItem sx={{ color: theme.palette.error.main }} onClick={onClearChatHistory}>
             <Trash color={theme.palette.error.main} />
-            Delete chat
+            Clear chat history
           </MenuItem>
         )}
       </StyledMenu>
