@@ -249,29 +249,39 @@ const ChatElement = ({ channel }) => {
           // Là topic
           const existingChannel = unreadChannels && unreadChannels.find(item => item.id === channel.data.id);
           const existingTopic = existingChannel && existingChannel.unreadTopics.find(t => t.id === topicInChannel.id);
+
           if (existingTopic) {
             // Cập nhật số lượng tin nhắn chưa đọc cho topic
             const topic = {
               ...existingTopic,
               unreadCount: event.unread_count,
             };
-            const channel = {
+            const unreadChannel = {
               ...existingChannel,
               unreadTopics: existingChannel.unreadTopics.map(t => (t.id === topicInChannel.id ? topic : t)),
             };
-            dispatch(UpdateUnreadChannel(channel));
+            console.log('----event---', event);
+            console.log('--existingTopic--', existingTopic);
+            console.log('--topic--', topic);
+            console.log('--unreadChannel--', unreadChannel);
+            dispatch(UpdateUnreadChannel(unreadChannel));
           } else {
             // Thêm topic mới vào danh sách unreadChannels
             const topic = {
               id: topicInChannel.id,
               unreadCount: event.unread_count,
             };
-            const channel = {
+            console.log('--topic--', topic);
+            console.log('--event--', event);
+
+            const unreadChannel = {
               id: channel.data.id,
-              unreadCount: event.unread_count,
+              unreadCount: existingChannel ? existingChannel.unreadCount : 0,
               unreadTopics: [...(existingChannel ? existingChannel.unreadTopics : []), topic],
             };
-            dispatch(AddUnreadChannel(channel));
+            console.log('--unreadChannel--', unreadChannel);
+
+            dispatch(AddUnreadChannel(unreadChannel));
           }
         } else if (event.channel_id === channel.data.id) {
           // Là channel
@@ -286,12 +296,12 @@ const ChatElement = ({ channel }) => {
             dispatch(UpdateUnreadChannel(updatedChannel));
           } else {
             // Thêm channel mới vào danh sách unreadChannels
-            const channel = {
+            const unreadChannel = {
               id: event.channel_id,
               unreadCount: event.unread_count,
               unreadTopics: [],
             };
-            dispatch(AddUnreadChannel(channel));
+            dispatch(AddUnreadChannel(unreadChannel));
           }
         }
       }

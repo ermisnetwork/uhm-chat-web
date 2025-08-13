@@ -200,15 +200,23 @@ const slice = createSlice({
       const { channelId, topicId } = action.payload;
       if (topicId) {
         // Xóa topic trong channel
-        state.unreadChannels = state.unreadChannels.map(item => {
-          if (item.id === channelId) {
-            return {
-              ...item,
-              unreadTopics: item.unreadTopics.filter(topic => topic.id !== topicId),
-            };
-          }
-          return item;
-        });
+        state.unreadChannels = state.unreadChannels
+          .map(item => {
+            if (item.id === channelId) {
+              return {
+                ...item,
+                unreadTopics: item.unreadTopics.filter(topic => topic.id !== topicId),
+              };
+            }
+            return item;
+          })
+          .filter(item => {
+            // Nếu là channel vừa xử lý, kiểm tra điều kiện để giữ lại hay xóa
+            if (item.id === channelId) {
+              return !(item.unreadCount === 0 && (!item.unreadTopics || item.unreadTopics.length === 0));
+            }
+            return true;
+          });
       } else {
         // Xóa channel hoặc chỉ set unreadCount = 0 nếu còn topic
         const channelIdx = state.unreadChannels.findIndex(item => item.id === channelId);
