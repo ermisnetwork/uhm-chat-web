@@ -6,7 +6,7 @@ import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
 import { ClientEvents } from '../../constants/events-const';
 import { FetchAllMembers } from './member';
-import { SetTopics } from './topic';
+import { SetLoadingTopics, SetTopics } from './topic';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created
@@ -266,11 +266,6 @@ const loadDataChannel = (channel, dispatch, user_id) => {
     if (myRole === RoleMember.MEMBER && duration > 0) {
       dispatch(SetCooldownTime({ duration, lastSend }));
     }
-
-    if (channel.data?.topics_enabled) {
-      const topics = channel.state?.topics || [];
-      dispatch(SetTopics(topics));
-    }
   } else {
     const membership = channel.state.membership;
     dispatch(SetIsBlocked(membership?.blocked ?? false));
@@ -354,8 +349,6 @@ export function FetchChannels(params) {
               pinnedChannels: [],
             },
           );
-
-        console.log('---unreadChannels---', unreadChannels);
 
         dispatch(
           slice.actions.fetchChannels({
@@ -442,6 +435,26 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
           setTimeout(() => {
             dispatch(SetMarkReadChannel(channel));
           }, 100);
+        }
+
+        if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
+          try {
+            const filter = {
+              type: ['topic', 'team'],
+              parent_cid: channel.cid,
+              include_parent: true,
+            };
+            const sort = [];
+            const options = {
+              message_limit: 25,
+            };
+            dispatch(SetLoadingTopics(true));
+            const responseTopics = await client.queryChannels(filter, sort, options);
+            dispatch(SetTopics(responseTopics));
+            dispatch(SetLoadingTopics(false));
+          } catch (error) {
+            dispatch(SetLoadingTopics(false));
+          }
         }
       }
     } catch (error) {

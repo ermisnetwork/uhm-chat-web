@@ -83,27 +83,29 @@ const ChatHeader = ({ currentChat, isBlocked }) => {
   };
 
   const renderIconAction = () => {
+    if (isGuest) return null;
+
     if (isEnabledTopics) {
       return (
         <IconButton>
           <DotsThreeIcon color={theme.palette.text.primary} />
         </IconButton>
       );
-    } else {
-      if (!isGuest && !isBlocked) {
-        return (
-          <IconButton
-            onClick={() => {
-              dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
-            }}
-          >
-            <MagnifyingGlass />
-          </IconButton>
-        );
-      } else {
-        return null;
-      }
     }
+
+    if (!isBlocked) {
+      return (
+        <IconButton
+          onClick={() => {
+            dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+          }}
+        >
+          <MagnifyingGlass />
+        </IconButton>
+      );
+    }
+
+    return null;
   };
 
   return (

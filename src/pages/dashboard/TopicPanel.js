@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   IconButton,
@@ -14,21 +14,23 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { splitChannelId } from '../../utils/commons';
-import { AvatarShape, SidebarType } from '../../constants/commons-const';
+import { myRoleInChannel, splitChannelId } from '../../utils/commons';
+import { AvatarShape, ChatType, RoleMember, SidebarType } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import NoTopic from '../../assets/Illustration/NoTopic';
 import GeneralElement from '../../components/GeneralElement';
 import NewTopicDialog from '../../sections/dashboard/NewTopicDialog';
-import { SetOpenNewTopicDialog } from '../../redux/slices/dialog';
+import { SetOpenInviteFriendDialog, SetOpenNewTopicDialog } from '../../redux/slices/dialog';
 import FlipMove from 'react-flip-move';
 import TopicElement from '../../components/TopicElement';
 import { ClientEvents } from '../../constants/events-const';
 import { WatchCurrentChannel } from '../../redux/slices/channel';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ConnectCurrentTopic, SetCurrentTopic } from '../../redux/slices/topic';
 import { setSidebar } from '../../redux/slices/app';
+import { DEFAULT_PATH } from '../../config';
+import SkeletonChannels from '../../components/SkeletonChannels';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -42,6 +44,8 @@ const StyledTopicItem = styled(Box)(({ theme }) => ({
 const TopicEmpty = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const { currentChannel } = useSelector(state => state.channel);
+  const myRole = myRoleInChannel(currentChannel);
 
   return (
     <Stack sx={{ flex: 1, width: '100%', minHeight: 'auto', alignItems: 'center', justifyContent: 'center' }}>
@@ -70,25 +74,30 @@ const TopicEmpty = () => {
         We moved older messages to “General.” Kick off a new topic anytime!
       </Typography>
 
-      <Button
-        variant="contained"
-        size="large"
-        sx={{ marginTop: 3, width: '200px' }}
-        onClick={() => {
-          dispatch(SetOpenNewTopicDialog(true));
-        }}
-      >
-        NEW TOPIC
-      </Button>
+      {[RoleMember.OWNER, RoleMember.MOD].includes(myRole) && (
+        <Button
+          variant="contained"
+          size="large"
+          sx={{ marginTop: 3, width: '200px' }}
+          onClick={() => {
+            dispatch(SetOpenNewTopicDialog(true));
+          }}
+        >
+          NEW TOPIC
+        </Button>
+      )}
     </Stack>
   );
 };
 
 const TopicHeader = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const { currentChannel } = useSelector(state => state.channel);
+  const { currentChannel, isGuest } = useSelector(state => state.channel);
+
   const [anchorEl, setAnchorEl] = useState(null);
+  const myRole = myRoleInChannel(currentChannel);
 
   const ACTIONS = [
     {
@@ -104,7 +113,8 @@ const TopicHeader = () => {
       icon: <SearchIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        // dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+        dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+        navigate(`${DEFAULT_PATH}/${currentChannel.cid}`);
       },
     },
     {
@@ -112,8 +122,7 @@ const TopicHeader = () => {
       icon: <ProfileAddIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        // Handle add members action
-        console.log('Add Members clicked');
+        dispatch(SetOpenInviteFriendDialog(true));
       },
     },
     {
@@ -123,6 +132,7 @@ const TopicHeader = () => {
         setAnchorEl(null);
         dispatch(SetOpenNewTopicDialog(true));
       },
+      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
     },
   ];
 
@@ -140,32 +150,49 @@ const TopicHeader = () => {
       }}
     >
       <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
-
-      <Typography
-        variant="h6"
+      <Box
         sx={{
-          color: theme.palette.text.primary,
           overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          minWidth: 'auto',
           flex: 1,
-          overflow: 'hidden',
         }}
       >
-        {currentChannel.data?.name}
-        <Typography
-          variant="caption"
+        <Button
+          onClick={() => {
+            if (!isGuest) {
+              dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
+            }
+          }}
           sx={{
-            display: 'block',
-            color: theme.palette.text.secondary,
-            fontSize: '12px',
-            fontWeight: 400,
+            textTransform: 'none',
+            maxWidth: '100%',
+            minWidth: 'auto',
+            justifyContent: 'start',
+            textAlign: 'left',
           }}
         >
-          {`${currentChannel.data?.member_count} members`}
-        </Typography>
-      </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              color: theme.palette.text.primary,
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {currentChannel.data?.name}
+            <Typography
+              variant="caption"
+              sx={{
+                display: 'block',
+                color: theme.palette.text.secondary,
+                fontSize: '12px',
+                fontWeight: 400,
+              }}
+            >
+              {`${currentChannel.data?.member_count} members`}
+            </Typography>
+          </Typography>
+        </Button>
+      </Box>
 
       <IconButton
         onClick={event => {
@@ -192,7 +219,7 @@ const TopicHeader = () => {
         }}
       >
         <MenuList sx={{ width: '210px' }}>
-          {ACTIONS.map((action, index) => (
+          {ACTIONS.filter(action => !action.allowRoles || action.allowRoles.includes(myRole)).map((action, index) => (
             <MenuItem
               key={index}
               onClick={action.onClick}
@@ -216,7 +243,7 @@ const TopicPanel = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
-  const { currentTopic, topics } = useSelector(state => state.topic);
+  const { currentTopic, topics, loadingTopics } = useSelector(state => state.topic);
   const [searchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
   const [idSelected, setIdSelected] = useState('');
@@ -246,9 +273,35 @@ const TopicPanel = () => {
     }
   }, [topicID, currentChannel]);
 
-  useEffect(() => {
-    console.log('--currentTopic--', currentTopic);
-  }, [currentTopic]);
+  const renderedTopics = useMemo(() => {
+    const displayTopics = topics.filter(item => item.type === ChatType.TOPIC);
+
+    if (loadingTopics) {
+      return <SkeletonChannels />;
+    } else {
+      return (
+        <>
+          <StyledTopicItem>
+            <GeneralElement idSelected={idSelected} />
+          </StyledTopicItem>
+
+          {displayTopics.length > 0 ? (
+            <FlipMove duration={200}>
+              {displayTopics.map(item => {
+                return (
+                  <StyledTopicItem key={`topic-${item.id}`}>
+                    <TopicElement topic={item} idSelected={idSelected} />
+                  </StyledTopicItem>
+                );
+              })}
+            </FlipMove>
+          ) : (
+            <TopicEmpty />
+          )}
+        </>
+      );
+    }
+  }, [topics, idSelected, loadingTopics]);
 
   if (!currentChannel?.data?.topics_enabled) return null;
 
@@ -267,23 +320,7 @@ const TopicPanel = () => {
           }}
           className="customScrollbar"
         >
-          <StyledTopicItem key={`topic-general`}>
-            <GeneralElement idSelected={idSelected} />
-          </StyledTopicItem>
-
-          {topics.length > 0 ? (
-            <FlipMove duration={200}>
-              {topics.map(item => {
-                return (
-                  <StyledTopicItem key={`topic-${item.id}`}>
-                    <TopicElement topic={item} idSelected={idSelected} />
-                  </StyledTopicItem>
-                );
-              })}
-            </FlipMove>
-          ) : (
-            <TopicEmpty />
-          )}
+          {renderedTopics}
         </Stack>
       </Stack>
 

@@ -8,6 +8,7 @@ import { SetMarkReadChannel } from './channel';
 const initialState = {
   currentTopic: null,
   topics: [],
+  loadingTopics: false,
 };
 
 const slice = createSlice({
@@ -19,6 +20,9 @@ const slice = createSlice({
     },
     setTopics(state, action) {
       state.topics = action.payload;
+    },
+    setLoadingTopics(state, action) {
+      state.loadingTopics = action.payload;
     },
   },
 });
@@ -63,5 +67,11 @@ export const SetCurrentTopic = payload => {
 export const SetTopics = topics => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.setTopics(topics));
+  };
+};
+
+export const SetLoadingTopics = loading => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setLoadingTopics(loading));
   };
 };

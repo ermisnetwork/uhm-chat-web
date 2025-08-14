@@ -124,7 +124,7 @@ const GeneralElement = ({ idSelected }) => {
         }
       }
     } else {
-      setLastMessageAt(getDisplayDate(channel.data.created_at));
+      setLastMessageAt(getDisplayDate(currentChannel?.data?.created_at));
       setLastMessage('No messages here yet');
     }
   };

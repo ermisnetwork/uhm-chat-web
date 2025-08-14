@@ -883,7 +883,7 @@ const ChatComponent = () => {
 
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      {!isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
+      {!isGuest && !isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
 
       <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
         <ChatHeader currentChat={currentChat} isBlocked={isBlocked} />
