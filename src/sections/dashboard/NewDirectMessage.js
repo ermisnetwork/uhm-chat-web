@@ -34,6 +34,15 @@ const NewDirectMessage = () => {
     });
   }, [activeChannels, user_id]);
 
+  // pendingDirectChannels: các channel direct mà người dùng đã gửi lời mời cho bạn, bạn chưa xác nhận tham gia.
+  const pendingDirectChannels = useMemo(() => {
+    return pendingChannels.filter(channel => {
+      const isDirect = channel.type === ChatType.MESSAGING;
+      const myMember = channel.state.members[user_id];
+      return isDirect && myMember && myMember.channel_role === RoleMember.PENDING;
+    });
+  }, [pendingChannels, user_id]);
+
   const onCloseDialogNewDirectMessage = () => {
     dispatch(CloseDialogNewDirectMessage());
   };
@@ -53,7 +62,7 @@ const NewDirectMessage = () => {
   };
 
   const onSelectChannel = async (channel, user) => {
-    const existChannel = [...invitedChannels, ...skippedChannels, ...pendingChannels].find(
+    const existChannel = [...invitedChannels, ...skippedChannels, ...pendingDirectChannels].find(
       channel => channel.state.members[user.id],
     );
 

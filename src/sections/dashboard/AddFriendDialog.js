@@ -37,6 +37,15 @@ const AddFriendDialog = () => {
     });
   }, [activeChannels, user_id]);
 
+  // pendingDirectChannels: các channel direct mà người dùng đã gửi lời mời cho bạn, bạn chưa xác nhận tham gia.
+  const pendingDirectChannels = useMemo(() => {
+    return pendingChannels.filter(channel => {
+      const isDirect = channel.type === ChatType.MESSAGING;
+      const myMember = channel.state.members[user_id];
+      return isDirect && myMember && myMember.channel_role === RoleMember.PENDING;
+    });
+  }, [pendingChannels, user_id]);
+
   useEffect(() => {
     let ignore = false;
     let debounceTimer;
@@ -90,7 +99,7 @@ const AddFriendDialog = () => {
   };
 
   const onSelectChannel = async (channel, user) => {
-    const existChannel = [...directChannels, ...skippedChannels, ...pendingChannels].find(
+    const existChannel = [...directChannels, ...skippedChannels, ...pendingDirectChannels].find(
       channel => channel.state.members[user.id],
     );
 
