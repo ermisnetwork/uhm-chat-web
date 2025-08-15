@@ -462,7 +462,7 @@ const TextLine = ({ message }) => {
             {part}
           </a>
         );
-      } else if (part.match(mentionRegex)) {
+      } else if (part.match(mentionRegex) && message?.mentioned_users) {
         const mentionObj = mentions.find(m => m.mentionId === part || m.mentionName === part);
         if (mentionObj) {
           const customClass =
