@@ -449,9 +449,7 @@ const TextLine = ({ message }) => {
     // Tách chuỗi thành các phần dựa trên URL, email, mention
     const parts = text.split(/(https?:\/\/[^\s]+|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|@\w+)/g);
 
-    console.log(message.mentioned_users);
     return parts.map((part, index) => {
-      // console.log(part);
       if (part.match(urlRegex)) {
         return (
           <a key={index} href={part} className="linkUrl" target="_blank" rel="noopener noreferrer">
@@ -464,10 +462,9 @@ const TextLine = ({ message }) => {
             {part}
           </a>
         );
-      } else if (part.match(mentionRegex) && message.mentioned_users) {
+      } else if (part.match(mentionRegex) && message?.mentioned_users) {
         const mentionObj = mentions.find(m => m.mentionId === part || m.mentionName === part);
         if (mentionObj) {
-          
           const customClass =
             mentionObj.mentionId === '@all' ? 'mentionAll' : mentionObj.id === user_id ? 'mentionMe' : '';
           return (
