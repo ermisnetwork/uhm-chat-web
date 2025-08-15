@@ -38,6 +38,7 @@ import {
   RemoveActiveChannel,
   SetCooldownTime,
   SetFilterWords,
+  SetIsBanned,
   SetIsGuest,
   SetMarkReadChannel,
   SetMemberCapabilities,
@@ -74,6 +75,8 @@ import UsersTyping from '../../components/UsersTyping';
 import NoMessageBox from '../../components/NoMessageBox';
 import { setSidebar, SetUserInfo } from '../../redux/slices/app';
 import TopicPanel from './TopicPanel';
+import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
+import { SetIsClosedTopic } from '../../redux/slices/topic';
 
 const StyledMessage = styled(motion(Stack))(({ theme }) => ({
   '&:hover': {
@@ -121,7 +124,7 @@ const MessageList = ({
   const isLgToXl = useResponsive('between', null, 'lg', 'xl');
   const isMobileToLg = useResponsive('down', 'lg');
   const { user_id } = useSelector(state => state.auth);
-  const { activeChannels, isGuest } = useSelector(state => state.channel);
+  const { activeChannels, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
 
   const lastReadIndex = messages.findIndex(msg => msg.id === lastReadMessageId);
 
@@ -426,7 +429,7 @@ const MessageList = ({
             })}
         </Stack>
       </motion.div>
-      {!isGuest && <ReadBy />}
+      {!isGuest && !isBlocked && !isBanned && <ReadBy />}
     </Box>
   );
 };
@@ -436,12 +439,12 @@ const ChatComponent = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const messageListRef = useRef(null);
-  const { currentChannel, isBlocked, isGuest } = useSelector(state => state.channel);
+  const { currentChannel, isBlocked, isGuest, isBanned } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
     state => state.messages,
   );
-  const { currentTopic } = useSelector(state => state.topic);
+  const { currentTopic, isClosedTopic } = useSelector(state => state.topic);
   const [messages, setMessages] = useState([]);
   const [usersTyping, setUsersTyping] = useState([]);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -700,6 +703,18 @@ const ChatComponent = () => {
         dispatch(WatchCurrentChannel(channelId, channelType));
       };
 
+      const handleMemberBanned = event => {
+        if (event.member.user_id === user_id) {
+          dispatch(SetIsBanned(event.member.banned));
+        }
+      };
+
+      const handleMemberUnBanned = event => {
+        if (event.member.user_id === user_id) {
+          dispatch(SetIsBanned(event.member.banned));
+        }
+      };
+
       const handleChannelTruncate = event => {
         const channelId = event.channel_id;
         const channelType = event.channel_type;
@@ -721,6 +736,14 @@ const ChatComponent = () => {
         dispatch(WatchCurrentChannel(channelId, channelType));
       };
 
+      const handleChannelTopicClosed = event => {
+        dispatch(SetIsClosedTopic(true));
+      };
+
+      const handleChannelTopicReopen = event => {
+        dispatch(SetIsClosedTopic(false));
+      };
+
       currentChat.on(ClientEvents.MessageNew, handleMessages);
       currentChat.on(ClientEvents.ReactionNew, handleMessages);
       currentChat.on(ClientEvents.ReactionDeleted, handleMessages);
@@ -736,10 +759,14 @@ const ChatComponent = () => {
       currentChat.on(ClientEvents.MemberRemoved, handleMemberRemoved);
       currentChat.on(ClientEvents.MemberPromoted, handleMemberPromoted);
       currentChat.on(ClientEvents.MemberDemoted, handleMemberDemoted);
+      currentChat.on(ClientEvents.MemberBanned, handleMemberBanned);
+      currentChat.on(ClientEvents.MemberUnBanned, handleMemberUnBanned);
       currentChat.on(ClientEvents.PollChoiceNew, handleMessages);
       currentChat.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
       currentChat.on(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
       currentChat.on(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
+      currentChat.on(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
+      currentChat.on(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
 
       return () => {
         currentChat.off(ClientEvents.MessageNew, handleMessages);
@@ -757,10 +784,14 @@ const ChatComponent = () => {
         currentChat.off(ClientEvents.MemberRemoved, handleMemberRemoved);
         currentChat.off(ClientEvents.MemberPromoted, handleMemberPromoted);
         currentChat.off(ClientEvents.MemberDemoted, handleMemberDemoted);
+        currentChat.off(ClientEvents.MemberBanned, handleMemberBanned);
+        currentChat.off(ClientEvents.MemberUnBanned, handleMemberUnBanned);
         currentChat.off(ClientEvents.PollChoiceNew, handleMessages);
         currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
         currentChat.off(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
         currentChat.off(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
+        currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
+        currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
       };
     } else {
       if (messageListRef.current) {
@@ -881,6 +912,10 @@ const ChatComponent = () => {
     });
   }
 
+  const showChatFooter = !isGuest && !isBanned && !isClosedTopic;
+  const showButtonScrollToBottom = !isBlocked || !isBanned;
+  const disabledScroll = isBlocked || isBanned;
+
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
       {!isGuest && !isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
@@ -944,7 +979,7 @@ const ChatComponent = () => {
                 sx={{
                   position: 'relative',
                   flexGrow: 1,
-                  overflowY: isBlocked ? 'hidden' : 'auto',
+                  overflowY: disabledScroll ? 'hidden' : 'auto',
                   overflowX: 'hidden',
                   display: 'flex',
                   flexDirection: 'column-reverse',
@@ -995,8 +1030,8 @@ const ChatComponent = () => {
           )}
         </Dropzone>
 
-        {currentChat ? <ScrollToBottom messageListRef={messageListRef} /> : null}
-        {!isGuest && (
+        {showButtonScrollToBottom && <ScrollToBottom messageListRef={messageListRef} />}
+        {showChatFooter && (
           <Box
             sx={{
               padding: '15px',
@@ -1007,16 +1042,17 @@ const ChatComponent = () => {
             <ChatFooter currentChannel={currentChat} setMessages={setMessages} isDialog={false} />
           </Box>
         )}
+        {isClosedTopic && <ClosedTopicBackdrop />}
         {isPendingInvite && <ChannelInvitation />}
-        {deleteMessage.openDialog && <DeleteMessageDialog />}
-        {forwardMessage.openDialog && <ForwardMessageDialog />}
-        {!isDirect && <BannedBackdrop />}
-        {isDirect && <BlockedBackdrop />}
-        <MessagesHistoryDialog />
-        {filesMessage.openDialog && <UploadFilesDialog setMessages={setMessages} />}
-        <CreatePollDialog />
-        <PollResultDialog />
+        {isBanned && <BannedBackdrop />}
+        {isBlocked && <BlockedBackdrop />}
       </Stack>
+      {deleteMessage.openDialog && <DeleteMessageDialog />}
+      {forwardMessage.openDialog && <ForwardMessageDialog />}
+      <MessagesHistoryDialog />
+      {filesMessage.openDialog && <UploadFilesDialog setMessages={setMessages} />}
+      <CreatePollDialog />
+      <PollResultDialog />
     </Stack>
   );
 };

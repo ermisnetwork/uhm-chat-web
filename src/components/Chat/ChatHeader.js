@@ -1,20 +1,179 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  MenuList,
+  Popover,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { CaretLeft, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
 import useResponsive from '../../hooks/useResponsive';
 import { setSidebar, showSnackbar } from '../../redux/slices/app';
 import { useDispatch, useSelector } from 'react-redux';
 import ChannelAvatar from '../ChannelAvatar';
-import { handleError, isChannelDirect } from '../../utils/commons';
-import { AvatarShape, CallType, CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
+import { handleError, isChannelDirect, myRoleInChannel } from '../../utils/commons';
+import {
+  AvatarShape,
+  CallType,
+  ChatType,
+  CurrentChannelStatus,
+  RoleMember,
+  SidebarType,
+} from '../../constants/commons-const';
 import { LoadingButton } from '@mui/lab';
 import { setCurrentChannel, setCurrentChannelStatus, SetIsGuest } from '../../redux/slices/channel';
 import useOnlineStatus from '../../hooks/useOnlineStatus';
 import { callClient } from '../../client';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../../config';
-import { DotsThreeIcon } from '../Icons';
+import { DotsThreeIcon, EditIcon, InfoIcon, PauseCircleRedIcon, PinIcon, PlayCircleIcon, TrashIcon } from '../Icons';
+
+const ActionsTopic = () => {
+  const dispatch = useDispatch();
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const { currentChannel } = useSelector(state => state.channel);
+  const { currentTopic } = useSelector(state => state.topic);
+  const myRole = myRoleInChannel(currentChannel);
+
+  const isTopicClosed = currentTopic?.data?.is_closed_topic;
+
+  const onCloseTopic = async () => {
+    try {
+      const topicCID = currentTopic?.cid;
+      await currentChannel.closeTopic(topicCID);
+      setAnchorEl(null);
+      dispatch(showSnackbar({ message: 'Topic closed successfully', severity: 'success' }));
+    } catch (error) {
+      handleError(dispatch, error);
+    }
+  };
+
+  const onReopenTopic = async () => {
+    try {
+      const topicCID = currentTopic?.cid;
+      await currentChannel.reopenTopic(topicCID);
+      setAnchorEl(null);
+      dispatch(showSnackbar({ message: 'Topic reopened successfully', severity: 'success' }));
+    } catch (error) {
+      handleError(dispatch, error);
+    }
+  };
+
+  const ACTIONS = [
+    !isTopicClosed && {
+      value: 'pin',
+      label: 'Pin To Top',
+      icon: <PinIcon color={theme.palette.text.primary} />,
+      onClick: () => {
+        setAnchorEl(null);
+      },
+    },
+    {
+      value: 'info',
+      label: 'Topic Info',
+      icon: <InfoIcon color={theme.palette.text.primary} />,
+      onClick: () => {
+        setAnchorEl(null);
+      },
+    },
+    !isTopicClosed && {
+      value: 'edit',
+      label: 'Edit Topic',
+      icon: <EditIcon color={theme.palette.text.primary} />,
+      onClick: () => {
+        setAnchorEl(null);
+        // dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+      },
+      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+    },
+    !isTopicClosed
+      ? {
+          value: 'close',
+          label: 'Close Topic',
+          icon: <PauseCircleRedIcon color={theme.palette.text.primary} />,
+          onClick: onCloseTopic,
+          allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+        }
+      : {
+          value: 'reopen',
+          label: 'Reopen Topic',
+          icon: <PlayCircleIcon color={theme.palette.text.primary} />,
+          onClick: onReopenTopic,
+          allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+        },
+    {
+      value: 'delete',
+      label: 'Delete Topic',
+      icon: <TrashIcon color={theme.palette.error.main} />,
+      onClick: () => {
+        setAnchorEl(null);
+      },
+      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+    },
+  ];
+
+  return (
+    <>
+      <IconButton
+        onClick={event => {
+          setAnchorEl(event.currentTarget);
+        }}
+      >
+        <DotsThreeIcon color={theme.palette.text.primary} />
+      </IconButton>
+
+      <Popover
+        id={Boolean(anchorEl) ? 'actions-topic-popover' : undefined}
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={() => {
+          setAnchorEl(null);
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuList sx={{ width: '210px' }}>
+          {ACTIONS.filter(Boolean)
+            .filter(action => !action.allowRoles || action.allowRoles.includes(myRole))
+            .map((action, index) => (
+              <MenuItem
+                key={index}
+                onClick={action.onClick}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 'auto!important', marginRight: '8px' }}>{action.icon}</ListItemIcon>
+                <ListItemText
+                  primaryTypographyProps={{
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: action.value === 'delete' ? theme.palette.error.main : theme.palette.text.primary,
+                  }}
+                  primary={action.label}
+                />
+              </MenuItem>
+            ))}
+        </MenuList>
+      </Popover>
+    </>
+  );
+};
 
 const ChatHeader = ({ currentChat, isBlocked }) => {
   const navigate = useNavigate();
@@ -85,12 +244,8 @@ const ChatHeader = ({ currentChat, isBlocked }) => {
   const renderIconAction = () => {
     if (isGuest) return null;
 
-    if (isEnabledTopics) {
-      return (
-        <IconButton>
-          <DotsThreeIcon color={theme.palette.text.primary} />
-        </IconButton>
-      );
+    if (isEnabledTopics || currentChat?.type === ChatType.TOPIC) {
+      return <ActionsTopic />;
     }
 
     if (!isBlocked) {

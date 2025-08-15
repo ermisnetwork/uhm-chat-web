@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { myRoleInChannel, splitChannelId } from '../../utils/commons';
+import { myRoleInChannel } from '../../utils/commons';
 import { AvatarShape, ChatType, RoleMember, SidebarType } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
 import ChannelAvatar from '../../components/ChannelAvatar';
@@ -25,9 +25,8 @@ import { SetOpenInviteFriendDialog, SetOpenNewTopicDialog } from '../../redux/sl
 import FlipMove from 'react-flip-move';
 import TopicElement from '../../components/TopicElement';
 import { ClientEvents } from '../../constants/events-const';
-import { WatchCurrentChannel } from '../../redux/slices/channel';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ConnectCurrentTopic, SetCurrentTopic } from '../../redux/slices/topic';
+import { AddTopic, ConnectCurrentTopic, SetCurrentTopic } from '../../redux/slices/topic';
 import { setSidebar } from '../../redux/slices/app';
 import { DEFAULT_PATH } from '../../config';
 import SkeletonChannels from '../../components/SkeletonChannels';
@@ -249,12 +248,13 @@ const TopicPanel = () => {
   const [idSelected, setIdSelected] = useState('');
 
   useEffect(() => {
+    console.log('--currentTopic--', currentTopic);
+  }, [currentTopic]);
+
+  useEffect(() => {
     console.log('--currentChannel--', currentChannel);
     const handleChannelTopicCreated = event => {
-      const splitCID = splitChannelId(event.cid);
-      const channelId = splitCID.channelId;
-      const channelType = splitCID.channelType;
-      dispatch(WatchCurrentChannel(channelId, channelType));
+      dispatch(AddTopic(event.channel_id));
     };
 
     currentChannel.on(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);

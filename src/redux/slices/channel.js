@@ -6,7 +6,7 @@ import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
 import { ClientEvents } from '../../constants/events-const';
 import { FetchAllMembers } from './member';
-import { SetLoadingTopics, SetTopics } from './topic';
+import { SetCurrentTopic, SetIsClosedTopic, SetLoadingTopics, SetTopics } from './topic';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created
@@ -36,6 +36,7 @@ const initialState = {
   currentChannelStatus: CurrentChannelStatus.IDLE,
   pinnedMessages: [],
   isBlocked: false,
+  isBanned: false,
   loadingChannels: true,
   isGuest: false,
 };
@@ -156,6 +157,9 @@ const slice = createSlice({
     setIsBlocked(state, action) {
       state.isBlocked = action.payload;
     },
+    setIsBanned(state, action) {
+      state.isBanned = action.payload;
+    },
     setIsGuest(state, action) {
       state.isGuest = action.payload;
     },
@@ -254,6 +258,9 @@ const loadDataChannel = (channel, dispatch, user_id) => {
     const myRole = myRoleInChannel(channel);
     const duration = channel.data.member_message_cooldown;
     const lastSend = channel.state.read[user_id].last_send;
+    const membership = channel.state.membership;
+    const banned = membership?.banned ?? false;
+    dispatch(SetIsBanned(banned));
     dispatch(
       SetMentions(
         Object.values(channel.state.members).filter(
@@ -408,6 +415,8 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
           canVotePoll: true,
         }),
       );
+      dispatch(SetCurrentTopic(null));
+      dispatch(SetIsClosedTopic(false));
       const { user_id } = getState().auth;
       const channel = client.channel(channelType, channelId);
       // const read = channel.state.read[user_id];
@@ -783,6 +792,12 @@ export const SetPinnedMessages = payload => {
 export const SetIsBlocked = payload => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.setIsBlocked(payload));
+  };
+};
+
+export const SetIsBanned = payload => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setIsBanned(payload));
   };
 };
 

@@ -2222,6 +2222,93 @@ export const ChatPurpleIcon = ({ size = 24, color = 'currentColor', ...props }) 
   </svg>
 );
 
+export const PinIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M8.47201 15.5273L3.99707 20.0023"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M15.6277 4.58215L19.4169 8.37138C19.8408 8.79524 20.0523 9.38682 19.9932 9.98334C19.9342 10.5799 19.6107 11.1185 19.112 11.451L16.3557 13.2885C15.9416 13.5646 15.6452 13.9851 15.5245 14.468L14.3305 19.2442C14.243 19.5938 13.9743 19.8694 13.627 19.9656C13.2796 20.0618 12.9074 19.9638 12.6526 19.7089L4.29007 11.3465C4.03524 11.0916 3.93719 10.7194 4.03339 10.3721C4.1296 10.0247 4.40519 9.75599 4.75483 9.66857L9.53109 8.47457C10.014 8.35384 10.4345 8.05748 10.7106 7.64334L12.5481 4.88709C12.8806 4.38832 13.4192 4.06491 14.0157 4.00584C14.6123 3.94677 15.2038 4.15827 15.6277 4.58215Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const UnPinIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M8.49894 15.502L3.99707 20.0038"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9.4604 8.45898L4.97853 9.57945C4.62885 9.66686 4.35322 9.93562 4.25702 10.283C4.16082 10.6303 4.25891 11.0026 4.5138 11.2575L12.7424 19.486C12.9972 19.7409 13.3695 19.839 13.7168 19.7428C14.0642 19.6466 14.3329 19.371 14.4203 19.0213L15.5408 14.5393"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M17.4633 12.4609L19.112 11.3617C19.6107 11.0292 19.9341 10.4906 19.9932 9.89411C20.0523 9.29759 19.8408 8.70602 19.4169 8.28215L15.7168 4.58213C15.2929 4.15827 14.7013 3.94678 14.1048 4.00584C13.5083 4.06491 12.9697 4.38831 12.6372 4.88707L11.5381 6.53571"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M20.0031 19.0021L5.49707 4.49609"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const PauseCircleRedIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
+    <path
+      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path d="M10 15V9" stroke="#EB0000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M14 15V9" stroke="#EB0000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+export const PlayCircleIcon = ({ size = 24, color = 'currentColor', ...props }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 28 28" fill="none" {...props}>
+    <path
+      d="M13.9997 25.6654C20.443 25.6654 25.6663 20.442 25.6663 13.9987C25.6663 7.55538 20.443 2.33203 13.9997 2.33203C7.55635 2.33203 2.33301 7.55538 2.33301 13.9987C2.33301 20.442 7.55635 25.6654 13.9997 25.6654Z"
+      stroke={color}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M11.667 9.33203L18.667 13.9987L11.667 18.6654V9.33203Z"
+      stroke="#7949EC"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default {
   EditProfileIcon,
   ArchiveMinusIcon,
@@ -2274,5 +2361,9 @@ export default {
   InfoIcon,
   SearchIcon,
   ChatPurpleIcon,
+  PinIcon,
+  UnPinIcon,
+  PauseCircleRedIcon,
+  PlayCircleIcon,
   // Add any other icons here as needed
 };

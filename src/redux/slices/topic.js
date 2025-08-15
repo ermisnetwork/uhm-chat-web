@@ -1,14 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RoleMember, SidebarType } from '../../constants/commons-const';
 import { client } from '../../client';
-import { myRoleInChannel } from '../../utils/commons';
+import { handleError, myRoleInChannel } from '../../utils/commons';
 import { setSidebar } from './app';
-import { SetMarkReadChannel } from './channel';
+import { SetMarkReadChannel, SetPinnedMessages } from './channel';
 
 const initialState = {
   currentTopic: null,
   topics: [],
   loadingTopics: false,
+  isClosedTopic: false,
 };
 
 const slice = createSlice({
@@ -21,8 +22,21 @@ const slice = createSlice({
     setTopics(state, action) {
       state.topics = action.payload;
     },
+    addTopic(state, action) {
+      const newTopic = action.payload;
+      if (!state.topics.some(topic => topic.id === newTopic.id)) {
+        state.topics.unshift(newTopic);
+      }
+    },
+    removeTopic(state, action) {
+      const topicId = action.payload;
+      state.topics = state.topics.filter(topic => topic.id !== topicId);
+    },
     setLoadingTopics(state, action) {
       state.loadingTopics = action.payload;
+    },
+    setIsClosedTopic(state, action) {
+      state.isClosedTopic = action.payload;
     },
   },
 });
@@ -36,6 +50,8 @@ export const ConnectCurrentTopic = topicId => {
     try {
       if (!client) return;
       // dispatch(slice.actions.setCurrentTopic(null));
+      dispatch(SetPinnedMessages([]));
+      dispatch(SetIsClosedTopic(false));
       const { user_id } = getState().auth;
       const topic = client.channel('topic', topicId);
       const messages = { limit: 25 };
@@ -46,12 +62,17 @@ export const ConnectCurrentTopic = topicId => {
       if (response) {
         dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
         dispatch(slice.actions.setCurrentTopic(topic));
+        dispatch(SetIsClosedTopic(topic.data?.is_closed_topic ?? false));
 
         const myRole = myRoleInChannel(topic);
         if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
           setTimeout(() => {
             dispatch(SetMarkReadChannel(topic));
           }, 100);
+        }
+
+        if (topic.state.pinnedMessages) {
+          dispatch(SetPinnedMessages(topic.state.pinnedMessages.reverse()));
         }
       }
     } catch (error) {}
@@ -70,8 +91,30 @@ export const SetTopics = topics => {
   };
 };
 
+export const AddTopic = topicId => {
+  return async (dispatch, getState) => {
+    try {
+      if (!client) return;
+      const topic = client.channel('topic', topicId);
+      const response = await topic.watch();
+
+      if (response) {
+        dispatch(slice.actions.addTopic(topic));
+      }
+    } catch (error) {
+      handleError(dispatch, error);
+    }
+  };
+};
+
 export const SetLoadingTopics = loading => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.setLoadingTopics(loading));
+  };
+};
+
+export const SetIsClosedTopic = isClosed => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setIsClosedTopic(isClosed));
   };
 };
