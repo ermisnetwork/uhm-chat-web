@@ -4,9 +4,8 @@ import { client } from '../../client';
 import { handleError, myRoleInChannel, splitChannelId } from '../../utils/commons';
 import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
-import { ClientEvents } from '../../constants/events-const';
 import { FetchAllMembers } from './member';
-import { SetCurrentTopic, SetIsClosedTopic, SetLoadingTopics, SetTopics } from './topic';
+import { FetchTopics, SetCurrentTopic, SetIsClosedTopic, SetTopics } from './topic';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created
@@ -447,23 +446,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
         }
 
         if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
-          try {
-            const filter = {
-              type: ['topic', 'team'],
-              parent_cid: channel.cid,
-              include_parent: true,
-            };
-            const sort = [];
-            const options = {
-              message_limit: 25,
-            };
-            dispatch(SetLoadingTopics(true));
-            const responseTopics = await client.queryChannels(filter, sort, options);
-            dispatch(SetTopics(responseTopics));
-            dispatch(SetLoadingTopics(false));
-          } catch (error) {
-            dispatch(SetLoadingTopics(false));
-          }
+          dispatch(FetchTopics(channel.cid));
         }
       }
     } catch (error) {

@@ -29,10 +29,19 @@ import {
 import { LoadingButton } from '@mui/lab';
 import { setCurrentChannel, setCurrentChannelStatus, SetIsGuest } from '../../redux/slices/channel';
 import useOnlineStatus from '../../hooks/useOnlineStatus';
-import { callClient } from '../../client';
+import { callClient, client } from '../../client';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../../config';
-import { DotsThreeIcon, EditIcon, InfoIcon, PauseCircleRedIcon, PinIcon, PlayCircleIcon, TrashIcon } from '../Icons';
+import {
+  DotsThreeIcon,
+  EditIcon,
+  InfoIcon,
+  PauseCircleRedIcon,
+  PinIcon,
+  PlayCircleIcon,
+  TrashIcon,
+  UnPinIcon,
+} from '../Icons';
 
 const ActionsTopic = () => {
   const dispatch = useDispatch();
@@ -43,6 +52,7 @@ const ActionsTopic = () => {
   const myRole = myRoleInChannel(currentChannel);
 
   const isTopicClosed = currentTopic?.data?.is_closed_topic;
+  const isPinned = currentTopic?.data?.is_pinned;
 
   const onCloseTopic = async () => {
     try {
@@ -66,14 +76,30 @@ const ActionsTopic = () => {
     }
   };
 
+  const onPinTopic = async () => {
+    try {
+      if (isPinned) {
+        await client.unpinChannel(ChatType.TOPIC, currentTopic?.id);
+      } else {
+        await client.pinChannel(ChatType.TOPIC, currentTopic?.id);
+      }
+    } catch (error) {
+      handleError(dispatch, error);
+    } finally {
+      setAnchorEl(null);
+    }
+  };
+
   const ACTIONS = [
     !isTopicClosed && {
-      value: 'pin',
-      label: 'Pin To Top',
-      icon: <PinIcon color={theme.palette.text.primary} />,
-      onClick: () => {
-        setAnchorEl(null);
-      },
+      value: isPinned ? 'unpin' : 'pin',
+      label: isPinned ? 'Unpin' : 'Pin To Top',
+      icon: isPinned ? (
+        <UnPinIcon color={theme.palette.text.primary} />
+      ) : (
+        <PinIcon color={theme.palette.text.primary} />
+      ),
+      onClick: onPinTopic,
     },
     {
       value: 'info',
@@ -93,21 +119,17 @@ const ActionsTopic = () => {
       },
       allowRoles: [RoleMember.OWNER, RoleMember.MOD],
     },
-    !isTopicClosed
-      ? {
-          value: 'close',
-          label: 'Close Topic',
-          icon: <PauseCircleRedIcon color={theme.palette.text.primary} />,
-          onClick: onCloseTopic,
-          allowRoles: [RoleMember.OWNER, RoleMember.MOD],
-        }
-      : {
-          value: 'reopen',
-          label: 'Reopen Topic',
-          icon: <PlayCircleIcon color={theme.palette.text.primary} />,
-          onClick: onReopenTopic,
-          allowRoles: [RoleMember.OWNER, RoleMember.MOD],
-        },
+    {
+      value: isTopicClosed ? 'reopen' : 'close',
+      label: isTopicClosed ? 'Reopen Topic' : 'Close Topic',
+      icon: isTopicClosed ? (
+        <PlayCircleIcon color={theme.palette.text.primary} />
+      ) : (
+        <PauseCircleRedIcon color={theme.palette.text.primary} />
+      ),
+      onClick: isTopicClosed ? onReopenTopic : onCloseTopic,
+      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+    },
     {
       value: 'delete',
       label: 'Delete Topic',
@@ -175,13 +197,13 @@ const ActionsTopic = () => {
   );
 };
 
-const ChatHeader = ({ currentChat, isBlocked }) => {
+const ChatHeader = ({ currentChat }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobileToMd = useResponsive('down', 'md');
   const theme = useTheme();
   const { user_id } = useSelector(state => state.auth);
-  const { isGuest } = useSelector(state => state.channel);
+  const { isGuest, isBlocked } = useSelector(state => state.channel);
   const { currentTopic } = useSelector(state => state.topic);
 
   const isDirect = isChannelDirect(currentChat);
@@ -242,13 +264,11 @@ const ChatHeader = ({ currentChat, isBlocked }) => {
   };
 
   const renderIconAction = () => {
-    if (isGuest) return null;
+    if (isGuest || isBlocked) return null;
 
-    if (isEnabledTopics || currentChat?.type === ChatType.TOPIC) {
+    if (currentChat?.type === ChatType.TOPIC) {
       return <ActionsTopic />;
-    }
-
-    if (!isBlocked) {
+    } else {
       return (
         <IconButton
           onClick={() => {
@@ -259,8 +279,6 @@ const ChatHeader = ({ currentChat, isBlocked }) => {
         </IconButton>
       );
     }
-
-    return null;
   };
 
   return (

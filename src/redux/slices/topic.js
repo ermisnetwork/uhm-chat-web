@@ -8,6 +8,7 @@ import { SetMarkReadChannel, SetPinnedMessages } from './channel';
 const initialState = {
   currentTopic: null,
   topics: [],
+  pinnedTopics: [],
   loadingTopics: false,
   isClosedTopic: false,
 };
@@ -38,12 +39,69 @@ const slice = createSlice({
     setIsClosedTopic(state, action) {
       state.isClosedTopic = action.payload;
     },
+    setPinnedTopics(state, action) {
+      state.pinnedTopics = action.payload;
+    },
+    addPinnedTopic(state, action) {
+      const newPinnedTopic = action.payload;
+      if (!state.pinnedTopics.some(topic => topic.id === newPinnedTopic.id)) {
+        state.pinnedTopics.unshift(newPinnedTopic);
+      }
+    },
+    removePinnedTopic(state, action) {
+      const topicId = action.payload;
+      state.pinnedTopics = state.pinnedTopics.filter(topic => topic.id !== topicId);
+    },
   },
 });
 
 export default slice.reducer;
 
 // ----------------------------------------------------------------------
+
+export const FetchTopics = channelCID => {
+  return async (dispatch, getState) => {
+    try {
+      if (!client) return;
+
+      const filter = {
+        type: ['topic', 'team'],
+        parent_cid: channelCID,
+        include_parent: true,
+      };
+      const sort = [];
+      const options = {
+        message_limit: 25,
+      };
+      dispatch(SetLoadingTopics(true));
+      const response = await client.queryChannels(filter, sort, options);
+
+      const { topics, pinnedTopics } = response.reduce(
+        (acc, topic) => {
+          if (topic.data.is_pinned) {
+            acc.pinnedTopics.push(topic);
+          } else {
+            acc.topics.push(topic);
+          }
+          return acc;
+        },
+        {
+          topics: [],
+          pinnedTopics: [],
+        },
+      );
+
+      console.log('---topics---', topics);
+      console.log('---pinnedTopics---', pinnedTopics);
+
+      dispatch(SetTopics(topics));
+      dispatch(SetPinnedTopics(pinnedTopics));
+      dispatch(SetLoadingTopics(false));
+    } catch (error) {
+      dispatch(SetLoadingTopics(false));
+    }
+  };
+};
 
 export const ConnectCurrentTopic = topicId => {
   return async (dispatch, getState) => {
@@ -116,5 +174,23 @@ export const SetLoadingTopics = loading => {
 export const SetIsClosedTopic = isClosed => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.setIsClosedTopic(isClosed));
+  };
+};
+
+export const SetPinnedTopics = pinnedTopics => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setPinnedTopics(pinnedTopics));
+  };
+};
+
+export const AddPinnedTopic = topic => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.addPinnedTopic(topic));
+  };
+};
+
+export const RemovePinnedTopic = topicId => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.removePinnedTopic(topicId));
   };
 };

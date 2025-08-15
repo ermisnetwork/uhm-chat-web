@@ -921,7 +921,7 @@ const ChatComponent = () => {
       {!isGuest && !isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
 
       <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
-        <ChatHeader currentChat={currentChat} isBlocked={isBlocked} />
+        <ChatHeader currentChat={currentChat} />
 
         {currentChat && (
           <Box

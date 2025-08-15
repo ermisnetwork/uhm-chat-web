@@ -411,10 +411,14 @@ const LeftPanel = () => {
       };
 
       const handleChannelPinned = event => {
-        dispatch(AddPinnedChannel(event.cid));
+        if (event.channel_type !== ChatType.TOPIC) {
+          dispatch(AddPinnedChannel(event.cid));
+        }
       };
       const handleChannelUnPinned = event => {
-        dispatch(RemovePinnedChannel(event.cid));
+        if (event.channel_type !== ChatType.TOPIC) {
+          dispatch(RemovePinnedChannel(event.cid));
+        }
       };
 
       const handleInviteReject = event => {

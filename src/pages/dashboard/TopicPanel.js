@@ -30,6 +30,7 @@ import { AddTopic, ConnectCurrentTopic, SetCurrentTopic } from '../../redux/slic
 import { setSidebar } from '../../redux/slices/app';
 import { DEFAULT_PATH } from '../../config';
 import SkeletonChannels from '../../components/SkeletonChannels';
+import { client } from '../../client';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -242,26 +243,41 @@ const TopicPanel = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
-  const { currentTopic, topics, loadingTopics } = useSelector(state => state.topic);
+  const { currentTopic, topics, loadingTopics, pinnedTopics } = useSelector(state => state.topic);
   const [searchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
   const [idSelected, setIdSelected] = useState('');
 
   useEffect(() => {
-    console.log('--currentTopic--', currentTopic);
-  }, [currentTopic]);
-
-  useEffect(() => {
-    console.log('--currentChannel--', currentChannel);
     const handleChannelTopicCreated = event => {
       dispatch(AddTopic(event.channel_id));
     };
 
-    currentChannel.on(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
-    return () => {
-      currentChannel.off(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
+    const handleChannelPinned = event => {
+      if (event.channel_type === ChatType.TOPIC) {
+        console.log('Channel pinned:', event);
+
+        // dispatch(AddPinnedTopic(event.cid));
+      }
     };
-  }, [currentChannel]);
+
+    const handleChannelUnPinned = event => {
+      if (event.channel_type === ChatType.TOPIC) {
+        console.log('Channel unpinned:', event);
+        // dispatch(RemovePinnedTopic(event.cid));
+      }
+    };
+
+    client.on(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
+    client.on(ClientEvents.ChannelPinned, handleChannelPinned);
+    client.on(ClientEvents.ChannelUnPinned, handleChannelUnPinned);
+
+    return () => {
+      client.off(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
+      client.off(ClientEvents.ChannelPinned, handleChannelPinned);
+      client.off(ClientEvents.ChannelUnPinned, handleChannelUnPinned);
+    };
+  }, [client]);
 
   useEffect(() => {
     if (topicID) {
@@ -285,6 +301,18 @@ const TopicPanel = () => {
             <GeneralElement idSelected={idSelected} />
           </StyledTopicItem>
 
+          {pinnedTopics.length > 0 && (
+            <FlipMove duration={200}>
+              {pinnedTopics.map(item => {
+                return (
+                  <StyledTopicItem key={`pinned-topic-${item.id}`}>
+                    <TopicElement topic={item} idSelected={idSelected} />
+                  </StyledTopicItem>
+                );
+              })}
+            </FlipMove>
+          )}
+
           {displayTopics.length > 0 ? (
             <FlipMove duration={200}>
               {displayTopics.map(item => {
@@ -301,7 +329,7 @@ const TopicPanel = () => {
         </>
       );
     }
-  }, [topics, idSelected, loadingTopics]);
+  }, [topics, idSelected, loadingTopics, pinnedTopics]);
 
   if (!currentChannel?.data?.topics_enabled) return null;
 
