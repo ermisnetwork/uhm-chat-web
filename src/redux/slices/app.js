@@ -7,6 +7,7 @@ const initialState = {
   sideBar: {
     open: false,
     type: SidebarType.Channel,
+    mode: '',
   },
   tab: TabType.Chat,
   snackbar: {
@@ -39,6 +40,7 @@ const slice = createSlice({
     setSidebar(state, action) {
       state.sideBar.type = action.payload.type;
       state.sideBar.open = action.payload.open;
+      state.sideBar.mode = action.payload.mode || '';
     },
     updateTab(state, action) {
       state.tab = action.payload.tab;

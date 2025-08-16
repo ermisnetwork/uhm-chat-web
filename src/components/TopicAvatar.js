@@ -25,9 +25,10 @@ const TopicAvatar = ({ url = '', name = '', size = 40, shape = 'circle', openLig
     return (
       <Box
         sx={{
-          width: size,
-          height: size,
-          fontSize: getFontSizeAvatar(size),
+          // width: size,
+          // height: size,
+          lineHeight: `${size}px`,
+          fontSize: size,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

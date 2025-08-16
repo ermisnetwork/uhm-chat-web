@@ -38,7 +38,6 @@ import { setSidebar } from '../../redux/slices/app';
 import { DEFAULT_PATH } from '../../config';
 import SkeletonChannels from '../../components/SkeletonChannels';
 import { client } from '../../client';
-import { RemoveActiveChannel } from '../../redux/slices/channel';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -119,6 +118,7 @@ const TopicHeader = () => {
       onClick: () => {
         setAnchorEl(null);
         dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+        dispatch(SetCurrentTopic(null));
         navigate(`${DEFAULT_PATH}/${currentChannel.cid}`);
       },
     },

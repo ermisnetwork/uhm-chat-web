@@ -69,9 +69,13 @@ const StyledMenu = styled(Menu)(({ theme }) => ({
 
 const ListTopic = ({ topics, isBoldTopics }) => {
   const theme = useTheme();
+  const maxTopics = 2; // Số topic tối đa hiển thị
+
+  const visibleTopics = topics.slice(0, maxTopics);
+  const hasMore = topics.length > maxTopics;
 
   return (
-    <Stack direction="row" alignItems="center" gap={1} sx={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+    <Stack direction="row" alignItems="center" gap={2}>
       <Stack direction="row" alignItems="center">
         <Typography
           variant="caption"
@@ -86,15 +90,19 @@ const ListTopic = ({ topics, isBoldTopics }) => {
         <AvatarGeneralDefault size={16} />
       </Stack>
 
-      {topics.map(topic => {
+      {visibleTopics.map(topic => {
         return (
-          <Stack key={topic.id} direction="row" alignItems="center">
+          <Stack key={topic.id} direction="row" alignItems="center" sx={{ maxWidth: 120, minWidth: 0 }}>
             <Typography
               variant="caption"
+              noWrap
               sx={{
                 color: theme.palette.text.primary,
                 fontSize: '12px',
                 fontWeight: isBoldTopics ? 600 : 400,
+                maxWidth: 70,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
               {topic.data.name}&nbsp;
@@ -108,6 +116,19 @@ const ListTopic = ({ topics, isBoldTopics }) => {
           </Stack>
         );
       })}
+
+      {hasMore && (
+        <Typography
+          variant="caption"
+          sx={{
+            color: theme.palette.text.secondary,
+            fontSize: '16px',
+            fontWeight: 600,
+          }}
+        >
+          ...
+        </Typography>
+      )}
     </Stack>
   );
 };
@@ -440,7 +461,7 @@ const ChatElement = ({ channel }) => {
 
   const isMuted = mutedChannels.some(channel => channel.id === channelId);
   const isEnabledTopics = channel.data?.topics_enabled;
-  const topics = channel.state?.topics ? channel.state?.topics.slice(0, 4) : [];
+  const topics = channel.state?.topics ? channel.state?.topics : [];
   const isBoldLastMsg = unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadCount > 0);
   const isShowDot = unreadChannels && unreadChannels.some(item => item.id === channelId);
   const isBoldTopics =

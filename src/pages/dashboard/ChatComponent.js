@@ -1041,7 +1041,7 @@ const ChatComponent = () => {
             }}
           >
             {usersTyping && usersTyping.length > 0 && <UsersTyping usersTyping={usersTyping} />}
-            <ChatFooter currentChannel={currentChat} setMessages={setMessages} isDialog={false} />
+            <ChatFooter setMessages={setMessages} isDialog={false} />
           </Box>
         )}
         {isClosedTopic && <ClosedTopicBackdrop />}

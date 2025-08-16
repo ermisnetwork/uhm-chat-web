@@ -129,6 +129,11 @@ export const SidebarType = {
   KeywordFiltering: 'KEYWORD_FILTERING',
   UserInfo: 'USER_INFO',
   ChannelTopics: 'CHANNEL_TOPICS',
+  TopicInfo: 'TOPIC_INFO',
+};
+
+export const SidebarMode = {
+  Edit: 'edit',
 };
 
 export const TabMembers = {

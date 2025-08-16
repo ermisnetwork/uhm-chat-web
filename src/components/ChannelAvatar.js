@@ -92,6 +92,7 @@ export default function ChannelAvatar({
   const channelAvatar = channel.data?.image || '';
   const isPublic = isPublicChannel(channel);
   const isChannelTopic = channel?.type === ChatType.TOPIC;
+  const isEnabledTopics = channel.data?.topics_enabled;
 
   const directMembers = useMemo(
     () => (isDirect ? Object.values(channel.state.members) : []),
@@ -143,7 +144,7 @@ export default function ChannelAvatar({
     border: `1px solid ${theme.palette.background.paper}`,
   };
 
-  const renderAvatar = () => {
+  const renderedAvatar = useMemo(() => {
     if (isDirect) {
       return (
         <StyledBadgeOnline
@@ -183,7 +184,7 @@ export default function ChannelAvatar({
             openLightbox={openLightbox}
           />
         );
-      } else if (showGeneralDefault) {
+      } else if (showGeneralDefault && isEnabledTopics) {
         return <AvatarGeneralDefault size={width} />;
       } else {
         if (isPublic) {
@@ -224,13 +225,29 @@ export default function ChannelAvatar({
         }
       }
     }
-  };
+  }, [
+    isDirect,
+    otherMemberInDirect,
+    onlineStatus,
+    width,
+    height,
+    styleCustom,
+    openLightbox,
+    isChannelTopic,
+    channel.data,
+    showGeneralDefault,
+    isPublic,
+    channelAvatar,
+    groupMemberFirst,
+    groupMemberSecond,
+    shape,
+  ]);
 
   if (!channel) return null;
 
   return (
     <Stack direction="row" spacing={2} sx={{ position: 'relative' }}>
-      {renderAvatar()}
+      {renderedAvatar}
     </Stack>
   );
 }

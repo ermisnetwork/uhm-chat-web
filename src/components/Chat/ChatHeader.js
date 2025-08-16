@@ -25,6 +25,7 @@ import {
   ConfirmType,
   CurrentChannelStatus,
   RoleMember,
+  SidebarMode,
   SidebarType,
 } from '../../constants/commons-const';
 import { LoadingButton } from '@mui/lab';
@@ -104,6 +105,15 @@ const ActionsTopic = () => {
     dispatch(setChannelConfirm(payload));
     setAnchorEl(null);
   };
+  const onOpenTopicInfo = () => {
+    dispatch(setSidebar({ type: SidebarType.TopicInfo, open: true }));
+    setAnchorEl(null);
+  };
+
+  const onEditTopicInfo = () => {
+    dispatch(setSidebar({ type: SidebarType.TopicInfo, open: true, mode: SidebarMode.Edit }));
+    setAnchorEl(null);
+  };
 
   const ACTIONS = [
     {
@@ -120,18 +130,13 @@ const ActionsTopic = () => {
       value: 'info',
       label: 'Topic Info',
       icon: <InfoIcon color={theme.palette.text.primary} />,
-      onClick: () => {
-        setAnchorEl(null);
-      },
+      onClick: onOpenTopicInfo,
     },
     !isTopicClosed && {
       value: 'edit',
       label: 'Edit Topic',
       icon: <EditIcon color={theme.palette.text.primary} />,
-      onClick: () => {
-        setAnchorEl(null);
-        // dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
-      },
+      onClick: onEditTopicInfo,
       allowRoles: [RoleMember.OWNER, RoleMember.MOD],
     },
     {
@@ -284,16 +289,12 @@ const ChatHeader = () => {
 
     if (currentTopic?.type === ChatType.TOPIC) {
       return <ActionsTopic />;
-    } else {
-      return (
-        <IconButton
-          onClick={() => {
-            dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
-          }}
-        >
-          <MagnifyingGlass />
-        </IconButton>
-      );
+    }
+  };
+
+  const onOpenChannelInfo = () => {
+    if (!isGuest) {
+      dispatch(setSidebar({ type: currentTopic ? SidebarType.TopicInfo : SidebarType.Channel, open: true }));
     }
   };
 
@@ -343,11 +344,7 @@ const ChatHeader = () => {
                 }}
               >
                 <Button
-                  onClick={() => {
-                    if (!isGuest) {
-                      dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
-                    }
-                  }}
+                  onClick={onOpenChannelInfo}
                   sx={{
                     textTransform: 'none',
                     maxWidth: '100%',
@@ -390,14 +387,21 @@ const ChatHeader = () => {
             {isDirect && (
               <>
                 <IconButton onClick={() => onStartCall(CallType.VIDEO)} disabled={isBlocked}>
-                  <VideoCamera />
+                  <VideoCamera color={theme.palette.text.primary} />
                 </IconButton>
                 <IconButton onClick={() => onStartCall(CallType.AUDIO)} disabled={isBlocked}>
-                  <Phone />
+                  <Phone color={theme.palette.text.primary} />
                 </IconButton>
               </>
             )}
 
+            <IconButton
+              onClick={() => {
+                dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+              }}
+            >
+              <MagnifyingGlass color={theme.palette.text.primary} />
+            </IconButton>
             {renderIconAction()}
 
             {isGuest && (

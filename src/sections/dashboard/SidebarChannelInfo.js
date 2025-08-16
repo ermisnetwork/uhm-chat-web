@@ -833,7 +833,7 @@ const SidebarChannelInfo = () => {
           {/* ------------Channel info tab--------------- */}
           {!isEditing && (
             <Stack>
-              <ChannelInfoTab />
+              <ChannelInfoTab currentChat={currentChannel} />
             </Stack>
           )}
         </Stack>
