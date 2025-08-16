@@ -115,6 +115,7 @@ const MessageList = ({
   onScrollToReplyMsg,
   highlightMsg,
   setHighlightMsg,
+  currentChat,
 }) => {
   const users = client.state.users ? Object.values(client.state.users) : [];
   const dispatch = useDispatch();
@@ -429,7 +430,7 @@ const MessageList = ({
             })}
         </Stack>
       </motion.div>
-      {!isGuest && !isBlocked && !isBanned && <ReadBy />}
+      {!isGuest && !isBlocked && !isBanned && <ReadBy currentChat={currentChat} />}
     </Box>
   );
 };
@@ -921,7 +922,7 @@ const ChatComponent = () => {
       {!isGuest && !isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
 
       <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
-        <ChatHeader currentChat={currentChat} />
+        <ChatHeader />
 
         {currentChat && (
           <Box
@@ -1019,6 +1020,7 @@ const ChatComponent = () => {
                       onScrollToReplyMsg={onScrollToReplyMsg}
                       highlightMsg={highlightMsg}
                       setHighlightMsg={setHighlightMsg}
+                      currentChat={currentChat}
                     />
                     {/* </SimpleBarStyle> */}
                   </InfiniteScroll>

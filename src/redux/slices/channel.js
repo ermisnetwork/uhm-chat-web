@@ -5,7 +5,7 @@ import { handleError, myRoleInChannel, splitChannelId } from '../../utils/common
 import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
 import { FetchAllMembers } from './member';
-import { FetchTopics, SetCurrentTopic, SetIsClosedTopic, SetTopics } from './topic';
+import { FetchTopics, SetCurrentTopic, SetIsClosedTopic, SetPinnedTopics, SetTopics } from './topic';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created
@@ -590,17 +590,7 @@ export const UpdateUnreadChannel = channel => {
 export const MoveChannelToTop = channelId => {
   return async (dispatch, getState) => {
     const { activeChannels, pinnedChannels } = getState().channel;
-    const { topics } = getState().topic;
-
-    if (topics.length > 0) {
-      const topicIndex = topics.findIndex(topic => topic.id === channelId);
-      if (topicIndex > -1) {
-        const topicToMove = topics[topicIndex];
-        const updatedTopics = [topicToMove, ...topics.slice(0, topicIndex), ...topics.slice(topicIndex + 1)];
-        dispatch(SetTopics(updatedTopics));
-        return;
-      }
-    }
+    const { topics, pinnedTopics } = getState().topic;
 
     // Xử lý activeChannels
     const channelIndex = activeChannels.findIndex(channel => channel.id === channelId);
@@ -625,6 +615,31 @@ export const MoveChannelToTop = channelId => {
         ...pinnedChannels.slice(pinnedIndex + 1),
       ];
       dispatch(slice.actions.setPinnedChannels(updatedPinned));
+    }
+
+    // Xử lý topics
+    if (topics.length > 0) {
+      const topicIndex = topics.findIndex(topic => topic.id === channelId);
+      if (topicIndex > -1) {
+        const topicToMove = topics[topicIndex];
+        const updatedTopics = [topicToMove, ...topics.slice(0, topicIndex), ...topics.slice(topicIndex + 1)];
+        dispatch(SetTopics(updatedTopics));
+        return;
+      }
+    }
+
+    // Xử lý pinnedTopics
+    if (pinnedTopics.length > 0) {
+      const pinnedIndex = pinnedTopics.findIndex(topic => topic.id === channelId);
+      if (pinnedIndex > -1) {
+        const topicToMove = pinnedTopics[pinnedIndex];
+        const updatedPinned = [
+          topicToMove,
+          ...pinnedTopics.slice(0, pinnedIndex),
+          ...pinnedTopics.slice(pinnedIndex + 1),
+        ];
+        dispatch(SetPinnedTopics(updatedPinned));
+      }
     }
   };
 };

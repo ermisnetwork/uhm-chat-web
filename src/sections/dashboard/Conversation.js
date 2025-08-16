@@ -97,7 +97,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
   const channelId = currentChannel.id;
   const messageId = message.id;
   const messageText = message.text;
-  const isDelete = checkPermissionDeleteMessage(message, channelType, membership.user_id, membership.channel_role);
+  const isDelete = checkPermissionDeleteMessage(message, channelType, membership?.user_id, membership?.channel_role);
   const isEdit = isMyMessage && message.text && [MessageType.Regular, MessageType.Reply].includes(message.type);
   const isDownload = message.attachments;
   const isUnPin = pinnedMessages.some(msg => msg.id === messageId);

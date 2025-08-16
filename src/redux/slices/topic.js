@@ -59,15 +59,30 @@ export default slice.reducer;
 
 // ----------------------------------------------------------------------
 
+const watchTopic = async topicId => {
+  try {
+    if (!client) return;
+    const topic = client.channel('topic', topicId);
+    const response = await topic.watch();
+
+    if (response) {
+      return topic;
+    }
+  } catch (error) {
+    handleError(dispatch, error);
+    return null;
+  }
+};
+
 export const FetchTopics = channelCID => {
   return async (dispatch, getState) => {
     try {
       if (!client) return;
 
       const filter = {
-        type: ['topic', 'team'],
+        type: ['topic'],
         parent_cid: channelCID,
-        include_parent: true,
+        // include_parent: true,
       };
       const sort = [];
       const options = {
@@ -151,17 +166,24 @@ export const SetTopics = topics => {
 
 export const AddTopic = topicId => {
   return async (dispatch, getState) => {
-    try {
-      if (!client) return;
-      const topic = client.channel('topic', topicId);
-      const response = await topic.watch();
-
-      if (response) {
+    const topicCID = `topic:${topicId}`;
+    const topic = client.activeChannels[topicCID];
+    if (topic) {
+      dispatch(slice.actions.addTopic(topic));
+      return;
+    } else {
+      const topic = await watchTopic(topicId);
+      if (topic) {
         dispatch(slice.actions.addTopic(topic));
       }
-    } catch (error) {
-      handleError(dispatch, error);
     }
+  };
+};
+
+export const RemoveTopic = topicId => {
+  return (dispatch, getState) => {
+    dispatch(slice.actions.removeTopic(topicId));
+    dispatch(slice.actions.removePinnedTopic(topicId));
   };
 };
 
@@ -183,14 +205,21 @@ export const SetPinnedTopics = pinnedTopics => {
   };
 };
 
-export const AddPinnedTopic = topic => {
+export const AddPinnedTopic = topicId => {
   return async (dispatch, getState) => {
+    const topicCID = `topic:${topicId}`;
+    const topic = client.activeChannels[topicCID];
+
     dispatch(slice.actions.addPinnedTopic(topic));
+    dispatch(slice.actions.removeTopic(topicId));
   };
 };
 
 export const RemovePinnedTopic = topicId => {
   return async (dispatch, getState) => {
+    const topicCID = `topic:${topicId}`;
+    const topic = client.activeChannels[topicCID];
     dispatch(slice.actions.removePinnedTopic(topicId));
+    dispatch(slice.actions.addTopic(topic));
   };
 };

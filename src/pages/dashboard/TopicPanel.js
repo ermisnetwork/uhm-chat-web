@@ -26,19 +26,24 @@ import FlipMove from 'react-flip-move';
 import TopicElement from '../../components/TopicElement';
 import { ClientEvents } from '../../constants/events-const';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AddTopic, ConnectCurrentTopic, SetCurrentTopic } from '../../redux/slices/topic';
+import {
+  AddPinnedTopic,
+  AddTopic,
+  ConnectCurrentTopic,
+  RemovePinnedTopic,
+  RemoveTopic,
+  SetCurrentTopic,
+} from '../../redux/slices/topic';
 import { setSidebar } from '../../redux/slices/app';
 import { DEFAULT_PATH } from '../../config';
 import SkeletonChannels from '../../components/SkeletonChannels';
 import { client } from '../../client';
+import { RemoveActiveChannel } from '../../redux/slices/channel';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
   margin: '0px -15px',
   padding: '5px 10px',
-  '&:last-child': {
-    borderBottom: 'none',
-  },
 }));
 
 const TopicEmpty = () => {
@@ -240,44 +245,57 @@ const TopicHeader = () => {
 };
 
 const TopicPanel = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
   const { currentTopic, topics, loadingTopics, pinnedTopics } = useSelector(state => state.topic);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
   const [idSelected, setIdSelected] = useState('');
 
   useEffect(() => {
-    const handleChannelTopicCreated = event => {
+    const handleTopicCreated = event => {
       dispatch(AddTopic(event.channel_id));
     };
 
-    const handleChannelPinned = event => {
+    const handleTopicPinned = event => {
       if (event.channel_type === ChatType.TOPIC) {
-        console.log('Channel pinned:', event);
-
-        // dispatch(AddPinnedTopic(event.cid));
+        dispatch(AddPinnedTopic(event.channel_id));
       }
     };
 
-    const handleChannelUnPinned = event => {
+    const handleTopicUnPinned = event => {
       if (event.channel_type === ChatType.TOPIC) {
-        console.log('Channel unpinned:', event);
-        // dispatch(RemovePinnedTopic(event.cid));
+        dispatch(RemovePinnedTopic(event.channel_id));
       }
     };
 
-    client.on(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
-    client.on(ClientEvents.ChannelPinned, handleChannelPinned);
-    client.on(ClientEvents.ChannelUnPinned, handleChannelUnPinned);
+    const handleTopicDeleted = event => {
+      if (event.channel_type === ChatType.TOPIC) {
+        dispatch(RemovePinnedTopic(event.channel_id));
+        dispatch(RemoveTopic(event.channel_id));
+        if (currentTopic?.id === event.channel_id) {
+          dispatch(SetCurrentTopic(null));
+          setIdSelected(currentChannel?.id);
+          searchParams.delete('topicId');
+          setSearchParams(searchParams, { replace: true });
+        }
+      }
+    };
+
+    client.on(ClientEvents.ChannelTopicCreated, handleTopicCreated);
+    client.on(ClientEvents.ChannelPinned, handleTopicPinned);
+    client.on(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
+    client.on(ClientEvents.ChannelDeleted, handleTopicDeleted);
 
     return () => {
-      client.off(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
-      client.off(ClientEvents.ChannelPinned, handleChannelPinned);
-      client.off(ClientEvents.ChannelUnPinned, handleChannelUnPinned);
+      client.off(ClientEvents.ChannelTopicCreated, handleTopicCreated);
+      client.off(ClientEvents.ChannelPinned, handleTopicPinned);
+      client.off(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
+      client.off(ClientEvents.ChannelDeleted, handleTopicDeleted);
     };
-  }, [client]);
+  }, [client, currentTopic, currentChannel]);
 
   useEffect(() => {
     if (topicID) {
@@ -290,8 +308,6 @@ const TopicPanel = () => {
   }, [topicID, currentChannel]);
 
   const renderedTopics = useMemo(() => {
-    const displayTopics = topics.filter(item => item.type === ChatType.TOPIC);
-
     if (loadingTopics) {
       return <SkeletonChannels />;
     } else {
@@ -313,9 +329,9 @@ const TopicPanel = () => {
             </FlipMove>
           )}
 
-          {displayTopics.length > 0 ? (
+          {topics.length > 0 ? (
             <FlipMove duration={200}>
-              {displayTopics.map(item => {
+              {topics.map(item => {
                 return (
                   <StyledTopicItem key={`topic-${item.id}`}>
                     <TopicElement topic={item} idSelected={idSelected} />

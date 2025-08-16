@@ -22,6 +22,7 @@ import {
   AvatarShape,
   CallType,
   ChatType,
+  ConfirmType,
   CurrentChannelStatus,
   RoleMember,
   SidebarType,
@@ -42,6 +43,7 @@ import {
   TrashIcon,
   UnPinIcon,
 } from '../Icons';
+import { setChannelConfirm } from '../../redux/slices/dialog';
 
 const ActionsTopic = () => {
   const dispatch = useDispatch();
@@ -49,6 +51,7 @@ const ActionsTopic = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const { currentChannel } = useSelector(state => state.channel);
   const { currentTopic } = useSelector(state => state.topic);
+  const { user_id } = useSelector(state => state.auth);
   const myRole = myRoleInChannel(currentChannel);
 
   const isTopicClosed = currentTopic?.data?.is_closed_topic;
@@ -90,8 +93,20 @@ const ActionsTopic = () => {
     }
   };
 
+  const onDeleteTopic = () => {
+    const payload = {
+      openDialog: true,
+      channel: currentTopic,
+      userId: user_id,
+      type: ConfirmType.DELETE_TOPIC,
+    };
+
+    dispatch(setChannelConfirm(payload));
+    setAnchorEl(null);
+  };
+
   const ACTIONS = [
-    !isTopicClosed && {
+    {
       value: isPinned ? 'unpin' : 'pin',
       label: isPinned ? 'Unpin' : 'Pin To Top',
       icon: isPinned ? (
@@ -134,10 +149,8 @@ const ActionsTopic = () => {
       value: 'delete',
       label: 'Delete Topic',
       icon: <TrashIcon color={theme.palette.error.main} />,
-      onClick: () => {
-        setAnchorEl(null);
-      },
-      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+      onClick: onDeleteTopic,
+      allowRoles: [RoleMember.OWNER],
     },
   ];
 
@@ -197,21 +210,24 @@ const ActionsTopic = () => {
   );
 };
 
-const ChatHeader = ({ currentChat }) => {
+const ChatHeader = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isMobileToMd = useResponsive('down', 'md');
   const theme = useTheme();
   const { user_id } = useSelector(state => state.auth);
-  const { isGuest, isBlocked } = useSelector(state => state.channel);
+  const { isGuest, isBlocked, currentChannel } = useSelector(state => state.channel);
   const { currentTopic } = useSelector(state => state.topic);
 
-  const isDirect = isChannelDirect(currentChat);
-  const isEnabledTopics = currentChat?.data?.topics_enabled;
+  const isDirect = isChannelDirect(currentChannel);
+  const isEnabledTopics = currentChannel?.data?.topics_enabled;
 
   const [loadingJoin, setLoadingJoin] = useState(false);
 
-  const members = useMemo(() => (isDirect ? Object.values(currentChat.state.members) : []), [currentChat, isDirect]);
+  const members = useMemo(
+    () => (isDirect ? Object.values(currentChannel.state.members) : []),
+    [currentChannel, isDirect],
+  );
 
   const otherMember = useMemo(() => members.find(member => member.user_id !== user_id), [members, user_id]);
 
@@ -220,13 +236,13 @@ const ChatHeader = ({ currentChat }) => {
   const onlineStatus = useOnlineStatus(isDirect ? otherMemberId : '');
 
   const onStartCall = async callType => {
-    await callClient.createCall(callType, currentChat.cid);
+    await callClient.createCall(callType, currentChannel.cid);
   };
 
   const onJoinChannel = async () => {
     try {
       setLoadingJoin(true);
-      const response = await currentChat.acceptInvite('join');
+      const response = await currentChannel.acceptInvite('join');
 
       if (response) {
         setLoadingJoin(false);
@@ -251,22 +267,22 @@ const ChatHeader = ({ currentChat }) => {
         return 'General';
       }
     } else {
-      return currentChat.data?.name;
+      return currentChannel.data?.name;
     }
   };
 
   const renderCaption = () => {
-    if (isEnabledTopics) {
-      return currentChat.data?.name;
+    if (isEnabledTopics || currentTopic) {
+      return currentChannel.data?.name;
     } else {
-      return isDirect ? onlineStatus : `${currentChat.data?.member_count} members`;
+      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} members`;
     }
   };
 
   const renderIconAction = () => {
     if (isGuest || isBlocked) return null;
 
-    if (currentChat?.type === ChatType.TOPIC) {
+    if (currentTopic?.type === ChatType.TOPIC) {
       return <ActionsTopic />;
     } else {
       return (
@@ -297,7 +313,7 @@ const ChatHeader = ({ currentChat }) => {
           sx={{ width: '100%', height: '100%' }}
           justifyContent="space-between"
         >
-          {currentChat ? (
+          {currentChannel ? (
             <Stack spacing={1} direction="row" alignItems="center" sx={{ flex: 1, overflow: 'hidden' }}>
               {isMobileToMd && (
                 <IconButton
@@ -312,7 +328,7 @@ const ChatHeader = ({ currentChat }) => {
               )}
 
               <ChannelAvatar
-                channel={currentChat}
+                channel={currentTopic ? currentTopic : currentChannel}
                 width={isEnabledTopics || currentTopic ? 40 : 60}
                 height={isEnabledTopics || currentTopic ? 40 : 60}
                 openLightbox={true}

@@ -482,7 +482,7 @@ const SidebarChannelInfo = () => {
       openDialog: true,
       channel: currentChannel,
       userId: user_id,
-      type: ConfirmType.DELETE,
+      type: ConfirmType.DELETE_CHANNEL,
     };
     dispatch(setChannelConfirm(payload));
   };

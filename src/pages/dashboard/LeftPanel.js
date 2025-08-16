@@ -286,16 +286,18 @@ const LeftPanel = () => {
       };
 
       const handleChannelDeleted = event => {
-        navigate(`${DEFAULT_PATH}`);
-        if (activeChannels.some(item => item.id === event.channel_id)) {
-          dispatch(RemoveActiveChannel(event.channel_id));
-        }
-        if (pendingChannels.some(item => item.id === event.channel_id)) {
-          dispatch(RemovePendingChannel(event.channel_id));
-        }
+        if (event.channel_type !== ChatType.TOPIC) {
+          navigate(`${DEFAULT_PATH}`);
+          if (activeChannels.some(item => item.id === event.channel_id)) {
+            dispatch(RemoveActiveChannel(event.channel_id));
+          }
+          if (pendingChannels.some(item => item.id === event.channel_id)) {
+            dispatch(RemovePendingChannel(event.channel_id));
+          }
 
-        if (mutedChannels.some(item => item.id === event.channel_id)) {
-          dispatch(RemoveMutedChannel(event.channel_id));
+          if (mutedChannels.some(item => item.id === event.channel_id)) {
+            dispatch(RemoveMutedChannel(event.channel_id));
+          }
         }
       };
 

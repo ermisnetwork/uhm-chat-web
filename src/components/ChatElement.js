@@ -415,7 +415,7 @@ const ChatElement = ({ channel }) => {
       openDialog: true,
       channel,
       userId: user_id,
-      type: ConfirmType.DELETE,
+      type: ConfirmType.DELETE_CHANNEL,
     };
     dispatch(setChannelConfirm(payload));
   };

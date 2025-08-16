@@ -91,13 +91,14 @@ export const RoleMember = {
 
 export const ConfirmType = {
   LEAVE: 'leave',
-  DELETE: 'delete',
+  DELETE_CHANNEL: 'delete_channel',
   REMOVE_MEMBER: 'remove_member',
   REMOVE_MODER: 'remove_moder',
   TRUNCATE: 'truncate', // tất cả tin nhắn trong cuộc trò chuyện sẽ bị xoá, chỉ sử dụng cho channel direct
   BLOCK: 'block',
   UNBLOCK: 'unblock',
   UNBANNED: 'unbanned',
+  DELETE_TOPIC: 'delete_topic',
 };
 
 export const TabType = {
