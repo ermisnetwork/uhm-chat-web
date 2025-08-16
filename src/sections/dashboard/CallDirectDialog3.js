@@ -261,8 +261,6 @@ const onCancelCall = () => {
       }
     };
 
-    // console.log(receiverInfo);
-    
     callClient.onConnectionMessageChange = msg => {
       setConnectionStatus(msg);
     };
@@ -600,8 +598,6 @@ const onCancelCall = () => {
       </>
     );
   };
-  console.log(remoteCameraOn);
-
   const onMinimize = () => setMinimized(true);
   const onRestore = () => setMinimized(false);
 
@@ -685,6 +681,7 @@ const onCancelCall = () => {
                 }
                 width={100}
                 height={100}
+                shape={20}
               />
               <img src={avatarBefore} style={{ left: 135, top: 30,height: 125, width: 130, position: 'absolute', }} alt="logo" />
               <img src={avatarAfter} style={{ left: 135, top: 30,height: 125, width: 130, position: 'absolute', }} alt="logo" />
@@ -781,12 +778,65 @@ const onCancelCall = () => {
         open={openCallDirectDialog}
         TransitionComponent={Transition}
         keepMounted
+        BackdropProps={{
+          style: { background: 'transparent' }
+        }}
         sx={{ 
           visibility: minimized ? 'hidden' : '',
           display: callDirectData?.type === 'incoming' && callDirectStatus !== CallStatus.CONNECTED ? 'none' : 'block', 
           }}
       >
         <DialogContent sx={{ padding: 0 }}>
+          <Box
+            variant="body1"
+            sx={{
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              zIndex: 2,
+              display: 'flex',
+            }}
+          >
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', background: 'none', boxShadow: 'none', borderRadius: '0px' }}
+            >
+              <Minus  size={14} onClick={() => setMinimized(true)} />
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', background: 'none', boxShadow: 'none', borderRadius: '0px' }}
+            >
+              <Rectangle size={14} />
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ minWidth: '30px', height: '30px', padding: 0, color: '#fff', background: 'none', boxShadow: 'none', borderRadius: '0px' }}
+            >
+              <X weight="fill" size={14} onClick={onSendRejectCall} />
+            </Button>
+          </Box>
+          <Box className="receiverAvatar"
+            sx={{
+              display: callDirectStatus === CallStatus.CONNECTED && (localCameraOn || remoteCameraOn) ? 'none !important' : 'block',
+            }}
+          >
+            <MemberAvatar
+              member={
+                user_id === callerInfo?.id
+                  ? { name: receiverInfo?.name, avatar: receiverInfo?.avatar }
+                  : { name: callerInfo?.name, avatar: callerInfo?.avatar }
+              }
+              width={100}
+              height={100}
+              shape={20}
+            />
+            <img src={avatarBefore} style={{ height: 125, width: 130, position: 'absolute', }} alt="logo" />
+            <img src={avatarAfter} style={{ height: 125, width: 130, position: 'absolute', }} alt="logo" />
+          </Box>
           <Typography
             variant="body1"
             sx={{
@@ -830,45 +880,35 @@ const onCancelCall = () => {
                 textAlign: 'center',
                 position: 'relative',
                 zIndex: 3,
-                color: theme.palette.success.main,
+                color: theme.palette.success.lighter,
               }}
             >
               {formatTime(time)}
             </Typography>
           )}
 
-          <div className="receiverAvatar">
-            <MemberAvatar
-              member={
-                user_id === callerInfo?.id
-                  ? { name: receiverInfo?.name, avatar: receiverInfo?.avatar }
-                  : { name: callerInfo?.name, avatar: callerInfo?.avatar }
-              }
-              width={200}
-              height={200}
-            />
-          </div>
           <div
             style={{
               textAlign: 'center',
               fontWeight: 600,
               marginTop: '15px',
               fontSize: '14px',
-              color: theme.palette.text.secondary,
+              lineHeight: '0px',
+              color: theme.palette.grey[0],
             }}
           >
             {callDirectStatus === CallStatus.RINGING ? (
-              'ringing'
+              'is calling you'
             ) : (
-              <span style={{ color: theme.palette.success.main }}>Connected</span>
+              <span style={{ color: theme.palette.grey[0] }}></span>
             )}
             {[CallStatus.RINGING].includes(callDirectStatus) && (
               <>
                 &nbsp;&nbsp;
                 <div className="loader">
-                  <div className="dot" style={{ backgroundColor: theme.palette.text.secondary }} />
-                  <div className="dot" style={{ backgroundColor: theme.palette.text.secondary }} />
-                  <div className="dot" style={{ backgroundColor: theme.palette.text.secondary }} />
+                  <div className="dot" style={{ backgroundColor: theme.palette.grey[0] }} />
+                  <div className="dot" style={{ backgroundColor: theme.palette.grey[0] }} />
+                  <div className="dot" style={{ backgroundColor: theme.palette.grey[0] }} />
                 </div>
               </>
             )}
