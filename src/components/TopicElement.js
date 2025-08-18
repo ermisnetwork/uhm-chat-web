@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Badge, Box, Stack, Typography } from '@mui/material';
+import { Badge, Box, Stack, Tooltip, Typography } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { ClientEvents } from '../constants/events-const';
@@ -13,11 +13,13 @@ import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
 import TopicAvatar from './TopicAvatar';
+import useResponsive from '../hooks/useResponsive';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
-  width: '100%',
+  // width: '100%',
   borderRadius: '16px',
   position: 'relative',
+  transition: 'all 0.2s ease-in-out',
   transition: 'background-color 0.2s ease-in-out',
   display: 'flex',
   alignItems: 'center',
@@ -32,8 +34,8 @@ const TopicElement = ({ topic, idSelected }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
+  const isMobileToMd = useResponsive('down', 'md');
   const { currentChannel, unreadChannels } = useSelector(state => state.channel);
-  const { currentTopic } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
   const topicId = topic?.id || '';
@@ -195,67 +197,99 @@ const TopicElement = ({ topic, idSelected }) => {
         }}
         gap={1}
       >
-        {/* -------------------------------avatar------------------------------- */}
-        <TopicAvatar url={topic.data?.image || ''} name={topic.data?.name || ''} size={40} shape={AvatarShape.Round} />
+        {isMobileToMd ? (
+          <Tooltip title={topic.data?.name} placement="right">
+            <Box sx={{ position: 'relative', width: 40, height: 40 }}>
+              {hasUnread ? (
+                <Badge
+                  variant="dot"
+                  color="error"
+                  sx={{
+                    position: 'absolute',
+                    top: '0px',
+                    right: '0px',
+                    zIndex: 2,
+                  }}
+                />
+              ) : null}
+              <TopicAvatar
+                url={topic.data?.image || ''}
+                name={topic.data?.name || ''}
+                size={40}
+                shape={AvatarShape.Round}
+              />
+            </Box>
+          </Tooltip>
+        ) : (
+          <>
+            {/* -------------------------------avatar------------------------------- */}
+            <TopicAvatar
+              url={topic.data?.image || ''}
+              name={topic.data?.name || ''}
+              size={40}
+              shape={AvatarShape.Round}
+            />
 
-        {/* -------------------------------content------------------------------- */}
-        <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
-          {/* -------------------------------topic name------------------------------- */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                flex: 1,
-                minWidth: 'auto',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: '14px',
-              }}
-            >
-              {topic.data.name}
-            </Typography>
+            {/* -------------------------------content------------------------------- */}
+            <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
+              {/* -------------------------------topic name------------------------------- */}
+              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    flex: 1,
+                    minWidth: 'auto',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontSize: '14px',
+                  }}
+                >
+                  {topic.data.name}
+                </Typography>
 
-            <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
-              {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
+                <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+                  {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
 
-              <Typography
-                sx={{
-                  color: theme.palette.text.secondary,
-                  minWidth: 'auto',
-                  flex: 1,
-                  overflow: 'hidden',
-                  fontSize: '10px',
-                }}
-                variant="caption"
-              >
-                {lastMessageAt}
-              </Typography>
-            </Stack>
-          </Stack>
+                  <Typography
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      minWidth: 'auto',
+                      flex: 1,
+                      overflow: 'hidden',
+                      fontSize: '10px',
+                    }}
+                    variant="caption"
+                  >
+                    {lastMessageAt}
+                  </Typography>
+                </Stack>
+              </Stack>
 
-          {/* -------------------------------last message------------------------------- */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-            <Typography
-              variant="caption"
-              sx={{
-                color: hasUnread ? 'inherit' : theme.palette.text.secondary,
-                flex: 1,
-                minWidth: 'auto',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: '14px',
-                display: 'block',
-                fontWeight: hasUnread ? 600 : 400,
-              }}
-            >
-              {lastMessage}
-            </Typography>
+              {/* -------------------------------last message------------------------------- */}
+              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: hasUnread ? 'inherit' : theme.palette.text.secondary,
+                    flex: 1,
+                    minWidth: 'auto',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontSize: '14px',
+                    display: 'block',
+                    fontWeight: hasUnread ? 600 : 400,
+                  }}
+                >
+                  {lastMessage}
+                </Typography>
 
-            {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
-          </Stack>
-        </Box>
+                {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+              </Stack>
+            </Box>
+          </>
+        )}
       </StyledTopicItem>
     </>
   );

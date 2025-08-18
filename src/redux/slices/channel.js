@@ -416,6 +416,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
       );
       dispatch(SetCurrentTopic(null));
       dispatch(SetIsClosedTopic(false));
+      dispatch(SetTopics([]));
       const { user_id } = getState().auth;
       const channel = client.channel(channelType, channelId);
       // const read = channel.state.read[user_id];

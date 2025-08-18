@@ -21,6 +21,7 @@ const initialState = {
   isUserConnected: false,
   searchQuery: '',
   userInfo: null,
+  openHomeSearch: false,
 };
 
 const slice = createSlice({
@@ -73,6 +74,9 @@ const slice = createSlice({
     },
     setUserInfo(state, action) {
       state.userInfo = action.payload;
+    },
+    setOpenHomeSearch(state, action) {
+      state.openHomeSearch = action.payload;
     },
   },
 });
@@ -152,5 +156,11 @@ export function SetSearchQuery(payload) {
 export function SetUserInfo(payload) {
   return async (dispatch, getState) => {
     dispatch(slice.actions.setUserInfo(payload));
+  };
+}
+
+export function SetOpenHomeSearch(payload) {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setOpenHomeSearch(payload));
   };
 }

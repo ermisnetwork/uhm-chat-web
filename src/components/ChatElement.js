@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Badge, Box, Stack, Typography, Menu, MenuItem } from '@mui/material';
+import { Badge, Box, Stack, Typography, Menu, MenuItem, Tooltip } from '@mui/material';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -26,10 +26,10 @@ import AvatarGeneralDefault from './AvatarGeneralDefault';
 import TopicAvatar from './TopicAvatar';
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
-  width: '100%',
+  // width: '100%',
   borderRadius: '16px',
   position: 'relative',
-  transition: 'background-color 0.2s ease-in-out',
+  transition: 'all 0.2s ease-in-out',
   display: 'flex',
   alignItems: 'center',
   '&:hover': {
@@ -466,6 +466,7 @@ const ChatElement = ({ channel }) => {
   const isShowDot = unreadChannels && unreadChannels.some(item => item.id === channelId);
   const isBoldTopics =
     unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadTopics?.length > 0);
+  const isCurrentChannelEnabledTopic = currentChannel?.data?.topics_enabled;
 
   return (
     <>
@@ -475,79 +476,107 @@ const ChatElement = ({ channel }) => {
         sx={{
           backgroundColor:
             currentChannel?.id === channelId ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
-          padding: '6px',
+          padding: '8px',
+          margin: '-8px',
         }}
         gap={2}
       >
-        {/* -------------------------------avatar------------------------------- */}
-        <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
-
-        {/* -------------------------------content------------------------------- */}
-        <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
-          {/* -------------------------------channel name------------------------------- */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                flex: 1,
-                minWidth: 'auto',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: '14px',
-              }}
-            >
-              {channel.data.name}
-            </Typography>
-
-            <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
-              {isMuted && <SpearkerOffIcon size={14} />}
-              {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
-
-              {!isBlocked && (
-                <Typography
+        {isCurrentChannelEnabledTopic ? (
+          <Tooltip title={channel.data.name} placement="right">
+            <Box sx={{ position: 'relative', width: 60, height: 60 }}>
+              {isShowDot ? (
+                <Badge
+                  variant="dot"
+                  color="error"
                   sx={{
-                    color: theme.palette.text.secondary,
-                    minWidth: 'auto',
-                    flex: 1,
-                    overflow: 'hidden',
-                    fontSize: '10px',
+                    position: 'absolute',
+                    top: '5px',
+                    right: '5px',
+                    zIndex: 2,
+                    '& .MuiBadge-badge': {
+                      minWidth: '12px',
+                      width: '12px',
+                      height: '12px',
+                    },
                   }}
-                  variant="caption"
+                />
+              ) : null}
+              <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
+            </Box>
+          </Tooltip>
+        ) : (
+          <>
+            {/* -------------------------------avatar------------------------------- */}
+            <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
+
+            {/* -------------------------------content------------------------------- */}
+            <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
+              {/* -------------------------------channel name------------------------------- */}
+              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    flex: 1,
+                    minWidth: 'auto',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontSize: '14px',
+                  }}
                 >
-                  {lastMessageAt}
+                  {channel.data.name}
                 </Typography>
+
+                <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+                  {isMuted && <SpearkerOffIcon size={14} />}
+                  {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
+
+                  {!isBlocked && (
+                    <Typography
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        minWidth: 'auto',
+                        flex: 1,
+                        overflow: 'hidden',
+                        fontSize: '10px',
+                      }}
+                      variant="caption"
+                    >
+                      {lastMessageAt}
+                    </Typography>
+                  )}
+                </Stack>
+              </Stack>
+
+              {/* -------------------------------list topic------------------------------- */}
+              {isEnabledTopics && <ListTopic topics={topics} isBoldTopics={isBoldTopics} />}
+
+              {/* -------------------------------last message------------------------------- */}
+              {!isBlocked && (
+                <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: isBoldLastMsg ? 'inherit' : theme.palette.text.secondary,
+                      flex: 1,
+                      minWidth: 'auto',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      fontSize: '14px',
+                      display: 'block',
+                      fontWeight: isBoldLastMsg ? 600 : 400,
+                    }}
+                  >
+                    {isBlocked ? 'You have block this user' : lastMessage}
+                  </Typography>
+
+                  {isShowDot ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+                </Stack>
               )}
-            </Stack>
-          </Stack>
-
-          {/* -------------------------------list topic------------------------------- */}
-          {isEnabledTopics && <ListTopic topics={topics} isBoldTopics={isBoldTopics} />}
-
-          {/* -------------------------------last message------------------------------- */}
-          {!isBlocked && (
-            <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: isBoldLastMsg ? 'inherit' : theme.palette.text.secondary,
-                  flex: 1,
-                  minWidth: 'auto',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontSize: '14px',
-                  display: 'block',
-                  fontWeight: isBoldLastMsg ? 600 : 400,
-                }}
-              >
-                {isBlocked ? 'You have block this user' : lastMessage}
-              </Typography>
-
-              {isShowDot ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
-            </Stack>
-          )}
-        </Box>
+            </Box>
+          </>
+        )}
       </StyledChatBox>
 
       <StyledMenu

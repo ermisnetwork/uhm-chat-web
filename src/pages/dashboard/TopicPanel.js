@@ -38,6 +38,8 @@ import { setSidebar } from '../../redux/slices/app';
 import { DEFAULT_PATH } from '../../config';
 import SkeletonChannels from '../../components/SkeletonChannels';
 import { client } from '../../client';
+import useResponsive from '../../hooks/useResponsive';
+import HomeSearch from '../../components/Search/HomeSearch';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -48,9 +50,11 @@ const StyledTopicItem = styled(Box)(({ theme }) => ({
 const TopicEmpty = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
+  const isMobileToMd = useResponsive('down', 'md');
   const { currentChannel } = useSelector(state => state.channel);
   const myRole = myRoleInChannel(currentChannel);
 
+  if (isMobileToMd) return null;
   return (
     <Stack sx={{ flex: 1, width: '100%', minHeight: 'auto', alignItems: 'center', justifyContent: 'center' }}>
       <NoTopic />
@@ -98,6 +102,7 @@ const TopicHeader = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
+  const isMobileToMd = useResponsive('down', 'md');
   const { currentChannel, isGuest } = useSelector(state => state.channel);
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -141,6 +146,12 @@ const TopicHeader = () => {
     },
   ];
 
+  const onOpenPopover = event => {
+    if (isMobileToMd) {
+      setAnchorEl(event.currentTarget);
+    }
+  };
+
   return (
     <Stack
       alignItems="center"
@@ -150,62 +161,69 @@ const TopicHeader = () => {
       sx={{
         width: '100%',
         height: '74px',
-        padding: '8px 16px',
+        padding: '8px 6px',
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
-      <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
-      <Box
-        sx={{
-          overflow: 'hidden',
-          flex: 1,
-        }}
-      >
-        <Button
-          onClick={() => {
-            if (!isGuest) {
-              dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
-            }
-          }}
-          sx={{
-            textTransform: 'none',
-            maxWidth: '100%',
-            minWidth: 'auto',
-            justifyContent: 'start',
-            textAlign: 'left',
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              color: theme.palette.text.primary,
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {currentChannel.data?.name}
-            <Typography
-              variant="caption"
-              sx={{
-                display: 'block',
-                color: theme.palette.text.secondary,
-                fontSize: '12px',
-                fontWeight: 400,
-              }}
-            >
-              {`${currentChannel.data?.member_count} members`}
-            </Typography>
-          </Typography>
-        </Button>
+      <Box sx={{ width: '60px', height: '60px' }} onClick={onOpenPopover}>
+        <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
       </Box>
 
-      <IconButton
-        onClick={event => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
-        <DotsThreeIcon color={theme.palette.text.primary} />
-      </IconButton>
+      {!isMobileToMd && (
+        <>
+          <Box
+            sx={{
+              overflow: 'hidden',
+              flex: 1,
+            }}
+          >
+            <Button
+              onClick={() => {
+                if (!isGuest) {
+                  dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
+                }
+              }}
+              sx={{
+                textTransform: 'none',
+                maxWidth: '100%',
+                minWidth: 'auto',
+                justifyContent: 'start',
+                textAlign: 'left',
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  color: theme.palette.text.primary,
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {currentChannel.data?.name}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    color: theme.palette.text.secondary,
+                    fontSize: '12px',
+                    fontWeight: 400,
+                  }}
+                >
+                  {`${currentChannel.data?.member_count} members`}
+                </Typography>
+              </Typography>
+            </Button>
+          </Box>
+
+          <IconButton
+            onClick={event => {
+              setAnchorEl(event.currentTarget);
+            }}
+          >
+            <DotsThreeIcon color={theme.palette.text.primary} />
+          </IconButton>
+        </>
+      )}
 
       <Popover
         id={Boolean(anchorEl) ? 'actions-channel-popover' : undefined}
@@ -250,9 +268,11 @@ const TopicPanel = () => {
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
   const { currentTopic, topics, loadingTopics, pinnedTopics } = useSelector(state => state.topic);
+  const { openHomeSearch } = useSelector(state => state.app);
   const [searchParams, setSearchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
   const [idSelected, setIdSelected] = useState('');
+  const isMobileToMd = useResponsive('down', 'md');
 
   useEffect(() => {
     const handleTopicCreated = event => {
@@ -351,21 +371,35 @@ const TopicPanel = () => {
 
   return (
     <>
-      <Stack sx={{ width: '300px', height: '100%', borderRight: `1px solid ${theme.palette.divider}` }}>
-        <TopicHeader />
+      <Stack
+        sx={{
+          width: isMobileToMd ? '73px' : '300px',
+          height: '100%',
+          borderRight: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        {openHomeSearch ? (
+          <Box sx={{ padding: '15px', width: '100%', height: '100%', position: 'relative' }}>
+            <HomeSearch />
+          </Box>
+        ) : (
+          <>
+            <TopicHeader />
 
-        <Stack
-          sx={{
-            flex: 1,
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            minHeight: 'auto',
-            padding: '0 15px',
-          }}
-          className="customScrollbar"
-        >
-          {renderedTopics}
-        </Stack>
+            <Stack
+              sx={{
+                flex: 1,
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                minHeight: 'auto',
+                padding: '0 15px',
+              }}
+              className="customScrollbar"
+            >
+              {renderedTopics}
+            </Stack>
+          </>
+        )}
       </Stack>
 
       <NewTopicDialog />

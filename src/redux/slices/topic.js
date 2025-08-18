@@ -106,9 +106,6 @@ export const FetchTopics = channelCID => {
         },
       );
 
-      console.log('---topics---', topics);
-      console.log('---pinnedTopics---', pinnedTopics);
-
       dispatch(SetTopics(topics));
       dispatch(SetPinnedTopics(pinnedTopics));
       dispatch(SetLoadingTopics(false));
@@ -143,6 +140,8 @@ export const ConnectCurrentTopic = topicId => {
             dispatch(SetMarkReadChannel(topic));
           }, 100);
         }
+
+        console.log('--topic.state.pinnedMessages--', topic.state.pinnedMessages);
 
         if (topic.state.pinnedMessages) {
           dispatch(SetPinnedMessages(topic.state.pinnedMessages.reverse()));
