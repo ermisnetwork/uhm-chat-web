@@ -248,10 +248,6 @@ export default slice.reducer;
 // ----------------------------------------------------------------------
 
 const loadDataChannel = (channel, dispatch, user_id) => {
-  if (channel.state.pinnedMessages) {
-    dispatch(SetPinnedMessages(channel.state.pinnedMessages.reverse()));
-  }
-
   const channelType = channel.type;
   if (channelType !== ChatType.MESSAGING) {
     const myRole = myRoleInChannel(channel);
@@ -401,7 +397,6 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
       if (!client) return;
       dispatch(SetCooldownTime(null));
       dispatch(slice.actions.setCurrentChannel(null));
-      dispatch(slice.actions.setPinnedMessages([]));
       dispatch(SetIsBlocked(false));
       dispatch(
         slice.actions.setChannelPermissions({

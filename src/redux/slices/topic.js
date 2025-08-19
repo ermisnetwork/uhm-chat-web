@@ -3,7 +3,7 @@ import { RoleMember, SidebarType } from '../../constants/commons-const';
 import { client } from '../../client';
 import { handleError, myRoleInChannel } from '../../utils/commons';
 import { setSidebar } from './app';
-import { SetMarkReadChannel, SetPinnedMessages } from './channel';
+import { SetMarkReadChannel } from './channel';
 
 const initialState = {
   currentTopic: null,
@@ -120,7 +120,6 @@ export const ConnectCurrentTopic = topicId => {
     try {
       if (!client) return;
       // dispatch(slice.actions.setCurrentTopic(null));
-      dispatch(SetPinnedMessages([]));
       dispatch(SetIsClosedTopic(false));
       const { user_id } = getState().auth;
       const topic = client.channel('topic', topicId);
@@ -139,12 +138,6 @@ export const ConnectCurrentTopic = topicId => {
           setTimeout(() => {
             dispatch(SetMarkReadChannel(topic));
           }, 100);
-        }
-
-        console.log('--topic.state.pinnedMessages--', topic.state.pinnedMessages);
-
-        if (topic.state.pinnedMessages) {
-          dispatch(SetPinnedMessages(topic.state.pinnedMessages.reverse()));
         }
       }
     } catch (error) {}
