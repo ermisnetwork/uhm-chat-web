@@ -65,7 +65,6 @@ import { DEFAULT_PATH } from '../../config';
 import MessagesHistoryDialog from '../../sections/dashboard/MessagesHistoryDialog';
 import { SetMessagesHistoryDialog } from '../../redux/slices/dialog';
 import ForwardMessageDialog from '../../sections/dashboard/ForwardMessageDialog';
-import ForwardMessageDialog2 from '../../sections/dashboard/ForwardMessageDialog2';
 import PinnedMessages from '../../components/PinnedMessages';
 import UploadFilesDialog from '../../sections/dashboard/UploadFilesDialog';
 import Dropzone from 'react-dropzone';

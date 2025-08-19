@@ -284,7 +284,7 @@ export function FetchChannels(params) {
     };
     const sort = [];
     const options = {
-      message_limit: 25,
+      message_limit: 1,
     };
     dispatch(slice.actions.fetchChannels({ activeChannels: [], pendingChannels: [] }));
 
