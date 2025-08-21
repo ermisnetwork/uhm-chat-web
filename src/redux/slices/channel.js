@@ -396,7 +396,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
     try {
       if (!client) return;
       dispatch(SetCooldownTime(null));
-      dispatch(slice.actions.setCurrentChannel(null));
+      // dispatch(slice.actions.setCurrentChannel(null));
       dispatch(SetIsBlocked(false));
       dispatch(
         slice.actions.setChannelPermissions({
@@ -411,7 +411,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
       );
       dispatch(SetCurrentTopic(null));
       dispatch(SetIsClosedTopic(false));
-      dispatch(SetTopics([]));
+      // dispatch(SetTopics([]));
       const { user_id } = getState().auth;
       const channel = client.channel(channelType, channelId);
       // const read = channel.state.read[user_id];
@@ -589,7 +589,9 @@ export const MoveChannelToTop = channelId => {
     const { topics, pinnedTopics } = getState().topic;
 
     // Xử lý activeChannels
-    const channelIndex = activeChannels.findIndex(channel => channel.id === channelId);
+    const channelIndex = activeChannels.findIndex(
+      channel => channel.id === channelId || channel.state.topics?.some(topic => topic.id === channelId),
+    );
     if (channelIndex > -1) {
       const channelToMove = activeChannels[channelIndex];
       const updatedChannels = [
@@ -602,7 +604,9 @@ export const MoveChannelToTop = channelId => {
     }
 
     // Xử lý pinnedChannels
-    const pinnedIndex = pinnedChannels.findIndex(channel => channel.id === channelId);
+    const pinnedIndex = pinnedChannels.findIndex(
+      channel => channel.id === channelId || channel.state.topics?.some(topic => topic.id === channelId),
+    );
     if (pinnedIndex > -1) {
       const channelToMove = pinnedChannels[pinnedIndex];
       const updatedPinned = [
