@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { GlobalStyles } from '@mui/material';
 import * as Yup from 'yup';
 import {
   Box,
@@ -82,16 +81,14 @@ const NewTopicDialog = () => {
 
   return (
     <>
-      <GlobalStyles
-        styles={{
-          ':where(em-emoji-picker)': {
-            width: '100% !important',
-            minWidth: '100% !important',
-            maxWidth: '100% !important',
-            height: '330px !important',
-          },
-        }}
-      />
+      <style>{`
+        .new-topic-dialog :where(em-emoji-picker) {
+          width: 100% !important;
+          min-width: 100% !important;
+          max-width: 100% !important;
+          height: 330px !important;
+        }
+      `}</style>
       <Dialog
         fullWidth
         maxWidth="xs"
@@ -107,7 +104,7 @@ const NewTopicDialog = () => {
           </IconButton>
         </DialogTitle>
 
-        <DialogContent>
+        <DialogContent className="new-topic-dialog">
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={3}>
               <Box>
