@@ -1057,6 +1057,7 @@ const StickerMsg = ({ el, forwardChannelName }) => {
               width={'200px'}
               height={'200px'}
               styleCustom={{ borderRadius: '12px' }}
+              openLightbox={true}
             />
           )}
 
