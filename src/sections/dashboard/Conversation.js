@@ -1046,12 +1046,18 @@ const StickerMsg = ({ el, forwardChannelName }) => {
       >
         <ForwardTo message={el} forwardChannelName={forwardChannelName} />
         <Stack direction="column" alignItems="flex-end" width={'200px'} justifyContent="center">
-          <ImageCanvas
-            dataUrl={el.sticker_url}
-            width={'200px'}
-            height={'200px'}
-            styleCustom={{ borderRadius: '12px' }}
-          />
+          {el.sticker_url.endsWith('.tgs') ? (
+            <tgs-player autoplay loop mode="normal" src={el.sticker_url} style={{ width: "200px", height: "200px" }}>
+            </tgs-player>
+          ) : (
+            <ImageCanvas
+              dataUrl={el.sticker_url}
+              width={'200px'}
+              height={'200px'}
+              styleCustom={{ borderRadius: '12px' }}
+            />
+          )}
+
           <DateLine date={isEdited ? el.updated_at : el.created_at} isMyMessage={el.isMyMessage} />
         </Stack>
 
