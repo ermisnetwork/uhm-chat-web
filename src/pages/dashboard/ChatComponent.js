@@ -465,6 +465,9 @@ const ChatComponent = () => {
   const currentChat = currentTopic ? currentTopic : currentChannel;
 
   useEffect(() => {
+    setUsersTyping([]);
+    setMessages([]);
+
     if (currentChat) {
       const channelName = currentChat.data.name ? currentChat.data.name : getChannelName(currentChat, users);
       document.title = channelName;

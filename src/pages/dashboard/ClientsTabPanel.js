@@ -29,7 +29,7 @@ const ClientsTabPanel = () => {
           width: widthBox,
           backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.grey[900],
           borderRadius: '16px',
-          transition: 'all 0.3s ease-in-out',
+          transition: 'width 0.3s ease-in-out',
         }}
       >
         {isUserConnected && <LeftPanel />}
