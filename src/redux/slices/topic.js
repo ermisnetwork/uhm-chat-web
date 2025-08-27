@@ -11,6 +11,7 @@ const initialState = {
   pinnedTopics: [],
   loadingTopics: false,
   isClosedTopic: false,
+  openTopicPanel: false,
 };
 
 const slice = createSlice({
@@ -51,6 +52,9 @@ const slice = createSlice({
     removePinnedTopic(state, action) {
       const topicId = action.payload;
       state.pinnedTopics = state.pinnedTopics.filter(topic => topic.id !== topicId);
+    },
+    setOpenTopicPanel(state, action) {
+      state.openTopicPanel = action.payload;
     },
   },
 });
@@ -213,5 +217,11 @@ export const RemovePinnedTopic = topicId => {
     const topic = client.activeChannels[topicCID];
     dispatch(slice.actions.removePinnedTopic(topicId));
     dispatch(slice.actions.addTopic(topic));
+  };
+};
+
+export const SetOpenTopicPanel = isOpen => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setOpenTopicPanel(isOpen));
   };
 };

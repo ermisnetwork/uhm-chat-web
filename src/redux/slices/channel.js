@@ -5,7 +5,7 @@ import { handleError, myRoleInChannel, splitChannelId } from '../../utils/common
 import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
 import { FetchAllMembers } from './member';
-import { FetchTopics, SetCurrentTopic, SetIsClosedTopic, SetPinnedTopics, SetTopics } from './topic';
+import { FetchTopics, SetCurrentTopic, SetIsClosedTopic, SetOpenTopicPanel, SetPinnedTopics, SetTopics } from './topic';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created
@@ -396,7 +396,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
     try {
       if (!client) return;
       dispatch(SetCooldownTime(null));
-      // dispatch(slice.actions.setCurrentChannel(null));
+      dispatch(slice.actions.setCurrentChannel(null));
       dispatch(SetIsBlocked(false));
       dispatch(
         slice.actions.setChannelPermissions({
@@ -411,7 +411,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
       );
       dispatch(SetCurrentTopic(null));
       dispatch(SetIsClosedTopic(false));
-      // dispatch(SetTopics([]));
+      dispatch(SetTopics([]));
       const { user_id } = getState().auth;
       const channel = client.channel(channelType, channelId);
       // const read = channel.state.read[user_id];
@@ -442,6 +442,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
         }
 
         if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
+          dispatch(SetOpenTopicPanel(true));
           dispatch(FetchTopics(channel.cid));
         }
       }
@@ -600,7 +601,6 @@ export const MoveChannelToTop = channelId => {
         ...activeChannels.slice(channelIndex + 1),
       ];
       dispatch(slice.actions.setActiveChannels(updatedChannels));
-      return; // Nếu đã tìm thấy ở activeChannels thì không cần tìm ở pinnedChannels nữa
     }
 
     // Xử lý pinnedChannels

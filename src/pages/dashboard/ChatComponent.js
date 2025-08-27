@@ -430,7 +430,7 @@ const MessageList = ({
             })}
         </Stack>
       </motion.div>
-      {!isGuest && !isBlocked && !isBanned && <ReadBy currentChat={currentChat} />}
+      {!isGuest && !isBlocked && !isBanned && <ReadBy />}
     </Box>
   );
 };

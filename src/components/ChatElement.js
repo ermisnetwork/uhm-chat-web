@@ -24,6 +24,7 @@ import { client } from '../client';
 import { SpearkerOffIcon } from './Icons';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
 import TopicAvatar from './TopicAvatar';
+import { SetOpenTopicPanel } from '../redux/slices/topic';
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   // width: '100%',
@@ -138,6 +139,7 @@ const ChatElement = ({ channel }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { currentChannel, mutedChannels, unreadChannels } = useSelector(state => state.channel);
+  const { openTopicPanel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
   const channelId = channel?.id || '';
@@ -451,10 +453,12 @@ const ChatElement = ({ channel }) => {
   }, [channel, user_id, users.length, unreadChannels, getOptimizedLastMessage]);
 
   const onLeftClick = () => {
-    if (!isRightClick && currentChannel?.id !== channelId) {
+    if (!isRightClick) {
       navigate(`${DEFAULT_PATH}/${channel.cid}`);
       dispatch(onReplyMessage(null));
       dispatch(onEditMessage(null));
+
+      dispatch(SetOpenTopicPanel(isEnabledTopics ? true : false));
     }
     setAnchorEl(null);
   };
@@ -525,102 +529,100 @@ const ChatElement = ({ channel }) => {
         }}
         gap={2}
       >
-        {isCurrentChannelEnabledTopic ? (
-          <Tooltip title={channel.data.name} placement="right">
-            <Box sx={{ position: 'relative', width: 60, height: 60 }}>
-              {hasUnread ? (
-                <Badge
-                  variant="dot"
-                  color="error"
-                  sx={{
-                    position: 'absolute',
-                    top: '5px',
-                    right: '5px',
-                    zIndex: 2,
-                    '& .MuiBadge-badge': {
-                      minWidth: '12px',
-                      width: '12px',
-                      height: '12px',
-                    },
-                  }}
-                />
-              ) : null}
-              <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
-            </Box>
-          </Tooltip>
-        ) : (
-          <>
-            {/* -------------------------------avatar------------------------------- */}
-            <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
+        {/* -------------------------------avatar------------------------------- */}
+        <Box sx={{ position: 'relative', width: 60, height: 60 }}>
+          {hasUnread && openTopicPanel ? (
+            <Badge
+              variant="dot"
+              color="error"
+              sx={{
+                position: 'absolute',
+                top: '5px',
+                right: '5px',
+                zIndex: 2,
+                '& .MuiBadge-badge': {
+                  minWidth: '12px',
+                  width: '12px',
+                  height: '12px',
+                },
+              }}
+            />
+          ) : null}
+          <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
+        </Box>
 
-            {/* -------------------------------content------------------------------- */}
-            <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
-              {/* -------------------------------channel name------------------------------- */}
-              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    flex: 1,
-                    minWidth: 'auto',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    fontSize: '14px',
-                  }}
-                >
-                  {channel.data.name}
-                </Typography>
+        {/* -------------------------------content------------------------------- */}
+        <Box
+          sx={{
+            flex: openTopicPanel ? 0 : 1,
+            minWidth: 'auto',
+            overflow: 'hidden',
+          }}
+        >
+          {/* -------------------------------channel name------------------------------- */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                flex: 1,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '14px',
+              }}
+            >
+              {channel.data.name}
+            </Typography>
 
-                <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
-                  {isMuted && <SpearkerOffIcon size={14} />}
-                  {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
+            <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+              {isMuted && <SpearkerOffIcon size={14} />}
+              {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
 
-                  {!isBlocked && (
-                    <Typography
-                      sx={{
-                        color: theme.palette.text.secondary,
-                        minWidth: 'auto',
-                        flex: 1,
-                        overflow: 'hidden',
-                        fontSize: '10px',
-                      }}
-                      variant="caption"
-                    >
-                      {lastMessageAt}
-                    </Typography>
-                  )}
-                </Stack>
-              </Stack>
-
-              {/* -------------------------------list topic------------------------------- */}
-              {isEnabledTopics && <ListTopic topics={topics} />}
-
-              {/* -------------------------------last message------------------------------- */}
               {!isBlocked && (
-                <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: hasUnread ? 'inherit' : theme.palette.text.secondary,
-                      flex: 1,
-                      minWidth: 'auto',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      fontSize: '14px',
-                      display: 'block',
-                      fontWeight: hasUnread ? 600 : 400,
-                    }}
-                  >
-                    {isBlocked ? 'You have block this user' : lastMessage}
-                  </Typography>
-
-                  {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
-                </Stack>
+                <Typography
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    minWidth: 'auto',
+                    flex: 1,
+                    overflow: 'hidden',
+                    fontSize: '10px',
+                  }}
+                  variant="caption"
+                >
+                  {lastMessageAt}
+                </Typography>
               )}
-            </Box>
-          </>
-        )}
+            </Stack>
+          </Stack>
+
+          {/* -------------------------------list topic------------------------------- */}
+          {isEnabledTopics && <ListTopic topics={topics} />}
+
+          {/* -------------------------------last message------------------------------- */}
+          {!isBlocked && (
+            <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: hasUnread ? 'inherit' : theme.palette.text.secondary,
+                  flex: 1,
+                  minWidth: 'auto',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  fontSize: '14px',
+                  display: 'block',
+                  fontWeight: hasUnread ? 600 : 400,
+                }}
+              >
+                {isBlocked ? 'You have block this user' : lastMessage}
+              </Typography>
+
+              {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+            </Stack>
+          )}
+        </Box>
       </StyledChatBox>
 
       <StyledMenu
