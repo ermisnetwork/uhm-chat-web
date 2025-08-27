@@ -919,10 +919,11 @@ const ChatComponent = () => {
   const showChatFooter = !isGuest && !isBanned && !isClosedTopic;
   const showButtonScrollToBottom = !isBlocked || !isBanned;
   const disabledScroll = isBlocked || isBanned;
+  const showTopicPanel = !isGuest && !isDirect && currentChannel?.data?.topics_enabled;
 
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      {!isGuest && !isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
+      {showTopicPanel && <TopicPanel />}
 
       <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
         <ChatHeader />

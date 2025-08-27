@@ -24,7 +24,6 @@ import { client } from '../client';
 import { SpearkerOffIcon } from './Icons';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
 import TopicAvatar from './TopicAvatar';
-import { FetchTopics } from '../redux/slices/topic';
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   // width: '100%',
@@ -159,6 +158,11 @@ const ChatElement = ({ channel }) => {
   const showItemDeleteConversation = isDirect;
   const showItemMarkAsRead =
     unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadCount > 0);
+  const isMuted = mutedChannels.some(channel => channel.id === channelId);
+  const isEnabledTopics = channel.data?.topics_enabled;
+  const topics = channel.state?.topics ? channel.state?.topics : [];
+  const hasUnread = unreadChannels && unreadChannels.some(item => item.id === channelId);
+  const isCurrentChannelEnabledTopic = currentChannel?.data?.topics_enabled;
 
   const replaceMentionsWithNames = inputValue => {
     users.forEach(user => {
@@ -507,13 +511,6 @@ const ChatElement = ({ channel }) => {
       await client.pinChannel(channelType, channelId);
     }
   };
-
-  const isMuted = mutedChannels.some(channel => channel.id === channelId);
-  const isEnabledTopics = channel.data?.topics_enabled;
-  const topics = channel.state?.topics ? channel.state?.topics : [];
-  const hasUnread = unreadChannels && unreadChannels.some(item => item.id === channelId);
-
-  const isCurrentChannelEnabledTopic = currentChannel?.data?.topics_enabled;
 
   return (
     <>

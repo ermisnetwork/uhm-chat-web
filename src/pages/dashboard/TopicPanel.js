@@ -40,6 +40,7 @@ import SkeletonChannels from '../../components/SkeletonChannels';
 import { client } from '../../client';
 import useResponsive from '../../hooks/useResponsive';
 import HomeSearch from '../../components/Search/HomeSearch';
+import { CaretLeft, X } from 'phosphor-react';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -152,6 +153,10 @@ const TopicHeader = () => {
     }
   };
 
+  // const onCloseTopicPanel = () => {
+  //   dispatch(SetOpenTopicPanel(false));
+  // };
+
   return (
     <Stack
       alignItems="center"
@@ -165,6 +170,10 @@ const TopicHeader = () => {
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
+      {/* <IconButton onClick={onCloseTopicPanel}>
+        <X size={20} />
+        <CaretLeft />
+      </IconButton> */}
       <Box sx={{ width: '60px', height: '60px' }} onClick={onOpenPopover}>
         <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
       </Box>
@@ -175,6 +184,7 @@ const TopicHeader = () => {
             sx={{
               overflow: 'hidden',
               flex: 1,
+              minWidth: 'auto',
             }}
           >
             <Button
@@ -197,6 +207,8 @@ const TopicHeader = () => {
                   color: theme.palette.text.primary,
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
+                  width: '100%',
+                  overflow: 'hidden',
                 }}
               >
                 {currentChannel.data?.name}
