@@ -76,7 +76,7 @@ import NoMessageBox from '../../components/NoMessageBox';
 import { setSidebar, SetUserInfo } from '../../redux/slices/app';
 import TopicPanel from './TopicPanel';
 import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
-import { SetIsClosedTopic } from '../../redux/slices/topic';
+import { SetIsClosedTopic, SetOpenTopicPanel } from '../../redux/slices/topic';
 
 const StyledMessage = styled(motion(Stack))(({ theme }) => ({
   '&:hover': {
@@ -731,6 +731,7 @@ const ChatComponent = () => {
         const channelId = splitCID.channelId;
         const channelType = splitCID.channelType;
         dispatch(WatchCurrentChannel(channelId, channelType));
+        dispatch(SetOpenTopicPanel(true));
       };
 
       const handleChannelTopicDisabled = event => {
@@ -738,6 +739,7 @@ const ChatComponent = () => {
         const channelId = splitCID.channelId;
         const channelType = splitCID.channelType;
         dispatch(WatchCurrentChannel(channelId, channelType));
+        dispatch(SetOpenTopicPanel(false));
       };
 
       const handleChannelTopicClosed = event => {

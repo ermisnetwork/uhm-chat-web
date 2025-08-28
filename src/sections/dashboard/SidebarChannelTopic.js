@@ -20,7 +20,7 @@ const SidebarChannelTopic = () => {
   const [saveLoading, setSaveLoading] = useState(false);
 
   const defaultValues = {
-    topicEnabled: String(currentChannel.data.topics_enabled),
+    topicEnabled: String(currentChannel?.data?.topics_enabled),
   };
 
   const methods = useForm({
