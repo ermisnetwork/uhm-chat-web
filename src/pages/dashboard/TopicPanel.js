@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { myRoleInChannel } from '../../utils/commons';
+import { myRoleInChannel, splitChannelId } from '../../utils/commons';
 import { AvatarShape, ChatType, RoleMember, SidebarType } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
 import ChannelAvatar from '../../components/ChannelAvatar';
@@ -291,17 +291,28 @@ const TopicPanel = () => {
 
   useEffect(() => {
     const handleTopicCreated = event => {
-      dispatch(AddTopic(event.channel_id));
+      const splitParentCID = splitChannelId(event.parent_cid);
+      const parentChannelId = splitParentCID.channelId;
+
+      if (parentChannelId === currentChannel?.id) {
+        dispatch(AddTopic(event.channel_id));
+      }
     };
 
     const handleTopicPinned = event => {
-      if (event.channel_type === ChatType.TOPIC) {
+      const splitParentCID = splitChannelId(event.parent_cid);
+      const parentChannelId = splitParentCID.channelId;
+
+      if (parentChannelId === currentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(AddPinnedTopic(event.channel_id));
       }
     };
 
     const handleTopicUnPinned = event => {
-      if (event.channel_type === ChatType.TOPIC) {
+      const splitParentCID = splitChannelId(event.parent_cid);
+      const parentChannelId = splitParentCID.channelId;
+
+      if (parentChannelId === currentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(RemovePinnedTopic(event.channel_id));
       }
     };

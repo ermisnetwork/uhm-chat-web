@@ -45,6 +45,7 @@ import {
   UnPinIcon,
 } from '../Icons';
 import { setChannelConfirm } from '../../redux/slices/dialog';
+import { SetOpenTopicPanel } from '../../redux/slices/topic';
 
 const ActionsTopic = () => {
   const dispatch = useDispatch();
@@ -322,6 +323,7 @@ const ChatHeader = () => {
                     navigate(`${DEFAULT_PATH}`);
                     dispatch(setCurrentChannel(null));
                     dispatch(setCurrentChannelStatus(CurrentChannelStatus.IDLE));
+                    dispatch(SetOpenTopicPanel(false));
                   }}
                 >
                   <CaretLeft />
