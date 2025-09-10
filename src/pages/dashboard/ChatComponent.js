@@ -76,7 +76,7 @@ import NoMessageBox from '../../components/NoMessageBox';
 import { setSidebar, SetUserInfo } from '../../redux/slices/app';
 import TopicPanel from './TopicPanel';
 import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
-import { SetIsClosedTopic } from '../../redux/slices/topic';
+import { SetIsClosedTopic, SetOpenTopicPanel } from '../../redux/slices/topic';
 
 const StyledMessage = styled(motion(Stack))(({ theme }) => ({
   '&:hover': {
@@ -430,7 +430,7 @@ const MessageList = ({
             })}
         </Stack>
       </motion.div>
-      {!isGuest && !isBlocked && !isBanned && <ReadBy currentChat={currentChat} />}
+      {!isGuest && !isBlocked && !isBanned && <ReadBy />}
     </Box>
   );
 };
@@ -465,6 +465,9 @@ const ChatComponent = () => {
   const currentChat = currentTopic ? currentTopic : currentChannel;
 
   useEffect(() => {
+    setUsersTyping([]);
+    setMessages([]);
+
     if (currentChat) {
       const channelName = currentChat.data.name ? currentChat.data.name : getChannelName(currentChat, users);
       document.title = channelName;
@@ -728,6 +731,7 @@ const ChatComponent = () => {
         const channelId = splitCID.channelId;
         const channelType = splitCID.channelType;
         dispatch(WatchCurrentChannel(channelId, channelType));
+        dispatch(SetOpenTopicPanel(true));
       };
 
       const handleChannelTopicDisabled = event => {
@@ -735,6 +739,7 @@ const ChatComponent = () => {
         const channelId = splitCID.channelId;
         const channelType = splitCID.channelType;
         dispatch(WatchCurrentChannel(channelId, channelType));
+        dispatch(SetOpenTopicPanel(false));
       };
 
       const handleChannelTopicClosed = event => {
@@ -916,10 +921,11 @@ const ChatComponent = () => {
   const showChatFooter = !isGuest && !isBanned && !isClosedTopic;
   const showButtonScrollToBottom = !isBlocked || !isBanned;
   const disabledScroll = isBlocked || isBanned;
+  const showTopicPanel = !isGuest && !isDirect && currentChannel?.data?.topics_enabled;
 
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      {!isGuest && !isDirect && currentChannel?.data?.topics_enabled && <TopicPanel />}
+      {showTopicPanel && <TopicPanel />}
 
       <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
         <ChatHeader />

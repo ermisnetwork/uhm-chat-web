@@ -63,13 +63,14 @@ const Channels = () => {
     state => state.channel,
   );
   const { openHomeSearch } = useSelector(state => state.app);
+  const { openTopicPanel } = useSelector(state => state.topic);
   const [listTab, setListTab] = useState([
     { label: 'All', value: TabValueChannel.All, count: 0 },
     { label: 'Group', value: TabValueChannel.Group, count: 0 },
     { label: 'Unread', value: TabValueChannel.Unread, count: 0 },
   ]);
   const [tabSeledected, setTabSelected] = useState(TabValueChannel.All);
-  const isEnabledTopics = currentChannel?.data?.topics_enabled;
+  const isEnabledTopics = currentChannel?.data?.topics_enabled && openTopicPanel;
 
   useEffect(() => {
     setListTab([

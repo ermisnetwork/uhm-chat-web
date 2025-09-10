@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { myRoleInChannel } from '../../utils/commons';
+import { myRoleInChannel, splitChannelId } from '../../utils/commons';
 import { AvatarShape, ChatType, RoleMember, SidebarType } from '../../constants/commons-const';
 import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
 import ChannelAvatar from '../../components/ChannelAvatar';
@@ -33,6 +33,7 @@ import {
   RemovePinnedTopic,
   RemoveTopic,
   SetCurrentTopic,
+  SetOpenTopicPanel,
 } from '../../redux/slices/topic';
 import { setSidebar } from '../../redux/slices/app';
 import { DEFAULT_PATH } from '../../config';
@@ -40,6 +41,7 @@ import SkeletonChannels from '../../components/SkeletonChannels';
 import { client } from '../../client';
 import useResponsive from '../../hooks/useResponsive';
 import HomeSearch from '../../components/Search/HomeSearch';
+import { X } from 'phosphor-react';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -152,6 +154,10 @@ const TopicHeader = () => {
     }
   };
 
+  const onCloseTopicPanel = () => {
+    dispatch(SetOpenTopicPanel(false));
+  };
+
   return (
     <Stack
       alignItems="center"
@@ -165,6 +171,12 @@ const TopicHeader = () => {
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
+      {!isMobileToMd && (
+        <IconButton onClick={onCloseTopicPanel}>
+          <X size={20} color={theme.palette.text.primary} />
+        </IconButton>
+      )}
+
       <Box sx={{ width: '60px', height: '60px' }} onClick={onOpenPopover}>
         <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
       </Box>
@@ -175,6 +187,7 @@ const TopicHeader = () => {
             sx={{
               overflow: 'hidden',
               flex: 1,
+              minWidth: 'auto',
             }}
           >
             <Button
@@ -197,6 +210,8 @@ const TopicHeader = () => {
                   color: theme.palette.text.primary,
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
+                  width: '100%',
+                  overflow: 'hidden',
                 }}
               >
                 {currentChannel.data?.name}
@@ -267,7 +282,7 @@ const TopicPanel = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
-  const { currentTopic, topics, loadingTopics, pinnedTopics } = useSelector(state => state.topic);
+  const { currentTopic, topics, loadingTopics, pinnedTopics, openTopicPanel } = useSelector(state => state.topic);
   const { openHomeSearch } = useSelector(state => state.app);
   const [searchParams, setSearchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
@@ -276,17 +291,28 @@ const TopicPanel = () => {
 
   useEffect(() => {
     const handleTopicCreated = event => {
-      dispatch(AddTopic(event.channel_id));
+      const splitParentCID = splitChannelId(event.parent_cid);
+      const parentChannelId = splitParentCID.channelId;
+
+      if (parentChannelId === currentChannel?.id) {
+        dispatch(AddTopic(event.channel_id));
+      }
     };
 
     const handleTopicPinned = event => {
-      if (event.channel_type === ChatType.TOPIC) {
+      const splitParentCID = splitChannelId(event.parent_cid);
+      const parentChannelId = splitParentCID.channelId;
+
+      if (parentChannelId === currentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(AddPinnedTopic(event.channel_id));
       }
     };
 
     const handleTopicUnPinned = event => {
-      if (event.channel_type === ChatType.TOPIC) {
+      const splitParentCID = splitChannelId(event.parent_cid);
+      const parentChannelId = splitParentCID.channelId;
+
+      if (parentChannelId === currentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(RemovePinnedTopic(event.channel_id));
       }
     };
@@ -367,7 +393,7 @@ const TopicPanel = () => {
     }
   }, [topics, idSelected, loadingTopics, pinnedTopics]);
 
-  if (!currentChannel?.data?.topics_enabled) return null;
+  if (!currentChannel?.data?.topics_enabled || !openTopicPanel) return null;
 
   return (
     <>

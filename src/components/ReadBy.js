@@ -69,7 +69,7 @@ const Row = memo(({ index, style, data }) => {
   );
 });
 
-export default function ReadBy({ currentChat }) {
+export default function ReadBy() {
   const theme = useTheme();
   const dispatch = useDispatch();
   const isLgToXl = useResponsive('between', null, 'lg', 'xl');
@@ -77,10 +77,13 @@ export default function ReadBy({ currentChat }) {
   // const { currentChannel } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const { messageReadType } = useSelector(state => state.messages);
+  const { currentChannel } = useSelector(state => state.channel);
+  const { currentTopic } = useSelector(state => state.topic);
 
   const [readBy, setReadBy] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const users = client.state.users ? Object.values(client.state.users) : [];
+  const currentChat = currentTopic ? currentTopic : currentChannel;
 
   useEffect(() => {
     if (currentChat) {
