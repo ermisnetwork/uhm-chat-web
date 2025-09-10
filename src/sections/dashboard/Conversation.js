@@ -88,16 +88,17 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel, pinnedMessages } = useSelector(state => state.channel);
+  const { currentTopic } = useSelector(state => state.topic);
   const { canEditMessage, canDeleteMessage, canPinMessage } = useSelector(state => state.channel.channelPermissions);
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const currentChat = currentTopic ? currentTopic : currentChannel;
 
-  const membership = currentChannel.state.membership;
+  const membership = currentChannel.state?.membership;
   const channelType = currentChannel.type;
-  const channelId = currentChannel.id;
   const messageId = message.id;
   const messageText = message.text;
-  const isDelete = checkPermissionDeleteMessage(message, channelType, membership.user_id, membership.channel_role);
+  const isDelete = checkPermissionDeleteMessage(message, channelType, membership?.user_id, membership?.channel_role);
   const isEdit = isMyMessage && message.text && [MessageType.Regular, MessageType.Reply].includes(message.type);
   const isDownload = message.attachments;
   const isUnPin = pinnedMessages.some(msg => msg.id === messageId);
@@ -159,6 +160,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
 
   const onTogglePin = async () => {
     try {
+      setAnchorEl(null);
       if (!canPinMessage) {
         dispatch(
           showSnackbar({ severity: 'error', message: 'You do not have permission to pin message in this channel' }),
@@ -174,11 +176,10 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
           }),
         );
       } else {
-        const response = await currentChannel.pinMessage(messageId);
+        const response = await currentChat.pinMessage(messageId);
 
         if (response) {
           dispatch(showSnackbar({ severity: 'success', message: 'Message pinned' }));
-          setAnchorEl(null);
         }
       }
     } catch (error) {
@@ -188,7 +189,6 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
           message: 'Unable to pin the message. Please try again',
         }),
       );
-      setAnchorEl(null);
     }
   };
 
@@ -530,6 +530,8 @@ const PollBox = ({ message, all_members }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
+  const { currentTopic } = useSelector(state => state.topic);
+  const currentChat = currentTopic ? currentTopic : currentChannel;
   const { user_id } = useSelector(state => state.auth);
   const pollType = message.poll_type; // 'single' hoặc 'multiple'
   const pollOptions = message.poll_choice_counts || {}; // {option: count, ...}
@@ -558,10 +560,10 @@ const PollBox = ({ message, all_members }) => {
 
     if (pollType === 'multiple' && Array.isArray(selected)) {
       for (const choice of selected) {
-        await currentChannel.votePoll(message.id, choice);
+        await currentChat.votePoll(message.id, choice);
       }
     } else {
-      await currentChannel.votePoll(message.id, selected);
+      await currentChat.votePoll(message.id, selected);
     }
   };
 

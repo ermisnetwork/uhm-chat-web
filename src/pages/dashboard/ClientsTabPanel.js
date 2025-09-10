@@ -15,6 +15,8 @@ const ClientsTabPanel = () => {
   const isDesktop = useResponsive('up', 'xl');
   const isScreenMdToXl = useResponsive('between', null, 'md', 'xl');
   const isMobileToMd = useResponsive('down', 'md');
+  const isEnabledTopics = currentChannel?.data?.topics_enabled;
+  const widthBox = isEnabledTopics ? '95px' : isDesktop ? `${WIDTH_LEFT_PANEL}px` : isScreenMdToXl ? '300px' : '100%';
 
   if (isMobileToMd && currentChannel) return null;
 
@@ -24,9 +26,10 @@ const ClientsTabPanel = () => {
         sx={{
           position: 'relative',
           height: '100%',
-          width: isDesktop ? `${WIDTH_LEFT_PANEL}px` : isScreenMdToXl ? '300px' : '100%',
+          width: widthBox,
           backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.grey[900],
           borderRadius: '16px',
+          transition: 'all 0.3s ease-in-out',
         }}
       >
         {isUserConnected && <LeftPanel />}

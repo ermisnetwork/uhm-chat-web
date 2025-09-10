@@ -69,12 +69,12 @@ const Row = memo(({ index, style, data }) => {
   );
 });
 
-export default function ReadBy() {
+export default function ReadBy({ currentChat }) {
   const theme = useTheme();
   const dispatch = useDispatch();
   const isLgToXl = useResponsive('between', null, 'lg', 'xl');
   const isMobileToLg = useResponsive('down', 'lg');
-  const { currentChannel } = useSelector(state => state.channel);
+  // const { currentChannel } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const { messageReadType } = useSelector(state => state.messages);
 
@@ -83,12 +83,12 @@ export default function ReadBy() {
   const users = client.state.users ? Object.values(client.state.users) : [];
 
   useEffect(() => {
-    if (currentChannel) {
+    if (currentChat) {
       const messages =
-        currentChannel.state.messages.filter(msg => ![MessageType.System, MessageType.Signal].includes(msg.type)) || [];
+        currentChat.state.messages.filter(msg => ![MessageType.System, MessageType.Signal].includes(msg.type)) || [];
 
       if (messages.length) {
-        const readMembers = Object.values(currentChannel.state.read).filter(
+        const readMembers = Object.values(currentChat.state.read).filter(
           item => item.user.id !== user_id && item.unread_messages === 0,
         );
 
@@ -153,24 +153,23 @@ export default function ReadBy() {
 
       const handleMessageDeleted = event => {
         const messages =
-          currentChannel.state.messages.filter(msg => ![MessageType.System, MessageType.Signal].includes(msg.type)) ||
-          [];
+          currentChat.state.messages.filter(msg => ![MessageType.System, MessageType.Signal].includes(msg.type)) || [];
         if (messages.length === 0) {
           dispatch(setMessageReadType(MessageReadType.Empty));
         }
       };
 
-      currentChannel.on(ClientEvents.MessageNew, handleMessageNew);
-      currentChannel.on(ClientEvents.MessageRead, handleMessageRead);
-      currentChannel.on(ClientEvents.MessageDeleted, handleMessageDeleted);
+      currentChat.on(ClientEvents.MessageNew, handleMessageNew);
+      currentChat.on(ClientEvents.MessageRead, handleMessageRead);
+      currentChat.on(ClientEvents.MessageDeleted, handleMessageDeleted);
 
       return () => {
-        currentChannel.off(ClientEvents.MessageNew, handleMessageNew);
-        currentChannel.off(ClientEvents.MessageRead, handleMessageRead);
-        currentChannel.off(ClientEvents.MessageDeleted, handleMessageDeleted);
+        currentChat.off(ClientEvents.MessageNew, handleMessageNew);
+        currentChat.off(ClientEvents.MessageRead, handleMessageRead);
+        currentChat.off(ClientEvents.MessageDeleted, handleMessageDeleted);
       };
     }
-  }, [currentChannel, user_id]);
+  }, [currentChat, user_id]);
 
   const renderReadBy = useCallback(() => {
     switch (messageReadType) {
