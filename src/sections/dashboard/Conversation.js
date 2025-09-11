@@ -99,7 +99,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
   const messageId = message.id;
   const messageText = message.text;
   const isDelete = checkPermissionDeleteMessage(message, channelType, membership?.user_id, membership?.channel_role);
-  const isEdit = isMyMessage && message.text && [MessageType.Regular, MessageType.Reply].includes(message.type);
+  const isEdit = isMyMessage && message.text && [MessageType.Regular].includes(message.type);
   const isDownload = message.attachments;
   const isUnPin = pinnedMessages.some(msg => msg.id === messageId);
 
@@ -315,7 +315,7 @@ const MessageOption = ({ isMyMessage, message }) => {
   const { isGuest } = useSelector(state => state.channel);
 
   const [isOpen, setIsOpen] = useState(false);
-  const isForward = [MessageType.Regular, MessageType.Reply, MessageType.Sticker].includes(message.type);
+  const isForward = [MessageType.Regular, MessageType.Sticker].includes(message.type);
   const orderReply = isMyMessage ? 3 : 1;
   const orderForward = 2;
   const orderMore = isMyMessage ? 1 : 3;
@@ -462,7 +462,7 @@ const TextLine = ({ message }) => {
             {part}
           </a>
         );
-      } else if (part.match(mentionRegex) && message.mentioned_users ) {
+      } else if (part.match(mentionRegex) && message.mentioned_users) {
         const mentionObj = mentions.find(m => m.mentionId === part || m.mentionName === part);
         if (mentionObj) {
           const customClass =
@@ -802,7 +802,7 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
   const voiceMsg = el.attachments ? el.attachments.find(attachment => attachment.type === 'voiceRecording') : null;
   const linkPreviewMsg =
     el.attachments && el.attachments[0]?.type === 'linkPreview' && el.attachments[0]?.title ? el.attachments[0] : null;
-  const stickerOfQuoted = quotedMessage.type === MessageType.Sticker ? quotedMessage.sticker_url : null;
+  const stickerOfQuoted = quotedMessage?.sticker_url ? quotedMessage.sticker_url : null;
 
   return (
     <Stack direction="row" justifyContent={el.isMyMessage ? 'end' : 'start'} alignItems="center">
@@ -837,12 +837,22 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
             />
             {stickerOfQuoted && (
               <Box sx={{ paddingLeft: '10px' }}>
-                <ImageCanvas
-                  dataUrl={stickerOfQuoted}
-                  width={'50px'}
-                  height={'auto'}
-                  styleCustom={{ borderRadius: '6px' }}
-                />
+                {stickerOfQuoted.endsWith('.tgs') ? (
+                  <tgs-player
+                    autoplay
+                    loop
+                    mode="normal"
+                    src={stickerOfQuoted}
+                    style={{ width: '50px', height: 'auto' }}
+                  ></tgs-player>
+                ) : (
+                  <ImageCanvas
+                    dataUrl={stickerOfQuoted}
+                    width={'50px'}
+                    height={'auto'}
+                    styleCustom={{ borderRadius: '6px' }}
+                  />
+                )}
               </Box>
             )}
             {media && (
@@ -1049,8 +1059,13 @@ const StickerMsg = ({ el, forwardChannelName }) => {
         <ForwardTo message={el} forwardChannelName={forwardChannelName} />
         <Stack direction="column" alignItems="flex-end" width={'200px'} justifyContent="center">
           {el.sticker_url.endsWith('.tgs') ? (
-            <tgs-player autoplay loop mode="normal" src={el.sticker_url} style={{ width: "200px", height: "200px" }}>
-            </tgs-player>
+            <tgs-player
+              autoplay
+              loop
+              mode="normal"
+              src={el.sticker_url}
+              style={{ width: '200px', height: '200px' }}
+            ></tgs-player>
           ) : (
             <ImageCanvas
               dataUrl={el.sticker_url}

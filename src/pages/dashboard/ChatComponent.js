@@ -191,6 +191,7 @@ const MessageList = ({
     const isMyMessage = checkMyMessage(user_id, el.user.id);
     const messageType = el.type;
     const forwardChannelName = getForwardChannelName(el?.forward_cid);
+    const quotedMessage = el?.quoted_message;
 
     if (el.deleted_at) {
       return (
@@ -213,6 +214,8 @@ const MessageList = ({
           </Box>
         </Stack>
       );
+    } else if (quotedMessage) {
+      return <ReplyMsg el={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />;
     } else {
       if (messageType === MessageType.Regular) {
         if (el.attachments && el.attachments.length > 0) {
@@ -231,12 +234,6 @@ const MessageList = ({
               return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
             }
           }
-        } else {
-          return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
-        }
-      } else if (messageType === MessageType.Reply) {
-        if (el.quoted_message) {
-          return <ReplyMsg el={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />;
         } else {
           return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
         }
