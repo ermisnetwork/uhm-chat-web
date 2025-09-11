@@ -605,7 +605,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
             startAdornment: (
               <>
                 {!isDialog && (
-                  <InputAdornment position="start" sx={{ position: 'absolute', bottom: '23px', left: '10px' }}>
+                  <InputAdornment position="start" sx={{ position: 'absolute', bottom: '23px', left: '5px' }}>
                     <ActionsChatPopover />
                   </InputAdornment>
                 )}
