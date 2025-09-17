@@ -30,7 +30,7 @@ const ForwardMessageDialog = () => {
   const theme = useTheme();
 
   const { openDialog, message } = useSelector(state => state.messages.forwardMessage);
-  const { activeChannels, currentChannel } = useSelector(state => state.channel);
+  const { activeChannels, pinnedChannels, currentChannel } = useSelector(state => state.channel);
   const { canSendMessage } = useSelector(state => state.channel.channelPermissions);
 
   const [filteredChannels, setFilteredChannels] = useState([]);
@@ -39,8 +39,8 @@ const ForwardMessageDialog = () => {
   const [forwardStatus, setForwardStatus] = useState({}); // 'idle' | 'loading' | 'sent' | 'error'
 
   const sortActiveChannels = useMemo(() => {
-    return [...activeChannels].sort((a, b) => a.data.name.localeCompare(b.data.name));
-  }, [activeChannels]);
+    return [...activeChannels, ...pinnedChannels].sort((a, b) => a.data.name.localeCompare(b.data.name));
+  }, [activeChannels, pinnedChannels]);
 
   useEffect(() => {
     if (sortActiveChannels.length) {
