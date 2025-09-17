@@ -110,7 +110,7 @@ export const TabType = {
 
 export const MessageType = {
   Regular: 'regular',
-  Reply: 'reply',
+  // Reply: 'reply', BE bỏ type Reply
   System: 'system',
   Signal: 'signal',
   Poll: 'poll',

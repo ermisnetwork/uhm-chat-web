@@ -112,13 +112,13 @@ const SideBar = () => {
   const selectedTab = tab;
 
   const handleChangeTab = index => {
+    dispatch(SetOpenTopicPanel(false));
     switch (index) {
       case TabType.Chat:
         dispatch(SetOpenTopicPanel(false));
         navigate(DEFAULT_PATH);
         break;
       case TabType.Contact:
-        dispatch(SetOpenTopicPanel(false));
         if (isMobileToMd) {
           navigate('/contacts');
         } else {
