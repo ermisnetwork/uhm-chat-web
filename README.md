@@ -1,12 +1,12 @@
-# Echat-chat-web
+# uhm-chat-web
 
 ## Setup & Run Guide
 
 ### 1. Clone the source code
 
 ```sh
-git clone https://github.com/ermisnetwork/Echat-chat-web
-cd Echat-chat-web
+git clone https://github.com/ermisnetwork/uhm-chat-web
+cd uhm-chat-web
 ```
 
 ### 2. Install dependencies

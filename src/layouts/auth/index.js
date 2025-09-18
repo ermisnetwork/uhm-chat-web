@@ -54,7 +54,7 @@ const AuthLayout = () => {
 
   const SLIDE = [
     {
-      title: 'Welcome to Echat...!',
+      title: 'Welcome to Echat',
       description:
         'Echat... isn’t just a chat app — it’s a decentralized hub for secure, real-time team collaboration. \nBuilt for Web3, made for you.',
       image: <SlideLogin1 style={{ margin: 'auto' }} size={imageSize} />,
