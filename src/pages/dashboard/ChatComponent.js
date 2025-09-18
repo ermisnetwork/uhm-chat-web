@@ -237,6 +237,13 @@ const MessageList = ({
         } else {
           return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
         }
+        } else if (messageType === MessageType.Reply) {
+        if (el.quoted_message) {
+          return <ReplyMsg el={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />;
+        } else {
+          return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
+        }
+
       } else if (messageType === MessageType.Signal) {
         return <SignalMsg el={{ ...el, isMyMessage }} />;
       } else if (messageType === MessageType.Poll) {
@@ -325,7 +332,7 @@ const MessageList = ({
                       direction="row"
                       alignItems="flex-end"
                       justifyContent={isMyMessage ? 'end' : 'start'}
-                      flexWrap="wrap"
+                      flexWrap="nowrap"
                       gap={1}
                       // key={el.id}
                       className={isMyMessage ? 'myMessage' : ''}

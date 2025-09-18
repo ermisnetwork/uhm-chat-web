@@ -488,14 +488,14 @@ const ChatElement = ({ channel }) => {
     dispatch(setChannelConfirm(payload));
   };
 
-  const onDelete = () => {
+  const onDelete = async () => {
     const payload = {
       openDialog: true,
       channel,
       userId: user_id,
       type: ConfirmType.DELETE_CHANNEL,
     };
-    dispatch(setChannelConfirm(payload));
+    await dispatch(setChannelConfirm(payload));
   };
 
   const onClearChatHistory = () => {
