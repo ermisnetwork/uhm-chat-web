@@ -1,6 +1,6 @@
 {
-  "short_name": "Uhmm...!",
-  "name": "Uhmm chat app",
+  "short_name": "Echat...!",
+  "name": "Echat chat app",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "logo-demo.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "logo-demo.png",
       "type": "image/png",
       "sizes": "512x512"
     }

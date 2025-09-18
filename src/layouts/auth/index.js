@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Stack, styled, Typography, useTheme } from '@mui/material';
 import { Navigate, Outlet } from 'react-router-dom';
 
-import Logo from '../../assets/Images/uhm.svg';
+import Logo from '../../assets/Images/logo-demo.png';
 import { useSelector } from 'react-redux';
 import { DEFAULT_PATH } from '../../config';
 import useResponsive from '../../hooks/useResponsive';
@@ -54,9 +54,9 @@ const AuthLayout = () => {
 
   const SLIDE = [
     {
-      title: 'Welcome to Uhmm...!',
+      title: 'Welcome to Echat...!',
       description:
-        'Uhmm... isn’t just a chat app — it’s a decentralized hub for secure, real-time team collaboration. \nBuilt for Web3, made for you.',
+        'Echat... isn’t just a chat app — it’s a decentralized hub for secure, real-time team collaboration. \nBuilt for Web3, made for you.',
       image: <SlideLogin1 style={{ margin: 'auto' }} size={imageSize} />,
     },
     {
@@ -68,7 +68,7 @@ const AuthLayout = () => {
     {
       title: 'Ready for the Workforce',
       description:
-        'Designed for DAOs, startups, and global teams embracing decentralization.\nUhmm... is your all-in-one, future-proof communication layer.',
+        'Designed for DAOs, startups, and global teams embracing decentralization.\nEchat... is your all-in-one, future-proof communication layer.',
       image: <SlideLogin3 style={{ margin: 'auto' }} size={imageSize} />,
     },
   ];
@@ -123,8 +123,8 @@ const AuthLayout = () => {
         alignItems="center"
       >
         {/* ---------------------LOGO--------------------- */}
-        <Stack sx={{ width: '100%', marginBottom: '50px' }} direction="column" alignItems={'center'}>
-          <img style={{ height: 70, width: 230 }} src={Logo} alt="Logo" />
+        <Stack sx={{ width: '100%', marginBottom: '30px' }} direction="column" alignItems={'center'}>
+          <img style={{ height: 220, width: 230 }} src={Logo} alt="Logo" />
         </Stack>
         <Outlet />
       </Stack>

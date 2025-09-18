@@ -18,7 +18,8 @@ import {
 } from '../../redux/slices/channel';
 import { ClientEvents } from '../../constants/events-const';
 import { getChannelName, getMemberInfo, splitChannelId } from '../../utils/commons';
-import Logo from '../../assets/Images/logo.svg';
+// import Logo from '../../assets/Images/logo.svg';
+import Logo from '../../assets/Images/logo-demo.png';
 import { DEFAULT_PATH, DOMAIN_APP } from '../../config';
 import { ChatType, EMOJI_QUICK, MessageType, TabType } from '../../constants/commons-const';
 import { convertMessageSystem } from '../../utils/messageSystem';

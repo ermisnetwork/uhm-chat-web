@@ -10,7 +10,8 @@ import LogoZora from '../assets/Images/logo-zora.webp';
 import LogoBase from '../assets/Images/logo-base.webp';
 import LogoCelo from '../assets/Images/logo-celo.webp';
 import LogoAurora from '../assets/Images/logo-aurora.webp';
-import LogoErmis from '../assets/Images/logo.svg';
+// import LogoErmis from '../assets/Images/logo.svg';
+import LogoErmis from '../assets/Images/logo-demo.png';
 import LogoSdk from '../assets/Images/logo-sdk.webp';
 
 export const CHAIN_ID = {
