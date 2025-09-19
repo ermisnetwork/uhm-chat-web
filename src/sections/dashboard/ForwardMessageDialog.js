@@ -108,11 +108,7 @@ const ForwardMessageDialog = () => {
   const ForwardItemRow = ({ item, status, disabled, onSend, isTopic = false }) => {
     return (
       <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Stack
-          direction="row"
-          alignItems="center"
-          sx={{ width: 'calc(100% - 60px)', paddingRight: '15px' }}
-        >
+        <Stack direction="row" alignItems="center" sx={{ width: 'calc(100% - 60px)', paddingRight: '15px' }}>
           <ChannelAvatar
             channel={item}
             width={isTopic ? 25 : 30}
@@ -149,7 +145,6 @@ const ForwardMessageDialog = () => {
       </Stack>
     );
   };
-
 
   return (
     <Dialog
@@ -195,7 +190,7 @@ const ForwardMessageDialog = () => {
 
                 return (
                   <Stack key={channelId} spacing={2}>
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" >
+                    <Stack direction="row" alignItems="center" justifyContent="space-between">
                       <Stack
                         direction="row"
                         alignItems="center"
@@ -231,7 +226,7 @@ const ForwardMessageDialog = () => {
                       </LoadingButton>
                     </Stack>
                     {topics.length > 0 && (
-                      <Stack sx={{ pl: 2 }} spacing={2}>
+                      <Stack sx={{ pl: 3 }} spacing={2}>
                         {topics.map(topic => {
                           const topicStatus = forwardStatus[topic.id] || 'idle';
                           return (
