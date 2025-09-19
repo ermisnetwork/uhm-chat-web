@@ -60,20 +60,18 @@ const TopicElement = ({ topic, idSelected }) => {
   const isMobileToMd = useResponsive('down', 'md');
   const { currentChannel, unreadChannels } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
+  const [isRightClick, setIsRightClick] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [lastMessage, setLastMessage] = useState('');
+  const [lastMessageAt, setLastMessageAt] = useState('');
+
   const users = client.state.users ? Object.values(client.state.users) : [];
   const topicId = topic?.id || '';
   const isPinned = topic.data?.is_pinned;
-  const [isRightClick, setIsRightClick] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
-  const isDirect = isChannelDirect(topic);
-  const myRole = myRoleInChannel(topic);
-  const [selectedTopic, setSelectedTopic] = useState(null);
-
-  const showItemDeleteTopic = !isDirect && [RoleMember.OWNER].includes(myRole);
-  const [lastMessage, setLastMessage] = useState('');
-  const [lastMessageAt, setLastMessageAt] = useState('');
-  const { currentTopic } = useSelector(state => state.topic);
+  const myRole = myRoleInChannel(currentChannel);
+  const showItemDeleteTopic = [RoleMember.OWNER].includes(myRole);
 
   const replaceMentionsWithNames = inputValue => {
     users.forEach(user => {
@@ -210,7 +208,7 @@ const TopicElement = ({ topic, idSelected }) => {
     }
     setAnchorEl(null);
   };
-  
+
   const onRightClick = event => {
     event.preventDefault();
     setIsRightClick(true);
@@ -385,14 +383,6 @@ const TopicElement = ({ topic, idSelected }) => {
           {isPinned ? 'Unpin from top' : 'Pin to top'}
         </MenuItem>
 
-        {/* --------------------Mark as read---------------- */}
-        {/* {showItemMarkAsRead && (
-          <MenuItem onClick={onMarkAsRead}>
-            <EnvelopeSimpleOpen />
-            Mark as read
-          </MenuItem>
-        )} */}
-
         {/* --------------------Delete Topic---------------- */}
         {showItemDeleteTopic && (
           <MenuItem sx={{ color: theme.palette.error.main }} onClick={onDeleteTopic}>
@@ -400,22 +390,6 @@ const TopicElement = ({ topic, idSelected }) => {
             Delete Topic
           </MenuItem>
         )}
-
-        {/* --------------------Leave Topic---------------- */}
-        {/* {showItemLeaveTopic && (
-          <MenuItem sx={{ color: theme.palette.error.main }} onClick={onLeave}>
-            <SignOut color={theme.palette.error.main} />
-            Leave Topic
-          </MenuItem>
-        )} */}
-
-        {/* --------------------Clear chat history---------------- */}
-        {/* {showItemDeleteConversation && (
-          <MenuItem sx={{ color: theme.palette.error.main }} onClick={onClearChatHistory}>
-            <Trash color={theme.palette.error.main} />
-            Clear chat history
-          </MenuItem>
-        )} */}
       </StyledMenu>
     </>
   );

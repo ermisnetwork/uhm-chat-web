@@ -481,7 +481,7 @@ const LeftPanel = () => {
         client.off(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
       };
     }
-  }, [dispatch, user_id, client, mutedChannels, activeChannels, pendingChannels, users.length]);
+  }, [dispatch, user_id, client, mutedChannels, activeChannels, pendingChannels, pinnedChannels, users.length]);
 
   useEffect(() => {
     if (mutedChannels) {
