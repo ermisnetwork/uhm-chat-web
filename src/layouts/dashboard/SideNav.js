@@ -115,7 +115,6 @@ const SideBar = () => {
     dispatch(SetOpenTopicPanel(false));
     switch (index) {
       case TabType.Chat:
-        dispatch(SetOpenTopicPanel(false));
         navigate(DEFAULT_PATH);
         break;
       case TabType.Contact:
