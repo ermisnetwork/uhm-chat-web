@@ -49,10 +49,10 @@ const ForwardMessageDialog = () => {
 
     if (value) {
       const results =
-        activeChannels.filter(channel => channel.data.name.toLowerCase().includes(value.toLowerCase())) || [];
+        sortActiveChannels.filter(channel => channel.data.name.toLowerCase().includes(value.toLowerCase())) || [];
       setFilteredChannels(results);
     } else {
-      setFilteredChannels(activeChannels);
+      setFilteredChannels(sortActiveChannels);
     }
   };
 
