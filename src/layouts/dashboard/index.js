@@ -112,8 +112,8 @@ const DashboardLayout = () => {
         </Stack>
       </Stack>
 
-      <CallDirectDialog3 />
-      {/* <CallDirectDialog2 /> */}
+      {/* <CallDirectDialog3 /> */}
+      <CallDirectDialog2 />
       {openDialogCreateChannel && <CreateChannel />}
       {openDialogNewDirectMessage && <NewDirectMessage />}
       {openAddFriendDialog && <AddFriendDialog />}
