@@ -125,7 +125,7 @@ const MessageList = ({
   const isLgToXl = useResponsive('between', null, 'lg', 'xl');
   const isMobileToLg = useResponsive('down', 'lg');
   const { user_id } = useSelector(state => state.auth);
-  const { activeChannels, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
+  const { activeChannels, pinnedChannels, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
 
   const lastReadIndex = messages.findIndex(msg => msg.id === lastReadMessageId);
 
@@ -172,11 +172,11 @@ const MessageList = ({
   const getForwardChannelName = forwardCid => {
     if (!forwardCid) return '';
 
-    if (activeChannels.length) {
+    if (activeChannels.length || pinnedChannels.length) {
       const parts = forwardCid.split(':');
       const channelId = parts.slice(1).join(':');
 
-      const channel = activeChannels.find(ch => ch.id === channelId);
+      const channel = [...activeChannels, ...pinnedChannels].find(ch => ch.id === channelId);
 
       if (channel) {
         return formatString(channel.data.name);
