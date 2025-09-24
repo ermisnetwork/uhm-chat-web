@@ -478,7 +478,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
           sendMessage();
         }
       } else {
-        onTyping();
+        // onTyping();
       }
     }
   };
@@ -582,6 +582,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
             event.preventDefault();
             const value = event.target.value;
             setValue(value);
+            onTyping();
 
             if (checkSendLinks(value)) {
               dispatch(
