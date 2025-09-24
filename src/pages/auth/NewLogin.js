@@ -62,6 +62,7 @@ export default function NewLogin() {
   const [showOtp, setShowOtp] = useState(false);
   const [agree, setAgree] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState(60);
 
   useEffect(() => {
     dispatch(SetAuthProvider(new ErmisAuthProvider(API_KEY, { baseURL: BASE_URL })));
@@ -75,6 +76,16 @@ export default function NewLogin() {
       emailRef.current.focus();
     }
   }, [loginType]);
+
+  useEffect(() => {
+    if (showOtp) {
+      let timer;
+      if (countdown > 0) {
+        timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      }
+      return () => clearTimeout(timer);
+    }
+  }, [countdown, showOtp]);
 
   const phoneSchema = Yup.object().shape({
     phone: Yup.string()
@@ -195,6 +206,7 @@ export default function NewLogin() {
           message: 'OTP has been resent successfully.',
         }),
       );
+      setCountdown(60);
     } catch (error) {
       dispatch(
         showSnackbar({
@@ -253,14 +265,20 @@ export default function NewLogin() {
             </Button>
           </FormProvider>
           <Stack direction="row" justifyContent="flex-end" sx={{ mt: '0px!important' }}>
-            <Button
-              variant="text"
-              color="primary"
-              onClick={onResendOtp}
-              sx={{ fontWeight: 400, padding: '5px', mt: '10px' }}
-            >
-              Send again
-            </Button>
+            {countdown > 0 ? (
+              <Typography sx={{ fontWeight: 400, padding: '5px', mt: '10px', color: 'primary.main' }}>
+                {countdown}s
+              </Typography>
+            ) : (
+              <Button
+                variant="text"
+                color="primary"
+                onClick={onResendOtp}
+                sx={{ fontWeight: 400, padding: '5px', mt: '10px' }}
+              >
+                Send again
+              </Button>
+            )}
           </Stack>
         </>
       );

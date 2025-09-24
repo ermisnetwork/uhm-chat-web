@@ -573,17 +573,21 @@ const ChatComponent = () => {
             });
             break;
           case ClientEvents.MessageDeleted:
-            setMessages(prev => {
-              return prev.filter(item => {
-                if (item.quoted_message_id && item.quoted_message_id === event.message.id) {
-                  return { ...item, quoted_message: { ...item.quoted_message, deleted_at: event.message.deleted_at } };
-                } else if (item.id === event.message.id) {
-                  return false;
-                } else {
-                  return true;
-                }
-              });
-            });
+            setMessages(prev =>
+              prev
+                .filter(item => item.id !== event.message.id) // Loại bỏ message bị xoá
+                .map(item => {
+                  // Nếu là reply tới message bị xoá thì xoá dữ liệu reply
+                  if (item.quoted_message_id === event.message.id) {
+                    return {
+                      ...item,
+                      quoted_message: undefined,
+                      quoted_message_id: undefined,
+                    };
+                  }
+                  return item;
+                }),
+            );
             break;
           case ClientEvents.MessageUpdated:
             setMessages(prev => {
