@@ -1,0 +1,13 @@
+{
+  "profile": {
+    "edit": "Edit Profile",
+    "language": "Language",
+    "logout": "Log Out"
+  },
+  "newchat": {
+    "add_friend": "Add Friend",
+    "new_chat": "New Chat",
+    "channel": "New Channel",
+    "message": "New Message"
+  }
+}

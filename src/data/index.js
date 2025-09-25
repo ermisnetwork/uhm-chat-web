@@ -7,13 +7,14 @@ import {
   PeopleIcon,
   PhoneIcon,
   SmileChatIcon,
+  TranslateIcon,
   UserOctagonIcon,
   UserSquareIcon,
 } from '../components/Icons';
 
 const Profile_Menu = [
   {
-    title: 'Edit Profile',
+    title: 'profile.edit',
     icon: <EditProfileIcon size={24} />,
     key: 'profile',
   },
@@ -28,7 +29,12 @@ const Profile_Menu = [
   //   key: 'blocked_contacts',
   // },
   {
-    title: 'Log Out',
+    title: 'profile.language',
+    icon: <TranslateIcon size={24} />,
+    key: 'change_language',
+  },
+  {
+    title: 'profile.logout',
     icon: <LogoutIcon size={24} />,
     key: 'logout',
   },
@@ -59,12 +65,12 @@ const Nav_Buttons = [
 
 const NewChat_Menu = [
   {
-    title: 'New Channel',
+    title: 'newchat.channel',
     icon: <PeopleIcon size={24} />,
     key: 'new_channel',
   },
   {
-    title: 'New Message',
+    title: 'newchat.message',
     icon: <NewChatIcon size={24} />,
     key: 'new_message',
   },

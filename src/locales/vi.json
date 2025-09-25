@@ -1,0 +1,13 @@
+{
+  "profile": {
+    "edit": "Chỉnh sửa hồ sơ",
+    "language": "Ngôn ngữ",
+    "logout": "Đăng xuất"
+  },
+  "newchat": {
+    "add_friend": "Thêm bạn",
+    "new_chat": "Chat mới",
+    "channel": "Kênh mới",
+    "message": "Tin nhắn mới"
+  }
+}
