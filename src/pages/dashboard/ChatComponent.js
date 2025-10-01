@@ -77,6 +77,7 @@ import { setSidebar, SetUserInfo } from '../../redux/slices/app';
 import TopicPanel from './TopicPanel';
 import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
 import { SetIsClosedTopic, SetOpenTopicPanel } from '../../redux/slices/topic';
+import { useTranslation } from 'react-i18next';
 
 const StyledMessage = styled(motion(Stack))(({ theme }) => ({
   '&:hover': {
@@ -117,6 +118,7 @@ const MessageList = ({
   setHighlightMsg,
   currentChat,
 }) => {
+  const { t } = useTranslation();
   const users = client.state.users ? Object.values(client.state.users) : [];
   const dispatch = useDispatch();
   const messageRefs = useRef({});
@@ -210,7 +212,7 @@ const MessageList = ({
             }}
           >
             <Trash size={16} color={theme.palette.grey[600]} />
-            &nbsp;&nbsp;Message deleted
+            &nbsp;&nbsp;{t('chatComponent.message_delete')}
           </Box>
         </Stack>
       );
@@ -285,7 +287,7 @@ const MessageList = ({
               const isNewestMessage = idx === messages.length - 1;
 
               if (messageType === MessageType.System) {
-                const msgSystem = renderSystemMessage(el.text, users, isDirect, messages);
+                const msgSystem = renderSystemMessage(el.text, users, isDirect, messages, t);
                 return (
                   <React.Fragment key={el.id}>
                     {el?.date_label && (
@@ -415,7 +417,7 @@ const MessageList = ({
                               }}
                             >
                               <Clock size={16} color={'#fff'} />
-                              <span style={{ fontSize: '12px', color: '#fff' }}>&nbsp;Sending&nbsp;</span>
+                              <span style={{ fontSize: '12px', color: '#fff' }}>&nbsp;{t('chatComponent.sending')}&nbsp;</span>
                             </Stack>
                           </Stack>
                         )}
@@ -423,7 +425,7 @@ const MessageList = ({
 
                       {lastReadMessageId === el.id && (
                         <Stack direction="row" justifyContent="center" sx={{ width: '100%', margin: '10px 0' }}>
-                          <Chip label="Unread message" />
+                          <Chip label={t('chatComponent.unread_message')} />
                         </Stack>
                       )}
                     </StyledMessage>
@@ -439,6 +441,7 @@ const MessageList = ({
 };
 
 const ChatComponent = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -487,7 +490,7 @@ const ChatComponent = () => {
       setIsPendingInvite(checkPendingInvite(currentChat));
       setUnreadCount(currentChat.state.unreadCount);
       dispatch(SetIsGuest(isGuestInPublicChannel(currentChat)));
-      setNoMessageTitle(listMessage.length ? '' : 'No messages here yet...');
+      setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
 
       const read = currentChat.state.read[user_id];
       const lastReadMsgId = read.unread_messages ? read.last_read_message_id : '';
@@ -915,8 +918,8 @@ const ChatComponent = () => {
       let date_label = null;
 
       if (!lastDate || !msgDate.isSame(lastDate)) {
-        if (msgDate.isSame(today)) date_label = 'Today';
-        else if (msgDate.isSame(yesterday)) date_label = 'Yesterday';
+        if (msgDate.isSame(today)) date_label = t('chatComponent.today');
+        else if (msgDate.isSame(yesterday)) date_label = t('chatComponent.yesterday');
         else date_label = msgDate.format('DD/MM/YYYY');
         lastDate = msgDate;
       }
@@ -951,7 +954,7 @@ const ChatComponent = () => {
               <Box sx={{ width: '100%' }}>
                 <Alert severity="info" sx={{ fontWeight: 400 }}>
                   <strong>{formatString(currentChat?.data.name)}</strong>
-                  &nbsp;needs to accept your invitation to see the messages you've sent
+                  &nbsp;{t('chatComponent.message')}
                 </Alert>
               </Box>
             )}
@@ -961,7 +964,7 @@ const ChatComponent = () => {
             {(showChipUnread || unreadCount >= MESSAGE_LIMIT) && (
               <Stack direction="row" alignItems="center" justifyContent="center">
                 <Chip
-                  label={`${unreadCount} Unread messages`}
+                  label={`${unreadCount} ${t('chatComponent.unread_message')}`}
                   color="primary"
                   onClick={onScrollToFirstUnread}
                   onDelete={onDeleteUnread}

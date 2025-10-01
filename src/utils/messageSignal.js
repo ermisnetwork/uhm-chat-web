@@ -28,19 +28,19 @@ export function convertMessageSignal(input) {
       color = '';
       break;
     case 2: // AudioCallMissed
-      text = isMe ? 'Outgoing audio call' : 'You missed audio call';
+      text = isMe ? 'messageSignal.outgoing_audio_call' : 'messageSignal.missed_audio_call';
       callType = CallType.AUDIO;
       color = '#FF4842';
       break;
     case 3: // AudioCallEnded
       if (duration) {
-        text = isMe ? 'Outgoing audio call' : 'Incoming audio call';
+        text = isMe ? 'messageSignal.outgoing_audio_call' : 'messageSignal.incoming_audio_call';
         color = '#54D62C';
       } else {
         if (enderId === myUserId) {
-          text = 'You cancel audio call';
+          text = 'messageSignal.cancel_audio_call';
         } else {
-          text = 'You missed audio call';
+          text = 'messageSignal.missed_audio_call';
         }
         color = '#FF4842';
       }
@@ -52,41 +52,41 @@ export function convertMessageSignal(input) {
       color = '';
       break;
     case 5: // VideoCallMissed
-      text = isMe ? 'Outgoing video call' : 'You missed video call';
+      text = isMe ? 'messageSignal.outgoing_video_call' : 'messageSignal.missed_video_call';
       callType = CallType.VIDEO;
       color = '#FF4842';
       break;
     case 6: // VideoCallEnded
       if (duration) {
-        text = isMe ? 'Outgoing video call' : 'Incoming video call';
+        text = isMe ? 'messageSignal.outgoing_video_call' : 'messageSignal.incoming_video_call';
         color = '#54D62C';
       } else {
         if (enderId === myUserId) {
-          text = 'You cancel video call';
+          text = 'messageSignal.cancel_video_call';
         } else {
-          text = 'You missed video call';
+          text = 'messageSignal.missed_video_call';
         }
         color = '#FF4842';
       }
       callType = CallType.VIDEO;
       break;
     case 7: // AudioCallRejected
-      text = isMe ? 'Recipient rejected audio call' : 'You rejected audio call';
+      text = isMe ? 'messageSignal.recipient_rejected_audio_call' : 'messageSignal.rejected_audio_call';
       callType = CallType.AUDIO;
       color = '#FF4842';
       break;
     case 8: // VideoCallCallRejected
-      text = isMe ? 'Recipient rejected video call' : 'You rejected video call';
+      text = isMe ? 'messageSignal.recipient_rejected_video_call' : 'messageSignal.rejected_video_call';
       callType = CallType.VIDEO;
       color = '#FF4842';
       break;
     case 9: // AudioCallBusy
-      text = isMe ? 'Recipient was busy' : 'You missed audio call';
+      text = isMe ? 'messageSignal.recipient_was_busy' : 'messageSignal.missed_audio_call';
       callType = CallType.AUDIO;
       color = '#FF4842';
       break;
     case 10: // VideoCallBusy
-      text = isMe ? 'Recipient was busy' : 'You missed video call';
+      text = isMe ? 'messageSignal.recipient_was_busy' : 'You missed video call';
       callType = CallType.VIDEO;
       color = '#FF4842';
       break;

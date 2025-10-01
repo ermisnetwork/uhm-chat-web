@@ -47,6 +47,7 @@ import {
   UsersIcon,
 } from '../../components/Icons';
 import ChannelInfoTab from './ChannelInfoTab';
+import { useTranslation } from 'react-i18next';
 
 const StyledStackItem = styled(Stack)(({ theme }) => ({
   width: '100%',
@@ -89,6 +90,7 @@ const StyledActionItem = styled(Stack)(({ theme }) => ({
 }));
 
 const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDisabled, setSaveLoading }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
@@ -100,7 +102,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
   };
 
   const NewGroupSchema = Yup.object().shape({
-    name: Yup.string().trim().required('Channel name is required').max(255, 'Max 255 characters'),
+    name: Yup.string().trim().required(t('sidebarChannelInfo.channel_name_required')).max(255, t('sidebarChannelInfo.max_chartacters')),
   });
 
   const defaultValues = {
@@ -125,7 +127,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
       const isImage = file.type.startsWith('image/');
 
       if (!isImage) {
-        dispatch(showSnackbar({ severity: 'error', message: 'Please upload an image file!' }));
+        dispatch(showSnackbar({ severity: 'error', message: t('sidebarChannelInfo.snackbar_upload_error') }));
       } else {
         const fileCompress = await processImageFile(file, true);
 
@@ -165,7 +167,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
 
       setSaveLoading(true);
       await currentChannel.update(params);
-      dispatch(showSnackbar({ severity: 'success', message: 'Channel updated successfully' }));
+      dispatch(showSnackbar({ severity: 'success', message: t('sidebarChannelInfo.snackbar_update_success') }));
     } catch (error) {
       handleError(dispatch, error);
     } finally {
@@ -245,7 +247,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
                 marginTop: '0px !important',
               }}
             >
-              {`${currentChannel.data.member_count} members`}
+              {`${currentChannel.data.member_count} ${t('sidebarChannelInfo.member')}`}
             </Typography>
             {/* --------------------channel description-------------------- */}
             {!isEditing && currentChannel.data.description && (
@@ -258,7 +260,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
               <Stack spacing={2} sx={{ width: '100%' }}>
                 <RHFTextField
                   name="name"
-                  placeholder="Channel name"
+                  placeholder={t('sidebarChannelInfo.channel_name')}
                   autoFocus
                   InputProps={{
                     startAdornment: (
@@ -278,7 +280,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
                   multiline
                   rows={4}
                   name="description"
-                  placeholder="Description"
+                  placeholder={t('sidebarChannelInfo.description')}
                   inputProps={{
                     maxLength: 100,
                   }}
@@ -299,7 +301,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
                       marginRight: '0px',
                     },
                   }}
-                  helperText={`${wordCount}/100 words`}
+                  helperText={`${wordCount}/100 ${t('sidebarChannelInfo.words')}}`}
                 />
               </Stack>
             )}
@@ -373,6 +375,7 @@ const styleDescription = {
 };
 
 const SidebarChannelInfo = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const formSubmitRef = useRef(null);
@@ -415,12 +418,12 @@ const SidebarChannelInfo = () => {
           const channelId = event.channel_id;
           if (event.member.muted) {
             dispatch(AddMutedChannel(event.cid));
-            dispatch(showSnackbar({ severity: 'success', message: 'Notifications have been muted' }));
+            dispatch(showSnackbar({ severity: 'success', message: t('sidebarChannelInfo.snackbar_notifications_muted') }));
             setOpenDialogMuted(false);
             setIsMuted(true);
           } else {
             dispatch(RemoveMutedChannel(channelId));
-            dispatch(showSnackbar({ severity: 'success', message: 'Notifications have been unmuted' }));
+            dispatch(showSnackbar({ severity: 'success', message: t('sidebarChannelInfo.snackbar_notifications_unmuted') }));
             setIsMuted(false);
           }
         }
@@ -538,7 +541,7 @@ const SidebarChannelInfo = () => {
                   disabled={saveDisabled}
                   loading={saveLoading}
                 >
-                  SAVE
+                  {t('sidebarChannelInfo.save')}
                 </LoadingButton>
               ) : (
                 <IconButton onClick={onEditing}>
@@ -603,7 +606,7 @@ const SidebarChannelInfo = () => {
                 >
                   {isPublic ? fullUrl : otherMemberId}
                 </Typography>
-                <ClipboardCopy text={isPublic ? fullUrl : otherMemberId} message="Copied to clipboard" />
+                <ClipboardCopy text={isPublic ? fullUrl : otherMemberId} message={t('sidebarChannelInfo.copied_clipboard')} />
               </Stack>
             )}
           </Stack>
@@ -614,7 +617,7 @@ const SidebarChannelInfo = () => {
               <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <BellIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">{isMuted ? 'Unmute' : 'Mute'} Notifications</Typography>
+                  <Typography variant="subtitle2">{isMuted ? t('sidebarChannelInfo.unmute') : t('sidebarChannelInfo.mute')} {t('sidebarChannelInfo.notifications')}</Typography>
                 </Stack>
 
                 <AntSwitch onChange={onChangeMute} checked={isMuted} />
@@ -626,7 +629,7 @@ const SidebarChannelInfo = () => {
               <StyledActionItem onClick={onInviteFriend}>
                 <ProfileAddIcon color={theme.palette.text.primary} />
                 <Typography variant="subtitle2" color={theme.palette.text.primary}>
-                  Invite Friend
+                  {t('sidebarChannelInfo.invite_friend')}
                 </Typography>
               </StyledActionItem>
             )}
@@ -636,7 +639,7 @@ const SidebarChannelInfo = () => {
               <StyledActionItem onClick={onToogleBlockUser}>
                 <UserOctagonIcon color={theme.palette.text.primary} colorUser={theme.palette.error.main} />
                 <Typography variant="subtitle2" color={theme.palette.error.main}>
-                  {isBlocked ? 'Unblock User' : 'Block User'}
+                  {isBlocked ? t('sidebarChannelInfo.unblock_user') : t('sidebarChannelInfo.block_user')}
                 </Typography>
               </StyledActionItem>
             )}
@@ -654,7 +657,7 @@ const SidebarChannelInfo = () => {
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <DeviceMessageIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Channel Type</Typography>
+                  <Typography variant="subtitle2">{t('sidebarChannelInfo.channel_type')}</Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
@@ -663,7 +666,7 @@ const SidebarChannelInfo = () => {
                     color={theme.palette.text.secondary}
                     sx={{ fontWeight: `400 !important` }}
                   >
-                    {isPublic ? 'Public' : 'Private'}
+                    {isPublic ? t('sidebarChannelInfo.public') : t('sidebarChannelInfo.private')}
                   </Typography>
                   <CaretRight size={20} />
                 </Stack>
@@ -683,7 +686,7 @@ const SidebarChannelInfo = () => {
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <StickyNoteIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Channel Topics</Typography>
+                  <Typography variant="subtitle2">{t('sidebarChannelInfo.channel_topics')}</Typography>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" spacing={1}>
@@ -692,7 +695,7 @@ const SidebarChannelInfo = () => {
                     color={theme.palette.text.secondary}
                     sx={{ fontWeight: `400 !important` }}
                   >
-                    {enableTopics ? 'Enabled' : 'Disabled'}
+                    {enableTopics ? t('sidebarChannelInfo.enabled') : t('sidebarChannelInfo.disabled')}
                   </Typography>
                   <CaretRight size={20} />
                 </Stack>
@@ -712,7 +715,7 @@ const SidebarChannelInfo = () => {
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <PeopleIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Members</Typography>
+                  <Typography variant="subtitle2">{t('sidebarChannelInfo.member')}</Typography>
                 </Stack>
 
                 <CaretRight size={20} />
@@ -732,7 +735,7 @@ const SidebarChannelInfo = () => {
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <FlashCircleIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Permissions</Typography>
+                  <Typography variant="subtitle2">{t('sidebarChannelInfo.permission')}</Typography>
                 </Stack>
 
                 <CaretRight size={20} />
@@ -752,7 +755,7 @@ const SidebarChannelInfo = () => {
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <AdministratorsIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Administrators</Typography>
+                  <Typography variant="subtitle2">{t('sidebarChannelInfo.administrators')}</Typography>
                 </Stack>
 
                 <CaretRight size={20} />
@@ -772,7 +775,7 @@ const SidebarChannelInfo = () => {
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <BannedIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Banned Members</Typography>
+                  <Typography variant="subtitle2">{t('sidebarChannelInfo.banned_members')}</Typography>
                 </Stack>
 
                 <CaretRight size={20} />
@@ -792,7 +795,7 @@ const SidebarChannelInfo = () => {
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <DocumentFilterIcon color={theme.palette.text.primary} />
-                  <Typography variant="subtitle2">Keyword Filtering</Typography>
+                  <Typography variant="subtitle2">{t('sidebarChannelInfo.keyword_filtering')}</Typography>
                 </Stack>
 
                 <CaretRight size={20} />
@@ -804,7 +807,7 @@ const SidebarChannelInfo = () => {
               <StyledActionItem onClick={onClearChatHistory}>
                 <TrashIcon color={theme.palette.text.primary} />
                 <Typography variant="subtitle2" color={theme.palette.error.main}>
-                  Clear chat history
+                  {t('sidebarChannelInfo.clear_chat_history')}
                 </Typography>
               </StyledActionItem>
             )}
@@ -814,7 +817,7 @@ const SidebarChannelInfo = () => {
               <StyledActionItem onClick={onLeaveChannel}>
                 <LogoutIcon color={theme.palette.text.primary} />
                 <Typography variant="subtitle2" color={theme.palette.error.main}>
-                  Leave channel
+                  {t('sidebarChannelInfo.leave_channel')}
                 </Typography>
               </StyledActionItem>
             )}
@@ -824,7 +827,7 @@ const SidebarChannelInfo = () => {
               <StyledActionItem onClick={onDeleteChannel}>
                 <TrashIcon color={theme.palette.text.primary} />
                 <Typography variant="subtitle2" color={theme.palette.error.main}>
-                  Delete channel
+                  {t('sidebarChannelInfo.delete_channel')}
                 </Typography>
               </StyledActionItem>
             )}

@@ -16,6 +16,7 @@ import TopicAvatar from './TopicAvatar';
 import useResponsive from '../hooks/useResponsive';
 import { handleError, isChannelDirect, myRoleInChannel } from '../utils/commons';
 import { setChannelConfirm } from '../redux/slices/dialog';
+import { useTranslation } from 'react-i18next';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   // width: '100%',
@@ -54,6 +55,7 @@ const StyledMenu = styled(Menu)(({ theme }) => ({
 }));
 
 const TopicElement = ({ topic, idSelected }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -86,16 +88,16 @@ const TopicElement = ({ topic, idSelected }) => {
       const sender = message.user;
       const senderId = sender?.id;
       const isMe = user_id === senderId;
-      const senderName = isMe ? 'You' : sender?.name || senderId;
+      const senderName = isMe ? t('chatElement.you') : sender?.name || senderId;
       setLastMessageAt(getDisplayDate(date));
       if (message.type === MessageType.System) {
-        const messageSystem = convertMessageSystem(message.text, users, false);
+        const messageSystem = convertMessageSystem(message.text, users, false, t);
         setLastMessage(`${senderName}: ${messageSystem}`);
       } else if (message.type === MessageType.Signal) {
         const messageSignal = convertMessageSignal(message.text);
         setLastMessage(messageSignal.text || '');
       } else if (message.type === MessageType.Sticker) {
-        setLastMessage(`${senderName}: Sticker`);
+        setLastMessage(`${senderName}: ${t('message.sticker')}`);
       } else {
         if (message.attachments) {
           const attachmentLast = message.attachments[message.attachments.length - 1];
@@ -120,7 +122,7 @@ const TopicElement = ({ topic, idSelected }) => {
                     margin: '0px 4px',
                   }}
                 />
-                {attachmentLast.title || 'Photo'}
+                {attachmentLast.title || t('chatElement.photo')}
               </>,
             );
           } else if (isVideo) {
@@ -159,7 +161,7 @@ const TopicElement = ({ topic, idSelected }) => {
       }
     } else {
       setLastMessageAt(getDisplayDate(topic.data.created_at));
-      setLastMessage('No messages here yet');
+      setLastMessage(t('topicPanel.no_message'));
     }
   };
 
@@ -353,7 +355,7 @@ const TopicElement = ({ topic, idSelected }) => {
                     fontWeight: hasUnread ? 600 : 400,
                   }}
                 >
-                  {lastMessage}
+                  {t(lastMessage)}
                 </Typography>
 
                 {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
@@ -380,14 +382,14 @@ const TopicElement = ({ topic, idSelected }) => {
         {/* --------------------Pin/Unpin Topic---------------- */}
         <MenuItem onClick={onPinTopic}>
           {isPinned ? <PushPinSlash /> : <PushPin />}
-          {isPinned ? 'Unpin from top' : 'Pin to top'}
+          {isPinned ? t('topicElement.unpinned') : t('topicElement.pinned')}
         </MenuItem>
 
         {/* --------------------Delete Topic---------------- */}
         {showItemDeleteTopic && (
           <MenuItem sx={{ color: theme.palette.error.main }} onClick={onDeleteTopic}>
             <Trash color={theme.palette.error.main} />
-            Delete Topic
+            {t('topicElement.delete_topic')}
           </MenuItem>
         )}
       </StyledMenu>

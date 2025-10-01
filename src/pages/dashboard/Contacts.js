@@ -13,8 +13,10 @@ import { useNavigate } from 'react-router-dom';
 import FriendList from '../../sections/dashboard/FriendList';
 import { SetSearchQuery } from '../../redux/slices/app';
 import { DEFAULT_PATH } from '../../config';
+import { useTranslation } from 'react-i18next';
 
 const Contacts = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -75,7 +77,7 @@ const Contacts = () => {
                 fontWeight: 600,
               }}
             >
-              No result {searchQuery ? `for "${searchQuery}"` : ''}
+              {t('noResult')} {searchQuery ? `"${searchQuery}"` : ''}
             </Typography>
           </Stack>
         );
@@ -137,7 +139,7 @@ const Contacts = () => {
               fontWeight: 600,
             }}
           >
-            No result {searchQuery ? `for "${searchQuery}"` : ''}
+            {t('contact.noResult')} {searchQuery ? `"${searchQuery}"` : ''}
           </Typography>
         </Stack>
       );
@@ -183,10 +185,10 @@ const Contacts = () => {
               }}
             >
               {currentHash === ContactType.Friends
-                ? 'Friends list'
+                ? t('contact.friends_list')
                 : currentHash === ContactType.Channels
-                  ? 'Channels list'
-                  : 'Friend/Channel Request'}
+                  ? t('contact.channel_list')
+                  : t('contact.channel_request')}
             </Typography>
           </Stack>
         )}

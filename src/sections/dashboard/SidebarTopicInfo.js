@@ -17,8 +17,10 @@ import { ChatPurpleIcon, EditIcon, EditOctagonIcon } from '../../components/Icon
 import ChannelInfoTab from './ChannelInfoTab';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
+import { useTranslation } from 'react-i18next';
 
 const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
@@ -33,7 +35,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
   };
 
   const NewGroupSchema = Yup.object().shape({
-    name: Yup.string().trim().required('Channel name is required').max(255, 'Max 255 characters'),
+    name: Yup.string().trim().required(t('sidebarTopicInfo.channel_name_required')).max(255, 'sidebarTopicInfo.max_characters'),
   });
 
   const defaultValues = {
@@ -73,7 +75,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
 
       setSaveLoading(true);
       await currentChannel.editTopic(topicCID, params);
-      dispatch(showSnackbar({ severity: 'success', message: 'Channel updated successfully' }));
+      dispatch(showSnackbar({ severity: 'success', message: t('sidebarTopicInfo.snackbar_update_success') }));
     } catch (error) {
       handleError(dispatch, error);
     } finally {
@@ -193,13 +195,13 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
                   marginBottom: '5px',
                 }}
               >
-                TOPIC NAME
+                {t('sidebarTopicInfo.topic_name')}
               </Typography>
 
               <Stack spacing={2}>
                 <RHFTextField
                   name="name"
-                  placeholder="What do you want to discuss?"
+                  placeholder={t('sidebarTopicInfo.placeholder')}
                   autoFocus
                   InputProps={{
                     startAdornment: (
@@ -234,7 +236,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
                   marginBottom: '5px',
                 }}
               >
-                TOPIC ICON
+                {t('sidebarTopicInfo.topic_icon')}
               </Typography>
 
               <Stack spacing={2} className="emoji-picker-wrapper">
@@ -272,7 +274,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
                   marginBottom: '5px',
                 }}
               >
-                DESCRIPTION
+                {t('sidebarTopicInfo.Description')}
               </Typography>
 
               <Stack spacing={2}>
@@ -280,7 +282,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
                   multiline
                   rows={4}
                   name="description"
-                  placeholder="Description"
+                  placeholder={t('sidebarTopicInfo.description_placeholder')}
                   inputProps={{
                     maxLength: 100,
                   }}
@@ -301,7 +303,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
                       marginRight: '0px',
                     },
                   }}
-                  helperText={`${wordCount}/100 words`}
+                  helperText={`${wordCount}/100 ${t('sidebarTopicInfo.words')}`}
                 />
               </Stack>
             </Box>
@@ -323,6 +325,7 @@ const styleDescription = {
 };
 
 const SidebarTopicInfo = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const formSubmitRef = useRef(null);
@@ -368,7 +371,7 @@ const SidebarTopicInfo = () => {
                 disabled={saveDisabled}
                 loading={saveLoading}
               >
-                SAVE
+                {t('sidebarTopicInfo.save')}
               </LoadingButton>
             ) : (
               <IconButton onClick={onEditing}>

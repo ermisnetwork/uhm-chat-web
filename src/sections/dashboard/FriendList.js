@@ -7,6 +7,7 @@ import ContactElement from '../../components/ContactElement';
 import { client } from '../../client';
 import { UpdateIsLoading } from '../../redux/slices/app';
 import UserElement from '../../components/UserElement';
+import { useTranslation } from 'react-i18next';
 
 const FriendList = ({
   searchQuery = '',
@@ -22,6 +23,7 @@ const FriendList = ({
   enableUserSearch = false,
   excludedUserIds = [],
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { activeChannels } = useSelector(state => state.channel);
@@ -172,7 +174,7 @@ const FriendList = ({
               fontWeight: 600,
             }}
           >
-            No result {searchQuery ? `for "${searchQuery}"` : ''}
+            {t('friendList.noResult')} {searchQuery ? `"${searchQuery}"` : ''}
           </Typography>
         </Stack>
       );

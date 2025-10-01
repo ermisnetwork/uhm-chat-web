@@ -7,10 +7,12 @@ import { AvatarShape } from '../constants/commons-const';
 import { handleError, isChannelDirect } from '../utils/commons';
 import useResponsive from '../hooks/useResponsive';
 import { showSnackbar } from '../redux/slices/app';
+import { useTranslation } from 'react-i18next';
 
 const InviteElement = ({ channel }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobileToLg = useResponsive('down', 'lg');
   const isDirect = isChannelDirect(channel);
 
@@ -20,7 +22,7 @@ const InviteElement = ({ channel }) => {
       dispatch(
         showSnackbar({
           severity: 'success',
-          message: 'You have skipped the invitation successfully!',
+          message: t('inviteElement.snackbar_onSkip_success'),
         }),
       );
     } catch (error) {
@@ -34,7 +36,7 @@ const InviteElement = ({ channel }) => {
       dispatch(
         showSnackbar({
           severity: 'success',
-          message: 'You have declined the invitation successfully!',
+          message: t('inviteElement.snackbar_onDecline_success'),
         }),
       );
     } catch (error) {
@@ -48,7 +50,7 @@ const InviteElement = ({ channel }) => {
       dispatch(
         showSnackbar({
           severity: 'success',
-          message: 'You have accepted the invitation successfully!',
+          message: t('inviteElement.snackbar_onAccept_success'),
         }),
       );
     } catch (error) {
@@ -87,7 +89,7 @@ const InviteElement = ({ channel }) => {
                 fontWeight: 400,
               }}
             >
-              {!isDirect ? 'Admin invites you' : 'Sent you a friend request'}
+              {!isDirect ? t('inviteElement.admin_invite') : t('inviteElement.message')}
             </Typography>
           </Box>
 
@@ -102,11 +104,11 @@ const InviteElement = ({ channel }) => {
               }}
               onClick={isDirect ? onSkip : onDecline}
             >
-              {isDirect ? 'SKIP' : 'DECLINE'}
+              {isDirect ? t('inviteElement.skip') : t('inviteElement.decline')}
             </Button>
 
             <Button variant="contained" sx={{ width: '130px', boxShadow: 'none' }} onClick={onAccept}>
-              {isDirect ? 'ACCEPT' : 'JOIN'}
+              {isDirect ? t('inviteElement.accept') : t('inviteElement.join')}
             </Button>
           </Stack>
         </Stack>

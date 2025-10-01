@@ -44,7 +44,7 @@ const Nav_Buttons = [
   {
     index: 0,
     icon: <SmileChatIcon size={30} />,
-    title: 'Convertions',
+    title: 'navbuttons.convertions',
   },
   // {
   //   index: 1,
@@ -54,7 +54,7 @@ const Nav_Buttons = [
   {
     index: 2,
     icon: <UserSquareIcon size={30} />,
-    title: 'Contacts',
+    title: 'navbuttons.contacts',
   },
   // {
   //   index: 3,

@@ -10,6 +10,7 @@ import FlipMove from 'react-flip-move';
 import NoResult from '../../assets/Illustration/NoResult';
 import { MagnifyingGlass } from 'phosphor-react';
 import { SetOpenHomeSearch } from '../../redux/slices/app';
+import { useTranslation } from 'react-i18next';
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({
   minHeight: 'auto',
@@ -57,6 +58,7 @@ const StyledTabs = styled(Tabs)(({ theme }) => ({
 }));
 
 const Channels = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { activeChannels, loadingChannels, pinnedChannels, unreadChannels, currentChannel } = useSelector(
@@ -65,23 +67,23 @@ const Channels = () => {
   const { openHomeSearch } = useSelector(state => state.app);
   const { openTopicPanel } = useSelector(state => state.topic);
   const [listTab, setListTab] = useState([
-    { label: 'All', value: TabValueChannel.All, count: 0 },
-    { label: 'Group', value: TabValueChannel.Group, count: 0 },
-    { label: 'Unread', value: TabValueChannel.Unread, count: 0 },
+    { label: t('channelList.all'), value: TabValueChannel.All, count: 0 },
+    { label: t('channelList.group'), value: TabValueChannel.Group, count: 0 },
+    { label: t('channelList.unread'), value: TabValueChannel.Unread, count: 0 },
   ]);
   const [tabSeledected, setTabSelected] = useState(TabValueChannel.All);
   const isEnabledTopics = currentChannel?.data?.topics_enabled && openTopicPanel;
 
   useEffect(() => {
     setListTab([
-      { label: 'All', value: TabValueChannel.All, count: 0 },
+      { label: t('channelList.all'), value: TabValueChannel.All, count: 0 },
       {
-        label: 'Group',
+        label: t('channelList.group'),
         value: TabValueChannel.Group,
         count: unreadChannels?.filter(c => c.type === ChatType.TEAM)?.length || 0,
       },
       {
-        label: 'Unread',
+        label: t('channelList.unread'),
         value: TabValueChannel.Unread,
         count: unreadChannels?.length || 0,
       },
@@ -157,7 +159,7 @@ const Channels = () => {
                   marginTop: '15px',
                 }}
               >
-                No channels
+                {t('channelList.no_channel')}
               </Typography>
             </Stack>
           )}
