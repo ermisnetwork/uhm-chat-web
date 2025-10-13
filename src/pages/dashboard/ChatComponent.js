@@ -125,7 +125,13 @@ const MessageList = ({
   const isLgToXl = useResponsive('between', null, 'lg', 'xl');
   const isMobileToLg = useResponsive('down', 'lg');
   const { user_id } = useSelector(state => state.auth);
-  const { activeChannels, pinnedChannels, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
+  const {
+    activeChannels = [],
+    pinnedChannels = [],
+    isGuest,
+    isBlocked,
+    isBanned,
+  } = useSelector(state => state.channel);
 
   const lastReadIndex = messages.findIndex(msg => msg.id === lastReadMessageId);
 
