@@ -212,7 +212,7 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
                   multiline
                   rows={4}
                   name="description"
-                  placeholder="Description"
+                  placeholder={t('create_channel.description')}
                   inputProps={{
                     maxLength: 100,
                   }}

@@ -39,7 +39,7 @@ const InviteFriendDialog = () => {
       await currentChannel.addMembers(selectedUsers.map(user => user.id));
       dispatch(showSnackbar({ severity: 'success', message: t('inviteFriendDialog.snackbar_success') }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setLoadingButton(false);
       onCloseDialog();

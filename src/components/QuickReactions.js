@@ -29,7 +29,7 @@ export default function QuickReactions({ message }) {
       }
     } catch (error) {
       setAnchorEl(null);
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 

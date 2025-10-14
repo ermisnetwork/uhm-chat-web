@@ -72,7 +72,7 @@ const SidebarSearchMessage = () => {
         setHasMore(false);
       }
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setLoading(false);
     }

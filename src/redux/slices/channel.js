@@ -374,7 +374,7 @@ export function FetchChannels(params) {
           }),
         );
         dispatch(slice.actions.setLoadingChannels(false));
-        handleError(dispatch, err);
+        handleError(dispatch, err, t);
       });
   };
 }
@@ -466,7 +466,7 @@ export const WatchCurrentChannel = (channelId, channelType) => {
         dispatch(slice.actions.updateActiveChannels(channel));
       }
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 };
@@ -666,7 +666,7 @@ export function FetchAllUnreadData() {
         dispatch(slice.actions.fetchAllUnreadData(response));
       })
       .catch(err => {
-        handleError(dispatch, err);
+        handleError(dispatch, err, t);
       });
   };
 }

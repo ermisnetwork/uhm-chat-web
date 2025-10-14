@@ -36,7 +36,7 @@ const DeleteMessageDialog = () => {
       if (error.code === 'ERR_NETWORK') {
         dispatch(setMessageIdError(messageId));
       } else {
-        handleError(dispatch, error);
+        handleError(dispatch, error, t);
       }
       onCloseDialog();
       setLoadingButton(false);

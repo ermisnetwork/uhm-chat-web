@@ -48,7 +48,7 @@ const SidebarChannelTopic = () => {
         }),
       );
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setSaveLoading(false);
     }

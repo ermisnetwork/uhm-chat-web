@@ -68,7 +68,7 @@ const ActionsTopic = () => {
       setAnchorEl(null);
       dispatch(showSnackbar({ message: t('chatHeader.snackbar_closed_success'), severity: 'success' }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 
@@ -79,7 +79,7 @@ const ActionsTopic = () => {
       setAnchorEl(null);
       dispatch(showSnackbar({ message: t('chatHeader.snackbar_reopen_success'), severity: 'success' }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 
@@ -91,7 +91,7 @@ const ActionsTopic = () => {
         await client.pinChannel(ChatType.TOPIC, currentTopic?.id);
       }
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setAnchorEl(null);
     }
@@ -264,7 +264,7 @@ const ChatHeader = () => {
       }
     } catch (error) {
       setLoadingJoin(false);
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 
@@ -284,7 +284,7 @@ const ChatHeader = () => {
     if (isEnabledTopics || currentTopic) {
       return currentChannel.data?.name;
     } else {
-      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} ${t('chatHeader.members')}` ;
+      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} ${t('chatHeader.member')}` ;
     }
   };
 

@@ -851,7 +851,7 @@ const ChatComponent = () => {
       setLoadingMore(false);
     } catch (error) {
       setLoadingMore(false);
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 

@@ -97,7 +97,7 @@ const SidebarAdministrators = () => {
       setIsAdd(false);
       setSelectedMembers([]);
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setLoadingButton(false);
     }

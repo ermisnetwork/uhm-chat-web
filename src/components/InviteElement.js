@@ -26,7 +26,7 @@ const InviteElement = ({ channel }) => {
         }),
       );
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error,t);
     }
   };
 
@@ -40,7 +40,7 @@ const InviteElement = ({ channel }) => {
         }),
       );
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 
@@ -54,7 +54,7 @@ const InviteElement = ({ channel }) => {
         }),
       );
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 

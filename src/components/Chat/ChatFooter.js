@@ -407,7 +407,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       }
     } catch (error) {
       if (error.response.status === 400) {
-        handleError(dispatch, error);
+        handleError(dispatch, error, t);
       } else {
         const data = JSON.parse(error.config.data);
         const created_at = new Date();

@@ -86,7 +86,7 @@ export function convertMessageSignal(input) {
       color = '#FF4842';
       break;
     case 10: // VideoCallBusy
-      text = isMe ? 'messageSignal.recipient_was_busy' : 'You missed video call';
+      text = isMe ? 'messageSignal.recipient_was_busy' : 'messageSignal.missed_video_call';
       callType = CallType.VIDEO;
       color = '#FF4842';
       break;

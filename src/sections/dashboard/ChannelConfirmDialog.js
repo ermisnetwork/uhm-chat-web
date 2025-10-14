@@ -293,7 +293,7 @@ const ChannelConfirmDialog = () => {
           }),
         );
       } else {
-        handleError(dispatch, error);
+        handleError(dispatch, error, t);
       }
     }
   };

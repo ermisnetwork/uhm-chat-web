@@ -74,7 +74,7 @@ const SidebarKeywords = () => {
       }
     } catch (error) {
       setLoadingButton(false);
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 

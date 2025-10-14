@@ -124,7 +124,7 @@ export const UpdateUserProfile = ( formValues, t ) => {
       dispatch(CloseDialogProfile());
     } catch (error) {
       dispatch(UpdateIsLoading({ isLoading: false }));
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 };
@@ -140,7 +140,7 @@ export function FetchFriends() {
         dispatch(slice.actions.fetchFriends(userIds));
       })
       .catch(err => {
-        // handleError(dispatch, err);
+        // handleError(dispatch, err, t);
       });
   };
 }

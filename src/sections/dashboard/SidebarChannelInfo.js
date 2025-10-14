@@ -169,7 +169,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
       await currentChannel.update(params);
       dispatch(showSnackbar({ severity: 'success', message: t('sidebarChannelInfo.snackbar_update_success') }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setSaveLoading(false);
       setIsEditing(false);

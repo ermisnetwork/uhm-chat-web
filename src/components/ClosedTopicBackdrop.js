@@ -20,7 +20,7 @@ export default function ClosedTopicBackdrop() {
       await currentChannel.reopenTopic(topicCID);
       dispatch(showSnackbar({ message: t('closedTopicBackdrop.snackbar_success'), severity: 'success' }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 

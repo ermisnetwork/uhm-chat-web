@@ -232,7 +232,7 @@ const TopicElement = ({ topic, idSelected }) => {
         await client.pinChannel(ChatType.TOPIC, selectedTopic?.id);
       }
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setAnchorEl(null);
     }

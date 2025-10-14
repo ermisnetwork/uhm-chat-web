@@ -38,7 +38,7 @@ const StyledActionItem = styled(Stack)(({ theme }) => ({
 const marks = [
   {
     value: 0,
-    label: 'sidebarPermissions.off',
+    label: 'Off',
     miliseconds: 0,
   },
   {
@@ -195,7 +195,7 @@ const SidebarPermissions = () => {
       }
     } catch (error) {
       setLoadingButton(false);
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 

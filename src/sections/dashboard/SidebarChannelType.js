@@ -50,7 +50,7 @@ const SidebarChannelType = () => {
       dispatch(showSnackbar({ severity: 'success', message: t('sidebarChannelType.snackbar_update_success') }));
       dispatch(UpdateSidebarType(SidebarType.Channel));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setSaveLoading(false);
     }

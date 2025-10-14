@@ -77,7 +77,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
       await currentChannel.editTopic(topicCID, params);
       dispatch(showSnackbar({ severity: 'success', message: t('sidebarTopicInfo.snackbar_update_success') }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setSaveLoading(false);
       dispatch(setSidebar({ type: SidebarType.TopicInfo, open: true, mode: '' }));

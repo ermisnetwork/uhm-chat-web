@@ -225,7 +225,7 @@
     "You": "Bạn"
   },
   "conversation": {
-    "copy_text": "Sao chép văn bản!",
+    "copy_text": "Sao chép văn bản thành công!",
     "copy_failed": "Sao chép không thành công!",
     "snackbar_delete": "Bạn không có quyền xóa tin nhắn trong kênh này",
     "snackbar_edit": "Bạn không có quyền chỉnh sửa tin nhắn trong kênh này",
@@ -572,7 +572,9 @@
     "rejected_audio_call": "Bạn đã từ chối cuộc gọi thoại",
     "recipient_rejected_video_call": "Người nhận đã từ chối cuộc gọi video",
     "rejected_video_call": "Bạn đã từ chối cuộc gọi video",
-    "recipient_was_busy": "Người nhận đang bận"
+    "recipient_was_busy": "Người nhận đang bận",
+    "min": "phút",
+    "sec": "giây"
   },
   "forwardMessageDialog": {
     "title": "Chuyển tiếp tin nhắn",
@@ -707,6 +709,28 @@
     "email_valid":"Địa chỉ email này đã tồn tại",
     "password_required":"Vui lòng nhập mật khẩu"
   },
+  "login_wallet": {
+    "address": "Địa chỉ",
+    "wallet": "Ví",
+    "network": "Mạng",
+    "disconnect": "Mất kết nối",
+    "sign": "Kí xác thực",
+    "login_wallet": "Đăng nhập qua ví"
+  },
+  "login_token": {
+    "login": "Đăng nhập",
+    "user_id": "ID người dùng",
+    "token": "mã xác minh",
+    "user_required": "Vui lòng nhập tên người dùng",
+    "token_required": "Vui lòng nhập mã xác minh"
+  },
+  "login_ermis": {
+    "login": "Đăng nhập đến Ermis"
+  },
+  "auth": {
+    "password_forgot_success": "Yêu cầu đặt lại mật khẩu của bạn đã được gửi thành công. Vui lòng kiểm tra email của bạn để tiếp tục!",
+    "password_reset_success": "Mật khẩu của bạn đã được đặt lại thành công. Vui lòng sử dụng mật khẩu mới để đăng nhập!"
+  },
   "recordingAudioBox": {
     "upload_audio_failed": "Tải đoạn ghi âm không thành công",
     "snackbar_cannot_microphone": "Không thể truy cập microphone",
@@ -732,5 +756,39 @@
   "pollResultDialog": {
     "title": "Kết quả bỏ phiếu",
     "no_voted": "Không ai bỏ phiếu"
+  },
+  "delete_account": {
+    "title": "Xác nhận xóa tài khoản",
+    "message": "Việc xóa tài khoản của bạn sẽ dẫn đến:",
+    "list_message_fisrt-strong": "Mất toàn bộ dữ liệu",
+    "list_message_fisrt": ":Tất cả thông tin cá nhân, lịch sử trò chuyện và danh bạ trên nền tảng Ermis sẽ bị xóa vĩnh viễn và không thể khôi phục.",
+    "list_message_two-strong": "Không ảnh hưởng đến các cuộc trò chuyện được tích hợp qua SDK.",
+    "list_message_two": ": Mọi cuộc trò chuyện được tích hợp thông qua SDK sẽ không bị ảnh hưởng.",
+    "message_question": "Bạn có chắc muốn xóa tài khoản?",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "connect_wallet": "Kết nối ví"
+  },
+  "wallet": {
+    "delete_account": "Tài khoản của bạn đã được xóa thành công"
+  },
+  "channelInvitation": {
+    "message": "Chấp nhận lời mời để xem tất cả tin nhắn của mục này",
+    "channel": "kênh",
+    "conversation": "cuộc trò chuyện",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối",
+    "skip": "Bỏ qua"
+  },
+  "messageHistoryDialog": {
+    "title": "Lịch sử tin nhắn"
+  },
+  "sidebarUserInfo": {
+    "invitation": "Đã gửi lời mời",
+    "invite_failed": "Gửi lời mời thất bại. Vui lòng thử lại",
+    "chat": "Trò chuyện",
+    "add_contact": "Thêm liên hệ",
+    "unblock": "Bỏ chặn người dùng",
+    "block": "Chặn người dùng"
   }
 }

@@ -572,7 +572,9 @@
     "rejected_audio_call": "You rejected audio call",
     "recipient_rejected_video_call": "Recipient rejected video call",
     "rejected_video_call": "You rejected video call",
-    "recipient_was_busy": "Recipient was busy"
+    "recipient_was_busy": "Recipient was busy",
+    "min": "min",
+    "sec": "sec"
   },
   "forwardMessageDialog": {
     "title": "Forward Message",
@@ -707,6 +709,28 @@
     "email_valid":"Email must be a valid email address",
     "password_required":"Password is required"
   },
+  "login_wallet": {
+    "address": "Address",
+    "wallet": "Wallet",
+    "network": "Network",
+    "disconnect": "Disconnect",
+    "sign": "Sign",
+    "login_wallet": "Login via Wallet"
+  },
+  "login_token": {
+    "login": "Login",
+    "user_id": "User ID",
+    "token": "Token",
+    "user_required": "User is required",
+    "token_required": "Token is required"
+  },
+  "login_ermis": {
+    "login": "Login to Ermis"
+  },
+  "auth": {
+    "password_forgot_success": "Your password reset request has been successfully sent. Please check your email to proceed!",
+    "password_reset_success": "Your password has been successfully reset. Please use the new password to log in!"
+  },
   "recordingAudioBox": {
     "upload_audio_failed": "Upload audio failed",
     "snackbar_cannot_microphone": "Cannot access microphone",
@@ -732,5 +756,43 @@
   "pollResultDialog": {
     "title": "Poll Result",
     "no_voted": "No one voted"
+  },
+  "delete_account": {
+    "title": "Account Deletion Confirmation",
+    "message": "Deleting your account will result in:",
+    "list_message_fisrt-strong": "Loss of all data",
+    "list_message_fisrt": ": All personal information, chat history, and contacts on the Ermis platform will be permanently deleted and cannot be recovered.",
+    "list_message_two-strong": "No impact on SDK-integrated conversations",
+    "list_message_two": ": Any conversations integrated through the SDK will remain unaffected.",
+    "message_question": "Are you sure you want to continue?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "connect_wallet": "Connect wallet"
+  },
+  "commons": {
+    "snackbar_wrong_error": "Something went wrong",
+    "snackbar_server_error": "Internal server error"
+  },
+  "wallet": {
+    "delete_account": "Your account has been successfully deleted"
+  },
+  "channelInvitation": {
+    "message": "Accept the invite to see all messages of this",
+    "channel": "channel",
+    "conversation": "conversation",
+    "accept": "Accept",
+    "decline": "Decline",
+    "skip": "Skip"
+  },
+  "messageHistoryDialog": {
+    "title": "Message history"
+  },
+  "sidebarUserInfo": {
+    "invitation": "Invitation sent",
+    "invite_failed": "Failed to send invite. Please retry",
+    "chat": "chat",
+    "add_contact": "Add to Contacts",
+    "unblock": "Unblock User",
+    "block": "Block User"
   }
 }
