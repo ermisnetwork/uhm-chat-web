@@ -536,10 +536,10 @@
   },
   "snackbar_profile_success": "Cập nhật hồ sơ thành công",
   "channelInfoTab": {
-    "media": "Media",
-    "files": "Files",
-    "links": "Links",
-    "members": "Members"
+    "media": "Ảnh,Video",
+    "files": "Thư mục",
+    "links": "Liên kết",
+    "members": "Thành viên"
   },
   "readBy": {
     "invalid": "Ngày không hợp lệ",
@@ -793,5 +793,8 @@
   },
   "noMessageBox": {
     "no_message": "Hãy bắt đầu cuộc trò chuyện này bằng những câu chuyện thật hay nhé!"
-  }
+  },
+  "online": "Trực tuyến",
+  "offline": "Ngoại tuyến"
+
 }

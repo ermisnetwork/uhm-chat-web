@@ -797,5 +797,7 @@
   },
   "noMessageBox": {
     "no_message": "Let start this conversations with great stories!"
-  }
+  },
+  "online": "Online",
+  "offline": "Offline"
 }

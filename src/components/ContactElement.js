@@ -107,7 +107,7 @@ const ContactElement = ({
               fontWeight: 400,
             }}
           >
-            {!isDirect ? `${channel.data?.member_count} ${t('contactElement.member')}` : <>{onlineStatus}</>}
+            {!isDirect ? `${channel.data?.member_count} ${t('contactElement.member')}` : <>{t(onlineStatus)}</>}
           </Typography>
         </Stack>
       </Stack>
