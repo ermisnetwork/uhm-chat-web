@@ -161,7 +161,7 @@ const TopicElement = ({ topic, idSelected }) => {
       }
     } else {
       setLastMessageAt(getDisplayDate(topic.data.created_at));
-      setLastMessage(t('topicPanel.no_message'));
+      setLastMessage(t('topicElement.no_message'));
     }
   };
 

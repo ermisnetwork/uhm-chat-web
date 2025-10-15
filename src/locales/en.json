@@ -794,5 +794,8 @@
     "add_contact": "Add to Contacts",
     "unblock": "Unblock User",
     "block": "Block User"
+  },
+  "noMessageBox": {
+    "no_message": "Let start this conversations with great stories!"
   }
 }

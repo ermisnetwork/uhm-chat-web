@@ -37,7 +37,7 @@ const Header = () => {
     >
       <Typography
         variant="h5"
-        sx={{ fontSize: isMobileToMd ? '18px!important' : '32px!important', textTransform: 'uppercase' }}
+        sx={{ fontSize: isMobileToMd ? '15px!important' : '32px!important', textTransform: 'uppercase' }}
       >
         {renderTitle()}
       </Typography>

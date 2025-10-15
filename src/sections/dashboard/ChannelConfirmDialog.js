@@ -181,7 +181,7 @@ const ChannelConfirmDialog = () => {
   const titleDialog = () => {
     switch (type) {
       case ConfirmType.LEAVE:
-        return t('channelConfirmDialog.leave_channel');
+        return t('channelConfirmDialog.dialog_title_leave_channel');
       case ConfirmType.REMOVE_MEMBER:
         return t('channelConfirmDialog.dialog_title_remove_member_action');
       case ConfirmType.DELETE_CHANNEL:

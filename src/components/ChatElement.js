@@ -646,7 +646,7 @@ const ChatElement = ({ channel }) => {
         {/* --------------------Pin/Unpin channel---------------- */}
         <MenuItem onClick={onPinChannel}>
           {isPinned ? <PushPinSlash /> : <PushPin />}
-          {isPinned ? t('chatElement.unpined') : t('chatElement.pinned')}
+          {isPinned ? t('chatElement.unpinned') : t('chatElement.pinned')}
         </MenuItem>
 
         {/* --------------------Mark as read---------------- */}

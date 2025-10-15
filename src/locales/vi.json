@@ -40,7 +40,7 @@
   "chatElement": {
     "general": "Chung",
     "blocked": "Bạn đã chặn người dùng này.",
-    "unpinned": "Bỏ ghim khỏi đầu",
+    "unpinned": "Bỏ ghim đầu",
     "pinned": "Ghim lên đầu",
     "delete_channel": "Xóa kênh",
     "leave_channel": "Rời khỏi kênh",
@@ -201,18 +201,18 @@
     "member_demoted": "đã gỡ khỏi làm quản trị viên",
     "member_demoted_channel": "đã gỡ khỏi làm quản trị viên của kênh này",
     "channel_update_member_capabilities": "đã cập nhật quyền hạn thành viên của kênh",
-    "conversation": "Cuộc trò chuyện",
-    "channel": "Kênh",
+    "conversation": "cuộc trò chuyện",
+    "channel": "kênh",
     "member_joined": "đã tham gia",
-    "joined_channel": "đã tham gia kênh này",
+    "joined_channel": "đã tham gia",
     "invite_rejected": "đã từ chối lời mời",
     "invite_rejected_channel": "đã từ chối lời mời vào kênh này",
     "member_leaved": "đã rời đi",
     "member_leaved_channel": "đã rời khỏi kênh này",
     "channel_truncate_messages": "đã xóa tất cả tin nhắn",
     "channel_truncate_messages_all": "đã xóa tất cả tin nhắn trong kênh này",
-    "channel_update_public": "đã chuyển kênh thành công khai",
-    "channel_update_public_this": "đã chuyển kênh này thành công khai",
+    "channel_update_public": "đã chuyển kênh thành ",
+    "channel_update_public_this": "đã chuyển kênh này thành",
     "channel_update_cooldown_disabled": "Đã tắt thời gian chờ",
     "channel_update_cooldown_enabled": "Tính năng thời gian chờ đã được bật. Thời gian chờ được đặt là",
     "channel_update_filter_words": "đã cập nhật từ ngữ bị cấm",
@@ -790,5 +790,8 @@
     "add_contact": "Thêm liên hệ",
     "unblock": "Bỏ chặn người dùng",
     "block": "Chặn người dùng"
+  },
+  "noMessageBox": {
+    "no_message": "Hãy bắt đầu cuộc trò chuyện này bằng những câu chuyện thật hay nhé!"
   }
 }
