@@ -25,6 +25,7 @@ import { SpearkerOffIcon } from './Icons';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
 import TopicAvatar from './TopicAvatar';
 import { SetOpenTopicPanel } from '../redux/slices/topic';
+import { useTranslation } from 'react-i18next';
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
   // width: '100%',
@@ -69,6 +70,7 @@ const StyledMenu = styled(Menu)(({ theme }) => ({
 }));
 
 const ListTopic = ({ topics }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const maxTopics = 2; // Số topic tối đa hiển thị
 
@@ -86,7 +88,7 @@ const ListTopic = ({ topics }) => {
             fontWeight: 400,
           }}
         >
-          General&nbsp;
+          {t('chatElement.general')}&nbsp;
         </Typography>
         <AvatarGeneralDefault size={16} />
       </Stack>
@@ -135,6 +137,7 @@ const ListTopic = ({ topics }) => {
 };
 
 const ChatElement = ({ channel }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -179,16 +182,16 @@ const ChatElement = ({ channel }) => {
       const sender = message.user;
       const senderId = sender?.id;
       const isMe = user_id === senderId;
-      const senderName = isMe ? 'You' : sender?.name || senderId;
+      const senderName = isMe ? t('chatElement.you') : sender?.name || senderId;
       setLastMessageAt(getDisplayDate(date));
       if (message.type === MessageType.System) {
-        const messageSystem = convertMessageSystem(message.text, users, isDirect);
+        const messageSystem = convertMessageSystem(message.text, users, isDirect, t);
         setLastMessage(`${senderName}: ${messageSystem}`);
       } else if (message.type === MessageType.Signal) {
         const messageSignal = convertMessageSignal(message.text);
         setLastMessage(messageSignal.text || '');
       } else if (message.type === MessageType.Sticker) {
-        setLastMessage(`${senderName}: Sticker`);
+        setLastMessage(`${senderName}: ${t('chatElement.sticker')}`);
       } else {
         if (message.attachments) {
           const attachmentLast = message.attachments[message.attachments.length - 1];
@@ -213,7 +216,7 @@ const ChatElement = ({ channel }) => {
                     margin: '0px 4px',
                   }}
                 />
-                {attachmentLast.title || 'Photo'}
+                {attachmentLast.title || t('chatElement.photo')}
               </>,
             );
           } else if (isVideo) {
@@ -252,7 +255,7 @@ const ChatElement = ({ channel }) => {
       }
     } else {
       setLastMessageAt(getDisplayDate(channel.data.created_at));
-      setLastMessage('No messages here yet');
+      setLastMessage(t('chatElement.no_message'));
     }
   };
 
@@ -616,7 +619,7 @@ const ChatElement = ({ channel }) => {
                   fontWeight: hasUnread ? 600 : 400,
                 }}
               >
-                {isBlocked ? 'You have block this user' : lastMessage}
+                {isBlocked ? t('chatElement.blocked') : t(lastMessage)}
               </Typography>
 
               {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
@@ -643,7 +646,7 @@ const ChatElement = ({ channel }) => {
         {/* --------------------Pin/Unpin channel---------------- */}
         <MenuItem onClick={onPinChannel}>
           {isPinned ? <PushPinSlash /> : <PushPin />}
-          {isPinned ? 'Unpin from top' : 'Pin to top'}
+          {isPinned ? t('chatElement.unpinned') : t('chatElement.pinned')}
         </MenuItem>
 
         {/* --------------------Mark as read---------------- */}
@@ -658,7 +661,7 @@ const ChatElement = ({ channel }) => {
         {showItemDeleteChannel && (
           <MenuItem sx={{ color: theme.palette.error.main }} onClick={onDelete}>
             <Trash color={theme.palette.error.main} />
-            Delete channel
+            {t('chatElement.delete_channel')}
           </MenuItem>
         )}
 
@@ -666,7 +669,7 @@ const ChatElement = ({ channel }) => {
         {showItemLeaveChannel && (
           <MenuItem sx={{ color: theme.palette.error.main }} onClick={onLeave}>
             <SignOut color={theme.palette.error.main} />
-            Leave channel
+            {t('chatElement.leave_channel')}
           </MenuItem>
         )}
 
@@ -674,7 +677,7 @@ const ChatElement = ({ channel }) => {
         {showItemDeleteConversation && (
           <MenuItem sx={{ color: theme.palette.error.main }} onClick={onClearChatHistory}>
             <Trash color={theme.palette.error.main} />
-            Clear chat history
+            {t('chatElement.clear_chat_history')}
           </MenuItem>
         )}
       </StyledMenu>

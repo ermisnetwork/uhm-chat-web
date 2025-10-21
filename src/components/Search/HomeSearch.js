@@ -14,6 +14,7 @@ import { removeVietnameseTones, splitChannelId } from '../../utils/commons';
 import { AvatarShape, ChatType } from '../../constants/commons-const';
 import { setSearchChannels } from '../../redux/slices/channel';
 import { SetOpenHomeSearch } from '../../redux/slices/app';
+import { useTranslation } from 'react-i18next';
 
 const StyledSearchItem = styled(Box)(({ theme }) => ({
   transition: 'all .1s',
@@ -27,6 +28,7 @@ const StyledSearchItem = styled(Box)(({ theme }) => ({
 }));
 
 const HomeSearch = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -136,7 +138,7 @@ const HomeSearch = () => {
               )}
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Search channel"
+              placeholder={t('Homesearch.search')}
               inputProps={{ 'aria-label': 'search' }}
               onFocus={onFocusSearch}
               onChange={onChangeSearch}
@@ -172,7 +174,7 @@ const HomeSearch = () => {
                 variant="subtitle2"
                 sx={{ color: theme.palette.text.secondary, marginBottom: '10px', fontWeight: 600 }}
               >
-                Your channels
+                {t('Homesearch.your_channel')}
               </Typography>
               {filteredLocalChannels.length ? (
                 <Stack spacing={1}>
@@ -224,7 +226,7 @@ const HomeSearch = () => {
                     fontWeight: 400,
                   }}
                 >
-                  No result
+                  {t('noResult')}
                 </Typography>
               )}
             </Box>
@@ -237,7 +239,7 @@ const HomeSearch = () => {
                 variant="subtitle2"
                 sx={{ color: theme.palette.text.secondary, marginBottom: '10px', fontWeight: 600 }}
               >
-                Public channels
+                {t('Homesearch.public_channel')}
               </Typography>
               {publicChannels.length ? (
                 <Stack spacing={1}>
@@ -296,7 +298,7 @@ const HomeSearch = () => {
                     fontWeight: 400,
                   }}
                 >
-                  No result
+                  {t('noResult')}
                 </Typography>
               )}
             </Box>

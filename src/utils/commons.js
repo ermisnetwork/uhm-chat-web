@@ -89,12 +89,12 @@ export async function onRefreshToken() {
   } catch (error) {}
 }
 
-export function handleError(dispatch, error) {
+export function handleError(dispatch, error, t) {
   if (error.response) {
     if (error.response.status === 401) {
       onRefreshToken();
     } else if (error.response.status === 500) {
-      dispatch(showSnackbar({ severity: 'error', message: 'Internal server error' }));
+      dispatch(showSnackbar({ severity: 'error', message: t('commons.snackbar_server_error') }));
     } else {
       const message = error.response.data?.message ? error.response.data.message : error.response.data;
       dispatch(showSnackbar({ severity: 'error', message: message }));
@@ -103,7 +103,7 @@ export function handleError(dispatch, error) {
     if (error.message) {
       dispatch(showSnackbar({ severity: 'error', message: error.message }));
     } else {
-      dispatch(showSnackbar({ severity: 'error', message: 'Something went wrong' }));
+      dispatch(showSnackbar({ severity: 'error', message: t('commons.snackbar_server_error') }));
     }
   }
 }

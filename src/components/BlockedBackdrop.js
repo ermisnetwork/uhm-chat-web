@@ -6,8 +6,10 @@ import { ConfirmType } from '../constants/commons-const';
 import { setChannelConfirm } from '../redux/slices/dialog';
 import { SetIsBlocked } from '../redux/slices/channel';
 import { formatString } from '../utils/commons';
+import { useTranslation } from 'react-i18next';
 
 export default function BlockedBackdrop() {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel, isBlocked } = useSelector(state => state.channel);
@@ -68,7 +70,7 @@ export default function BlockedBackdrop() {
         }}
       >
         <Typography>
-          You have blocked <strong>{formatString(currentChannel?.data?.name)}</strong>
+          {t('blockedBackdrop.message')} <strong>{formatString(currentChannel?.data?.name)}</strong>
         </Typography>
         <Button
           variant="contained"
@@ -83,7 +85,7 @@ export default function BlockedBackdrop() {
             dispatch(setChannelConfirm(payload));
           }}
         >
-          Unblock
+          {t('blockedBackdrop.unblock')}
         </Button>
       </Box>
     </Box>

@@ -27,6 +27,7 @@ import ActionsChatPopover from '../ActionsChatPopover';
 import { MicrophoneIcon, PictureImageIcon, SendIcon } from '../Icons';
 import EmojiPickerPopover from '../EmojiPickerPopover';
 import RecordingAudioBox from '../../sections/dashboard/RecordingAudioBox';
+import { useTranslation } from 'react-i18next';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -41,6 +42,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 const ChatFooter = ({ setMessages, isDialog }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const inputRef = useRef(null);
@@ -230,11 +232,11 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   useEffect(() => {
     const showValidationErrors = () => {
       if (hasLinksError) {
-        dispatch(showSnackbar({ severity: 'error', message: 'Members in this channel are not allowed to send links' }));
+        dispatch(showSnackbar({ severity: 'error', message: t('chatFooter.check_sendLinks') }));
       }
 
       if (hasFilterWordsError) {
-        dispatch(showSnackbar({ severity: 'error', message: 'The content you entered contains blocked keywords' }));
+        dispatch(showSnackbar({ severity: 'error', message: t('chatFooter.check_filterWords') }));
       }
     };
 
@@ -381,9 +383,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   const sendMessage = async () => {
     try {
       if (!canSendMessage) {
-        dispatch(
-          showSnackbar({ severity: 'error', message: 'You do not have permission to send message in this channel' }),
-        );
+        dispatch(showSnackbar({ severity: 'error', message: t('chatFooter.send_message') }));
         return;
       }
 
@@ -470,7 +470,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       }
     } catch (error) {
       if (error.response.status === 400) {
-        handleError(dispatch, error);
+        handleError(dispatch, error, t);
       } else {
         const data = JSON.parse(error.config.data);
         const created_at = new Date();
@@ -630,7 +630,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
           )}
           onPaste={onPaste}
           fullWidth
-          placeholder="Write a message..."
+          placeholder={t('chatFooter.placeholder')}
           variant="outlined"
           multiline
           maxRows={10}

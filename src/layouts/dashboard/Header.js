@@ -5,8 +5,10 @@ import NewChatMenu from './NewChatMenu';
 import { useSelector } from 'react-redux';
 import { TabType } from '../../constants/commons-const';
 import useResponsive from '../../hooks/useResponsive';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
+  const { t } = useTranslation();
   const isMobileToMd = useResponsive('down', 'md');
   const theme = useTheme();
   const { tab } = useSelector(state => state.app);
@@ -14,15 +16,15 @@ const Header = () => {
   const renderTitle = () => {
     switch (tab) {
       case TabType.Chat:
-        return 'Conversations';
+        return t('renderTitle.conversations');
       case TabType.Contact:
-        return 'Contacts';
+        return t('renderTitle.contacts');
       case TabType.Call:
-        return 'Calls';
+        return t('renderTitle.calls');
       case TabType.More:
-        return 'More';
+        return t('renderTitle.more');
       default:
-        return 'Conversations';
+        return t('renderTitle.conversations');
     }
   };
 
@@ -35,7 +37,7 @@ const Header = () => {
     >
       <Typography
         variant="h5"
-        sx={{ fontSize: isMobileToMd ? '18px!important' : '32px!important', textTransform: 'uppercase' }}
+        sx={{ fontSize: isMobileToMd ? '15px!important' : '32px!important', textTransform: 'uppercase' }}
       >
         {renderTitle()}
       </Typography>

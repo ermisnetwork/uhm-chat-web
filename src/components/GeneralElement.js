@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '../config';
 import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
 import { SetIsClosedTopic } from '../redux/slices/topic';
+import { useTranslation } from 'react-i18next';
 
 const StyledGeneralItem = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -30,6 +31,7 @@ const StyledGeneralItem = styled(Box)(({ theme }) => ({
 }));
 
 const GeneralElement = ({ idSelected }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -53,16 +55,16 @@ const GeneralElement = ({ idSelected }) => {
       const sender = message.user;
       const senderId = sender?.id;
       const isMe = user_id === senderId;
-      const senderName = isMe ? 'You' : sender?.name || senderId;
+      const senderName = isMe ? t('you') : sender?.name || senderId;
       setLastMessageAt(getDisplayDate(date));
       if (message.type === MessageType.System) {
-        const messageSystem = convertMessageSystem(message.text, users, false);
+        const messageSystem = convertMessageSystem(message.text, users, false, t);
         setLastMessage(`${senderName}: ${messageSystem}`);
       } else if (message.type === MessageType.Signal) {
         const messageSignal = convertMessageSignal(message.text);
         setLastMessage(messageSignal.text || '');
       } else if (message.type === MessageType.Sticker) {
-        setLastMessage(`${senderName}: Sticker`);
+        setLastMessage(`${senderName}: ${t('message.sticker')}`);
       } else {
         if (message.attachments) {
           const attachmentLast = message.attachments[message.attachments.length - 1];
@@ -126,7 +128,7 @@ const GeneralElement = ({ idSelected }) => {
       }
     } else {
       setLastMessageAt(getDisplayDate(currentChannel?.data?.created_at));
-      setLastMessage('No messages here yet');
+      setLastMessage(t('chat_element.no_messages'));
     }
   };
 
@@ -213,7 +215,7 @@ const GeneralElement = ({ idSelected }) => {
               fontSize: '14px',
             }}
           >
-            General
+            {t('chat_element.general')}
           </Typography>
 
           <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>

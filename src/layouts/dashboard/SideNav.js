@@ -13,6 +13,7 @@ import useResponsive from '../../hooks/useResponsive';
 import { setCurrentChannel, setCurrentChannelStatus } from '../../redux/slices/channel';
 import { ContactType, CurrentChannelStatus, TabType } from '../../constants/commons-const';
 import { SetOpenTopicPanel } from '../../redux/slices/topic';
+import { useTranslation } from 'react-i18next';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: 'inherit',
@@ -89,6 +90,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const SideBar = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -136,7 +138,7 @@ const SideBar = () => {
     return Nav_Buttons.map(el => {
       const isSelected = el.index === selectedTab;
       return (
-        <Tooltip title={el.title} key={el.index} placement="right">
+        <Tooltip title={t(el.title)} key={el.index} placement="right">
           <StyledIconButton
             onClick={() => handleChangeTab(el.index)}
             sx={{

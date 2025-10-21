@@ -58,6 +58,8 @@ import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { setPollResult } from '../../redux/slices/dialog';
 import { ForwardIcon, QuoteDownIcon, ThreeDotsIcon } from '../../components/Icons';
 import CustomCheckbox from '../../components/CustomCheckbox';
+import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.background.neutral,
@@ -85,6 +87,7 @@ const StyledTextLine = styled(Typography)(({ theme }) => ({
 }));
 
 const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel, pinnedMessages } = useSelector(state => state.channel);
@@ -106,10 +109,10 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
   const onCoppyText = async () => {
     try {
       await navigator.clipboard.writeText(messageText);
-      dispatch(showSnackbar({ severity: 'success', message: 'Message copied to clipboard!' }));
+      dispatch(showSnackbar({ severity: 'success', message: t('conversation.copy_text') }));
       setAnchorEl(null);
     } catch (err) {
-      dispatch(showSnackbar({ severity: 'error', message: 'Failed to copy!' }));
+      dispatch(showSnackbar({ severity: 'error', message: t('conversation.copy_failed') }));
       setAnchorEl(null);
     }
   };
@@ -117,7 +120,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
   const onDelete = () => {
     if (!canDeleteMessage) {
       dispatch(
-        showSnackbar({ severity: 'error', message: 'You do not have permission to delete message in this channel' }),
+        showSnackbar({ severity: 'error', message: t('conversation.snackbar_delete') }),
       );
       return;
     }
@@ -134,7 +137,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
   const onEdit = () => {
     if (!canEditMessage) {
       dispatch(
-        showSnackbar({ severity: 'error', message: 'You do not have permission to edit message in this channel' }),
+        showSnackbar({ severity: 'error', message: t('conversation.snackbar_edit') }),
       );
       return;
     }
@@ -163,7 +166,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
       setAnchorEl(null);
       if (!canPinMessage) {
         dispatch(
-          showSnackbar({ severity: 'error', message: 'You do not have permission to pin message in this channel' }),
+          showSnackbar({ severity: 'error', message: t('conversation.snackbar_pin') }),
         );
         return;
       }
@@ -179,14 +182,14 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
         const response = await currentChat.pinMessage(messageId);
 
         if (response) {
-          dispatch(showSnackbar({ severity: 'success', message: 'Message pinned' }));
+          dispatch(showSnackbar({ severity: 'success', message: t('conversation.snackbar_pinned') }));
         }
       }
     } catch (error) {
       dispatch(
         showSnackbar({
           severity: 'error',
-          message: 'Unable to pin the message. Please try again',
+          message: t('conversation.snackbar_pin_failed'),
         }),
       );
     }
@@ -194,7 +197,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
 
   return (
     <>
-      <Tooltip title="More">
+      <Tooltip title={t('conversation.more')}>
         <StyledIconButton
           sx={{ order: orderMore }}
           onClick={event => {
@@ -228,7 +231,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
             <ListItemButton>
               <ListItemIcon>{isUnPin ? <PushPinSimpleSlash size={18} /> : <PushPin size={18} />}</ListItemIcon>
               <ListItemText
-                primary={isUnPin ? 'UnPin' : 'Pin'}
+                primary={isUnPin ? t('conversation.unpin') : t('conversation.pin')}
                 primaryTypographyProps={{
                   fontSize: '14px',
                 }}
@@ -244,7 +247,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
                   <Download size={18} />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Download"
+                  primary={t('conversation.download')}
                   primaryTypographyProps={{
                     fontSize: '14px',
                   }}
@@ -261,7 +264,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
                   <PencilSimple size={18} />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Edit"
+                  primary={t('conversation.edit')}
                   primaryTypographyProps={{
                     fontSize: '14px',
                   }}
@@ -278,7 +281,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
                   <Copy size={18} />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Copy"
+                  primary={t('conversation.copy')}
                   primaryTypographyProps={{
                     fontSize: '14px',
                   }}
@@ -295,7 +298,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
                   <Trash size={18} color={theme.palette.error.main} />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Delete"
+                  primary={t('conversation.delete')}
                   primaryTypographyProps={{
                     fontSize: '14px',
                     color: theme.palette.error.main,
@@ -311,6 +314,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
 };
 
 const MessageOption = ({ isMyMessage, message }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { isGuest } = useSelector(state => state.channel);
 
@@ -351,13 +355,13 @@ const MessageOption = ({ isMyMessage, message }) => {
           padding: '8px',
         }}
       >
-        <Tooltip title="Reply">
+        <Tooltip title={t('conversation.reply')}>
           <StyledIconButton sx={{ order: orderReply }} onClick={onReply}>
             <QuoteDownIcon size={14} />
           </StyledIconButton>
         </Tooltip>
         {isForward && (
-          <Tooltip title="Forward">
+          <Tooltip title={t('conversation.forward')}>
             <StyledIconButton sx={{ order: orderForward }} onClick={onForward}>
               <ForwardIcon size={14} />
             </StyledIconButton>
@@ -371,6 +375,7 @@ const MessageOption = ({ isMyMessage, message }) => {
 };
 
 const ForwardTo = ({ message, forwardChannelName }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   if (!message.forward_cid) return null;
   const isSticker = message.type === MessageType.Sticker;
@@ -386,12 +391,13 @@ const ForwardTo = ({ message, forwardChannelName }) => {
       }}
     >
       <ArrowBendUpRight size={14} weight="fill" color={color} />
-      &nbsp;Forwarded from <strong>{forwardChannelName ? forwardChannelName : 'unknown channel'}</strong>
+      &nbsp;{t('conversation.forward_from')} <strong>{forwardChannelName ? forwardChannelName : t('conversation.unknown_channel')}</strong>
     </Typography>
   );
 };
 
 const DateLine = ({ date, isEdited, isMyMessage }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   return (
@@ -402,7 +408,7 @@ const DateLine = ({ date, isEdited, isMyMessage }) => {
     >
       {isEdited && (
         <span className="underline" style={{ cursor: 'pointer', marginRight: '6px' }}>
-          Edited
+          {t('conversation.edited')}
         </span>
       )}
       <span>{fTime(date)}</span>
@@ -527,6 +533,7 @@ const VoiceLine = ({ voiceMsg, isMyMessage }) => {
 };
 
 const PollBox = ({ message, all_members }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
@@ -554,7 +561,7 @@ const PollBox = ({ message, all_members }) => {
 
   const handleVote = async () => {
     if (!selected || (selected.length === 0 && pollType === 'multiple')) {
-      dispatch(showSnackbar({ severity: 'error', message: 'Please select an option to vote' }));
+      dispatch(showSnackbar({ severity: 'error', message: t('conversation.snackbar_vote') }));
       return;
     }
 
@@ -694,7 +701,7 @@ const PollBox = ({ message, all_members }) => {
               color: message.isMyMessage ? theme.palette.primary.main : '#fff',
             }}
           >
-            VOTE
+            {t('conversation.vote')}
           </Button>
         </Box>
       )}
@@ -710,7 +717,7 @@ const PollBox = ({ message, all_members }) => {
             }}
             onClick={handleShowPollResult}
           >
-            RESULT
+            {t('conversation.result')}
           </Button>
         </Box>
       )}
@@ -720,7 +727,7 @@ const PollBox = ({ message, all_members }) => {
         color={message.isMyMessage ? theme.palette.grey[400] : theme.palette.text.secondary}
         sx={{ fontSize: '12px', position: 'absolute', bottom: '13px' }}
       >
-        {totalVotes} votes
+        {totalVotes} {t('conversation.votes')}
       </Typography>
     </Box>
   );
@@ -789,6 +796,7 @@ const AttachmentMsg = ({ el, menu, forwardChannelName }) => {
   );
 };
 const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
+  const { t } = useTranslation();
   const { mentions } = useSelector(state => state.channel);
   const theme = useTheme();
   const memberInfo = el.quoted_message?.user;
@@ -880,7 +888,7 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
                   }}
                 >
                   <Trash size={16} color={theme.palette.grey[600]} />
-                  &nbsp;&nbsp;Message deleted
+                  &nbsp;&nbsp;{t('conversation.message_deleted')}
                 </Typography>
               ) : (
                 <>
@@ -945,7 +953,7 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
 
 const SignalMsg = ({ el }) => {
   const theme = useTheme();
-
+  const { t } = useTranslation();
   const msg = convertMessageSignal(el.text);
 
   return (
@@ -972,7 +980,7 @@ const SignalMsg = ({ el }) => {
             color={el.isMyMessage ? '#fff' : theme.palette.text}
             sx={{ wordBreak: 'break-word', paddingLeft: '10px' }}
           >
-            {msg?.text}
+            {t(msg?.text)}
 
             {msg?.duration && <span style={{ display: 'block', color: theme.palette.grey[500] }}>{msg?.duration}</span>}
           </Typography>
