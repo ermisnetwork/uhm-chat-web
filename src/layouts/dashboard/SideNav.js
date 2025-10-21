@@ -99,7 +99,7 @@ const SideBar = () => {
   const isMobileToMd = useResponsive('down', 'md');
 
   const { tab } = useSelector(state => state.app);
-  const { pendingChannels } = useSelector(state => state.channel);
+  const { pendingChannels = [] } = useSelector(state => state.channel);
 
   const { onToggleMode } = useSettings();
 

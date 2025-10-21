@@ -119,9 +119,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
 
   const onDelete = () => {
     if (!canDeleteMessage) {
-      dispatch(
-        showSnackbar({ severity: 'error', message: t('conversation.snackbar_delete') }),
-      );
+      dispatch(showSnackbar({ severity: 'error', message: t('conversation.snackbar_delete') }));
       return;
     }
 
@@ -136,9 +134,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
 
   const onEdit = () => {
     if (!canEditMessage) {
-      dispatch(
-        showSnackbar({ severity: 'error', message: t('conversation.snackbar_edit') }),
-      );
+      dispatch(showSnackbar({ severity: 'error', message: t('conversation.snackbar_edit') }));
       return;
     }
 
@@ -165,9 +161,7 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
     try {
       setAnchorEl(null);
       if (!canPinMessage) {
-        dispatch(
-          showSnackbar({ severity: 'error', message: t('conversation.snackbar_pin') }),
-        );
+        dispatch(showSnackbar({ severity: 'error', message: t('conversation.snackbar_pin') }));
         return;
       }
 
@@ -391,7 +385,8 @@ const ForwardTo = ({ message, forwardChannelName }) => {
       }}
     >
       <ArrowBendUpRight size={14} weight="fill" color={color} />
-      &nbsp;{t('conversation.forward_from')} <strong>{forwardChannelName ? forwardChannelName : t('conversation.unknown_channel')}</strong>
+      &nbsp;{t('conversation.forward_from')}{' '}
+      <strong>{forwardChannelName ? forwardChannelName : t('conversation.unknown_channel')}</strong>
     </Typography>
   );
 };

@@ -52,7 +52,7 @@ const SidebarUserInfo = () => {
   const theme = useTheme();
   const { user_id } = useSelector(state => state.auth);
   const { userInfo } = useSelector(state => state.app);
-  const { activeChannels } = useSelector(state => state.channel);
+  const { activeChannels = [] } = useSelector(state => state.channel);
   const onlineStatus = useOnlineStatus(userInfo?.id || '');
   const [isBlocked, setIsBlocked] = useState(false);
 

@@ -32,7 +32,7 @@ const DashboardLayout = () => {
     openDialogProfile,
     channelConfirm,
   } = useSelector(state => state.dialog);
-  const { unreadChannels } = useSelector(state => state.channel);
+  const { unreadChannels = [] } = useSelector(state => state.channel);
 
   const accessToken = localStorage.getItem(LocalStorageKey.AccessToken);
 

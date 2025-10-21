@@ -141,7 +141,7 @@ const ChatElement = ({ channel }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { currentChannel, mutedChannels, unreadChannels } = useSelector(state => state.channel);
+  const { currentChannel, mutedChannels = [], unreadChannels = [] } = useSelector(state => state.channel);
   const { openTopicPanel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];

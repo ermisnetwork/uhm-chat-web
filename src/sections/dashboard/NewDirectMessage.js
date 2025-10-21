@@ -24,7 +24,7 @@ const NewDirectMessage = () => {
   const { openDialogNewDirectMessage } = useSelector(state => state.dialog);
   const { isLoading } = useSelector(state => state.app);
   const { user_id } = useSelector(state => state.auth);
-  const { activeChannels, skippedChannels, pendingChannels } = useSelector(state => state.channel);
+  const { activeChannels = [], skippedChannels = [], pendingChannels = [] } = useSelector(state => state.channel);
   const [searchQuery, setSearchQuery] = useState('');
 
   // invitedChannels: các channel direct mà bạn đã gửi lời mời, đối phương chưa xác nhận tham gia.

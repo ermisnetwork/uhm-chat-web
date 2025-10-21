@@ -37,7 +37,12 @@ const LeftPanel = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { tab } = useSelector(state => state.app);
-  const { activeChannels, pendingChannels, mutedChannels, pinnedChannels } = useSelector(state => state.channel);
+  const {
+    activeChannels = [],
+    pendingChannels = [],
+    mutedChannels = [],
+    pinnedChannels = [],
+  } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
 
@@ -269,10 +274,7 @@ const LeftPanel = () => {
           const notiData = {
             type: ClientEvents.ChannelCreated,
             message: {
-              text:
-                event.channel_type === ChatType.TEAM
-                  ? t('leftPanel.chat_type_team')
-                  : t('leftPanel.chat_type_dm'),
+              text: event.channel_type === ChatType.TEAM ? t('leftPanel.chat_type_team') : t('leftPanel.chat_type_dm'),
             },
             senderId: event.user.id,
             channel: {
@@ -398,8 +400,7 @@ const LeftPanel = () => {
           const notiData = {
             type: ClientEvents.MemberAdded,
             message: {
-              text:
-                channelType === ChatType.TEAM ? t('leftPanel.chat_type_team') : t('leftPanel.chat_type_dm'),
+              text: channelType === ChatType.TEAM ? t('leftPanel.chat_type_team') : t('leftPanel.chat_type_dm'),
             },
             senderId: event.user.id,
             channel: {

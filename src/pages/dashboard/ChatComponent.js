@@ -70,7 +70,7 @@ import UploadFilesDialog from '../../sections/dashboard/UploadFilesDialog';
 import Dropzone from 'react-dropzone';
 import CreatePollDialog from '../../sections/dashboard/CreatePollDialog';
 import PollResultDialog from '../../sections/dashboard/PollResultDialog';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import UsersTyping from '../../components/UsersTyping';
 import NoMessageBox from '../../components/NoMessageBox';
 import { setSidebar, SetUserInfo } from '../../redux/slices/app';
@@ -79,7 +79,20 @@ import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
 import { SetIsClosedTopic, SetOpenTopicPanel } from '../../redux/slices/topic';
 import { useTranslation } from 'react-i18next';
 
-const StyledMessage = styled(motion(Stack))(({ theme }) => ({
+const messageMotion = {
+  layout: true,
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+  transition: {
+    type: 'spring',
+    stiffness: 400,
+    damping: 20,
+    mass: 0.4,
+  },
+};
+
+const StyledMessage = styled(Stack)(({ theme }) => ({
   '&:hover': {
     '& .messageActions': {
       visibility: 'visible',
@@ -298,12 +311,8 @@ const MessageList = React.memo(
 
     return (
       <Box sx={{ padding: isMobileToLg ? '20px' : isLgToXl ? '40px 50px' : '40px 90px' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
-        >
-          <Stack spacing={3} sx={{ position: 'relative' }}>
+        <Stack sx={{ position: 'relative' }}>
+          <AnimatePresence initial={false}>
             {filteredMessages.map((el, idx) => {
               const messageType = el.type;
               let sender = el.user;
@@ -314,12 +323,11 @@ const MessageList = React.memo(
               }
               const isMyMessage = el.user.id === user_id;
               const name = sender?.name || sender?.id;
-              const isNewestMessage = idx === messages.length - 1;
 
               if (messageType === MessageType.System) {
                 const msgSystem = renderSystemMessage(el.text, users, isDirect, messages, t);
                 return (
-                  <React.Fragment key={el.id}>
+                  <motion.div key={el.id} {...messageMotion}>
                     {el?.date_label && (
                       <Stack
                         direction="row"
@@ -332,7 +340,6 @@ const MessageList = React.memo(
                     <StyledMessage
                       direction="row"
                       justifyContent="center"
-                      // key={el.id}
                       ref={element => setMessageRef(el.id, element, idx)}
                     >
                       <Typography
@@ -342,14 +349,14 @@ const MessageList = React.memo(
                         dangerouslySetInnerHTML={{ __html: msgSystem }}
                       />
                     </StyledMessage>
-                  </React.Fragment>
+                  </motion.div>
                 );
               } else {
                 const nextMsg = messages[idx + 1];
                 const showAvatar = !isMyMessage && (!nextMsg || nextMsg.user.id !== el.user.id);
 
                 return (
-                  <React.Fragment key={el.id}>
+                  <motion.div key={el.id} {...messageMotion}>
                     {el?.date_label && (
                       <Stack
                         direction="row"
@@ -365,7 +372,6 @@ const MessageList = React.memo(
                       justifyContent={isMyMessage ? 'end' : 'start'}
                       flexWrap="wrap"
                       gap={1}
-                      // key={el.id}
                       className={isMyMessage ? 'myMessage' : ''}
                       ref={element => setMessageRef(el.id, element, idx)}
                       sx={{
@@ -376,9 +382,6 @@ const MessageList = React.memo(
                         marginBottom: showAvatar ? '32px!important' : '0px!important',
                         marginTop: '0px!important',
                       }}
-                      initial={isNewestMessage ? { opacity: 0, y: 10 } : false}
-                      animate={isNewestMessage ? { opacity: 1, y: 0 } : false}
-                      transition={isNewestMessage ? { duration: 0.4, type: 'spring', stiffness: 200 } : undefined}
                     >
                       {highlightMsg === el.id && (
                         <Box
@@ -427,7 +430,6 @@ const MessageList = React.memo(
                           minWidth: 'auto',
                           maxWidth: '80%',
                           flex: 1,
-                          // overflow: 'hidden',
                         }}
                       >
                         {renderMessage(el)}
@@ -461,18 +463,18 @@ const MessageList = React.memo(
                         </Stack>
                       )}
                     </StyledMessage>
-                  </React.Fragment>
+                  </motion.div>
                 );
               }
             })}
-          </Stack>
-        </motion.div>
+          </AnimatePresence>
+        </Stack>
+
         {!isGuest && !isBlocked && !isBanned && <ReadBy />}
       </Box>
     );
   },
 );
-
 const ChatComponent = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();

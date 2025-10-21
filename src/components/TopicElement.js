@@ -60,7 +60,7 @@ const TopicElement = ({ topic, idSelected }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobileToMd = useResponsive('down', 'md');
-  const { currentChannel, unreadChannels } = useSelector(state => state.channel);
+  const { currentChannel, unreadChannels = [] } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const [isRightClick, setIsRightClick] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);

@@ -20,7 +20,7 @@ const ForwardMessageDialog = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const { openDialog, message } = useSelector(state => state.messages.forwardMessage);
-  const { activeChannels, currentChannel, pinnedChannels } = useSelector(state => state.channel);
+  const { activeChannels = [], currentChannel, pinnedChannels = [] } = useSelector(state => state.channel);
   const { canSendMessage } = useSelector(state => state.channel.channelPermissions);
 
   const [filteredChannels, setFilteredChannels] = useState([]);
@@ -59,9 +59,7 @@ const ForwardMessageDialog = () => {
 
   const sendForwardMessage = async channel => {
     if (!canSendMessage) {
-      dispatch(
-        showSnackbar({ severity: 'error', message: t('forwardMessageDialog.snackbar_sendForward_error') }),
-      );
+      dispatch(showSnackbar({ severity: 'error', message: t('forwardMessageDialog.snackbar_sendForward_error') }));
       return;
     }
 
@@ -97,12 +95,14 @@ const ForwardMessageDialog = () => {
       if (result) {
         // Gửi thành công
         setForwardStatus(prev => ({ ...prev, [channel.id]: 'sent' }));
-        dispatch(showSnackbar({ severity: 'success', message: t('forwardMessageDialog.snackbar_sendForward_success') }) );
+        dispatch(
+          showSnackbar({ severity: 'success', message: t('forwardMessageDialog.snackbar_sendForward_success') }),
+        );
       }
     } catch (error) {
       // Gửi thất bại
       setForwardStatus(prev => ({ ...prev, [channel.id]: 'error' }));
-      dispatch(showSnackbar({ severity: 'error', message: t('forwardMessageDialog.snackbar_sendForward_error') }) );
+      dispatch(showSnackbar({ severity: 'error', message: t('forwardMessageDialog.snackbar_sendForward_error') }));
     }
   };
 
