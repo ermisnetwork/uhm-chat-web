@@ -88,7 +88,7 @@ const Channels = () => {
         count: unreadChannels?.length || 0,
       },
     ]);
-  }, [unreadChannels]);
+  }, [unreadChannels, t]);
 
   const renderedChannels = useMemo(() => {
     let displayChannels = [];

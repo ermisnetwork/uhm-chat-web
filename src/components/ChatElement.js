@@ -619,7 +619,7 @@ const ChatElement = ({ channel }) => {
                   fontWeight: hasUnread ? 600 : 400,
                 }}
               >
-                {isBlocked ? t('chatElement.blocked') : t(lastMessage)}
+                {isBlocked ? t('chatElement.blocked') : lastMessage}
               </Typography>
 
               {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}

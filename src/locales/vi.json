@@ -38,7 +38,7 @@
     "unread_message": "Tin nhắn chưa đọc"
   },
   "chatElement": {
-    "general": "Chung",
+    "general": "General",
     "blocked": "Bạn đã chặn người dùng này.",
     "unpinned": "Bỏ ghim đầu",
     "pinned": "Ghim lên đầu",
@@ -117,14 +117,14 @@
     "join": "THAM GIA"
   },
   "inviteFriendDialog": {
-   "title": "Mời thành viên vào kênh này",
-   "search": "Tìm kiếm", 
-   "invite": "MỜI", 
-   "members": "THANH VIÊN",
-   "snackbar_success": "Đã thêm thành viên thành công"
+    "title": "Mời thành viên vào kênh này",
+    "search": "Tìm kiếm",
+    "invite": "MỜI",
+    "members": "THANH VIÊN",
+    "snackbar_success": "Đã thêm thành viên thành công"
   },
   "chatHeader": {
-    "general": "Chung",
+    "general": "General",
     "member": "Thành viên",
     "join": "Tham gia",
     "pin": "Ghim",
@@ -144,7 +144,7 @@
     "snackbar_reopened_success": "Đã mở lại chủ đề thành công"
   },
   "chat_element": {
-    "general": "Chung",
+    "general": "General",
     "no_message": "Chưa có tin nhắn nào ở đây",
     "last_message": "Bạn đã chặn người dùng này."
   },
@@ -476,7 +476,7 @@
   },
   "topicPanel": {
     "topic_waiting": "Chủ đề đang chờ!",
-    "message": "Chúng tôi đã chuyển các tin nhắn cũ sang “Chung”. Bắt đầu một chủ đề mới bất cứ lúc nào!",
+    "message": "Chúng tôi đã chuyển các tin nhắn cũ sang “General”. Bắt đầu một chủ đề mới bất cứ lúc nào!",
     "New_topic": "CHỦ ĐỀ MỚI",
     "info_channel": "Thông tin kênh",
     "search": "Tìm tin nhắn",
@@ -705,9 +705,9 @@
     "email_label": "Địa chỉ Email",
     "password_label": "Password",
     "text": "Mật khẩu",
-    "email_required":"Vui lòng nhập email",
-    "email_valid":"Địa chỉ email này đã tồn tại",
-    "password_required":"Vui lòng nhập mật khẩu"
+    "email_required": "Vui lòng nhập email",
+    "email_valid": "Địa chỉ email này đã tồn tại",
+    "password_required": "Vui lòng nhập mật khẩu"
   },
   "login_wallet": {
     "address": "Địa chỉ",
@@ -796,5 +796,4 @@
   },
   "online": "Trực tuyến",
   "offline": "Ngoại tuyến"
-
 }
