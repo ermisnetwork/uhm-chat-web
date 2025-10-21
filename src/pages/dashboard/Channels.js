@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Stack, Typography, Tabs, Tab, Chip, Button } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import ChatElement from '../../components/ChatElement';
@@ -66,16 +66,11 @@ const Channels = () => {
   );
   const { openHomeSearch } = useSelector(state => state.app);
   const { openTopicPanel } = useSelector(state => state.topic);
-  const [listTab, setListTab] = useState([
-    { label: t('channelList.all'), value: TabValueChannel.All, count: 0 },
-    { label: t('channelList.group'), value: TabValueChannel.Group, count: 0 },
-    { label: t('channelList.unread'), value: TabValueChannel.Unread, count: 0 },
-  ]);
-  const [tabSeledected, setTabSelected] = useState(TabValueChannel.All);
-  const isEnabledTopics = currentChannel?.data?.topics_enabled && openTopicPanel;
 
-  useEffect(() => {
-    setListTab([
+  const [tabSeledected, setTabSelected] = useState(TabValueChannel.All);
+
+  const listTab = useMemo(
+    () => [
       { label: t('channelList.all'), value: TabValueChannel.All, count: 0 },
       {
         label: t('channelList.group'),
@@ -87,44 +82,53 @@ const Channels = () => {
         value: TabValueChannel.Unread,
         count: unreadChannels?.length || 0,
       },
-    ]);
-  }, [unreadChannels, t]);
+    ],
+    [unreadChannels, t],
+  );
 
-  const renderedChannels = useMemo(() => {
-    let displayChannels = [];
-    let displayPinnedChannels = [];
+  const isEnabledTopics = useMemo(() => {
+    return currentChannel?.data?.topics_enabled && openTopicPanel;
+  }, [currentChannel?.data?.topics_enabled, openTopicPanel]);
 
+  const filteredPinnedChannels = useMemo(() => {
     switch (tabSeledected) {
       case TabValueChannel.All:
-        displayPinnedChannels = pinnedChannels || [];
-        displayChannels = activeChannels || [];
-        break;
+        return pinnedChannels || [];
       case TabValueChannel.Group:
-        displayPinnedChannels = (pinnedChannels || []).filter(c => c.type === ChatType.TEAM);
-        displayChannels = (activeChannels || []).filter(c => c.type === ChatType.TEAM);
-        break;
+        return (pinnedChannels || []).filter(c => c.type === ChatType.TEAM);
       case TabValueChannel.Unread:
-        displayPinnedChannels = (pinnedChannels || []).filter(c => {
+        return (pinnedChannels || []).filter(c => {
           return unreadChannels.some(item => item.id === c.id);
         });
-        displayChannels = (activeChannels || []).filter(c => {
-          return unreadChannels.some(item => item.id === c.id);
-        });
-        break;
       default:
-        displayPinnedChannels = [];
-        displayChannels = [];
-        break;
+        return [];
     }
+  }, [pinnedChannels, tabSeledected, unreadChannels]);
 
+  const filteredActiveChannels = useMemo(() => {
+    switch (tabSeledected) {
+      case TabValueChannel.All:
+        return activeChannels || [];
+      case TabValueChannel.Group:
+        return (activeChannels || []).filter(c => c.type === ChatType.TEAM);
+      case TabValueChannel.Unread:
+        return (activeChannels || []).filter(c => {
+          return unreadChannels.some(item => item.id === c.id);
+        });
+      default:
+        return [];
+    }
+  }, [activeChannels, tabSeledected, unreadChannels]);
+
+  const renderedChannels = useMemo(() => {
     if (loadingChannels) {
       return <SkeletonChannels />;
     } else {
       return (
         <>
-          {displayPinnedChannels.length > 0 && (
+          {filteredPinnedChannels.length > 0 && (
             <FlipMove style={{ marginBottom: '6px' }} duration={200}>
-              {displayPinnedChannels.map(item => (
+              {filteredPinnedChannels.map(item => (
                 <div className="channelItem" key={`pinned-${item.id}`}>
                   <ChatElement channel={item} />
                 </div>
@@ -132,9 +136,9 @@ const Channels = () => {
             </FlipMove>
           )}
 
-          {displayChannels.length > 0 && (
+          {filteredActiveChannels.length > 0 && (
             <FlipMove duration={200}>
-              {displayChannels.map(item => {
+              {filteredActiveChannels.map(item => {
                 return (
                   <div className="channelItem" key={`channel-${item.id}`}>
                     <ChatElement channel={item} />
@@ -144,7 +148,7 @@ const Channels = () => {
             </FlipMove>
           )}
 
-          {displayChannels.length === 0 && displayPinnedChannels.length === 0 && (
+          {filteredActiveChannels.length === 0 && filteredPinnedChannels.length === 0 && (
             <Stack
               key="no-channels"
               sx={{ width: '100%', alignItems: 'center', justifyContent: 'center', marginTop: '50px!important' }}
@@ -166,11 +170,15 @@ const Channels = () => {
         </>
       );
     }
-  }, [activeChannels, pinnedChannels, loadingChannels, unreadChannels, tabSeledected, theme, isEnabledTopics]);
+  }, [filteredPinnedChannels, filteredActiveChannels, loadingChannels, theme, isEnabledTopics, t]);
 
-  const onToggleHomeSearch = () => {
+  const onToggleHomeSearch = useCallback(() => {
     dispatch(SetOpenHomeSearch(!openHomeSearch));
-  };
+  }, [dispatch, openHomeSearch]);
+
+  const handleTabChange = useCallback((event, newValue) => {
+    setTabSelected(newValue);
+  }, []);
 
   return (
     <Stack spacing={2} sx={{ height: '100%', width: '100%', padding: '15px' }}>
@@ -191,9 +199,7 @@ const Channels = () => {
 
         <StyledTabs
           value={tabSeledected}
-          onChange={(event, newValue) => {
-            setTabSelected(newValue);
-          }}
+          onChange={handleTabChange}
           variant="scrollable"
           sx={{
             transition: 'all 0.2s ease',
