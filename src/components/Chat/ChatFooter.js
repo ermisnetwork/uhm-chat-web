@@ -1,6 +1,6 @@
 import { Box, IconButton, InputAdornment, TextField } from '@mui/material';
 import { useTheme, styled } from '@mui/material/styles';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   handleError,
@@ -20,6 +20,7 @@ import Mentions from '../Mentions';
 import { ClientEvents } from '../../constants/events-const';
 import { AddMention, RemoveMention } from '../../redux/slices/channel';
 import useMentions from '../../hooks/useMentions';
+import useDebounce from '../../hooks/useDebounce';
 import uuidv4 from '../../utils/uuidv4';
 import { client } from '../../client';
 import ActionsChatPopover from '../ActionsChatPopover';
@@ -71,13 +72,61 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     setSelectedMentions,
   } = useMentions(value, inputRef);
 
-  const onTyping = async () => {
+  const onTyping = useCallback(async () => {
     try {
       await currentChat.keystroke();
     } catch (error) {
       // handleError(dispatch, error);
     }
-  };
+  }, [currentChat]);
+
+  // Debounced version of onTyping để giảm số lần gọi API
+  const debouncedOnTyping = useDebounce(onTyping, 500);
+
+  const checkSendLinks = useCallback(
+    value => {
+      const emailMentionRegex = /@\S+@\S+\.\S+/g; // Regex kiểm tra mention email
+      const hasEmailMention = emailMentionRegex.test(value);
+      const hasLinks = linkify.find(value).length > 0;
+
+      if (!canSendLinks && myRole === RoleMember.MEMBER && hasLinks) {
+        if (hasEmailMention) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+      return false;
+    },
+    [canSendLinks, myRole],
+  );
+
+  const checkHaveFilterWords = useCallback(
+    value => {
+      const hasKeyword = filterWords.some(keyword => value.trim().toLowerCase().includes(keyword));
+      if (hasKeyword) {
+        return true;
+      }
+      return false;
+    },
+    [filterWords],
+  );
+
+  // Memoize các giá trị validation để tránh tính toán lại không cần thiết
+  const hasLinksError = useMemo(() => checkSendLinks(value), [value, checkSendLinks]);
+  const hasFilterWordsError = useMemo(() => checkHaveFilterWords(value), [value, checkHaveFilterWords]);
+
+  const checkDisabledButton = useMemo(() => {
+    if (
+      (value.trim() === '' && attachmentsMessage.length === 0) ||
+      (attachmentsMessage.length > 0 && attachmentsMessage.some(item => item.loading || item.error)) ||
+      hasLinksError ||
+      hasFilterWordsError
+    ) {
+      return true;
+    }
+    return false;
+  }, [value, attachmentsMessage, hasLinksError, hasFilterWordsError]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -176,6 +225,22 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       sendMessage();
     }
   }, [stickerUrl]);
+
+  // Effect để hiển thị lỗi validation với debounce
+  useEffect(() => {
+    const showValidationErrors = () => {
+      if (hasLinksError) {
+        dispatch(showSnackbar({ severity: 'error', message: 'Members in this channel are not allowed to send links' }));
+      }
+
+      if (hasFilterWordsError) {
+        dispatch(showSnackbar({ severity: 'error', message: 'The content you entered contains blocked keywords' }));
+      }
+    };
+
+    const timeout = setTimeout(showValidationErrors, 500); // Debounce 500ms cho validation errors
+    return () => clearTimeout(timeout);
+  }, [hasLinksError, hasFilterWordsError, dispatch]);
 
   useEffect(() => {
     if (!anchorElMention) return;
@@ -417,41 +482,6 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     }
   };
 
-  const checkSendLinks = value => {
-    const emailMentionRegex = /@\S+@\S+\.\S+/g; // Regex kiểm tra mention email
-    const hasEmailMention = emailMentionRegex.test(value);
-    const hasLinks = linkify.find(value).length > 0;
-
-    if (!canSendLinks && myRole === RoleMember.MEMBER && hasLinks) {
-      if (hasEmailMention) {
-        return false;
-      } else {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const checkHaveFilterWords = value => {
-    const hasKeyword = filterWords.some(keyword => value.trim().toLowerCase().includes(keyword));
-    if (hasKeyword) {
-      return true;
-    }
-    return false;
-  };
-
-  const checkDisabledButton = () => {
-    if (
-      (value.trim() === '' && attachmentsMessage.length === 0) ||
-      (attachmentsMessage.length > 0 && attachmentsMessage.some(item => item.loading || item.error)) ||
-      checkSendLinks(value) ||
-      checkHaveFilterWords(value)
-    ) {
-      return true;
-    }
-    return false;
-  };
-
   const onKeyDown = e => {
     if (isComposing) return;
 
@@ -474,7 +504,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     } else {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        if (!checkDisabledButton()) {
+        if (!checkDisabledButton) {
           sendMessage();
         }
       } else {
@@ -484,7 +514,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   };
 
   const onKeyPress = e => {
-    if (e.key === 'Enter' && !e.shiftKey && !checkDisabledButton()) {
+    if (e.key === 'Enter' && !e.shiftKey && !checkDisabledButton) {
       e.preventDefault();
       // sendMessage();
     } else {
@@ -492,70 +522,79 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     }
   };
 
-  const onKeyUp = e => {
-    if (e.key === 'Delete' || e.key === 'Backspace') {
-      const input = inputRef.current;
-      const cursorPosition = input.selectionStart;
-      let newValue = value;
-      let newCursorPos = cursorPosition;
-      let mentionRemoved = false;
+  const onKeyUp = useCallback(
+    e => {
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const input = inputRef.current;
+        const cursorPosition = input.selectionStart;
+        let newValue = value;
+        let newCursorPos = cursorPosition;
+        let mentionRemoved = false;
 
-      mentions.forEach(user => {
-        const mentionIndex = newValue.indexOf(user.mentionName);
-        if (
-          mentionIndex !== -1 &&
-          cursorPosition > mentionIndex &&
-          cursorPosition <= mentionIndex + user.mentionName.length
-        ) {
-          newValue = newValue.slice(0, mentionIndex) + newValue.slice(mentionIndex + user.mentionName.length);
-          newCursorPos = mentionIndex; // Đặt lại vị trí con trỏ tại vị trí vừa xoá mention
-          mentionRemoved = true;
+        // Tối ưu: chỉ xử lý mentions nếu có ký tự @ trong value
+        if (value.includes('@')) {
+          mentions.forEach(user => {
+            const mentionIndex = newValue.indexOf(user.mentionName);
+            if (
+              mentionIndex !== -1 &&
+              cursorPosition > mentionIndex &&
+              cursorPosition <= mentionIndex + user.mentionName.length
+            ) {
+              newValue = newValue.slice(0, mentionIndex) + newValue.slice(mentionIndex + user.mentionName.length);
+              newCursorPos = mentionIndex; // Đặt lại vị trí con trỏ tại vị trí vừa xoá mention
+              mentionRemoved = true;
+            }
+          });
+
+          if (mentionRemoved) {
+            setValue(newValue);
+            setTimeout(() => {
+              input.setSelectionRange(newCursorPos, newCursorPos);
+            }, 0);
+          }
+
+          setSelectedMentions(prev => prev.filter(item => newValue.includes(item.mentionName)));
         }
-      });
+      }
+    },
+    [value, mentions, setSelectedMentions],
+  );
 
-      if (mentionRemoved) {
+  const onSelectMention = useCallback(
+    mention => {
+      const input = inputRef.current;
+      const cursorPos = input.selectionStart;
+      const value = input.value;
+      const mentionText = `@${mention.name.toLowerCase()}`;
+
+      // Tìm vị trí @ gần nhất trước con trỏ
+      const beforeCursor = value.slice(0, cursorPos);
+      const match = beforeCursor.match(/@\w*$/);
+
+      if (match) {
+        const start = match.index;
+        const end = cursorPos;
+        const newValue = value.slice(0, start) + mentionText + ' ' + value.slice(end);
+
         setValue(newValue);
+
+        // Đặt lại vị trí con trỏ sau mention vừa thêm
         setTimeout(() => {
-          input.setSelectionRange(newCursorPos, newCursorPos);
+          input.setSelectionRange(start + mentionText.length + 1, start + mentionText.length + 1);
         }, 0);
       }
 
-      setSelectedMentions(prev => prev.filter(item => newValue.includes(item.mentionName)));
-    }
-  };
-
-  const onSelectMention = mention => {
-    const input = inputRef.current;
-    const cursorPos = input.selectionStart;
-    const value = input.value;
-    const mentionText = `@${mention.name.toLowerCase()}`;
-
-    // Tìm vị trí @ gần nhất trước con trỏ
-    const beforeCursor = value.slice(0, cursorPos);
-    const match = beforeCursor.match(/@\w*$/);
-
-    if (match) {
-      const start = match.index;
-      const end = cursorPos;
-      const newValue = value.slice(0, start) + mentionText + ' ' + value.slice(end);
-
-      setValue(newValue);
-
-      // Đặt lại vị trí con trỏ sau mention vừa thêm
-      setTimeout(() => {
-        input.setSelectionRange(start + mentionText.length + 1, start + mentionText.length + 1);
-      }, 0);
-    }
-
-    setSelectedMentions(prev => {
-      const updatedMentions = [...prev, mention];
-      const uniqueMentions = Array.from(new Map(updatedMentions.map(item => [item.id, item])).values());
-      return uniqueMentions;
-    });
-    setHighlightedIndex(0);
-    setAnchorElMention(null);
-    inputRef.current.focus();
-  };
+      setSelectedMentions(prev => {
+        const updatedMentions = [...prev, mention];
+        const uniqueMentions = Array.from(new Map(updatedMentions.map(item => [item.id, item])).values());
+        return uniqueMentions;
+      });
+      setHighlightedIndex(0);
+      setAnchorElMention(null);
+      inputRef.current.focus();
+    },
+    [setSelectedMentions, setHighlightedIndex, setAnchorElMention],
+  );
 
   const onPaste = event => {
     const file = event.clipboardData.files[0];
@@ -577,25 +616,18 @@ const ChatFooter = ({ setMessages, isDialog }) => {
           className="customScrollbarChatInput"
           inputRef={inputRef}
           value={value}
-          onChange={event => {
-            event.stopPropagation();
-            event.preventDefault();
-            const value = event.target.value;
-            setValue(value);
-            onTyping();
+          onChange={useCallback(
+            event => {
+              event.stopPropagation();
+              event.preventDefault();
+              const newValue = event.target.value;
+              setValue(newValue);
 
-            if (checkSendLinks(value)) {
-              dispatch(
-                showSnackbar({ severity: 'error', message: 'Members in this channel are not allowed to send links' }),
-              );
-            }
-
-            if (checkHaveFilterWords(value)) {
-              dispatch(
-                showSnackbar({ severity: 'error', message: 'The content you entered contains blocked keywords' }),
-              );
-            }
-          }}
+              // Sử dụng debounced typing để giảm tải
+              debouncedOnTyping();
+            },
+            [debouncedOnTyping],
+          )}
           onPaste={onPaste}
           fullWidth
           placeholder="Write a message..."
@@ -614,7 +646,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
             ),
             endAdornment: (
               <InputAdornment position="end" sx={{ position: 'absolute', bottom: '23px', right: '5px' }}>
-                {checkDisabledButton() && !isDialog && (
+                {checkDisabledButton && !isDialog && (
                   <>
                     <IconButton onClick={() => recordingBoxRef.current?.startRecording()}>
                       <MicrophoneIcon color={theme.palette.text.primary} />
@@ -641,7 +673,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
                   />
                 )}
 
-                {!checkDisabledButton() && (
+                {!checkDisabledButton && (
                   <>
                     {cooldownTime ? (
                       <CooldownMessage cooldownTime={cooldownTime} />

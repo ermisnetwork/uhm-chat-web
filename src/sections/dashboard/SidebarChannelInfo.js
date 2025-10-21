@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { IconButton, InputAdornment, Stack, Typography } from '@mui/material';
-import { CaretRight, X } from 'phosphor-react';
+import { CaretLeft, CaretRight, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ToggleSidebar, UpdateSidebarType, showSnackbar } from '../../redux/slices/app';
+import { SetIsEditing, ToggleSidebar, UpdateSidebarType, showSnackbar } from '../../redux/slices/app';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import {
   checkDirectBlock,
@@ -88,10 +88,11 @@ const StyledActionItem = styled(Stack)(({ theme }) => ({
   },
 }));
 
-const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDisabled, setSaveLoading }) => {
+const FormTeamChannelInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { currentChannel } = useSelector(state => state.channel);
+  const { isEditing } = useSelector(state => state.app);
 
   const channelInfo = {
     name: currentChannel.data.name || '',
@@ -170,7 +171,7 @@ const FormTeamChannelInfo = ({ isEditing, setIsEditing, formSubmitRef, setSaveDi
       handleError(dispatch, error);
     } finally {
       setSaveLoading(false);
-      setIsEditing(false);
+      dispatch(SetIsEditing(false));
     }
   };
 
@@ -378,6 +379,7 @@ const SidebarChannelInfo = () => {
   const formSubmitRef = useRef(null);
   const { currentChannel, mutedChannels } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
+  const { isEditing } = useSelector(state => state.app);
   const myRole = myRoleInChannel(currentChannel);
   const isDirect = isChannelDirect(currentChannel);
   const isPublic = isPublicChannel(currentChannel);
@@ -387,7 +389,6 @@ const SidebarChannelInfo = () => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [openDialogMuted, setOpenDialogMuted] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
   const enableTopics = currentChannel?.data?.topics_enabled;
@@ -492,7 +493,7 @@ const SidebarChannelInfo = () => {
   };
 
   const onEditing = () => {
-    setIsEditing(true);
+    dispatch(SetIsEditing(true));
   };
 
   const onSaveClick = () => {
@@ -520,13 +521,24 @@ const SidebarChannelInfo = () => {
     <>
       <Stack sx={{ width: '100%', height: '100%', position: 'relative' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ padding: '10px 15px' }}>
-          <IconButton
-            onClick={() => {
-              dispatch(ToggleSidebar());
-            }}
-          >
-            <X size={20} color={theme.palette.text.primary} />
-          </IconButton>
+          {isEditing ? (
+            <IconButton
+              onClick={() => {
+                dispatch(SetIsEditing(false));
+              }}
+            >
+              <CaretLeft size={20} color={theme.palette.text.primary} />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={() => {
+                dispatch(ToggleSidebar());
+                dispatch(SetIsEditing(false));
+              }}
+            >
+              <X size={20} color={theme.palette.text.primary} />
+            </IconButton>
+          )}
 
           {showEditChannel && (
             <>
@@ -565,8 +577,6 @@ const SidebarChannelInfo = () => {
               <DirectChannelInfo />
             ) : (
               <FormTeamChannelInfo
-                isEditing={isEditing}
-                setIsEditing={setIsEditing}
                 formSubmitRef={formSubmitRef}
                 setSaveDisabled={setSaveDisabled}
                 setSaveLoading={setSaveLoading}
