@@ -284,7 +284,7 @@ const ChatHeader = () => {
     if (isEnabledTopics || currentTopic) {
       return currentChannel.data?.name;
     } else {
-      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} ${t('chatHeader.member')}` ;
+      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} ${t('chatHeader.member')}`;
     }
   };
 
@@ -307,7 +307,7 @@ const ChatHeader = () => {
       <Box
         sx={{
           width: '100%',
-          height: '74px',
+          height: '65px',
           padding: '8px 16px',
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}

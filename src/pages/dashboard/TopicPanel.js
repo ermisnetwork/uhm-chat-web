@@ -169,7 +169,7 @@ const TopicHeader = () => {
       spacing={1}
       sx={{
         width: '100%',
-        height: '74px',
+        height: '65px',
         padding: '8px 6px',
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}

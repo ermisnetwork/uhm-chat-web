@@ -33,7 +33,7 @@ const Header = () => {
       direction="row"
       justifyContent="space-between"
       alignItems="center"
-      sx={{ width: '100%', height: '98px', padding: '0 15px', borderBottom: `1px solid ${theme.palette.divider}` }}
+      sx={{ width: '100%', height: '70px', padding: '0 15px', borderBottom: `1px solid ${theme.palette.divider}` }}
     >
       <Typography
         variant="h5"

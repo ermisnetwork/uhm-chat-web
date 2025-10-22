@@ -184,14 +184,14 @@ const SideBar = () => {
         direction="row"
         justifyContent="center"
         alignItems="center"
-        sx={{ width: '100%', height: '98px', borderBottom: `1px solid ${theme.palette.divider}` }}
+        sx={{ width: '100%', height: '70px', borderBottom: `1px solid ${theme.palette.divider}` }}
       >
         <Box onClick={onGoToHome} sx={{ cursor: 'pointer' }}>
           <img src={Logo} alt="logo" />
         </Box>
       </Stack>
 
-      <Stack alignItems={'center'} justifyContent="center" sx={{ height: 'calc(100% - 98px)', width: '100%' }}>
+      <Stack alignItems={'center'} justifyContent="center" sx={{ height: 'calc(100% - 70px)', width: '100%' }}>
         <Stack sx={{ width: 'max-content' }} direction="column" alignItems={'center'} spacing={3}>
           {renderNavButtons()}
         </Stack>

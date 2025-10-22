@@ -47,7 +47,7 @@ export default function BlockedBackdrop() {
     <Box
       sx={{
         position: 'absolute',
-        top: '74px',
+        top: '65px',
         left: 0,
         right: 0,
         bottom: 0,
