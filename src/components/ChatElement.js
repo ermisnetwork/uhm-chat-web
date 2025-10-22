@@ -179,6 +179,21 @@ const ChatElement = ({ channel }) => {
     unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadCount > 0);
   const isCurrentChannelEnabledTopic = currentChannel?.data?.topics_enabled;
 
+  const isActiveChannel = useCallback(
+    (channel, currentChannel) => {
+      const isCurrentChannel = currentChannel?.id === channel?.id;
+
+      if (!isCurrentChannel) return false;
+
+      // Nếu không phải current channel thì không active
+      if (!isCurrentChannelEnabledTopic) return true;
+
+      // Nếu current channel có topics enabled thì chỉ active khi openTopicPanel = true
+      return openTopicPanel;
+    },
+    [isCurrentChannelEnabledTopic, openTopicPanel],
+  );
+
   const replaceMentionsWithNames = useCallback(
     inputValue => {
       users.forEach(user => {
@@ -191,85 +206,111 @@ const ChatElement = ({ channel }) => {
 
   const getLastMessage = useCallback(
     message => {
-      if (message) {
-        const date = message.updated_at ? message.updated_at : message.created_at;
-        const sender = message.user;
-        const senderId = sender?.id;
-        const isMe = user_id === senderId;
-        const senderName = isMe ? t('chatElement.you') : sender?.name || senderId;
-        setLastMessageAt(getDisplayDate(date));
-        if (message.type === MessageType.System) {
+      if (!message) {
+        setLastMessageAt(getDisplayDate(channel.data.created_at));
+        setLastMessage(t('chatElement.no_message'));
+        return;
+      }
+
+      const date = message.updated_at ? message.updated_at : message.created_at;
+      const sender = message.user;
+      const senderId = sender?.id;
+      const isMe = user_id === senderId;
+      const senderName = isMe ? t('chatElement.you') : sender?.name || senderId;
+      setLastMessageAt(getDisplayDate(date));
+
+      switch (message.type) {
+        case MessageType.System: {
           const messageSystem = convertMessageSystem(message.text, users, isDirect, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
-        } else if (message.type === MessageType.Signal) {
+          break;
+        }
+
+        case MessageType.Signal: {
           const messageSignal = convertMessageSignal(message.text);
           setLastMessage(messageSignal.text || '');
-        } else if (message.type === MessageType.Sticker) {
+          break;
+        }
+
+        case MessageType.Sticker: {
           setLastMessage(`${senderName}: ${t('chatElement.sticker')}`);
-        } else {
+          break;
+        }
+
+        default: {
+          // MessageType.Regular
           if (message.attachments) {
             const attachmentLast = message.attachments[message.attachments.length - 1];
+            const { type: attachmentType } = attachmentLast;
 
-            const isLinkPreview = attachmentLast.type === 'linkPreview';
-            const isImage = attachmentLast.type === 'image';
-            const isVideo = attachmentLast.type === 'video';
-
-            if (isImage) {
-              setLastMessage(
-                <>
-                  {`${senderName}:`}
-                  <img
-                    src={attachmentLast.image_url}
-                    alt={attachmentLast.title || 'image'}
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: '5px',
-                      display: 'inline-block',
-                      verticalAlign: 'top',
-                      margin: '0px 4px',
-                    }}
-                  />
-                  {attachmentLast.title || t('chatElement.photo')}
-                </>,
-              );
-            } else if (isVideo) {
-              setLastMessage(
-                <>
-                  {`${senderName}:`}
-                  <span style={{ position: 'relative', display: 'inline-block', margin: '0px 4px' }}>
+            switch (attachmentType) {
+              case 'image': {
+                setLastMessage(
+                  <>
+                    {`${senderName}:`}
                     <img
-                      src={attachmentLast.thumb_url}
-                      alt={attachmentLast.title || 'video'}
+                      src={attachmentLast.image_url}
+                      alt={attachmentLast.title || 'image'}
                       style={{
                         width: 20,
                         height: 20,
                         borderRadius: '5px',
                         display: 'inline-block',
                         verticalAlign: 'top',
+                        margin: '0px 4px',
                       }}
                     />
-                    <Play
-                      size={10}
-                      color="#fff"
-                      weight="fill"
-                      style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
-                    />
-                  </span>
-                  {attachmentLast.title || 'Video'}
-                </>,
-              );
-            } else {
-              setLastMessage(`${senderName}: ${isLinkPreview ? attachmentLast.link_url : attachmentLast.title}`);
+                    {attachmentLast.title || t('chatElement.photo')}
+                  </>,
+                );
+                break;
+              }
+
+              case 'video': {
+                setLastMessage(
+                  <>
+                    {`${senderName}:`}
+                    <span style={{ position: 'relative', display: 'inline-block', margin: '0px 4px' }}>
+                      <img
+                        src={attachmentLast.thumb_url}
+                        alt={attachmentLast.title || 'video'}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '5px',
+                          display: 'inline-block',
+                          verticalAlign: 'top',
+                        }}
+                      />
+                      <Play
+                        size={10}
+                        color="#fff"
+                        weight="fill"
+                        style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                      />
+                    </span>
+                    {attachmentLast.title || 'Video'}
+                  </>,
+                );
+                break;
+              }
+
+              case 'linkPreview': {
+                setLastMessage(`${senderName}: ${attachmentLast.link_url}`);
+                break;
+              }
+
+              default: {
+                setLastMessage(`${senderName}: ${attachmentLast.title}`);
+                break;
+              }
             }
           } else {
             const messagePreview = replaceMentionsWithNames(message.text);
             setLastMessage(`${senderName}: ${messagePreview}`);
           }
+          break;
         }
-      } else {
-        setLastMessageAt(getDisplayDate(channel.data.created_at));
-        setLastMessage(t('chatElement.no_message'));
       }
     },
     [user_id, users, isDirect, t, replaceMentionsWithNames, channel.data.created_at],
@@ -322,6 +363,10 @@ const ChatElement = ({ channel }) => {
 
   useEffect(() => {
     getLastMessage(optimizedLastMessage);
+  }, [optimizedLastMessage]);
+
+  useEffect(() => {
+    // getLastMessage(optimizedLastMessage);
 
     const membership = channel.state.membership;
     const blocked = membership?.blocked ?? false;
@@ -541,10 +586,12 @@ const ChatElement = ({ channel }) => {
         onClick={onLeftClick}
         onContextMenu={onRightClick}
         sx={{
-          backgroundColor:
-            currentChannel?.id === channelId ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
+          backgroundColor: isActiveChannel(channel, currentChannel)
+            ? `${alpha(theme.palette.primary.main, 0.2)} !important`
+            : 'transparent',
           padding: '8px',
           margin: '-8px',
+          justifyContent: openTopicPanel ? 'center' : 'flex-start',
         }}
         gap={2}
       >
@@ -571,77 +618,79 @@ const ChatElement = ({ channel }) => {
         </Box>
 
         {/* -------------------------------content------------------------------- */}
-        <Box
-          sx={{
-            flex: openTopicPanel ? 0 : 1,
-            minWidth: 'auto',
-            overflow: 'hidden',
-          }}
-        >
-          {/* -------------------------------channel name------------------------------- */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                flex: 1,
-                minWidth: 'auto',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontSize: '14px',
-              }}
-            >
-              {channel.data.name}
-            </Typography>
-
-            <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
-              {isMuted && <SpearkerOffIcon size={14} />}
-              {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
-
-              {!isBlocked && (
-                <Typography
-                  sx={{
-                    color: theme.palette.text.secondary,
-                    minWidth: 'auto',
-                    flex: 1,
-                    overflow: 'hidden',
-                    fontSize: '10px',
-                  }}
-                  variant="caption"
-                >
-                  {lastMessageAt}
-                </Typography>
-              )}
-            </Stack>
-          </Stack>
-
-          {/* -------------------------------list topic------------------------------- */}
-          {isEnabledTopics && <ListTopic topics={topics} />}
-
-          {/* -------------------------------last message------------------------------- */}
-          {!isBlocked && (
+        {!openTopicPanel && (
+          <Box
+            sx={{
+              flex: 1,
+              minWidth: 'auto',
+              overflow: 'hidden',
+            }}
+          >
+            {/* -------------------------------channel name------------------------------- */}
             <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
               <Typography
-                variant="caption"
+                variant="subtitle2"
                 sx={{
-                  color: hasUnread ? 'inherit' : theme.palette.text.secondary,
                   flex: 1,
                   minWidth: 'auto',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   fontSize: '14px',
-                  display: 'block',
-                  fontWeight: hasUnread ? 600 : 400,
                 }}
               >
-                {isBlocked ? t('chatElement.blocked') : lastMessage}
+                {channel.data.name}
               </Typography>
 
-              {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+              <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+                {isMuted && <SpearkerOffIcon size={14} />}
+                {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
+
+                {!isBlocked && (
+                  <Typography
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      minWidth: 'auto',
+                      flex: 1,
+                      overflow: 'hidden',
+                      fontSize: '10px',
+                    }}
+                    variant="caption"
+                  >
+                    {lastMessageAt}
+                  </Typography>
+                )}
+              </Stack>
             </Stack>
-          )}
-        </Box>
+
+            {/* -------------------------------list topic------------------------------- */}
+            {isEnabledTopics && <ListTopic topics={topics} />}
+
+            {/* -------------------------------last message------------------------------- */}
+            {!isBlocked && (
+              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: hasUnread ? 'inherit' : theme.palette.text.secondary,
+                    flex: 1,
+                    minWidth: 'auto',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontSize: '14px',
+                    display: 'block',
+                    fontWeight: hasUnread ? 600 : 400,
+                  }}
+                >
+                  {isBlocked ? t('chatElement.blocked') : lastMessage}
+                </Typography>
+
+                {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+              </Stack>
+            )}
+          </Box>
+        )}
       </StyledChatBox>
 
       <StyledMenu

@@ -55,4 +55,4 @@ export const DEFAULT_PATH = PATH_DASHBOARD.general.app; // as '/channels'
 
 export const WIDTH_LEFT_PANEL = 377;
 export const WIDTH_SIDEBAR_PANEL = 430;
-export const WIDTH_SIDE_NAV = 98;
+export const WIDTH_SIDE_NAV = 70;

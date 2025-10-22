@@ -434,13 +434,6 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
         dispatch(slice.actions.setCurrentChannel(channel));
         loadDataChannel(channel, dispatch, user_id);
 
-        const myRole = myRoleInChannel(channel);
-        if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
-          setTimeout(() => {
-            dispatch(SetMarkReadChannel(channel));
-          }, 100);
-        }
-
         if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
           dispatch(SetOpenTopicPanel(true));
           dispatch(FetchTopics(channel.cid));
