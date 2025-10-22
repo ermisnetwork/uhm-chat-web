@@ -569,6 +569,12 @@ const ChatComponent = () => {
         }
       };
 
+      if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRoleInChannel(currentChat))) {
+        setTimeout(() => {
+          dispatch(SetMarkReadChannel(currentChat));
+        }, 100);
+      }
+
       const handleMessages = event => {
         switch (event.type) {
           case ClientEvents.MessageNew:

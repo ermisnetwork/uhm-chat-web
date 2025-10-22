@@ -180,8 +180,8 @@ const TopicHeader = () => {
         </IconButton>
       )}
 
-      <Box sx={{ width: '60px', height: '60px' }} onClick={onOpenPopover}>
-        <ChannelAvatar channel={currentChannel} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
+      <Box sx={{ width: '50px', height: '50px' }} onClick={onOpenPopover}>
+        <ChannelAvatar channel={currentChannel} width={50} height={50} openLightbox={true} shape={AvatarShape.Round} />
       </Box>
 
       {!isMobileToMd && (
