@@ -44,7 +44,7 @@ import {
   SetMemberCapabilities,
   WatchCurrentChannel,
 } from '../../redux/slices/channel';
-import { Clock, Trash } from 'phosphor-react';
+import { Trash, WarningCircle } from 'phosphor-react';
 import ScrollToBottom from '../../components/ScrollToBottom';
 import DeleteMessageDialog from '../../sections/dashboard/DeleteMessageDialog';
 import {
@@ -225,6 +225,7 @@ const MessageList = React.memo(
         const forwardChannelName = getForwardChannelName(el?.forward_cid);
         const quotedMessage = el?.quoted_message;
 
+        // Handle deleted messages
         if (el.deleted_at) {
           return (
             <Stack direction="row" justifyContent={isMyMessage ? 'end' : 'start'} alignItems="center">
@@ -246,10 +247,16 @@ const MessageList = React.memo(
               </Box>
             </Stack>
           );
-        } else if (quotedMessage) {
+        }
+
+        // Handle quoted messages
+        if (quotedMessage) {
           return <ReplyMsg el={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />;
-        } else {
-          if (messageType === MessageType.Regular) {
+        }
+
+        // Handle different message types
+        switch (messageType) {
+          case MessageType.Regular:
             if (el.attachments && el.attachments.length > 0) {
               // Nếu trong attachmens có type linkPreview thì hiển thị Attachmens UI. Chỉ hiển thị LinkPreview UI nếu msg chỉ là link
               if (
@@ -271,7 +278,8 @@ const MessageList = React.memo(
             } else {
               return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
             }
-          } else if (messageType === MessageType.Reply) {
+
+          case MessageType.Reply:
             if (el.quoted_message) {
               return (
                 <ReplyMsg el={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />
@@ -279,15 +287,18 @@ const MessageList = React.memo(
             } else {
               return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
             }
-          } else if (messageType === MessageType.Signal) {
+
+          case MessageType.Signal:
             return <SignalMsg el={{ ...el, isMyMessage }} />;
-          } else if (messageType === MessageType.Poll) {
+
+          case MessageType.Poll:
             return <PollMsg el={{ ...el, isMyMessage }} all_members={users} />;
-          } else if (messageType === MessageType.Sticker) {
+
+          case MessageType.Sticker:
             return <StickerMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
-          } else {
+
+          default:
             return null;
-          }
         }
       },
       [user_id, getForwardChannelName, theme.palette, t, users, onScrollToReplyMsg],
@@ -381,6 +392,7 @@ const MessageList = React.memo(
                         paddingLeft: !showAvatar ? '44px' : '0',
                         marginBottom: showAvatar ? '32px!important' : '0px!important',
                         marginTop: '0px!important',
+                        opacity: el.status === 'sending' ? 0.5 : 1,
                       }}
                     >
                       {highlightMsg === el.id && (
@@ -428,7 +440,7 @@ const MessageList = React.memo(
                       <Stack
                         sx={{
                           minWidth: 'auto',
-                          maxWidth: '80%',
+                          maxWidth: '90%',
                           flex: 1,
                         }}
                       >
@@ -437,22 +449,12 @@ const MessageList = React.memo(
                         <ReactionsMessage isMyMessage={isMyMessage} message={el} />
 
                         {el.status === 'error' && (
-                          <Stack direction="row" justifyContent="flex-end" sx={{ marginTop: '3px' }}>
-                            <Stack
-                              direction="row"
-                              justifyContent="center"
-                              alignItems="center"
-                              sx={{
-                                backgroundColor: theme.palette.mode === 'light' ? theme.palette.grey[400] : '#545c64',
-                                padding: '3px',
-                                borderRadius: '32px',
-                              }}
-                            >
-                              <Clock size={16} color={'#fff'} />
-                              <span style={{ fontSize: '12px', color: '#fff' }}>
-                                &nbsp;{t('chatComponent.sending')}&nbsp;
-                              </span>
-                            </Stack>
+                          <Stack
+                            direction="row"
+                            justifyContent="flex-end"
+                            sx={{ marginTop: '0px', position: 'absolute', bottom: '3px', right: '-9px' }}
+                          >
+                            <WarningCircle size={24} weight="fill" color={theme.palette.error.main} />
                           </Stack>
                         )}
                       </Stack>

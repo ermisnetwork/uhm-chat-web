@@ -413,6 +413,7 @@ const DateLine = ({ date, isEdited, isMyMessage }) => {
 
 const TextLine = ({ message }) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
   const { mentions } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
 
@@ -479,13 +480,42 @@ const TextLine = ({ message }) => {
     });
   };
 
+  const onCopyCode = async code => {
+    try {
+      await navigator.clipboard.writeText(code);
+      dispatch(showSnackbar({ severity: 'success', message: t('conversation.copy_text') }));
+    } catch (err) {
+      dispatch(showSnackbar({ severity: 'error', message: t('conversation.copy_failed') }));
+    }
+  };
+
   const renderMsg = () => {
     if (isCode(message.text)) {
       const codeContent = message.text.slice(3, -3).trim();
       return (
-        <SyntaxHighlighter language="javascript" style={atomDark} showLineNumbers customStyle={{ width: '100%' }}>
-          {codeContent}
-        </SyntaxHighlighter>
+        <Box sx={{ position: 'relative' }}>
+          <SyntaxHighlighter language="javascript" style={atomDark} showLineNumbers customStyle={{ width: '100%' }}>
+            {codeContent}
+          </SyntaxHighlighter>
+
+          <IconButton
+            onClick={() => onCopyCode(codeContent)}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              color: '#fff',
+              width: 32,
+              height: 32,
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              },
+            }}
+          >
+            <Copy size={16} />
+          </IconButton>
+        </Box>
       );
     } else {
       return (
@@ -739,7 +769,7 @@ const TextMsg = ({ el, forwardChannelName }) => {
           backgroundColor: el.isMyMessage ? theme.palette.primary.main : theme.palette.background.neutral,
           borderRadius: 1.5,
           position: 'relative',
-          maxWidth: '75%',
+          maxWidth: '100%',
         }}
       >
         <ForwardTo message={el} forwardChannelName={forwardChannelName} />
@@ -815,7 +845,7 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
         sx={{
           backgroundColor: el.isMyMessage ? theme.palette.primary.main : theme.palette.background.neutral,
           borderRadius: 1.5,
-          maxWidth: '75%',
+          maxWidth: '100%',
           position: 'relative',
         }}
       >
@@ -961,7 +991,7 @@ const SignalMsg = ({ el }) => {
           borderRadius: 1.5,
           // display: 'flex',
           // alignItems: 'center',
-          maxWidth: '75%',
+          maxWidth: '100%',
         }}
       >
         <Stack direction="row" alignItems="center">
@@ -1032,7 +1062,7 @@ const PollMsg = ({ el, all_members }) => {
           backgroundColor: el.isMyMessage ? theme.palette.primary.main : theme.palette.background.neutral,
           borderRadius: 1.5,
           position: 'relative',
-          maxWidth: '75%',
+          maxWidth: '90%',
         }}
       >
         <PollBox message={el} all_members={all_members} />
@@ -1053,7 +1083,7 @@ const StickerMsg = ({ el, forwardChannelName }) => {
         py={1.5}
         sx={{
           position: 'relative',
-          maxWidth: '75%',
+          maxWidth: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: el.isMyMessage ? 'flex-end' : 'flex-start',
