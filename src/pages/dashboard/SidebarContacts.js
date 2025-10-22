@@ -8,12 +8,14 @@ import { PeopleIcon, UserSupportIcon, DeviceMessageIcon } from '../../components
 import { SetSearchQuery } from '../../redux/slices/app';
 import { ChatType, ContactType, RoleMember } from '../../constants/commons-const';
 import useResponsive from '../../hooks/useResponsive';
+import { useTranslation } from 'react-i18next';
 
 const SidebarContacts = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const isMobileToMd = useResponsive('down', 'md');
-  const { activeChannels, pendingChannels } = useSelector(state => state.channel);
+  const { activeChannels = [], pendingChannels = [], pinnedChannels = [] } = useSelector(state => state.channel);
   const { searchQuery } = useSelector(state => state.app);
   const { user_id } = useSelector(state => state.auth);
   const [currentHash, setCurrentHash] = useState(window.location.hash);
@@ -26,17 +28,17 @@ const SidebarContacts = () => {
 
   // Friend list: direct channels có owner khác mình
   const directChannels = useMemo(() => {
-    return activeChannels.filter(channel => {
+    return [...activeChannels, ...pinnedChannels].filter(channel => {
       const isDirect = channel.type === ChatType.MESSAGING;
       const otherMember = Object.values(channel.state.members).find(member => member.user_id !== user_id);
       return isDirect && otherMember && otherMember.channel_role === RoleMember.OWNER;
     });
-  }, [activeChannels, user_id]);
+  }, [activeChannels, pinnedChannels, user_id]);
 
   // Channels list: type là team
   const teamChannels = useMemo(() => {
-    return activeChannels.filter(channel => channel.type === ChatType.TEAM);
-  }, [activeChannels]);
+    return [...activeChannels, ...pinnedChannels].filter(channel => channel.type === ChatType.TEAM);
+  }, [activeChannels, pinnedChannels]);
 
   // Friend/Channel Request: số lượng pendingChannels
   const requestCount = pendingChannels.length;
@@ -44,19 +46,19 @@ const SidebarContacts = () => {
   const buttonList = [
     {
       key: ContactType.Friends,
-      label: 'Friends list',
+      label: t('contact.friends_list'),
       icon: <PeopleIcon color={theme.palette.text.primary} />,
       count: directChannels.length,
     },
     {
       key: ContactType.Channels,
-      label: 'Channels list',
+      label:t('contact.channel_list'),
       icon: <DeviceMessageIcon color={theme.palette.text.primary} />,
       count: teamChannels.length,
     },
     {
       key: ContactType.Request,
-      label: 'Friend/Channel Request',
+      label: t('contact.channel_request'),
       icon: <UserSupportIcon color={theme.palette.text.primary} />,
       count: requestCount,
     },
@@ -73,7 +75,7 @@ const SidebarContacts = () => {
           <Search>
             <SearchIconWrapper>{<MagnifyingGlass size={18} />}</SearchIconWrapper>
             <StyledInputBase
-              placeholder="Search"
+              placeholder={t('contact.search')}
               inputProps={{ 'aria-label': 'search' }}
               value={searchQuery}
               onChange={e => dispatch(SetSearchQuery(e.target.value))}

@@ -7,6 +7,8 @@ import ContactElement from '../../components/ContactElement';
 import { client } from '../../client';
 import { UpdateIsLoading } from '../../redux/slices/app';
 import UserElement from '../../components/UserElement';
+import { removeVietnameseTones } from '../../utils/commons';
+import { useTranslation } from 'react-i18next';
 
 const FriendList = ({
   searchQuery = '',
@@ -22,14 +24,15 @@ const FriendList = ({
   enableUserSearch = false,
   excludedUserIds = [],
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const { activeChannels } = useSelector(state => state.channel);
+  const { activeChannels = [], pinnedChannels = [] } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const [searchedUser, setSearchedUser] = useState(null);
 
   const directChannels = useMemo(() => {
-    return activeChannels.filter(channel => {
+    return [...activeChannels, ...pinnedChannels].filter(channel => {
       const isDirect = channel.type === ChatType.MESSAGING;
       const otherMember = Object.values(channel.state.members).find(member => member.user_id !== user_id);
       return (
@@ -39,7 +42,7 @@ const FriendList = ({
         !excludedUserIds.includes(otherMember.user_id)
       );
     });
-  }, [activeChannels, user_id, excludedUserIds]);
+  }, [activeChannels, pinnedChannels, user_id, excludedUserIds]);
 
   // Gọi API tìm user nếu không có filteredChannels và enableUserSearch=true
   useEffect(() => {
@@ -47,8 +50,9 @@ const FriendList = ({
     let debounceTimer;
 
     const filteredChannels = directChannels.filter(channel => {
-      const name = channel.data?.name || '';
-      return name.toLowerCase().includes(searchQuery.toLowerCase());
+      const name = removeVietnameseTones(channel.data?.name.toLowerCase()) || '';
+      const searchTerm = removeVietnameseTones(searchQuery.toLowerCase());
+      return name.includes(searchTerm);
     });
 
     if (enableUserSearch && searchQuery && filteredChannels.length === 0) {
@@ -83,8 +87,9 @@ const FriendList = ({
 
   const renderedFriends = useMemo(() => {
     const filteredChannels = directChannels.filter(channel => {
-      const name = channel.data?.name || '';
-      return name.toLowerCase().includes(searchQuery.toLowerCase());
+      const name = removeVietnameseTones(channel.data?.name.toLowerCase()) || '';
+      const searchTerm = removeVietnameseTones(searchQuery.toLowerCase());
+      return name.includes(searchTerm);
     });
 
     // Nếu không có channel và có searchedUsers thì hiển thị searchedUsers
@@ -172,13 +177,14 @@ const FriendList = ({
               fontWeight: 600,
             }}
           >
-            No result {searchQuery ? `for "${searchQuery}"` : ''}
+            {t('friendList.noResult')} {searchQuery ? `"${searchQuery}"` : ''}
           </Typography>
         </Stack>
       );
     }
   }, [
     activeChannels,
+    pinnedChannels,
     user_id,
     theme,
     searchQuery,

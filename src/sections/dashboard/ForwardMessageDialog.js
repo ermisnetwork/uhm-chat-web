@@ -1,25 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Slide,
-  Box,
-  Stack,
-  Typography,
-  IconButton,
-  useTheme,
-  Tooltip,
-  alpha,
-} from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Slide, Box, Stack, Typography, IconButton, useTheme } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
+import { LoadingButton } from '@mui/lab';
 import { onForwardMessage } from '../../redux/slices/messages';
 import ChannelAvatar from '../../components/ChannelAvatar';
-import { ArrowLeft, MagnifyingGlass, X } from 'phosphor-react';
+import { MagnifyingGlass, X } from 'phosphor-react';
 import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { AvatarShape, ChatType } from '../../constants/commons-const';
+import { AvatarShape } from '../../constants/commons-const';
 import { showSnackbar } from '../../redux/slices/app';
-import { LoadingSpinner } from '../../components/animate';
+import { formatString } from '../../utils/commons';
+import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -28,13 +18,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const ForwardMessageDialog = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
-
+  const { t } = useTranslation();
   const { openDialog, message } = useSelector(state => state.messages.forwardMessage);
-  const { activeChannels, pinnedChannels, currentChannel } = useSelector(state => state.channel);
+  const { activeChannels = [], currentChannel, pinnedChannels = [] } = useSelector(state => state.channel);
   const { canSendMessage } = useSelector(state => state.channel.channelPermissions);
 
   const [filteredChannels, setFilteredChannels] = useState([]);
-  const [topics, setTopics] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [forwardStatus, setForwardStatus] = useState({}); // 'idle' | 'loading' | 'sent' | 'error'
 
@@ -52,7 +41,6 @@ const ForwardMessageDialog = () => {
     dispatch(onForwardMessage({ openDialog: false, message: null }));
     setSearchQuery('');
     setFilteredChannels([]);
-    setTopics([]);
     setForwardStatus({});
   };
 
@@ -60,21 +48,18 @@ const ForwardMessageDialog = () => {
     const value = event.target.value;
     setSearchQuery(value);
 
-    const arr = topics.length ? topics : sortActiveChannels;
-
     if (value) {
-      const results = arr.filter(channel => channel.data.name.toLowerCase().includes(value.toLowerCase())) || [];
+      const results =
+        sortActiveChannels.filter(channel => channel.data.name.toLowerCase().includes(value.toLowerCase())) || [];
       setFilteredChannels(results);
     } else {
-      setFilteredChannels(arr);
+      setFilteredChannels(sortActiveChannels);
     }
   };
 
   const sendForwardMessage = async channel => {
     if (!canSendMessage) {
-      dispatch(
-        showSnackbar({ severity: 'error', message: 'You do not have permission to send message in this channel' }),
-      );
+      dispatch(showSnackbar({ severity: 'error', message: t('forwardMessageDialog.snackbar_sendForward_error') }));
       return;
     }
 
@@ -110,25 +95,56 @@ const ForwardMessageDialog = () => {
       if (result) {
         // Gửi thành công
         setForwardStatus(prev => ({ ...prev, [channel.id]: 'sent' }));
-        dispatch(showSnackbar({ severity: 'success', message: 'Message forwarded successfully' }));
-        onCloseDialog();
+        dispatch(
+          showSnackbar({ severity: 'success', message: t('forwardMessageDialog.snackbar_sendForward_success') }),
+        );
       }
     } catch (error) {
       // Gửi thất bại
       setForwardStatus(prev => ({ ...prev, [channel.id]: 'error' }));
-      dispatch(showSnackbar({ severity: 'error', message: 'Unable to forward the message. Please try again' }));
+      dispatch(showSnackbar({ severity: 'error', message: t('forwardMessageDialog.snackbar_sendForward_error') }));
     }
   };
 
-  const onSelectChannel = channel => {
-    if (channel.type === ChatType.TEAM && channel.state.topics.length > 0) {
-      const activeTopics = channel.state.topics.filter(topic => !topic.data?.is_closed_topic);
-      setTopics(activeTopics);
-      setFilteredChannels(activeTopics);
-      setSearchQuery('');
-    } else {
-      sendForwardMessage(channel);
-    }
+  const ForwardItemRow = ({ item, status, disabled, onSend, isTopic = false }) => {
+    return (
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Stack direction="row" alignItems="center" sx={{ width: 'calc(100% - 60px)', paddingRight: '15px' }}>
+          <ChannelAvatar
+            channel={item}
+            width={isTopic ? 25 : 30}
+            height={isTopic ? 25 : 30}
+            shape={AvatarShape.Round}
+          />
+          <Typography
+            variant="subtitle2"
+            sx={{
+              paddingLeft: isTopic ? '10px' : '15px',
+              width: 'calc(100% - 30px)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {formatString(item.data?.name)}
+          </Typography>
+        </Stack>
+
+        <LoadingButton
+          variant="outlined"
+          size="small"
+          sx={{ width: '60px', marginRight: '10px' }}
+          onClick={() => onSend(item)}
+          loading={status === 'loading'}
+          disabled={disabled}
+          color={status === 'error' ? 'error' : 'primary'}
+        >
+          {status === 'sent' && t('forwardMessageDialog.sent')}
+          {status === 'error' && t('forwardMessageDialog.resend')}
+          {['idle', 'loading'].includes(status) && t('forwardMessageDialog.send')}
+        </LoadingButton>
+      </Stack>
+    );
   };
 
   return (
@@ -141,33 +157,21 @@ const ForwardMessageDialog = () => {
       onClose={onCloseDialog}
     >
       <DialogTitle sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        Forward message{' '}
+        {t('forwardMessageDialog.title')}
         <IconButton onClick={onCloseDialog}>
           <X />
         </IconButton>
       </DialogTitle>
       <DialogContent>
         {/* -------------------------------search input---------------------------- */}
-        <Box sx={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {topics.length > 0 && (
-            <IconButton
-              onClick={() => {
-                setTopics([]);
-                setFilteredChannels(sortActiveChannels);
-                setSearchQuery('');
-              }}
-            >
-              <ArrowLeft size={20} color={theme.palette.text.primary} />
-            </IconButton>
-          )}
-
+        <Box sx={{ marginBottom: '20px' }}>
           <Search>
             <SearchIconWrapper>
-              <MagnifyingGlass size={18} color={theme.palette.text.primary} />
+              <MagnifyingGlass color="#709CE6" />
             </SearchIconWrapper>
             <StyledInputBase
               autoFocus
-              placeholder="Forward to..."
+              placeholder={t('forwardMessageDialog.search')}
               inputProps={{ 'aria-label': 'search' }}
               onChange={onSearch}
               value={searchQuery}
@@ -177,76 +181,68 @@ const ForwardMessageDialog = () => {
 
         {/* -------------------------------channel list---------------------------- */}
         <Box sx={{ height: '350px', overflowY: 'auto' }} className="customScrollbar">
-          <Stack direction="row" flexWrap="wrap">
+          <Stack spacing={2}>
             {filteredChannels.length ? (
               filteredChannels.map(channel => {
                 const channelId = channel.id;
                 const status = forwardStatus[channelId] || 'idle';
                 const isDisabled = status === 'sent';
+                const topics = channel.state?.topics || [];
 
                 return (
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    sx={{
-                      width: '25%',
-                      padding: '5px',
-                    }}
-                    key={channelId}
-                  >
-                    <Tooltip title={channel.data.name} placement="top">
+                  <Stack key={channelId} spacing={2}>
+                    <Stack direction="row" alignItems="center" justifyContent="space-between">
                       <Stack
-                        direction="column"
+                        direction="row"
                         alignItems="center"
-                        justifyContent="center"
-                        sx={{
-                          width: '100%',
-                          padding: '5px',
-                          borderRadius: '16px',
-                          cursor: 'pointer',
-                          transition: 'background-color 0.3s',
-                          position: 'relative',
-                          '&:hover': { backgroundColor: theme.palette.divider },
-                        }}
-                        onClick={() => onSelectChannel(channel)}
+                        sx={{ width: 'calc(100% - 60px)', paddingRight: '15px' }}
                       >
-                        <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
+                        <ChannelAvatar channel={channel} width={30} height={30} shape={AvatarShape.Round} />
                         <Typography
                           variant="subtitle2"
                           sx={{
-                            // paddingLeft: '15px',
-                            width: '100%',
+                            paddingLeft: '15px',
+                            width: 'calc(100% - 30px)',
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            textAlign: 'center',
                           }}
                         >
-                          {channel.data.name}
+                          {formatString(channel.data.name)}
                         </Typography>
-
-                        {status === 'loading' && (
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              height: '100%',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              backgroundColor: alpha(theme.palette.background.default, 0.5),
-                              zIndex: 2,
-                              backdropFilter: 'blur(4px)',
-                            }}
-                          >
-                            <LoadingSpinner />
-                          </Box>
-                        )}
                       </Stack>
-                    </Tooltip>
+
+                      <LoadingButton
+                        variant="outlined"
+                        size="small"
+                        sx={{ width: '60px', marginRight: '10px' }}
+                        onClick={() => sendForwardMessage(channel)}
+                        loading={status === 'loading'}
+                        disabled={isDisabled}
+                        color={status === 'error' ? 'error' : 'primary'}
+                      >
+                        {status === 'sent' && t('forwardMessageDialog.sent')}
+                        {status === 'error' && t('forwardMessageDialog.resend')}
+                        {['idle', 'loading'].includes(status) && t('forwardMessageDialog.send')}
+                      </LoadingButton>
+                    </Stack>
+                    {topics.length > 0 && (
+                      <Stack sx={{ pl: 3 }} spacing={2}>
+                        {topics.map(topic => {
+                          const topicStatus = forwardStatus[topic.id] || 'idle';
+                          return (
+                            <ForwardItemRow
+                              key={topic.id}
+                              item={topic}
+                              status={topicStatus}
+                              disabled={topicStatus === 'sent'}
+                              onSend={sendForwardMessage}
+                              isTopic
+                            />
+                          );
+                        })}
+                      </Stack>
+                    )}
                   </Stack>
                 );
               })
@@ -255,14 +251,13 @@ const ForwardMessageDialog = () => {
                 variant="subtitle2"
                 sx={{
                   textAlign: 'center',
-                  fontSize: '16px',
+                  fontStyle: 'italic',
+                  fontSize: '14px',
                   color: theme.palette.text.secondary,
                   fontWeight: 400,
-                  width: '100%',
-                  padding: '20px 0',
                 }}
               >
-                No chats found
+                {t('forwardMessageDialog.noResult')}
               </Typography>
             )}
           </Stack>

@@ -9,8 +9,11 @@ import MemberAvatar from '../../components/MemberAvatar';
 import { formatString } from '../../utils/commons';
 import Iconify from '../../components/Iconify';
 import useResponsive from '../../hooks/useResponsive';
+import { useTranslation } from 'react-i18next';
+import { LocalStorageKey } from '../../constants/localStorage-const';
 
 const ProfileMenu = () => {
+  const { i18n, t } = useTranslation();
   const isMobileToMd = useResponsive('down', 'md');
   const theme = useTheme();
   const { myUserInfo } = useSelector(state => state.member);
@@ -33,6 +36,12 @@ const ProfileMenu = () => {
     dispatch(LogoutUser());
   };
 
+  const onChangeLanguage = () => {
+    const newLang = i18n.language === 'vi' ? 'en' : 'vi';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem(LocalStorageKey.Locale, newLang);
+  };
+
   const handleMenuItem = key => {
     switch (key) {
       case 'profile':
@@ -41,6 +50,9 @@ const ProfileMenu = () => {
       case 'saved_messages':
         break;
       case 'blocked_contacts':
+        break;
+      case 'change_language':
+        onChangeLanguage();
         break;
       case 'logout':
         onLogout();
@@ -52,10 +64,10 @@ const ProfileMenu = () => {
 
   return (
     <>
-      <Button ref={stackRef} variant="text" color="inherit" onClick={handleClick}>
+      <Button ref={stackRef} variant="text" color="inherit" onClick={handleClick} sx={{ textTransform: 'none' }}>
         <MemberAvatar member={myUserInfo} width={isMobileToMd ? 30 : 40} height={isMobileToMd ? 30 : 40} />
         {!isMobileToMd && (
-          <Typography variant="subtitle1" sx={{ fontSize: '16px', padding: '0px 8px', textTransform: 'lowercase' }}>
+          <Typography variant="subtitle1" sx={{ fontSize: '16px', padding: '0px 8px' }}>
             {formatString(myUserInfo.name)}
           </Typography>
         )}
@@ -96,10 +108,17 @@ const ProfileMenu = () => {
                   sx={{ width: '100%' }}
                   direction="row"
                   alignItems={'center'}
+                  justifyContent={'space-between'}
                   spacing={2}
                 >
-                  {el.icon}
-                  <span style={{ color: el.key === 'logout' ? theme.palette.error.main : 'inherit' }}>{el.title}</span>
+                  <Stack direction="row" alignItems={'center'} spacing={1}>
+                    {el.icon}
+                    <span style={{ color: el.key === 'logout' ? theme.palette.error.main : 'inherit' }}>
+                      {t(el.title)}
+                    </span>
+                  </Stack>
+
+                  {el.key === 'change_language' && <span>{i18n.language === 'vi' ? '🇻🇳' : '🇺🇸'}</span>}
                 </Stack>
               </MenuItem>
             ))}

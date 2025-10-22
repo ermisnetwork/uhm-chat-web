@@ -3,8 +3,11 @@ import { Box, Typography } from '@mui/material';
 import { formatString } from '../utils/commons';
 import ChannelAvatar from './ChannelAvatar';
 import { AvatarShape } from '../constants/commons-const';
+import { useTranslation } from 'react-i18next';
 
 const NoMessageBox = ({ channel }) => {
+  const { t } = useTranslation();
+  
   if (!channel) return null;
 
   return (
@@ -35,7 +38,7 @@ const NoMessageBox = ({ channel }) => {
           fontWeight: 400,
         }}
       >
-        Let start this conversations with great stories!
+        {t('noMessageBox.no_message')}
       </Typography>
     </Box>
   );

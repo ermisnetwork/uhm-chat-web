@@ -14,6 +14,7 @@ import useResponsive from '../../hooks/useResponsive';
 import { setCurrentChannel, setCurrentChannelStatus } from '../../redux/slices/channel';
 import { ContactType, CurrentChannelStatus, TabType } from '../../constants/commons-const';
 import { SetOpenTopicPanel } from '../../redux/slices/topic';
+import { useTranslation } from 'react-i18next';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: 'inherit',
@@ -90,6 +91,7 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const SideBar = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -98,7 +100,7 @@ const SideBar = () => {
   const isMobileToMd = useResponsive('down', 'md');
 
   const { tab } = useSelector(state => state.app);
-  const { pendingChannels } = useSelector(state => state.channel);
+  const { pendingChannels = [] } = useSelector(state => state.channel);
 
   const { onToggleMode } = useSettings();
 
@@ -137,7 +139,7 @@ const SideBar = () => {
     return Nav_Buttons.map(el => {
       const isSelected = el.index === selectedTab;
       return (
-        <Tooltip title={el.title} key={el.index} placement="right">
+        <Tooltip title={t(el.title)} key={el.index} placement="right">
           <StyledIconButton
             onClick={() => handleChangeTab(el.index)}
             sx={{
@@ -183,14 +185,14 @@ const SideBar = () => {
         direction="row"
         justifyContent="center"
         alignItems="center"
-        sx={{ width: '100%', height: '98px', borderBottom: `1px solid ${theme.palette.divider}` }}
+        sx={{ width: '100%', height: '70px', borderBottom: `1px solid ${theme.palette.divider}` }}
       >
         <Box onClick={onGoToHome} sx={{ cursor: 'pointer' }}>
           <img src={Logo} alt="logo" />
         </Box>
       </Stack>
 
-      <Stack alignItems={'center'} justifyContent="center" sx={{ height: 'calc(100% - 98px)', width: '100%' }}>
+      <Stack alignItems={'center'} justifyContent="center" sx={{ height: 'calc(100% - 70px)', width: '100%' }}>
         <Stack sx={{ width: 'max-content' }} direction="column" alignItems={'center'} spacing={3}>
           {renderNavButtons()}
         </Stack>

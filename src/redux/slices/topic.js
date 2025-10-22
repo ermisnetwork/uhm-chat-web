@@ -73,7 +73,7 @@ const watchTopic = async topicId => {
       return topic;
     }
   } catch (error) {
-    handleError(dispatch, error);
+    handleError(dispatch, error, t);
     return null;
   }
 };

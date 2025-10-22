@@ -42,6 +42,7 @@ import { client } from '../../client';
 import useResponsive from '../../hooks/useResponsive';
 import HomeSearch from '../../components/Search/HomeSearch';
 import { X } from 'phosphor-react';
+import { useTranslation } from 'react-i18next';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
@@ -50,6 +51,7 @@ const StyledTopicItem = styled(Box)(({ theme }) => ({
 }));
 
 const TopicEmpty = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const isMobileToMd = useResponsive('down', 'md');
@@ -70,7 +72,7 @@ const TopicEmpty = () => {
           marginTop: 2,
         }}
       >
-        Topic Is Waiting!
+        {t('topicPanel.topic_waiting')}
       </Typography>
       <Typography
         variant="subtitle2"
@@ -81,7 +83,7 @@ const TopicEmpty = () => {
           fontWeight: 400,
         }}
       >
-        We moved older messages to “General.” Kick off a new topic anytime!
+        {t('topicPanel.message')}
       </Typography>
 
       {[RoleMember.OWNER, RoleMember.MOD].includes(myRole) && (
@@ -93,7 +95,7 @@ const TopicEmpty = () => {
             dispatch(SetOpenNewTopicDialog(true));
           }}
         >
-          NEW TOPIC
+          {t('topicPanel.New_topic')}
         </Button>
       )}
     </Stack>
@@ -101,6 +103,7 @@ const TopicEmpty = () => {
 };
 
 const TopicHeader = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -112,7 +115,7 @@ const TopicHeader = () => {
 
   const ACTIONS = [
     {
-      label: 'Channel Info',
+      label: t('topicPanel.info_channel'),
       icon: <InfoIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
@@ -120,7 +123,7 @@ const TopicHeader = () => {
       },
     },
     {
-      label: 'Search Messages',
+      label: t('topicPanel.search'),
       icon: <SearchIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
@@ -130,7 +133,7 @@ const TopicHeader = () => {
       },
     },
     {
-      label: 'Add Members',
+      label: t('topicPanel.add_member'),
       icon: <ProfileAddIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
@@ -138,7 +141,7 @@ const TopicHeader = () => {
       },
     },
     {
-      label: 'New Topic',
+      label: t('topicPanel.new_topic'),
       icon: <StickyNoteIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
@@ -166,7 +169,7 @@ const TopicHeader = () => {
       spacing={1}
       sx={{
         width: '100%',
-        height: '74px',
+        height: '65px',
         padding: '8px 6px',
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
@@ -224,7 +227,7 @@ const TopicHeader = () => {
                     fontWeight: 400,
                   }}
                 >
-                  {`${currentChannel.data?.member_count} members`}
+                  {`${currentChannel.data?.member_count} ${t('topicPanel.member')}`}
                 </Typography>
               </Typography>
             </Button>
@@ -278,6 +281,7 @@ const TopicHeader = () => {
 };
 
 const TopicPanel = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -375,7 +379,7 @@ const TopicPanel = () => {
             </FlipMove>
           )}
 
-          {topics.length > 0 ? (
+          {topics.length > 0 || pinnedTopics.length > 0 ? (
             <FlipMove duration={200}>
               {topics.map(item => {
                 return (
