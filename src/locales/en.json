@@ -397,11 +397,11 @@
     "message": "We couldn’t find any messages. Try a different keyword or share something to get started."
   },
   "inviteFriendDialog": {
-   "title": "Invite members to this channel",
-   "search": "Search", 
-   "invite": "INVITE", 
-   "members": "MEMBERS",
-   "snackbar_success": "Members added successfully"
+    "title": "Invite members to this channel",
+    "search": "Search",
+    "invite": "INVITE",
+    "members": "MEMBERS",
+    "snackbar_success": "Members added successfully"
   },
   "newTopicDialog": {
     "title": "Start a new topic",
@@ -665,12 +665,12 @@
     "snackbar_google_login_failed": "Google login failed. Please try again."
   },
   "index_login": {
-    "title_one": "Welcome to Uhmm...",
-    "description_one": "Uhmm... isn’t just a chat app — it’s a decentralized hub for secure, real-time team collaboration. \nBuilt for Web3, made for you.",
+    "title_one": "Welcome to EChat...",
+    "description_one": "EChat... isn’t just a chat app — it’s a decentralized hub for secure, real-time team collaboration. \nBuilt for Web3, made for you.",
     "title_two": "Smart. Secure. On-Chain.",
     "description_two": "Powered by blockchain, your messages stay encrypted, verified,\nand tamper-proof - with data ownership in your hands.",
     "title_three": "Ready for the Workforce",
-    "description_three": "Designed for DAOs, startups, and global teams embracing decentralization.\nUhmm... is your all-in-one, future-proof communication layer."
+    "description_three": "Designed for DAOs, startups, and global teams embracing decentralization.\nEChat... is your all-in-one, future-proof communication layer."
   },
   "register": {
     "title": "Get started with Ermis.",
@@ -705,9 +705,9 @@
     "email_label": "Email address",
     "password_label": "Password",
     "text": "text",
-    "email_required":"Email is required",
-    "email_valid":"Email must be a valid email address",
-    "password_required":"Password is required"
+    "email_required": "Email is required",
+    "email_valid": "Email must be a valid email address",
+    "password_required": "Password is required"
   },
   "login_wallet": {
     "address": "Address",

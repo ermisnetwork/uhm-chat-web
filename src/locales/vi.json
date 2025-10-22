@@ -665,12 +665,12 @@
     "snackbar_google_login_failed": "Đăng nhập bằng Google không thành công. Vui lòng thử lại."
   },
   "index_login": {
-    "title_one": "Chào mừng đến với Uhmm...",
-    "description_one": "Uhmm... không chỉ là một ứng dụng chat — mà còn là trung tâm phi tập trung cho sự cộng tác nhóm an toàn, thời gian thực.\nĐược xây dựng cho Web3, tạo ra dành cho bạn.",
+    "title_one": "Chào mừng đến với EChat...",
+    "description_one": "EChat... không chỉ là một ứng dụng chat — mà còn là trung tâm phi tập trung cho sự cộng tác nhóm an toàn, thời gian thực.\nĐược xây dựng cho Web3, tạo ra dành cho bạn.",
     "title_two": "Thông minh. An toàn. On-Chain.",
     "description_two": "Được hỗ trợ bởi blockchain, tin nhắn của bạn luôn được mã hóa, xác thực,\nvà chống giả mạo - với quyền sở hữu dữ liệu nằm trong tay bạn.",
     "title_three": "Sẵn sàng cho lực lượng lao động",
-    "description_three": "Được thiết kế cho DAO, startup và các nhóm toàn cầu đang đón nhận sự phi tập trung.\nUhmm... là lớp giao tiếp tất cả trong một, sẵn sàng cho tương lai."
+    "description_three": "Được thiết kế cho DAO, startup và các nhóm toàn cầu đang đón nhận sự phi tập trung.\nEChat... là lớp giao tiếp tất cả trong một, sẵn sàng cho tương lai."
   },
   "register": {
     "title": "Hãy bắt đầu với Ermis.",
