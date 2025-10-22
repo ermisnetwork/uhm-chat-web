@@ -412,7 +412,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
           setMessages(prev => {
             return prev.map(item => {
               if (item.id === editMessage.id) {
-                const editMsgData = { ...item, ...payloadEdit, updated_at: new Date() };
+                const editMsgData = { ...item, ...payloadEdit, updated_at: new Date(), status: 'sending' };
 
                 if (!isOnline) {
                   editMsgData.status = 'error';
@@ -458,6 +458,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
           type: stickerUrl ? 'sticker' : 'regular',
           user: { id: user_id, name: myUserInfo?.name || user_id, avatar: myUserInfo?.avatar || '' },
           created_at,
+          status: 'sending',
         };
         if (!isOnline) {
           msgData.status = 'error';
