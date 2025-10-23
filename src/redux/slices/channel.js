@@ -414,16 +414,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
       dispatch(SetTopics([]));
       const { user_id } = getState().auth;
       const channel = client.channel(channelType, channelId);
-      // const read = channel.state.read[user_id];
-      // const lastMessageId =
-      //   read && read.unread_messages > 0 && read.last_read_message_id ? read.last_read_message_id : '';
-
       const messages = { limit: 25 };
-      // if (lastMessageId) {
-      //   messages.id_gt = lastMessageId;
-      // }
-
-      // await channel.watch();
       const response = await channel.query({
         messages,
       });
