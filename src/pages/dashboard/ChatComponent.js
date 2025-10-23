@@ -321,7 +321,7 @@ const MessageList = React.memo(
     if (messages.length === 0) return null;
 
     return (
-      <Box sx={{ padding: isMobileToLg ? '20px' : isLgToXl ? '40px 50px' : '40px 90px' }}>
+      <Box sx={{ padding: isMobileToLg ? '20px' : isLgToXl ? '40px 50px' : '40px 90px', overflow: 'hidden' }}>
         <Stack sx={{ position: 'relative' }}>
           <AnimatePresence initial={false}>
             {filteredMessages.map((el, idx) => {
@@ -531,9 +531,9 @@ const ChatComponent = () => {
       setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
 
       const read = currentChat.state.read[user_id];
-      const lastReadMsgId = read.unread_messages ? read.last_read_message_id : '';
+      const lastReadMsgId = read && read?.unread_messages ? read.last_read_message_id : '';
       setLastReadMessageId(lastReadMsgId);
-      let lastSend = read.last_send || DefaultLastSend;
+      let lastSend = (read && read?.last_send) || DefaultLastSend;
       let duration = currentChat.data.member_message_cooldown || 0;
 
       const onSetCooldownTime = event => {
