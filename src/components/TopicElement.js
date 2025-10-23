@@ -14,7 +14,7 @@ import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
 import TopicAvatar from './TopicAvatar';
 import useResponsive from '../hooks/useResponsive';
-import { handleError, isChannelDirect, myRoleInChannel } from '../utils/commons';
+import { handleError, myRoleInChannel } from '../utils/commons';
 import { setChannelConfirm } from '../redux/slices/dialog';
 import { useTranslation } from 'react-i18next';
 
@@ -92,85 +92,110 @@ const TopicElement = ({ topic, idSelected }) => {
 
   const getLastMessage = useCallback(
     message => {
-      if (message) {
-        const date = message.updated_at ? message.updated_at : message.created_at;
-        const sender = message.user;
-        const senderId = sender?.id;
-        const isMe = user_id === senderId;
-        const senderName = isMe ? t('chatElement.you') : sender?.name || senderId;
-        setLastMessageAt(getDisplayDate(date));
-        if (message.type === MessageType.System) {
+      if (!message) {
+        setLastMessageAt(getDisplayDate(topic.data.created_at));
+        setLastMessage(t('topicElement.no_message'));
+        return;
+      }
+
+      const date = message.updated_at || message.created_at;
+      const sender = message.user;
+      const senderId = sender?.id;
+      const isMe = user_id === senderId;
+      const senderName = isMe ? t('chatElement.you') : sender?.name || senderId;
+
+      setLastMessageAt(getDisplayDate(date));
+
+      switch (message.type) {
+        case MessageType.System: {
           const messageSystem = convertMessageSystem(message.text, users, false, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
-        } else if (message.type === MessageType.Signal) {
+          break;
+        }
+
+        case MessageType.Signal: {
           const messageSignal = convertMessageSignal(message.text);
           setLastMessage(messageSignal.text || '');
-        } else if (message.type === MessageType.Sticker) {
-          setLastMessage(`${senderName}: ${t('message.sticker')}`);
-        } else {
-          if (message.attachments) {
+          break;
+        }
+
+        case MessageType.Sticker: {
+          setLastMessage(`${senderName}: ${t('chatElement.sticker')}`);
+          break;
+        }
+
+        default: {
+          if (message.attachments && message.attachments.length > 0) {
             const attachmentLast = message.attachments[message.attachments.length - 1];
 
-            const isLinkPreview = attachmentLast.type === 'linkPreview';
-            const isImage = attachmentLast.type === 'image';
-            const isVideo = attachmentLast.type === 'video';
-
-            if (isImage) {
-              setLastMessage(
-                <>
-                  {`${senderName}:`}
-                  <img
-                    src={attachmentLast.image_url}
-                    alt={attachmentLast.title || 'image'}
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: '5px',
-                      display: 'inline-block',
-                      verticalAlign: 'top',
-                      margin: '0px 4px',
-                    }}
-                  />
-                  {attachmentLast.title || t('chatElement.photo')}
-                </>,
-              );
-            } else if (isVideo) {
-              setLastMessage(
-                <>
-                  {`${senderName}:`}
-                  <span style={{ position: 'relative', display: 'inline-block', margin: '0px 4px' }}>
+            switch (attachmentLast.type) {
+              case 'image': {
+                setLastMessage(
+                  <>
+                    {`${senderName}:`}
                     <img
-                      src={attachmentLast.thumb_url}
-                      alt={attachmentLast.title || 'video'}
+                      src={attachmentLast.image_url}
+                      alt={attachmentLast.title || 'image'}
                       style={{
                         width: 20,
                         height: 20,
                         borderRadius: '5px',
                         display: 'inline-block',
                         verticalAlign: 'top',
+                        margin: '0px 4px',
                       }}
                     />
-                    <Play
-                      size={10}
-                      color="#fff"
-                      weight="fill"
-                      style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
-                    />
-                  </span>
-                  {attachmentLast.title || 'Video'}
-                </>,
-              );
-            } else {
-              setLastMessage(`${senderName}: ${isLinkPreview ? attachmentLast.link_url : attachmentLast.title}`);
+                    {attachmentLast.title || t('chatElement.photo')}
+                  </>,
+                );
+                break;
+              }
+
+              case 'video': {
+                setLastMessage(
+                  <>
+                    {`${senderName}:`}
+                    <span style={{ position: 'relative', display: 'inline-block', margin: '0px 4px' }}>
+                      <img
+                        src={attachmentLast.thumb_url}
+                        alt={attachmentLast.title || 'video'}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '5px',
+                          display: 'inline-block',
+                          verticalAlign: 'top',
+                        }}
+                      />
+                      <Play
+                        size={10}
+                        color="#fff"
+                        weight="fill"
+                        style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+                      />
+                    </span>
+                    {attachmentLast.title || 'Video'}
+                  </>,
+                );
+                break;
+              }
+
+              case 'linkPreview': {
+                setLastMessage(`${senderName}: ${attachmentLast.link_url}`);
+                break;
+              }
+
+              default: {
+                setLastMessage(`${senderName}: ${attachmentLast.title}`);
+                break;
+              }
             }
           } else {
             const messagePreview = replaceMentionsWithNames(message.text);
             setLastMessage(`${senderName}: ${messagePreview}`);
           }
+          break;
         }
-      } else {
-        setLastMessageAt(getDisplayDate(topic.data.created_at));
-        setLastMessage(t('topicElement.no_message'));
       }
     },
     [user_id, users, t, replaceMentionsWithNames, topic.data.created_at],
@@ -370,7 +395,7 @@ const TopicElement = ({ topic, idSelected }) => {
                     fontWeight: hasUnread ? 600 : 400,
                   }}
                 >
-                  {t(lastMessage)}
+                  {lastMessage}
                 </Typography>
 
                 {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}

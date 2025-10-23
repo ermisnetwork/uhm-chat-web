@@ -40,24 +40,24 @@ const ChannelDetailApp = () => {
       if (result) {
         dispatch(ConnectCurrentChannel(result.channelId, result.channelType));
 
-        const handleVisibilityChange = () => {
-          if (document.hidden) {
-            hiddenTimeRef.current = Date.now();
-          } else if (hiddenTimeRef.current) {
-            const elapsed = Date.now() - hiddenTimeRef.current;
-            // Nếu tab bị ẩn hơn 30 phút (1800000 ms), reconnect lại
-            if (elapsed > 1800000) {
-              dispatch(ConnectCurrentChannel(result.channelId, result.channelType));
-            }
-            hiddenTimeRef.current = null;
-          }
-        };
+        // const handleVisibilityChange = () => {
+        //   if (document.hidden) {
+        //     hiddenTimeRef.current = Date.now();
+        //   } else if (hiddenTimeRef.current) {
+        //     const elapsed = Date.now() - hiddenTimeRef.current;
+        //     // Nếu tab bị ẩn hơn 30 phút (1800000 ms), reconnect lại
+        //     if (elapsed > 1800000) {
+        //       dispatch(ConnectCurrentChannel(result.channelId, result.channelType));
+        //     }
+        //     hiddenTimeRef.current = null;
+        //   }
+        // };
 
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+        // document.addEventListener('visibilitychange', handleVisibilityChange);
 
-        return () => {
-          document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
+        // return () => {
+        //   document.removeEventListener('visibilitychange', handleVisibilityChange);
+        // };
       } else {
         navigate(`${DEFAULT_PATH}`);
       }
