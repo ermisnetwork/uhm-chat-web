@@ -1,9 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { RoleMember, SidebarType } from '../../constants/commons-const';
+import { SidebarType } from '../../constants/commons-const';
 import { client } from '../../client';
-import { handleError, myRoleInChannel } from '../../utils/commons';
+import { handleError } from '../../utils/commons';
 import { setSidebar } from './app';
-import { SetMarkReadChannel } from './channel';
 
 const initialState = {
   currentTopic: null,
@@ -73,7 +72,7 @@ const watchTopic = async topicId => {
       return topic;
     }
   } catch (error) {
-    handleError(dispatch, error);
+    handleError(dispatch, error, t);
     return null;
   }
 };
@@ -136,13 +135,6 @@ export const ConnectCurrentTopic = topicId => {
         dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
         dispatch(slice.actions.setCurrentTopic(topic));
         dispatch(SetIsClosedTopic(topic.data?.is_closed_topic ?? false));
-
-        const myRole = myRoleInChannel(topic);
-        if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
-          setTimeout(() => {
-            dispatch(SetMarkReadChannel(topic));
-          }, 100);
-        }
       }
     } catch (error) {}
   };

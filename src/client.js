@@ -20,7 +20,7 @@ const customConfig = {
 
 const connectUser = async (projectId, user_id, token, dispatch) => {
   client = ErmisChat.getInstance(API_KEY, projectId, {
-    timeout: 6000,
+    // timeout: 6000,
     baseURL: BASE_URL,
   });
 

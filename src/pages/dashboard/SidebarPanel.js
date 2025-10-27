@@ -3,7 +3,7 @@ import { Box, useTheme, Drawer } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 import { WIDTH_SIDEBAR_PANEL } from '../../config';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSidebar, ToggleSidebar } from '../../redux/slices/app';
+import { SetIsEditing, setSidebar, ToggleSidebar } from '../../redux/slices/app';
 import { SidebarType } from '../../constants/commons-const';
 
 const SidebarPanel = ({ children }) => {
@@ -19,6 +19,7 @@ const SidebarPanel = ({ children }) => {
     return () => {
       // Cleanup if necessary
       dispatch(setSidebar({ type: SidebarType.Channel, open: false, mode: '' })); // Reset sidebar state on unmount
+      dispatch(SetIsEditing(false));
     };
   }, []);
 

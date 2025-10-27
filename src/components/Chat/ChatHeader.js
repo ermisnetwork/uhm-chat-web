@@ -46,8 +46,10 @@ import {
 } from '../Icons';
 import { setChannelConfirm } from '../../redux/slices/dialog';
 import { SetOpenTopicPanel } from '../../redux/slices/topic';
+import { useTranslation } from 'react-i18next';
 
 const ActionsTopic = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -64,9 +66,9 @@ const ActionsTopic = () => {
       const topicCID = currentTopic?.cid;
       await currentChannel.closeTopic(topicCID);
       setAnchorEl(null);
-      dispatch(showSnackbar({ message: 'Topic closed successfully', severity: 'success' }));
+      dispatch(showSnackbar({ message: t('chatHeader.snackbar_closed_success'), severity: 'success' }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 
@@ -75,9 +77,9 @@ const ActionsTopic = () => {
       const topicCID = currentTopic?.cid;
       await currentChannel.reopenTopic(topicCID);
       setAnchorEl(null);
-      dispatch(showSnackbar({ message: 'Topic reopened successfully', severity: 'success' }));
+      dispatch(showSnackbar({ message: t('chatHeader.snackbar_reopen_success'), severity: 'success' }));
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 
@@ -89,7 +91,7 @@ const ActionsTopic = () => {
         await client.pinChannel(ChatType.TOPIC, currentTopic?.id);
       }
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     } finally {
       setAnchorEl(null);
     }
@@ -118,8 +120,8 @@ const ActionsTopic = () => {
 
   const ACTIONS = [
     {
-      value: isPinned ? 'unpin' : 'pin',
-      label: isPinned ? 'Unpin' : 'Pin To Top',
+      value: isPinned ? t('chatHeader.unpin') : t('chatHeader.pin'),
+      label: isPinned ? t('chatHeader.unpin') : t('chatHeader.pin_to_top'),
       icon: isPinned ? (
         <UnPinIcon color={theme.palette.text.primary} />
       ) : (
@@ -128,21 +130,21 @@ const ActionsTopic = () => {
       onClick: onPinTopic,
     },
     {
-      value: 'info',
-      label: 'Topic Info',
+      value: t('chatHeader.info'),
+      label: t('chatHeader.topic_info'),
       icon: <InfoIcon color={theme.palette.text.primary} />,
       onClick: onOpenTopicInfo,
     },
     !isTopicClosed && {
-      value: 'edit',
-      label: 'Edit Topic',
+      value: t('chatHeader.topic'),
+      label: t('chatHeader.edit_topic'),
       icon: <EditIcon color={theme.palette.text.primary} />,
       onClick: onEditTopicInfo,
       allowRoles: [RoleMember.OWNER, RoleMember.MOD],
     },
     {
-      value: isTopicClosed ? 'reopen' : 'close',
-      label: isTopicClosed ? 'Reopen Topic' : 'Close Topic',
+      value: isTopicClosed ? t('chatHeader.reopen') : t('chatHeader.close'),
+      label: isTopicClosed ? t('chatHeader.reopen_topic') : t('chatHeader.close_topic'),
       icon: isTopicClosed ? (
         <PlayCircleIcon color={theme.palette.text.primary} />
       ) : (
@@ -152,8 +154,8 @@ const ActionsTopic = () => {
       allowRoles: [RoleMember.OWNER, RoleMember.MOD],
     },
     {
-      value: 'delete',
-      label: 'Delete Topic',
+      value: t('chatHeader.delete'),
+      label: t('chatHeader.delete_topic'),
       icon: <TrashIcon color={theme.palette.error.main} />,
       onClick: onDeleteTopic,
       allowRoles: [RoleMember.OWNER],
@@ -218,6 +220,7 @@ const ActionsTopic = () => {
 
 const ChatHeader = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const isMobileToMd = useResponsive('down', 'md');
   const theme = useTheme();
@@ -261,7 +264,7 @@ const ChatHeader = () => {
       }
     } catch (error) {
       setLoadingJoin(false);
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 
@@ -270,7 +273,7 @@ const ChatHeader = () => {
       if (currentTopic) {
         return currentTopic.data?.name;
       } else {
-        return 'General';
+        return t('chatHeader.general');
       }
     } else {
       return currentChannel.data?.name;
@@ -281,7 +284,7 @@ const ChatHeader = () => {
     if (isEnabledTopics || currentTopic) {
       return currentChannel.data?.name;
     } else {
-      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} members`;
+      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} ${t('chatHeader.member')}`;
     }
   };
 
@@ -304,7 +307,7 @@ const ChatHeader = () => {
       <Box
         sx={{
           width: '100%',
-          height: '74px',
+          height: '65px',
           padding: '8px 16px',
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}
@@ -411,7 +414,7 @@ const ChatHeader = () => {
 
             {isGuest && (
               <LoadingButton variant="contained" onClick={onJoinChannel} loading={loadingJoin}>
-                Join
+                {t('chatHeader.join')}
               </LoadingButton>
             )}
           </Stack>

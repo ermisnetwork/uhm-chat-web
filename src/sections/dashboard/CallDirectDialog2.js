@@ -38,6 +38,7 @@ import {
 } from 'phosphor-react';
 import { Howl } from 'howler';
 import { showSnackbar } from '../../redux/slices/app';
+import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -139,6 +140,7 @@ const StyledMenu = styled(Menu)(({ theme }) => ({
 
 const CallDirectDialog2 = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const localVideoRef = useRef(null);
   const localAudioRef = useRef(null);
@@ -466,7 +468,7 @@ const CallDirectDialog2 = () => {
           >
             <ChatCircleDots weight="fill" size={20} />
           </Button>
-          <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>chat</span>
+          <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{t('callDirectDialog.chat')}</span>
         </StyledButton>
 
         <StyledButton>
@@ -489,7 +491,9 @@ const CallDirectDialog2 = () => {
               <CaretDown size={14} />
             </Button>
           )}
-          <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{micOn ? 'mute' : 'unmute'}</span>
+          <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>
+            {micOn ? t('callDirectDialog.mute') : t('callDirectDialog.unmute')}
+          </span>
         </StyledButton>
 
         <StyledButton>
@@ -513,7 +517,7 @@ const CallDirectDialog2 = () => {
             </Button>
           )}
           <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>
-            {localCameraOn ? 'stop video' : 'start video'}
+            {localCameraOn ? t('callDirectDialog.stop_video') : t('callDirectDialog.start_video')}
           </span>
         </StyledButton>
 
@@ -527,7 +531,9 @@ const CallDirectDialog2 = () => {
             >
               <Screencast weight="fill" size={20} />
             </Button>
-            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>screencast</span>
+            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>
+              {t('callDirectDialog.screencast')}
+            </span>
           </StyledButton>
         )}
 
@@ -537,13 +543,13 @@ const CallDirectDialog2 = () => {
               <Button onClick={onSendRejectCall} variant="contained" color="error">
                 <PhoneDisconnect weight="fill" size={20} />
               </Button>
-              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>decline</span>
+              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{t('callDirectDialog.decline')}</span>
             </StyledButton>
             <StyledButton>
               <LoadingButton onClick={onSendAcceptCall} variant="contained" color="success" loading={loadingButton}>
                 <Phone weight="fill" size={20} />
               </LoadingButton>
-              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>accept</span>
+              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{t('callDirectDialog.accept')}</span>
             </StyledButton>
           </>
         )}
@@ -553,7 +559,7 @@ const CallDirectDialog2 = () => {
             <Button onClick={onSendEndCall} variant="contained" color="error">
               <PhoneDisconnect weight="fill" size={20} />
             </Button>
-            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>end call</span>
+            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{t('callDirectDialog.end_call')}</span>
           </StyledButton>
         )}
 
@@ -562,7 +568,7 @@ const CallDirectDialog2 = () => {
             <Button onClick={onCancelCall} variant="contained" color="error">
               <X weight="fill" size={20} />
             </Button>
-            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>cancel</span>
+            <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{t('callDirectDialog.cancel')}</span>
           </StyledButton>
         )}
       </>
@@ -700,9 +706,9 @@ const CallDirectDialog2 = () => {
             }}
           >
             {callDirectStatus === CallStatus.RINGING ? (
-              'ringing'
+              t('callDirectDialog.ringing')
             ) : (
-              <span style={{ color: theme.palette.success.main }}>Connected</span>
+              <span style={{ color: theme.palette.success.main }}>{t('callDirectDialog.Connected')}</span>
             )}
             {[CallStatus.RINGING].includes(callDirectStatus) && (
               <>
@@ -785,7 +791,7 @@ const CallDirectDialog2 = () => {
                   color: '#DFE3E8',
                 }}
               >
-                Request to switch to a video call
+                {t('callDirectDialog.request_switch_video_call')}
               </Stack>
             )}
 
@@ -809,7 +815,7 @@ const CallDirectDialog2 = () => {
               <LoadingButton onClick={onSwitchToVideoCall} variant="contained" color="success">
                 <Phone weight="fill" size={20} />
               </LoadingButton>
-              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>accept</span>
+              <span className={`spanTitle ${remoteCameraOn ? 'whiteColor' : ''}`}>{t('callDirectDialog.accept')}</span>
             </StyledButton>
           ) : (
             renderButton()

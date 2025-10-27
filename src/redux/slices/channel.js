@@ -374,7 +374,7 @@ export function FetchChannels(params) {
           }),
         );
         dispatch(slice.actions.setLoadingChannels(false));
-        handleError(dispatch, err);
+        handleError(dispatch, err, t);
       });
   };
 }
@@ -414,16 +414,7 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
       dispatch(SetTopics([]));
       const { user_id } = getState().auth;
       const channel = client.channel(channelType, channelId);
-      // const read = channel.state.read[user_id];
-      // const lastMessageId =
-      //   read && read.unread_messages > 0 && read.last_read_message_id ? read.last_read_message_id : '';
-
       const messages = { limit: 25 };
-      // if (lastMessageId) {
-      //   messages.id_gt = lastMessageId;
-      // }
-
-      // await channel.watch();
       const response = await channel.query({
         messages,
       });
@@ -433,13 +424,6 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
         dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
         dispatch(slice.actions.setCurrentChannel(channel));
         loadDataChannel(channel, dispatch, user_id);
-
-        const myRole = myRoleInChannel(channel);
-        if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
-          setTimeout(() => {
-            dispatch(SetMarkReadChannel(channel));
-          }, 100);
-        }
 
         if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
           dispatch(SetOpenTopicPanel(true));
@@ -466,7 +450,7 @@ export const WatchCurrentChannel = (channelId, channelType) => {
         dispatch(slice.actions.updateActiveChannels(channel));
       }
     } catch (error) {
-      handleError(dispatch, error);
+      handleError(dispatch, error, t);
     }
   };
 };
@@ -666,7 +650,7 @@ export function FetchAllUnreadData() {
         dispatch(slice.actions.fetchAllUnreadData(response));
       })
       .catch(err => {
-        handleError(dispatch, err);
+        handleError(dispatch, err, t);
       });
   };
 }

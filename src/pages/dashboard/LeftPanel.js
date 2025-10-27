@@ -29,14 +29,20 @@ import { convertMessageSignal } from '../../utils/messageSignal';
 import { UpdateMember } from '../../redux/slices/member';
 import Channels from './Channels';
 import SidebarContacts from './SidebarContacts';
+import { useTranslation } from 'react-i18next';
 
 const LeftPanel = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
-
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { tab } = useSelector(state => state.app);
-  const { activeChannels, pendingChannels, mutedChannels, pinnedChannels } = useSelector(state => state.channel);
+  const {
+    activeChannels = [],
+    pendingChannels = [],
+    mutedChannels = [],
+    pinnedChannels = [],
+  } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const users = client.state.users ? Object.values(client.state.users) : [];
 
@@ -134,7 +140,7 @@ const LeftPanel = () => {
         };
 
         if (message.type === MessageType.System) {
-          notiText = convertMessageSystem(message.text, users, isDirect, isNotify);
+          notiText = convertMessageSystem(message.text, users, isDirect, isNotify, t);
         } else {
           if (message.attachments) {
             const getAttachmentMessage = attachments => {
@@ -145,29 +151,29 @@ const LeftPanel = () => {
 
               if (attachments.length === 1) {
                 const typeMap = {
-                  file: 'a file',
-                  image: 'a photo',
-                  video: 'a video',
-                  voiceRecording: 'a voice recording',
-                  linkPreview: 'a link preview',
+                  file: t('leftPanel.file'),
+                  image: t('leftPanel.photo'),
+                  video: t('leftPanel.video'),
+                  voiceRecording: t('leftPanel.voice_recording'),
+                  linkPreview: t('leftPanel.linkPreview'),
                 };
-                return `${senderName} sent ${typeMap[attachments[0].type] || 'an attachment'}`;
+                return `${senderName} ${t('leftPanel.sent')} ${typeMap[attachments[0].type] || 'an attachment'}`;
               }
 
               if (image && video && !file && !voiceRecording && !linkPreview) {
-                return `${senderName} sent ${image + video} photos and videos`;
+                return `${senderName} ${t('leftPanel.sent')} ${image + video} ${t('leftPanel.photos_videos')}`;
               }
 
-              return `${senderName} sent ${attachments.length} files`;
+              return `${senderName} ${t('leftPanel.sent')} ${attachments.length} ${t('leftPanel.files')}`;
             };
             notiText = getAttachmentMessage(message.attachments);
             // notiText = `${senderName} has sent you an attachment`;
           } else {
             if (message.mentioned_all) {
-              notiText = `${senderName} mentioned everyone in ${channelName}: ${message.text}`;
+              notiText = `${senderName} ${t('leftPanel.mentioned_all')} ${channelName}: ${message.text}`;
             } else if (message.mentioned_users && message.mentioned_users.includes(user_id)) {
               const messagePreview = replaceMentionsWithNames(message.text);
-              notiText = `You were mentioned by ${senderName} in ${channelName}: ${messagePreview}`;
+              notiText = `${t('leftPanel.mentioned_by')} ${senderName} in ${channelName}: ${messagePreview}`;
             } else {
               notiText = replaceMentionsWithNames(message.text);
             }
@@ -178,7 +184,7 @@ const LeftPanel = () => {
         notiText = message.text;
         break;
       case ClientEvents.ReactionNew:
-        notiText = `${senderName} reacted with ${message.emoji.value} to your message`;
+        notiText = `${senderName} ${t('leftPanel.reacted')} ${message.emoji.value} ${t('leftPanel.your_message')}`;
         break;
       case ClientEvents.MemberBanned:
         notiText = message.text;
@@ -189,7 +195,7 @@ const LeftPanel = () => {
       case ClientEvents.MessageUpdated:
         notiText =
           message.type === MessageType.System
-            ? convertMessageSystem(message.text, users, isDirect, isNotify)
+            ? convertMessageSystem(message.text, users, isDirect, isNotify, t)
             : message.type === MessageType.Signal
               ? convertMessageSignal(message.text).text || ''
               : message.text;
@@ -211,7 +217,7 @@ const LeftPanel = () => {
     };
 
     if (!('Notification' in window)) {
-      alert('This browser does not support system notifications!');
+      alert(t('leftPanel.alert'));
     } else if (Notification.permission === 'granted') {
       sendNotification(data);
     } else if (Notification.permission !== 'denied') {
@@ -268,10 +274,7 @@ const LeftPanel = () => {
           const notiData = {
             type: ClientEvents.ChannelCreated,
             message: {
-              text:
-                event.channel_type === ChatType.TEAM
-                  ? 'You have a new channel invitation'
-                  : 'You have a new DM invitation',
+              text: event.channel_type === ChatType.TEAM ? t('leftPanel.chat_type_team') : t('leftPanel.chat_type_dm'),
             },
             senderId: event.user.id,
             channel: {
@@ -334,7 +337,7 @@ const LeftPanel = () => {
           const channelType = event.channel_type;
           const notiData = {
             type: ClientEvents.MemberBanned,
-            message: { text: `You have been banned from interacting in a channel` },
+            message: { text: `${t('leftPanel.memberbanned')}}` },
             senderId: '',
             channel: {
               id: channelId,
@@ -355,7 +358,7 @@ const LeftPanel = () => {
 
           const notiData = {
             type: ClientEvents.MemberBanned,
-            message: { text: `You have been unbanned in a channel` },
+            message: { text: `${t('leftPanel.member_unbanned')}` },
             senderId: '',
             channel: {
               id: channelId,
@@ -397,8 +400,7 @@ const LeftPanel = () => {
           const notiData = {
             type: ClientEvents.MemberAdded,
             message: {
-              text:
-                channelType === ChatType.TEAM ? 'You have a new channel invitation' : 'You have a new DM invitation',
+              text: channelType === ChatType.TEAM ? t('leftPanel.chat_type_team') : t('leftPanel.chat_type_dm'),
             },
             senderId: event.user.id,
             channel: {
