@@ -10,7 +10,7 @@ import { client } from '../../client';
 import { debounce } from '@mui/material/utils';
 import { LoadingSpinner } from '../animate';
 import AvatarComponent from '../AvatarComponent';
-import { splitChannelId } from '../../utils/commons';
+import { removeVietnameseTones, splitChannelId } from '../../utils/commons';
 import { AvatarShape, ChatType } from '../../constants/commons-const';
 import { setSearchChannels } from '../../redux/slices/channel';
 import { SetOpenHomeSearch } from '../../redux/slices/app';
@@ -32,7 +32,7 @@ const HomeSearch = () => {
   const theme = useTheme();
   const { user_id } = useSelector(state => state.auth);
   const { openHomeSearch } = useSelector(state => state.app);
-  const { searchChannels, activeChannels } = useSelector(state => state.channel);
+  const { searchChannels, activeChannels = [] } = useSelector(state => state.channel);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredLocalChannels, setFilteredLocalChannels] = useState([]);
   const [publicChannels, setPublicChannels] = useState([]);
