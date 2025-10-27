@@ -154,14 +154,14 @@ const LeftPanel = () => {
                   file: t('leftPanel.file'),
                   image: t('leftPanel.photo'),
                   video: t('leftPanel.video'),
-                  voiceRecording: t('leftPanel.voice_recording'),
+                  voiceRecording: t('leftPanel.voiceRecording'),
                   linkPreview: t('leftPanel.linkPreview'),
                 };
                 return `${senderName} ${t('leftPanel.sent')} ${typeMap[attachments[0].type] || 'an attachment'}`;
               }
 
               if (image && video && !file && !voiceRecording && !linkPreview) {
-                return `${senderName} ${t('leftPanel.sent')} ${image + video} ${t('leftPanel.photos_videos')}`;
+                return `${senderName} ${t('leftPanel.sent')} ${image + video} ${t('leftPanel.photo_videos')}`;
               }
 
               return `${senderName} ${t('leftPanel.sent')} ${attachments.length} ${t('leftPanel.files')}`;
@@ -170,7 +170,7 @@ const LeftPanel = () => {
             // notiText = `${senderName} has sent you an attachment`;
           } else {
             if (message.mentioned_all) {
-              notiText = `${senderName} ${t('leftPanel.mentioned_all')} ${channelName}: ${message.text}`;
+              notiText = `${senderName} ${t('leftPanel.mention_all')} ${channelName}: ${message.text}`;
             } else if (message.mentioned_users && message.mentioned_users.includes(user_id)) {
               const messagePreview = replaceMentionsWithNames(message.text);
               notiText = `${t('leftPanel.mentioned_by')} ${senderName} in ${channelName}: ${messagePreview}`;
@@ -337,7 +337,7 @@ const LeftPanel = () => {
           const channelType = event.channel_type;
           const notiData = {
             type: ClientEvents.MemberBanned,
-            message: { text: `${t('leftPanel.memberbanned')}}` },
+            message: { text: `${t('leftPanel.member_banned')}}` },
             senderId: '',
             channel: {
               id: channelId,

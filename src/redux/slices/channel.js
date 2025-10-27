@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ChatType, CurrentChannelStatus, RoleMember, SidebarType } from '../../constants/commons-const';
 import { client } from '../../client';
-import { handleError, myRoleInChannel, splitChannelId } from '../../utils/commons';
+import { handleError, isEmptyObject, myRoleInChannel, splitChannelId } from '../../utils/commons';
 import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
 import { FetchAllMembers } from './member';
 import { FetchTopics, SetCurrentTopic, SetIsClosedTopic, SetOpenTopicPanel, SetPinnedTopics, SetTopics } from './topic';
+import { onEditMessage, onReplyMessage } from './messages';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created
@@ -250,6 +251,10 @@ export default slice.reducer;
 const loadDataChannel = (channel, dispatch, user_id) => {
   const channelType = channel.type;
   if (channelType !== ChatType.MESSAGING) {
+    if (!channel.state.read || !channel.state.read[user_id]) {
+      return;
+    }
+
     const myRole = myRoleInChannel(channel);
     const duration = channel.data.member_message_cooldown;
     const lastSend = channel.state.read[user_id].last_send;
@@ -284,7 +289,7 @@ export function FetchChannels(params) {
     };
     const sort = [];
     const options = {
-      message_limit: 1,
+      message_limit: 25,
     };
     dispatch(slice.actions.fetchChannels({ activeChannels: [], pendingChannels: [] }));
 
@@ -391,47 +396,74 @@ export const SetPendingChannels = payload => {
   };
 };
 
+// export const ConnectCurrentChannel = (channelId, channelType) => {
+//   return async (dispatch, getState) => {
+//     try {
+//       if (!client) return;
+//       dispatch(SetCooldownTime(null));
+//       dispatch(slice.actions.setCurrentChannel(null));
+//       dispatch(SetIsBlocked(false));
+//       dispatch(
+//         slice.actions.setChannelPermissions({
+//           canSendMessage: true,
+//           canEditMessage: true,
+//           canDeleteMessage: true,
+//           canReactMessage: true,
+//           canPinMessage: true,
+//           canCreatePoll: true,
+//           canVotePoll: true,
+//         }),
+//       );
+//       dispatch(SetCurrentTopic(null));
+//       dispatch(SetIsClosedTopic(false));
+//       dispatch(SetTopics([]));
+//       const { user_id } = getState().auth;
+//       const channel = client.channel(channelType, channelId);
+//       const messages = { limit: 25 };
+//       const response = await channel.query({
+//         messages,
+//       });
+
+//       if (response) {
+//         dispatch(slice.actions.setCurrentChannelStatus(CurrentChannelStatus.ACTIVE));
+//         dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
+//         dispatch(slice.actions.setCurrentChannel(channel));
+//         loadDataChannel(channel, dispatch, user_id);
+
+//         if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
+//           dispatch(SetOpenTopicPanel(true));
+//           dispatch(FetchTopics(channel.cid));
+//         }
+//       }
+//     } catch (error) {
+//       dispatch(slice.actions.setCurrentChannelStatus(CurrentChannelStatus.ERROR));
+//     }
+//   };
+// };
+
 export const ConnectCurrentChannel = (channelId, channelType) => {
-  return async (dispatch, getState) => {
-    try {
-      if (!client) return;
-      dispatch(SetCooldownTime(null));
-      dispatch(slice.actions.setCurrentChannel(null));
-      dispatch(SetIsBlocked(false));
-      dispatch(
-        slice.actions.setChannelPermissions({
-          canSendMessage: true,
-          canEditMessage: true,
-          canDeleteMessage: true,
-          canReactMessage: true,
-          canPinMessage: true,
-          canCreatePoll: true,
-          canVotePoll: true,
-        }),
-      );
-      dispatch(SetCurrentTopic(null));
-      dispatch(SetIsClosedTopic(false));
-      dispatch(SetTopics([]));
-      const { user_id } = getState().auth;
-      const channel = client.channel(channelType, channelId);
-      const messages = { limit: 25 };
-      const response = await channel.query({
-        messages,
-      });
+  return (dispatch, getState) => {
+    if (!client) return;
+    const { user_id } = getState().auth;
+    const channel = client.channel(channelType, channelId);
 
-      if (response) {
-        dispatch(slice.actions.setCurrentChannelStatus(CurrentChannelStatus.ACTIVE));
-        dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
-        dispatch(slice.actions.setCurrentChannel(channel));
-        loadDataChannel(channel, dispatch, user_id);
+    console.log('---channel---', channel);
 
-        if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
-          dispatch(SetOpenTopicPanel(true));
-          dispatch(FetchTopics(channel.cid));
-        }
-      }
-    } catch (error) {
+    if (isEmptyObject(channel.data)) {
       dispatch(slice.actions.setCurrentChannelStatus(CurrentChannelStatus.ERROR));
+      return;
+    }
+
+    dispatch(slice.actions.setCurrentChannelStatus(CurrentChannelStatus.ACTIVE));
+    dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
+    dispatch(slice.actions.setCurrentChannel(channel));
+    loadDataChannel(channel, dispatch, user_id);
+
+    if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
+      dispatch(SetOpenTopicPanel(true));
+      dispatch(FetchTopics(channel));
+    } else {
+      dispatch(SetOpenTopicPanel(false));
     }
   };
 };
@@ -452,6 +484,29 @@ export const WatchCurrentChannel = (channelId, channelType) => {
     } catch (error) {
       handleError(dispatch, error, t);
     }
+  };
+};
+
+export const ClearDataChannel = () => {
+  return (dispatch, getState) => {
+    dispatch(onReplyMessage(null));
+    dispatch(onEditMessage(null));
+    dispatch(SetCooldownTime(null));
+    dispatch(SetIsBlocked(false));
+    dispatch(
+      slice.actions.setChannelPermissions({
+        canSendMessage: true,
+        canEditMessage: true,
+        canDeleteMessage: true,
+        canReactMessage: true,
+        canPinMessage: true,
+        canCreatePoll: true,
+        canVotePoll: true,
+      }),
+    );
+    dispatch(SetCurrentTopic(null));
+    dispatch(SetIsClosedTopic(false));
+    dispatch(SetTopics([]));
   };
 };
 
@@ -632,6 +687,7 @@ export const SetMarkReadChannel = channel => {
   return async (dispatch, getState) => {
     const { user_id } = getState().auth;
     const read = channel.state.read[user_id];
+    if (!read) return;
     const unreadMessage = read.unread_messages;
     if (unreadMessage) {
       await channel.markRead();

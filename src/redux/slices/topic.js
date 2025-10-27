@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { SidebarType } from '../../constants/commons-const';
+import { CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
 import { client } from '../../client';
-import { handleError } from '../../utils/commons';
+import { handleError, isEmptyObject } from '../../utils/commons';
 import { setSidebar } from './app';
+import { setCurrentChannelStatus } from './channel';
 
 const initialState = {
   currentTopic: null,
@@ -77,66 +78,105 @@ const watchTopic = async topicId => {
   }
 };
 
-export const FetchTopics = channelCID => {
-  return async (dispatch, getState) => {
-    try {
-      if (!client) return;
+// export const FetchTopics = channelCID => {
+//   return async (dispatch, getState) => {
+//     try {
+//       if (!client) return;
 
-      const filter = {
-        type: ['topic'],
-        parent_cid: channelCID,
-        // include_parent: true,
-      };
-      const sort = [];
-      const options = {
-        message_limit: 25,
-      };
-      dispatch(SetLoadingTopics(true));
-      const response = await client.queryChannels(filter, sort, options);
+//       const filter = {
+//         type: ['topic'],
+//         parent_cid: channelCID,
+//         // include_parent: true,
+//       };
+//       const sort = [];
+//       const options = {
+//         message_limit: 25,
+//       };
+//       dispatch(SetLoadingTopics(true));
+//       const response = await client.queryChannels(filter, sort, options);
 
-      const { topics, pinnedTopics } = response.reduce(
-        (acc, topic) => {
-          if (topic.data.is_pinned) {
-            acc.pinnedTopics.push(topic);
-          } else {
-            acc.topics.push(topic);
-          }
-          return acc;
-        },
-        {
-          topics: [],
-          pinnedTopics: [],
-        },
-      );
+//       const { topics, pinnedTopics } = response.reduce(
+//         (acc, topic) => {
+//           if (topic.data.is_pinned) {
+//             acc.pinnedTopics.push(topic);
+//           } else {
+//             acc.topics.push(topic);
+//           }
+//           return acc;
+//         },
+//         {
+//           topics: [],
+//           pinnedTopics: [],
+//         },
+//       );
 
-      dispatch(SetTopics(topics));
-      dispatch(SetPinnedTopics(pinnedTopics));
-      dispatch(SetLoadingTopics(false));
-    } catch (error) {
-      dispatch(SetLoadingTopics(false));
-    }
+//       dispatch(SetTopics(topics));
+//       dispatch(SetPinnedTopics(pinnedTopics));
+//       dispatch(SetLoadingTopics(false));
+//     } catch (error) {
+//       dispatch(SetLoadingTopics(false));
+//     }
+//   };
+// };
+
+// export const ConnectCurrentTopic = topicId => {
+//   return async (dispatch, getState) => {
+//     try {
+//       if (!client) return;
+//       // dispatch(slice.actions.setCurrentTopic(null));
+//       dispatch(SetIsClosedTopic(false));
+//       const { user_id } = getState().auth;
+//       const topic = client.channel('topic', topicId);
+//       const messages = { limit: 25 };
+//       const response = await topic.query({
+//         messages,
+//       });
+
+//       if (response) {
+//         dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
+//         dispatch(slice.actions.setCurrentTopic(topic));
+//         dispatch(SetIsClosedTopic(topic.data?.is_closed_topic ?? false));
+//       }
+//     } catch (error) {}
+//   };
+// };
+
+export const FetchTopics = channel => {
+  return (dispatch, getState) => {
+    const { topics, pinnedTopics } = channel.state.topics.reduce(
+      (acc, topic) => {
+        if (topic.data.is_pinned) {
+          acc.pinnedTopics.push(topic);
+        } else {
+          acc.topics.push(topic);
+        }
+        return acc;
+      },
+      {
+        topics: [],
+        pinnedTopics: [],
+      },
+    );
+
+    dispatch(SetTopics(topics));
+    dispatch(SetPinnedTopics(pinnedTopics));
   };
 };
 
 export const ConnectCurrentTopic = topicId => {
-  return async (dispatch, getState) => {
-    try {
-      if (!client) return;
-      // dispatch(slice.actions.setCurrentTopic(null));
-      dispatch(SetIsClosedTopic(false));
-      const { user_id } = getState().auth;
-      const topic = client.channel('topic', topicId);
-      const messages = { limit: 25 };
-      const response = await topic.query({
-        messages,
-      });
+  return (dispatch, getState) => {
+    dispatch(SetIsClosedTopic(false));
+    const topic = client.channel('topic', topicId);
 
-      if (response) {
-        dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
-        dispatch(slice.actions.setCurrentTopic(topic));
-        dispatch(SetIsClosedTopic(topic.data?.is_closed_topic ?? false));
-      }
-    } catch (error) {}
+    if (isEmptyObject(topic.data)) {
+      dispatch(setCurrentChannelStatus(CurrentChannelStatus.ERROR));
+      dispatch(SetOpenTopicPanel(false));
+      return;
+    }
+
+    dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
+    dispatch(slice.actions.setCurrentTopic(topic));
+    dispatch(SetIsClosedTopic(topic.data?.is_closed_topic ?? false));
   };
 };
 

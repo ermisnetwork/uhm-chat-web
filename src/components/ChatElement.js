@@ -4,6 +4,7 @@ import { styled, useTheme, alpha } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   AddUnreadChannel,
+  ClearDataChannel,
   RemoveUnreadChannel,
   SetMarkReadChannel,
   UpdateUnreadChannel,
@@ -221,7 +222,7 @@ const ChatElement = ({ channel }) => {
 
       switch (message.type) {
         case MessageType.System: {
-          const messageSystem = convertMessageSystem(message.text, users, isDirect, t);
+          const messageSystem = convertMessageSystem(message.text, users, isDirect, false, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
           break;
         }
@@ -516,16 +517,25 @@ const ChatElement = ({ channel }) => {
     };
   }, [channel, user_id, unreadChannels, getOptimizedLastMessage, getLastMessage, dispatch]);
 
+  // const onLeftClick = useCallback(() => {
+  //   if (!isRightClick) {
+  //     navigate(`${DEFAULT_PATH}/${channel.cid}`);
+  //     dispatch(onReplyMessage(null));
+  //     dispatch(onEditMessage(null));
+
+  //     dispatch(SetOpenTopicPanel(isEnabledTopics ? true : false));
+  //   }
+  //   setAnchorEl(null);
+  // }, [isRightClick, navigate, channel.cid, dispatch, isEnabledTopics]);
+
   const onLeftClick = useCallback(() => {
     if (!isRightClick) {
-      navigate(`${DEFAULT_PATH}/${channel.cid}`);
-      dispatch(onReplyMessage(null));
-      dispatch(onEditMessage(null));
-
+      dispatch(ClearDataChannel());
       dispatch(SetOpenTopicPanel(isEnabledTopics ? true : false));
+      navigate(`${DEFAULT_PATH}/${channel.cid}`);
     }
     setAnchorEl(null);
-  }, [isRightClick, navigate, channel.cid, dispatch, isEnabledTopics]);
+  }, [isRightClick, navigate, channel.cid, dispatch]);
 
   const onRightClick = useCallback(event => {
     event.preventDefault();
