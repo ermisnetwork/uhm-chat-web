@@ -78,6 +78,7 @@ import TopicPanel from './TopicPanel';
 import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
 import { SetIsClosedTopic, SetOpenTopicPanel } from '../../redux/slices/topic';
 import { useTranslation } from 'react-i18next';
+import useMessageSound from '../../hooks/useMessageSound';
 
 const messageMotion = {
   layout: true,
@@ -483,6 +484,7 @@ const ChatComponent = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const messageListRef = useRef(null);
+  const { playNewMessageSound, cleanup } = useMessageSound();
   const { currentChannel, isBlocked, isGuest, isBanned } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
@@ -578,6 +580,13 @@ const ChatComponent = () => {
       const handleMessages = event => {
         switch (event.type) {
           case ClientEvents.MessageNew:
+            const messageType = event.message.type;
+
+            // Phát âm thanh cho tin nhắn mới (trừ tin nhắn system/signal)
+            if (![MessageType.System, MessageType.Signal].includes(messageType)) {
+              playNewMessageSound();
+            }
+
             if (user_id !== event.user.id || [MessageType.System, MessageType.Signal].includes(event.message.type)) {
               setMessages(prev => {
                 return [...prev, event.message];
@@ -829,6 +838,9 @@ const ChatComponent = () => {
         currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
         currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
         currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+
+        // Cleanup audio khi thay đổi chat hoặc component unmount
+        cleanup();
       };
     } else {
       if (messageListRef.current) {
