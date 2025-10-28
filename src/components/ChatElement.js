@@ -535,7 +535,7 @@ const ChatElement = ({ channel }) => {
       navigate(`${DEFAULT_PATH}/${channel.cid}`);
     }
     setAnchorEl(null);
-  }, [isRightClick, navigate, channel.cid, dispatch]);
+  }, [isRightClick, navigate, channel.cid, dispatch, isEnabledTopics]);
 
   const onRightClick = useCallback(event => {
     event.preventDefault();

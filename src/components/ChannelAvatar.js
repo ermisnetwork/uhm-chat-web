@@ -5,7 +5,6 @@ import { Badge, Stack, Box } from '@mui/material';
 import PropTypes from 'prop-types';
 
 import { AvatarShape, ChatType, OnlineStatusUser } from '../constants/commons-const';
-import { isPublicChannel } from '../utils/commons';
 import useOnlineStatus from '../hooks/useOnlineStatus';
 import AvatarComponent from './AvatarComponent';
 import AvatarDefault from './AvatarDefault';
@@ -116,11 +115,11 @@ export default function ChannelAvatar({
     () => ({
       isDirect: channel?.type === ChatType.MESSAGING,
       channelAvatar: channel?.data?.image || '',
-      isPublic: isPublicChannel(channel),
+      isPublic: channel?.data?.public,
       isChannelTopic: channel?.type === ChatType.TOPIC,
       isEnabledTopics: channel?.data?.topics_enabled,
     }),
-    [channel?.type, channel?.data?.image, channel?.data?.topics_enabled, channel],
+    [channel?.type, channel?.data?.image, channel?.data?.topics_enabled, channel?.data?.public],
   );
 
   const { isDirect, channelAvatar, isPublic, isChannelTopic, isEnabledTopics } = channelData;

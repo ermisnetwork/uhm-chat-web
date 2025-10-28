@@ -356,7 +356,7 @@ const MessageList = React.memo(
                       <Typography
                         variant="body2"
                         color={theme.palette.grey[500]}
-                        sx={{ textAlign: 'center', fontWeight: 400, order: 2, width: '100%' }}
+                        sx={{ textAlign: 'center', fontWeight: 400, order: 2, width: '100%', marginBottom: '10px' }}
                         dangerouslySetInnerHTML={{ __html: msgSystem }}
                       />
                     </StyledMessage>
@@ -774,26 +774,7 @@ const ChatComponent = () => {
       };
 
       const handleChannelTruncate = event => {
-        const channelId = event.channel_id;
-        const channelType = event.channel_type;
-        setMessages([]);
-        dispatch(WatchCurrentChannel(channelId, channelType));
-      };
-
-      const handleChannelTopicEnabled = event => {
-        const splitCID = splitChannelId(event.cid);
-        const channelId = splitCID.channelId;
-        const channelType = splitCID.channelType;
-        dispatch(WatchCurrentChannel(channelId, channelType));
-        dispatch(SetOpenTopicPanel(true));
-      };
-
-      const handleChannelTopicDisabled = event => {
-        const splitCID = splitChannelId(event.cid);
-        const channelId = splitCID.channelId;
-        const channelType = splitCID.channelType;
-        dispatch(WatchCurrentChannel(channelId, channelType));
-        dispatch(SetOpenTopicPanel(false));
+        setMessages(currentChat.state.messages || []);
       };
 
       const handleChannelTopicClosed = event => {
@@ -823,8 +804,6 @@ const ChatComponent = () => {
       currentChat.on(ClientEvents.MemberUnBanned, handleMemberUnBanned);
       currentChat.on(ClientEvents.PollChoiceNew, handleMessages);
       currentChat.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
-      currentChat.on(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
-      currentChat.on(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
       currentChat.on(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
       currentChat.on(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
 
@@ -848,8 +827,6 @@ const ChatComponent = () => {
         currentChat.off(ClientEvents.MemberUnBanned, handleMemberUnBanned);
         currentChat.off(ClientEvents.PollChoiceNew, handleMessages);
         currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
-        currentChat.off(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
-        currentChat.off(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
         currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
         currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
       };
@@ -1134,7 +1111,7 @@ const ChatComponent = () => {
         {isClosedTopic && <ClosedTopicBackdrop />}
         {isPendingInvite && <ChannelInvitation />}
         {isBanned && <BannedBackdrop />}
-        {isBlocked && <BlockedBackdrop />}
+        <BlockedBackdrop />
       </Stack>
       {deleteMessage.openDialog && <DeleteMessageDialog />}
       {forwardMessage.openDialog && <ForwardMessageDialog />}

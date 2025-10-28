@@ -62,6 +62,12 @@ const slice = createSlice({
         channel.id === updatedChannel.id ? updatedChannel : channel,
       );
     },
+    updatePinnedChannels(state, action) {
+      const updatedChannel = action.payload;
+      state.pinnedChannels = state.pinnedChannels.map(channel =>
+        channel.id === updatedChannel.id ? updatedChannel : channel,
+      );
+    },
     addActiveChannel(state, action) {
       state.activeChannels.unshift(action.payload);
     },
@@ -273,9 +279,17 @@ const loadDataChannel = (channel, dispatch, user_id) => {
     if (myRole === RoleMember.MEMBER && duration > 0) {
       dispatch(SetCooldownTime({ duration, lastSend }));
     }
+
+    if (channel.data?.topics_enabled) {
+      dispatch(SetOpenTopicPanel(true));
+      dispatch(FetchTopics(channel));
+    } else {
+      dispatch(SetOpenTopicPanel(false));
+    }
   } else {
     const membership = channel.state.membership;
     dispatch(SetIsBlocked(membership?.blocked ?? false));
+    dispatch(SetOpenTopicPanel(false));
   }
 };
 
@@ -447,8 +461,6 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
     const { user_id } = getState().auth;
     const channel = client.channel(channelType, channelId);
 
-    console.log('---channel---', channel);
-
     if (isEmptyObject(channel.data)) {
       dispatch(slice.actions.setCurrentChannelStatus(CurrentChannelStatus.ERROR));
       return;
@@ -458,13 +470,6 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
     dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
     dispatch(slice.actions.setCurrentChannel(channel));
     loadDataChannel(channel, dispatch, user_id);
-
-    if (channel.type === ChatType.TEAM && channel.data?.topics_enabled) {
-      dispatch(SetOpenTopicPanel(true));
-      dispatch(FetchTopics(channel));
-    } else {
-      dispatch(SetOpenTopicPanel(false));
-    }
   };
 };
 
@@ -473,13 +478,23 @@ export const WatchCurrentChannel = (channelId, channelType) => {
     try {
       if (!client) return;
       const { user_id } = getState().auth;
+      const { currentChannel, activeChannels = [], pinnedChannels = [] } = getState().channel;
       const channel = client.channel(channelType, channelId);
       const response = await channel.watch();
 
       if (response) {
-        dispatch(slice.actions.setCurrentChannel(channel));
-        loadDataChannel(channel, dispatch, user_id);
-        dispatch(slice.actions.updateActiveChannels(channel));
+        if (activeChannels.some(c => c.id === channel.id)) {
+          dispatch(slice.actions.updateActiveChannels(channel));
+        }
+
+        if (pinnedChannels.some(c => c.id === channel.id)) {
+          dispatch(slice.actions.updatePinnedChannels(channel));
+        }
+
+        if (currentChannel && currentChannel.id === channel.id) {
+          dispatch(slice.actions.setCurrentChannel(channel));
+          loadDataChannel(channel, dispatch, user_id);
+        }
       }
     } catch (error) {
       handleError(dispatch, error, t);
@@ -489,6 +504,7 @@ export const WatchCurrentChannel = (channelId, channelType) => {
 
 export const ClearDataChannel = () => {
   return (dispatch, getState) => {
+    dispatch(SetCurrentTopic(null));
     dispatch(onReplyMessage(null));
     dispatch(onEditMessage(null));
     dispatch(SetCooldownTime(null));
@@ -506,7 +522,7 @@ export const ClearDataChannel = () => {
     );
     dispatch(SetCurrentTopic(null));
     dispatch(SetIsClosedTopic(false));
-    dispatch(SetTopics([]));
+    // dispatch(SetTopics([]));
   };
 };
 

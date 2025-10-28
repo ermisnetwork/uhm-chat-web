@@ -34,6 +34,13 @@ const slice = createSlice({
       const topicId = action.payload;
       state.topics = state.topics.filter(topic => topic.id !== topicId);
     },
+    updateTopic(state, action) {
+      const updatedTopic = action.payload;
+      const index = state.topics.findIndex(topic => topic.id === updatedTopic.id);
+      if (index !== -1) {
+        state.topics[index] = updatedTopic;
+      }
+    },
     setLoadingTopics(state, action) {
       state.loadingTopics = action.payload;
     },
@@ -212,6 +219,15 @@ export const RemoveTopic = topicId => {
   return (dispatch, getState) => {
     dispatch(slice.actions.removeTopic(topicId));
     dispatch(slice.actions.removePinnedTopic(topicId));
+  };
+};
+
+export const UpdateTopic = topicCID => {
+  return (dispatch, getState) => {
+    const topic = client.activeChannels[topicCID];
+    if (topic) {
+      dispatch(slice.actions.updateTopic(topic));
+    }
   };
 };
 

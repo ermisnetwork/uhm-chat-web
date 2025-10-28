@@ -16,6 +16,7 @@ import {
   removePinnedChannel,
   RemovePinnedChannel,
   RemoveSkippedChannel,
+  WatchCurrentChannel,
 } from '../../redux/slices/channel';
 import { ClientEvents } from '../../constants/events-const';
 import { getChannelName, getMemberInfo, splitChannelId } from '../../utils/commons';
@@ -24,12 +25,13 @@ import { DEFAULT_PATH, DOMAIN_APP } from '../../config';
 import { ChatType, EMOJI_QUICK, MessageType, TabType } from '../../constants/commons-const';
 import { convertMessageSystem } from '../../utils/messageSystem';
 import dayjs from 'dayjs';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { convertMessageSignal } from '../../utils/messageSignal';
 import { UpdateMember } from '../../redux/slices/member';
 import Channels from './Channels';
 import SidebarContacts from './SidebarContacts';
 import { useTranslation } from 'react-i18next';
+import { AddTopic, RemovePinnedTopic, RemoveTopic, SetCurrentTopic, UpdateTopic } from '../../redux/slices/topic';
 
 const LeftPanel = () => {
   const dispatch = useDispatch();
@@ -44,7 +46,9 @@ const LeftPanel = () => {
     pinnedChannels = [],
   } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
+  const { currentTopic } = useSelector(state => state.topic);
   const users = client.state.users ? Object.values(client.state.users) : [];
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     dispatch(FetchChannels());
@@ -304,6 +308,16 @@ const LeftPanel = () => {
           if (mutedChannels.some(item => item.id === event.channel_id)) {
             dispatch(RemoveMutedChannel(event.channel_id));
           }
+        } else {
+          dispatch(RemovePinnedTopic(event.channel_id));
+          dispatch(RemoveTopic(event.channel_id));
+
+          const topicIdFromQuery = searchParams.get('topicId');
+          if (currentTopic && topicIdFromQuery && currentTopic?.id === topicIdFromQuery) {
+            dispatch(SetCurrentTopic(null));
+            searchParams.delete('topicId');
+            setSearchParams(searchParams, { replace: true });
+          }
         }
       };
 
@@ -453,6 +467,46 @@ const LeftPanel = () => {
         }
       };
 
+      const handleChannelTopicEnabled = event => {
+        const splitCID = splitChannelId(event.cid);
+        const channelId = splitCID.channelId;
+        const channelType = splitCID.channelType;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+      };
+
+      const handleChannelTopicDisabled = event => {
+        const topicIdFromQuery = searchParams.get('topicId');
+        const splitCID = splitChannelId(event.cid);
+        const channelId = splitCID.channelId;
+        const channelType = splitCID.channelType;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+
+        if (currentTopic && topicIdFromQuery && currentTopic?.id === topicIdFromQuery) {
+          dispatch(SetCurrentTopic(null));
+          searchParams.delete('topicId');
+          setSearchParams(searchParams, { replace: true });
+        }
+      };
+
+      const handleChannelTopicCreated = event => {
+        const splitParentCID = splitChannelId(event.parent_cid);
+        const parentChannelId = splitParentCID.channelId;
+        const parentChannelType = splitParentCID.channelType;
+
+        const activeChannel = activeChannels.find(c => c.id === parentChannelId);
+        const pinnedChannel = pinnedChannels.find(c => c.id === parentChannelId);
+        const channel = activeChannel || pinnedChannel;
+
+        if (channel) {
+          dispatch(AddTopic(event.channel_id));
+          dispatch(WatchCurrentChannel(parentChannelId, parentChannelType));
+        }
+      };
+
+      const handleChannelTopicUpdated = event => {
+        dispatch(UpdateTopic(event.cid));
+      };
+
       client.on(ClientEvents.ChannelCreated, handleChannelCreated);
       client.on(ClientEvents.ChannelDeleted, handleChannelDeleted);
       client.on(ClientEvents.MessageNew, handleMessageNew);
@@ -466,6 +520,10 @@ const LeftPanel = () => {
       client.on(ClientEvents.Notification.InviteRejected, handleInviteReject);
       client.on(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
       client.on(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
+      client.on(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
+      client.on(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
+      client.on(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
+      client.on(ClientEvents.ChannelTopicUpdated, handleChannelTopicUpdated);
 
       return () => {
         client.off(ClientEvents.ChannelCreated, handleChannelCreated);
@@ -481,9 +539,24 @@ const LeftPanel = () => {
         client.off(ClientEvents.Notification.InviteRejected, handleInviteReject);
         client.off(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
         client.off(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
+        client.off(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
+        client.off(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
+        client.off(ClientEvents.ChannelTopicCreated, handleChannelTopicCreated);
+        client.off(ClientEvents.ChannelTopicUpdated, handleChannelTopicUpdated);
       };
     }
-  }, [dispatch, user_id, client, mutedChannels, activeChannels, pendingChannels, pinnedChannels, users.length]);
+  }, [
+    dispatch,
+    user_id,
+    client,
+    mutedChannels,
+    activeChannels,
+    pendingChannels,
+    pinnedChannels,
+    users.length,
+    currentTopic,
+    searchParams,
+  ]);
 
   useEffect(() => {
     if (mutedChannels) {

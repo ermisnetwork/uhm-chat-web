@@ -28,10 +28,8 @@ import { ClientEvents } from '../../constants/events-const';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AddPinnedTopic,
-  AddTopic,
   ConnectCurrentTopic,
   RemovePinnedTopic,
-  RemoveTopic,
   SetCurrentTopic,
   SetOpenTopicPanel,
 } from '../../redux/slices/topic';
@@ -282,7 +280,6 @@ const TopicHeader = () => {
 
 const TopicPanel = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
@@ -294,15 +291,6 @@ const TopicPanel = () => {
   const isMobileToMd = useResponsive('down', 'md');
 
   useEffect(() => {
-    const handleTopicCreated = event => {
-      const splitParentCID = splitChannelId(event.parent_cid);
-      const parentChannelId = splitParentCID.channelId;
-
-      if (parentChannelId === currentChannel?.id) {
-        dispatch(AddTopic(event.channel_id));
-      }
-    };
-
     const handleTopicPinned = event => {
       const splitParentCID = splitChannelId(event.parent_cid);
       const parentChannelId = splitParentCID.channelId;
@@ -321,29 +309,12 @@ const TopicPanel = () => {
       }
     };
 
-    const handleTopicDeleted = event => {
-      if (event.channel_type === ChatType.TOPIC) {
-        dispatch(RemovePinnedTopic(event.channel_id));
-        dispatch(RemoveTopic(event.channel_id));
-        if (currentTopic?.id === event.channel_id) {
-          dispatch(SetCurrentTopic(null));
-          setIdSelected(currentChannel?.id);
-          searchParams.delete('topicId');
-          setSearchParams(searchParams, { replace: true });
-        }
-      }
-    };
-
-    client.on(ClientEvents.ChannelTopicCreated, handleTopicCreated);
     client.on(ClientEvents.ChannelPinned, handleTopicPinned);
     client.on(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
-    client.on(ClientEvents.ChannelDeleted, handleTopicDeleted);
 
     return () => {
-      client.off(ClientEvents.ChannelTopicCreated, handleTopicCreated);
       client.off(ClientEvents.ChannelPinned, handleTopicPinned);
       client.off(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
-      client.off(ClientEvents.ChannelDeleted, handleTopicDeleted);
     };
   }, [client, currentTopic, currentChannel]);
 
@@ -353,7 +324,9 @@ const TopicPanel = () => {
       setIdSelected(topicID);
     } else {
       dispatch(SetCurrentTopic(null));
-      setIdSelected(currentChannel.id);
+      if (currentChannel) {
+        setIdSelected(currentChannel.id);
+      }
     }
   }, [topicID, currentChannel]);
 
