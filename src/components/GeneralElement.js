@@ -141,13 +141,13 @@ const GeneralElement = ({ idSelected }) => {
         setLastMessageAt(getDisplayDate(date));
 
         if (message.type === MessageType.System) {
-          const messageSystem = convertMessageSystem(message.text, users, false, t);
+          const messageSystem = convertMessageSystem(message.text, users, false, false, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
         } else if (message.type === MessageType.Signal) {
           const messageSignal = convertMessageSignal(message.text);
           setLastMessage(messageSignal.text || '');
         } else if (message.type === MessageType.Sticker) {
-          setLastMessage(`${senderName}: ${t('message.sticker')}`);
+          setLastMessage(`${senderName}: ${t('chatElement.sticker')}`);
         } else if (message.attachments) {
           const attachmentLast = message.attachments[message.attachments.length - 1];
           setLastMessage(renderAttachmentPreview(attachmentLast, senderName));
@@ -157,7 +157,7 @@ const GeneralElement = ({ idSelected }) => {
         }
       } else {
         setLastMessageAt(getDisplayDate(currentChannel?.data?.created_at));
-        setLastMessage(t('chat_element.no_messages'));
+        setLastMessage(t('chatElement.no_message'));
       }
     },
     [user_id, users, t, currentChannel?.data?.created_at, renderAttachmentPreview, replaceMentionsWithNames],

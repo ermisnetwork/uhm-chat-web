@@ -303,7 +303,7 @@ const SidebarPermissions = () => {
                 }}
               >
                 <Slider
-                  value={t(newCooldown.value)}
+                  value={newCooldown.value}
                   step={10}
                   valueLabelDisplay="off"
                   marks={marks}
