@@ -108,7 +108,7 @@ const TopicElement = ({ topic, idSelected }) => {
 
       switch (message.type) {
         case MessageType.System: {
-          const messageSystem = convertMessageSystem(message.text, users, false, t);
+          const messageSystem = convertMessageSystem(message.text, users, false, false, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
           break;
         }

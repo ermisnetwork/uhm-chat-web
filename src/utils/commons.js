@@ -383,3 +383,7 @@ export function removeVietnameseTones(str) {
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'D');
 }
+
+export const isEmptyObject = obj => {
+  return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+};
