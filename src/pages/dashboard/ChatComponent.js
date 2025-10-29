@@ -74,9 +74,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import UsersTyping from '../../components/UsersTyping';
 import NoMessageBox from '../../components/NoMessageBox';
 import { setSidebar, SetUserInfo } from '../../redux/slices/app';
-import TopicPanel from './TopicPanel';
 import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
-import { SetIsClosedTopic, SetOpenTopicPanel } from '../../redux/slices/topic';
+import { SetIsClosedTopic } from '../../redux/slices/topic';
 import { useTranslation } from 'react-i18next';
 import useMessageSound from '../../hooks/useMessageSound';
 
@@ -987,8 +986,6 @@ const ChatComponent = () => {
 
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      {showTopicPanel && <TopicPanel />}
-
       <Stack
         sx={{
           minWidth: 'auto',

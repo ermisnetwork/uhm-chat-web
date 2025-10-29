@@ -5,7 +5,14 @@ import { handleError, isEmptyObject, myRoleInChannel, splitChannelId } from '../
 import { CapabilitiesName } from '../../constants/capabilities-const';
 import { setSidebar } from './app';
 import { FetchAllMembers } from './member';
-import { FetchTopics, SetCurrentTopic, SetIsClosedTopic, SetOpenTopicPanel, SetPinnedTopics, SetTopics } from './topic';
+import {
+  SetCurrentTopic,
+  SetIsClosedTopic,
+  SetOpenTopicPanel,
+  SetParentChannel,
+  SetPinnedTopics,
+  SetTopics,
+} from './topic';
 import { onEditMessage, onReplyMessage } from './messages';
 
 const initialState = {
@@ -282,7 +289,7 @@ const loadDataChannel = (channel, dispatch, user_id) => {
 
     if (channel.data?.topics_enabled) {
       dispatch(SetOpenTopicPanel(true));
-      dispatch(FetchTopics(channel));
+      dispatch(SetParentChannel(channel));
     } else {
       dispatch(SetOpenTopicPanel(false));
     }
@@ -459,6 +466,8 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
   return (dispatch, getState) => {
     if (!client) return;
     const { user_id } = getState().auth;
+    dispatch(ClearDataChannel());
+
     const channel = client.channel(channelType, channelId);
 
     if (isEmptyObject(channel.data)) {

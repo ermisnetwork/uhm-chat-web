@@ -96,7 +96,6 @@ const SideBar = () => {
   const location = useLocation();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const isMobileToXl = useResponsive('down', 'xl');
   const isMobileToMd = useResponsive('down', 'md');
 
   const { tab } = useSelector(state => state.app);
@@ -172,33 +171,88 @@ const SideBar = () => {
     dispatch(SetOpenTopicPanel(false));
   };
 
+  const getResponsiveStyles = () => {
+    if (isMobileToMd) {
+      return {
+        container: {
+          width: '100%',
+          height: '60px',
+          borderTop: `1px solid ${theme.palette.divider}`,
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: theme.palette.background.paper,
+          zIndex: 1,
+        },
+        navigation: {
+          flexDirection: 'row',
+          height: '100%',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          padding: '0 16px',
+          children: {
+            flexDirection: 'row',
+            gap: 3,
+          },
+        },
+        logo: {
+          display: 'none',
+        },
+        switch: {
+          display: 'none',
+        },
+      };
+    } else {
+      return {
+        container: {
+          height: '100%',
+          width: `${WIDTH_SIDE_NAV}px`,
+          borderRight: `1px solid ${theme.palette.divider}`,
+          position: 'relative',
+        },
+        navigation: {
+          height: 'calc(100% - 70px)',
+          width: '100%',
+          children: {
+            width: 'max-content',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 3,
+          },
+        },
+        logo: {
+          width: '100%',
+          height: '70px',
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        },
+        switch: {
+          position: 'absolute',
+          bottom: 20,
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'center',
+        },
+      };
+    }
+  };
+
+  const styles = getResponsiveStyles();
+
   return (
-    <Box
-      sx={{
-        height: '100%',
-        width: isMobileToXl ? '70px' : `${WIDTH_SIDE_NAV}px`,
-        borderRight: `1px solid ${theme.palette.divider}`,
-        position: 'relative',
-      }}
-    >
-      <Stack
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-        sx={{ width: '100%', height: '70px', borderBottom: `1px solid ${theme.palette.divider}` }}
-      >
+    <Box sx={styles.container}>
+      <Stack direction="row" justifyContent="center" alignItems="center" sx={styles.logo}>
         <Box onClick={onGoToHome} sx={{ cursor: 'pointer' }}>
           <img src={Logo} alt="logo" />
         </Box>
       </Stack>
 
-      <Stack alignItems={'center'} justifyContent="center" sx={{ height: 'calc(100% - 70px)', width: '100%' }}>
-        <Stack sx={{ width: 'max-content' }} direction="column" alignItems={'center'} spacing={3}>
-          {renderNavButtons()}
-        </Stack>
+      <Stack alignItems={'center'} justifyContent="center" sx={styles.navigation}>
+        <Stack sx={styles.navigation.children}>{renderNavButtons()}</Stack>
       </Stack>
 
-      <Box sx={{ position: 'absolute', bottom: 20, left: 0, right: 0, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={styles.switch}>
         <AntSwitch defaultChecked={theme.palette.mode === 'dark'} onChange={onToggleMode} />
       </Box>
     </Box>
