@@ -11,6 +11,7 @@ import AvatarDefault from './AvatarDefault';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
 import ImageCanvas from './ImageCanvas';
 import TopicAvatar from './TopicAvatar';
+import { TRANSITION } from '../config';
 
 const StyledBadgeOnline = styled(Badge, {
   shouldForwardProp: prop => prop !== 'status',
@@ -53,7 +54,7 @@ const TeamAvatarBox = ({ member1, member2, width = 48, height = 48, shape = 'cir
   );
 
   return (
-    <Box sx={{ position: 'relative', width, height }}>
+    <Box sx={{ position: 'relative', width, height, transition: TRANSITION }}>
       <Box
         sx={{
           position: 'absolute',
@@ -62,6 +63,7 @@ const TeamAvatarBox = ({ member1, member2, width = 48, height = 48, shape = 'cir
           zIndex: 1,
           width: sizes.member1,
           height: sizes.member1,
+          transition: TRANSITION,
         }}
       >
         {member1.avatar ? (
@@ -83,6 +85,7 @@ const TeamAvatarBox = ({ member1, member2, width = 48, height = 48, shape = 'cir
           zIndex: 2,
           width: sizes.member2,
           height: sizes.member2,
+          transition: TRANSITION,
         }}
       >
         {member2.avatar ? (

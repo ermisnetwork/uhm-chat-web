@@ -4,7 +4,7 @@ import { ArrowLeft, MagnifyingGlass } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
 import ChannelAvatar from '../ChannelAvatar';
 import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { DEFAULT_PATH } from '../../config';
+import { DEFAULT_PATH, TRANSITION } from '../../config';
 import { useNavigate } from 'react-router-dom';
 import { client } from '../../client';
 import { debounce } from '@mui/material/utils';
@@ -35,6 +35,7 @@ const HomeSearch = () => {
   const { user_id } = useSelector(state => state.auth);
   const { openHomeSearch } = useSelector(state => state.app);
   const { searchChannels, activeChannels = [] } = useSelector(state => state.channel);
+  const { openTopicPanel } = useSelector(state => state.topic);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredLocalChannels, setFilteredLocalChannels] = useState([]);
   const [publicChannels, setPublicChannels] = useState([]);
@@ -121,7 +122,16 @@ const HomeSearch = () => {
 
   return (
     <>
-      <Stack sx={{ width: '100%', position: 'relative', zIndex: 4 }}>
+      <Stack
+        sx={{
+          width: '100%',
+          position: 'relative',
+          zIndex: 4,
+          transition: TRANSITION,
+          opacity: openTopicPanel ? 0.5 : 1,
+          pointerEvents: openTopicPanel ? 'none' : 'auto',
+        }}
+      >
         <Stack direction="row" alignItems="center" gap={1}>
           {openHomeSearch && (
             <IconButton onClick={onCloseSearch}>

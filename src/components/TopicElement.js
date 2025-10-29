@@ -60,7 +60,8 @@ const TopicElement = ({ topic, idSelected }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobileToMd = useResponsive('down', 'md');
-  const { currentChannel, unreadChannels = [] } = useSelector(state => state.channel);
+  const { unreadChannels = [] } = useSelector(state => state.channel);
+  const { parentChannel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
   const [isRightClick, setIsRightClick] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -77,7 +78,7 @@ const TopicElement = ({ topic, idSelected }) => {
   const topicId = useMemo(() => topic?.id || '', [topic?.id]);
   const isPinned = useMemo(() => topic.data?.is_pinned, [topic.data?.is_pinned]);
   const openMenu = useMemo(() => Boolean(anchorEl), [anchorEl]);
-  const myRole = useMemo(() => myRoleInChannel(currentChannel), [currentChannel]);
+  const myRole = useMemo(() => myRoleInChannel(parentChannel), [parentChannel]);
   const showItemDeleteTopic = useMemo(() => [RoleMember.OWNER].includes(myRole), [myRole]);
 
   const replaceMentionsWithNames = useCallback(
@@ -240,12 +241,12 @@ const TopicElement = ({ topic, idSelected }) => {
 
   const onLeftClick = useCallback(() => {
     if (!isRightClick) {
-      navigate(`${DEFAULT_PATH}/${currentChannel?.cid}?topicId=${topicId}`);
+      navigate(`${DEFAULT_PATH}/${parentChannel?.cid}?topicId=${topicId}`);
       dispatch(onReplyMessage(null));
       dispatch(onEditMessage(null));
     }
     setAnchorEl(null);
-  }, [isRightClick, navigate, currentChannel?.cid, topicId, dispatch]);
+  }, [isRightClick, navigate, parentChannel?.cid, topicId, dispatch]);
 
   const onRightClick = useCallback(
     event => {
@@ -292,12 +293,12 @@ const TopicElement = ({ topic, idSelected }) => {
   const hasUnread = useMemo(() => {
     if (!unreadChannels) return false;
     // Tìm channel chứa topic này
-    const channel = unreadChannels.find(ch => ch.id === currentChannel?.id);
+    const channel = unreadChannels.find(ch => ch.id === parentChannel?.id);
     if (!channel || !channel.unreadTopics) return false;
     // Tìm topic trong channel
     const topicUnread = channel.unreadTopics.find(tp => tp.id === topicId);
     return topicUnread && topicUnread.unreadCount > 0;
-  }, [unreadChannels, currentChannel?.id, topicId]);
+  }, [unreadChannels, parentChannel?.id, topicId]);
 
   return (
     <>
@@ -310,99 +311,67 @@ const TopicElement = ({ topic, idSelected }) => {
         }}
         gap={1}
       >
-        {isMobileToMd ? (
-          <Tooltip title={topic.data?.name} placement="right">
-            <Box sx={{ position: 'relative', width: 40, height: 40 }}>
-              {hasUnread ? (
-                <Badge
-                  variant="dot"
-                  color="error"
-                  sx={{
-                    position: 'absolute',
-                    top: '0px',
-                    right: '0px',
-                    zIndex: 2,
-                  }}
-                />
-              ) : null}
-              <TopicAvatar
-                url={topic.data?.image || ''}
-                name={topic.data?.name || ''}
-                size={40}
-                shape={AvatarShape.Round}
-              />
-            </Box>
-          </Tooltip>
-        ) : (
-          <>
-            {/* -------------------------------avatar------------------------------- */}
-            <TopicAvatar
-              url={topic.data?.image || ''}
-              name={topic.data?.name || ''}
-              size={40}
-              shape={AvatarShape.Round}
-            />
+        {/* -------------------------------avatar------------------------------- */}
+        <TopicAvatar url={topic.data?.image || ''} name={topic.data?.name || ''} size={40} shape={AvatarShape.Round} />
 
-            {/* -------------------------------content------------------------------- */}
-            <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
-              {/* -------------------------------topic name------------------------------- */}
-              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    flex: 1,
-                    minWidth: 'auto',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    fontSize: '14px',
-                  }}
-                >
-                  {topic.data.name}
-                </Typography>
+        {/* -------------------------------content------------------------------- */}
+        <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
+          {/* -------------------------------topic name------------------------------- */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                flex: 1,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '14px',
+              }}
+            >
+              {topic.data.name}
+            </Typography>
 
-                <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
-                  {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
+            <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+              {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
 
-                  <Typography
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      minWidth: 'auto',
-                      flex: 1,
-                      overflow: 'hidden',
-                      fontSize: '10px',
-                    }}
-                    variant="caption"
-                  >
-                    {lastMessageAt}
-                  </Typography>
-                </Stack>
-              </Stack>
+              <Typography
+                sx={{
+                  color: theme.palette.text.secondary,
+                  minWidth: 'auto',
+                  flex: 1,
+                  overflow: 'hidden',
+                  fontSize: '10px',
+                }}
+                variant="caption"
+              >
+                {lastMessageAt}
+              </Typography>
+            </Stack>
+          </Stack>
 
-              {/* -------------------------------last message------------------------------- */}
-              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: hasUnread ? 'inherit' : theme.palette.text.secondary,
-                    flex: 1,
-                    minWidth: 'auto',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    fontSize: '14px',
-                    display: 'block',
-                    fontWeight: hasUnread ? 600 : 400,
-                  }}
-                >
-                  {lastMessage}
-                </Typography>
+          {/* -------------------------------last message------------------------------- */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: hasUnread ? 'inherit' : theme.palette.text.secondary,
+                flex: 1,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '14px',
+                display: 'block',
+                fontWeight: hasUnread ? 600 : 400,
+              }}
+            >
+              {lastMessage}
+            </Typography>
 
-                {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
-              </Stack>
-            </Box>
-          </>
-        )}
+            {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
+          </Stack>
+        </Box>
       </StyledTopicItem>
       <StyledMenu
         anchorEl={anchorEl}
