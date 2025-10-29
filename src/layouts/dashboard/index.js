@@ -15,14 +15,16 @@ import ChannelConfirmDialog from '../../sections/dashboard/ChannelConfirmDialog'
 import ProfileDialog from '../../sections/dashboard/ProfileDialog';
 import ClientsTabPanel from '../../pages/dashboard/ClientsTabPanel';
 import useFaviconBadge from '../../hooks/useFaviconBadge';
-import CallDirectDialog3 from '../../sections/dashboard/CallDirectDialog3';
 import CallDirectDialog2 from '../../sections/dashboard/CallDirectDialog2';
 import Header from './Header';
 import { SetIsUserConnected } from '../../redux/slices/app';
+import TopicPanel from '../../pages/dashboard/TopicPanel';
+import useResponsive from '../../hooks/useResponsive';
 
 const DashboardLayout = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const isMobileToMd = useResponsive('down', 'md');
 
   const { isLoggedIn, user_id } = useSelector(state => state.auth);
   const {
@@ -33,6 +35,7 @@ const DashboardLayout = () => {
     channelConfirm,
   } = useSelector(state => state.dialog);
   const { unreadChannels = [] } = useSelector(state => state.channel);
+  const { isUserConnected } = useSelector(state => state.app);
 
   const accessToken = localStorage.getItem(LocalStorageKey.AccessToken);
 
@@ -90,7 +93,7 @@ const DashboardLayout = () => {
     <>
       <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
         <SideNav />
-        <Stack direction="column" sx={{ height: '100%', minWidth: 'auto', flex: 1, overflow: 'hidden' }}>
+        <Stack direction="column" sx={{ height: '100%', minWidth: 'auto', flex: 1, overflow: 'hidden', paddingBottom: isMobileToMd ? '60px' : 0 }}>
           <Header />
 
           <Stack
@@ -106,7 +109,12 @@ const DashboardLayout = () => {
             }}
             spacing={2}
           >
-            <ClientsTabPanel />
+            {isUserConnected && (
+              <>
+                <ClientsTabPanel />
+                <TopicPanel />
+              </>
+            )}
             <Outlet />
           </Stack>
         </Stack>

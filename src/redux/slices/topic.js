@@ -12,6 +12,7 @@ const initialState = {
   loadingTopics: false,
   isClosedTopic: false,
   openTopicPanel: false,
+  parentChannel: null,
 };
 
 const slice = createSlice({
@@ -62,6 +63,9 @@ const slice = createSlice({
     },
     setOpenTopicPanel(state, action) {
       state.openTopicPanel = action.payload;
+    },
+    setParentChannel(state, action) {
+      state.parentChannel = action.payload;
     },
   },
 });
@@ -271,5 +275,12 @@ export const RemovePinnedTopic = topicId => {
 export const SetOpenTopicPanel = isOpen => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.setOpenTopicPanel(isOpen));
+  };
+};
+
+export const SetParentChannel = channel => {
+  return async (dispatch, getState) => {
+    dispatch(slice.actions.setParentChannel(channel));
+    dispatch(FetchTopics(channel));
   };
 };

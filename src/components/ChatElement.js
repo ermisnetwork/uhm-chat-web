@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { Badge, Box, Stack, Typography, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Badge, Box, Stack, Typography, Menu, MenuItem } from '@mui/material';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   AddUnreadChannel,
-  ClearDataChannel,
   RemoveUnreadChannel,
   SetMarkReadChannel,
   UpdateUnreadChannel,
@@ -12,20 +11,19 @@ import {
 import ChannelAvatar from './ChannelAvatar';
 import { isChannelDirect, myRoleInChannel } from '../utils/commons';
 import { ClientEvents } from '../constants/events-const';
-import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
 import { Play, PushPin, PushPinSlash, SignOut, Trash } from 'phosphor-react';
 import { AvatarShape, ChatType, ConfirmType, MessageType, RoleMember } from '../constants/commons-const';
 import { setChannelConfirm } from '../redux/slices/dialog';
 import { convertMessageSystem } from '../utils/messageSystem';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../config';
+import { DEFAULT_PATH, TRANSITION } from '../config';
 import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
 import { SpearkerOffIcon } from './Icons';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
 import TopicAvatar from './TopicAvatar';
-import { SetOpenTopicPanel } from '../redux/slices/topic';
+import { SetOpenTopicPanel, SetParentChannel } from '../redux/slices/topic';
 import { useTranslation } from 'react-i18next';
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
@@ -180,20 +178,17 @@ const ChatElement = ({ channel }) => {
     unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadCount > 0);
   const isCurrentChannelEnabledTopic = currentChannel?.data?.topics_enabled;
 
-  const isActiveChannel = useCallback(
-    (channel, currentChannel) => {
-      const isCurrentChannel = currentChannel?.id === channel?.id;
+  const isActiveChannel = useCallback(() => {
+    const isCurrentChannel = currentChannel?.id === channel?.id;
 
-      if (!isCurrentChannel) return false;
+    if (!isCurrentChannel) return false;
 
-      // Nếu không phải current channel thì không active
-      if (!isCurrentChannelEnabledTopic) return true;
+    // Nếu không phải current channel thì không active
+    if (!currentChannel?.data?.topics_enabled) return true;
 
-      // Nếu current channel có topics enabled thì chỉ active khi openTopicPanel = true
-      return openTopicPanel;
-    },
-    [isCurrentChannelEnabledTopic, openTopicPanel],
-  );
+    // Nếu current channel có topics enabled thì chỉ active khi openTopicPanel = true
+    return openTopicPanel;
+  }, [channel, currentChannel, openTopicPanel]);
 
   const replaceMentionsWithNames = useCallback(
     inputValue => {
@@ -529,13 +524,22 @@ const ChatElement = ({ channel }) => {
   // }, [isRightClick, navigate, channel.cid, dispatch, isEnabledTopics]);
 
   const onLeftClick = useCallback(() => {
-    if (!isRightClick) {
-      dispatch(ClearDataChannel());
-      dispatch(SetOpenTopicPanel(isEnabledTopics ? true : false));
-      navigate(`${DEFAULT_PATH}/${channel.cid}`);
-    }
     setAnchorEl(null);
-  }, [isRightClick, navigate, channel.cid, dispatch, isEnabledTopics]);
+
+    if (!isRightClick) {
+      if (isEnabledTopics) {
+        if (openTopicPanel) {
+          dispatch(SetOpenTopicPanel(false));
+        } else {
+          dispatch(SetOpenTopicPanel(true));
+          dispatch(SetParentChannel(channel));
+        }
+      } else {
+        dispatch(SetOpenTopicPanel(false));
+        navigate(`${DEFAULT_PATH}/${channel.cid}`);
+      }
+    }
+  }, [isRightClick, navigate, dispatch, isEnabledTopics, channel, openTopicPanel]);
 
   const onRightClick = useCallback(event => {
     event.preventDefault();
@@ -590,23 +594,40 @@ const ChatElement = ({ channel }) => {
     }
   }, [isPinned, channelType, channelId]);
 
+  const renderChannelAvatar = useMemo(() => {
+    return (
+      <ChannelAvatar
+        channel={channel}
+        width={openTopicPanel ? 50 : 60}
+        height={openTopicPanel ? 50 : 60}
+        shape={AvatarShape.Round}
+      />
+    );
+  }, [channel, openTopicPanel]);
+
   return (
     <>
       <StyledChatBox
         onClick={onLeftClick}
         onContextMenu={onRightClick}
         sx={{
-          backgroundColor: isActiveChannel(channel, currentChannel)
-            ? `${alpha(theme.palette.primary.main, 0.2)} !important`
-            : 'transparent',
+          backgroundColor: isActiveChannel() ? `${alpha(theme.palette.primary.main, 0.2)} !important` : 'transparent',
           padding: '8px',
           margin: '-8px',
-          justifyContent: openTopicPanel ? 'center' : 'flex-start',
+          transition: TRANSITION,
+          height: openTopicPanel ? 66 : 'auto',
         }}
         gap={2}
       >
         {/* -------------------------------avatar------------------------------- */}
-        <Box sx={{ position: 'relative', width: 60, height: 60 }}>
+        <Box
+          sx={{
+            position: 'relative',
+            width: openTopicPanel ? 50 : 60,
+            height: openTopicPanel ? 50 : 60,
+            transition: TRANSITION,
+          }}
+        >
           {hasUnread && openTopicPanel ? (
             <Badge
               variant="dot"
@@ -624,83 +645,84 @@ const ChatElement = ({ channel }) => {
               }}
             />
           ) : null}
-          <ChannelAvatar channel={channel} width={60} height={60} shape={AvatarShape.Round} />
+          {renderChannelAvatar}
         </Box>
 
         {/* -------------------------------content------------------------------- */}
-        {!openTopicPanel && (
-          <Box
-            sx={{
-              flex: 1,
-              minWidth: 'auto',
-              overflow: 'hidden',
-            }}
-          >
-            {/* -------------------------------channel name------------------------------- */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 'auto',
+            overflow: 'hidden',
+            transition: TRANSITION,
+            transform: openTopicPanel ? 'scale(0)' : 'scale(1)',
+            opacity: openTopicPanel ? 0 : 1,
+          }}
+        >
+          {/* -------------------------------channel name------------------------------- */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                flex: 1,
+                minWidth: 'auto',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                fontSize: '14px',
+              }}
+            >
+              {channel.data.name}
+            </Typography>
+
+            <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
+              {isMuted && <SpearkerOffIcon size={14} />}
+              {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
+
+              {!isBlocked && (
+                <Typography
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    minWidth: 'auto',
+                    flex: 1,
+                    overflow: 'hidden',
+                    fontSize: '10px',
+                  }}
+                  variant="caption"
+                >
+                  {lastMessageAt}
+                </Typography>
+              )}
+            </Stack>
+          </Stack>
+
+          {/* -------------------------------list topic------------------------------- */}
+          {isEnabledTopics && <ListTopic topics={topics} />}
+
+          {/* -------------------------------last message------------------------------- */}
+          {!isBlocked && (
             <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
               <Typography
-                variant="subtitle2"
+                variant="caption"
                 sx={{
+                  color: hasUnread ? 'inherit' : theme.palette.text.secondary,
                   flex: 1,
                   minWidth: 'auto',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   fontSize: '14px',
+                  display: 'block',
+                  fontWeight: hasUnread ? 600 : 400,
                 }}
               >
-                {channel.data.name}
+                {isBlocked ? t('chatElement.blocked') : lastMessage}
               </Typography>
 
-              <Stack direction="row" alignItems="center" justifyContent="flex-end" gap={1}>
-                {isMuted && <SpearkerOffIcon size={14} />}
-                {isPinned && <PushPin size={14} color={theme.palette.primary.main} weight="fill" />}
-
-                {!isBlocked && (
-                  <Typography
-                    sx={{
-                      color: theme.palette.text.secondary,
-                      minWidth: 'auto',
-                      flex: 1,
-                      overflow: 'hidden',
-                      fontSize: '10px',
-                    }}
-                    variant="caption"
-                  >
-                    {lastMessageAt}
-                  </Typography>
-                )}
-              </Stack>
+              {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
             </Stack>
-
-            {/* -------------------------------list topic------------------------------- */}
-            {isEnabledTopics && <ListTopic topics={topics} />}
-
-            {/* -------------------------------last message------------------------------- */}
-            {!isBlocked && (
-              <Stack direction="row" justifyContent="space-between" alignItems="center" gap={1}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: hasUnread ? 'inherit' : theme.palette.text.secondary,
-                    flex: 1,
-                    minWidth: 'auto',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    fontSize: '14px',
-                    display: 'block',
-                    fontWeight: hasUnread ? 600 : 400,
-                  }}
-                >
-                  {isBlocked ? t('chatElement.blocked') : lastMessage}
-                </Typography>
-
-                {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
-              </Stack>
-            )}
-          </Box>
-        )}
+          )}
+        </Box>
       </StyledChatBox>
 
       <StyledMenu
