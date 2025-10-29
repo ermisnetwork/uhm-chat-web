@@ -532,6 +532,7 @@ export const ClearDataChannel = () => {
     dispatch(SetCurrentTopic(null));
     dispatch(SetIsClosedTopic(false));
     // dispatch(SetTopics([]));
+    dispatch(SetParentChannel(null));
   };
 };
 

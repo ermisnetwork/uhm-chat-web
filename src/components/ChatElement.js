@@ -528,18 +528,14 @@ const ChatElement = ({ channel }) => {
 
     if (!isRightClick) {
       if (isEnabledTopics) {
-        if (openTopicPanel) {
-          dispatch(SetOpenTopicPanel(false));
-        } else {
-          dispatch(SetOpenTopicPanel(true));
-          dispatch(SetParentChannel(channel));
-        }
+        dispatch(SetOpenTopicPanel(true));
+        dispatch(SetParentChannel(channel));
       } else {
         dispatch(SetOpenTopicPanel(false));
         navigate(`${DEFAULT_PATH}/${channel.cid}`);
       }
     }
-  }, [isRightClick, navigate, dispatch, isEnabledTopics, channel, openTopicPanel]);
+  }, [isRightClick, navigate, dispatch, isEnabledTopics, channel]);
 
   const onRightClick = useCallback(event => {
     event.preventDefault();
