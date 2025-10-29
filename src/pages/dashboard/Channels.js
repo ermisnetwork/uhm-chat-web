@@ -213,7 +213,7 @@ const Channels = () => {
       </Stack>
 
       <Stack
-        className="customScrollbar"
+        className={`customScrollbar ${openTopicPanel ? 'noScrollBar' : ''}`}
         sx={{
           overflowY: 'auto',
           overflowX: 'hidden',
