@@ -202,7 +202,7 @@ const LeftPanel = () => {
           message.type === MessageType.System
             ? convertMessageSystem(message.text, users, isDirect, isNotify, t)
             : message.type === MessageType.Signal
-              ? convertMessageSignal(message.text).text || ''
+              ? convertMessageSignal(message.text, t).text || ''
               : message.text;
         break;
       case ClientEvents.MemberAdded:

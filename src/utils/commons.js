@@ -173,11 +173,11 @@ export async function getThumbBlobVideo(file, seekTo = 0.1) {
 
 export function checkPendingInvite(channel) {
   if (!channel) return false;
-
-  const membership = channel.state.membership;
   const myUserId = window.localStorage.getItem(LocalStorageKey.UserId);
+  const member = channel.state.members[myUserId];
+  if (!member) return false;
 
-  return [RoleMember.PENDING, RoleMember.SKIPPED].includes(membership.channel_role) && channel.state.members[myUserId];
+  return [RoleMember.PENDING, RoleMember.SKIPPED].includes(member.channel_role) && channel.state.members[myUserId];
 }
 
 export function checkPermissionDeleteMessage(message, channelType, userId, userRole) {
@@ -255,17 +255,19 @@ export function getMemberInfoInChannel(member, all_members) {
 
 export function myRoleInChannel(channel) {
   if (!channel) return '';
+  const myUserId = window.localStorage.getItem(LocalStorageKey.UserId);
+  const member = channel.state.members[myUserId];
 
-  const membership = channel.state.membership;
-  return membership.channel_role;
+  if (!member) return '';
+  return member.channel_role;
 }
 
 export function checkDirectBlock(channel) {
   if (!channel) return false;
-
-  const membership = channel.state.membership;
-
-  return membership.blocked;
+  const myUserId = window.localStorage.getItem(LocalStorageKey.UserId);
+  const member = channel.state.members[myUserId];
+  if (!member) return false;
+  return member.blocked;
 }
 
 export function splitChannelId(id) {
@@ -370,10 +372,20 @@ export const replaceMentionsWithNames = (text, mentions) => {
 export const replaceMentionsWithIds = (text, mentions) => {
   if (!mentions) return text;
 
-  mentions.forEach(user => {
-    text = text.replaceAll(user.mentionName, user.mentionId);
-  });
-  return text;
+  const queues = mentions.reduce((acc, m) => {
+    (acc[m.mentionName] ??= []).push(m);
+    return acc;
+  }, {});
+
+  return text
+    .split(/(@\S+)/g)
+    .map(part => {
+      if (queues[part]?.length) {
+        return queues[part].shift().mentionId;
+      }
+      return part;
+    })
+    .join('');
 };
 
 export function removeVietnameseTones(str) {

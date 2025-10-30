@@ -72,6 +72,14 @@ const HomeSearch = () => {
     }
   }, [activeChannels, user_id]);
 
+  function removeVietnameseTones(str) {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D');
+  }
+
   const debouncedSearch = useCallback(
     debounce(async term => {
       if (term) {
