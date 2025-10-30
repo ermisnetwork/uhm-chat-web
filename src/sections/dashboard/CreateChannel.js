@@ -95,12 +95,12 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
           setSearchQuery('');
           setSelectedUsers([]);
           onCloseDialogCreateChannel();
-          dispatch(showSnackbar({ severity: 'success', message: t('create_channel.success') }));
+          dispatch(showSnackbar({ severity: 'success', message: t('create_channel.create_success') }));
         }
       } catch (error) {
         reset();
         setIsLoading(false);
-        dispatch(showSnackbar({ severity: 'error', message: t('create_channel.failed') }));
+        dispatch(showSnackbar({ severity: 'error', message: t('create_channel.create_failed') }));
       }
     }
   };
