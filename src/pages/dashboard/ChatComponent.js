@@ -118,30 +118,6 @@ const StyledMessage = styled(Stack)(({ theme }) => ({
 
 const MESSAGE_LIMIT = 25;
 
-<<<<<<< HEAD
-const MessageList = ({
-  messageListRef,
-  messages,
-  lastReadMessageId,
-  targetId,
-  setTargetId,
-  isDirect,
-  setShowChipUnread,
-  onScrollToReplyMsg,
-  highlightMsg,
-  setHighlightMsg,
-  currentChat,
-}) => {
-  const users = client.state.users ? Object.values(client.state.users) : [];
-  const dispatch = useDispatch();
-  const messageRefs = useRef({});
-  const unreadRefs = useRef([]);
-  const theme = useTheme();
-  const isLgToXl = useResponsive('between', null, 'lg', 'xl');
-  const isMobileToLg = useResponsive('down', 'lg');
-  const { user_id } = useSelector(state => state.auth);
-  const { activeChannels, pinnedChannels, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
-=======
 const MessageList = React.memo(
   ({
     messageListRef,
@@ -172,7 +148,6 @@ const MessageList = React.memo(
       isBlocked,
       isBanned,
     } = useSelector(state => state.channel);
->>>>>>> 210377d1fb540cdda5bfb9bf70e31dbd242cd4c0
 
     const lastReadIndex = useMemo(
       () => messages.findIndex(msg => msg.id === lastReadMessageId),

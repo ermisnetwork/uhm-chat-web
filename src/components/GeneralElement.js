@@ -143,7 +143,7 @@ const GeneralElement = ({ idSelected }) => {
           const messageSystem = convertMessageSystem(message.text, users, false, false, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
         } else if (message.type === MessageType.Signal) {
-          const messageSignal = convertMessageSignal(message.text);
+          const messageSignal = convertMessageSignal(message.text, t);
           setLastMessage(messageSignal.text || '');
         } else if (message.type === MessageType.Sticker) {
           setLastMessage(`${senderName}: ${t('chatElement.sticker')}`);

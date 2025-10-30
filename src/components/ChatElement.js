@@ -223,7 +223,7 @@ const ChatElement = ({ channel }) => {
         }
 
         case MessageType.Signal: {
-          const messageSignal = convertMessageSignal(message.text);
+          const messageSignal = convertMessageSignal(message.text, t);
           setLastMessage(messageSignal.text || '');
           break;
         }
