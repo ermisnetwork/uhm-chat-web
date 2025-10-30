@@ -16,7 +16,6 @@ import {
 import { CheckCircle, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
 import MemberAvatar from './MemberAvatar';
-import { formatString } from '../utils/commons';
 import { fDateTime } from '../utils/formatTime';
 import { ClientEvents } from '../constants/events-const';
 import { AvatarShape, MessageReadType, MessageType } from '../constants/commons-const';
@@ -62,7 +61,7 @@ const Row = memo(({ index, style, data, t }) => {
         />
       </ListItemAvatar>
       <ListItemText
-        primary={formatString(item.user.name)}
+        primary={item.user.name}
         secondary={!isNaN(new Date(item.last_read)) ? fDateTime(item.last_read) : t('readBy.invalid')}
         sx={{ width: 'calc(100% - 40px)', paddingLeft: '15px' }}
       />

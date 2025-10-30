@@ -62,18 +62,16 @@ const ChannelDetailApp = () => {
     }
   }, [dispatch, id, isUserConnected, navigate, loadingChannels]);
 
-  if (loadingChannels) {
-    return (
-      <BoxContainer>
-        <LoadingScreen />
-      </BoxContainer>
-    );
-  }
-
   return (
     <>
       <BoxContainer>
-        {currentChannelStatus === CurrentChannelStatus.ERROR ? <ChannelNotFound /> : <ChatComponent />}
+        {loadingChannels ? (
+          <LoadingScreen />
+        ) : currentChannelStatus === CurrentChannelStatus.ERROR ? (
+          <ChannelNotFound />
+        ) : (
+          <ChatComponent />
+        )}
         <InviteFriendDialog />
       </BoxContainer>
 

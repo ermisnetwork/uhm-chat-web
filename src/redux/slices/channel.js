@@ -300,6 +300,74 @@ const loadDataChannel = (channel, dispatch, user_id) => {
   }
 };
 
+const categorizeChannels = (channels, userId) => {
+  return channels.reduce(
+    (acc, channel) => {
+      const membership = channel.state.membership;
+      const channelRole = membership.channel_role;
+
+      // Phân loại theo role
+      if (channelRole === RoleMember.PENDING) {
+        acc.pendingChannels.push(channel);
+      } else if (channelRole === RoleMember.SKIPPED) {
+        acc.skippedChannels.push(channel);
+      } else {
+        // Channel đã join - phân loại theo pinned
+        if (channel.data.is_pinned) {
+          acc.pinnedChannels.push(channel);
+        } else {
+          acc.activeChannels.push(channel);
+        }
+
+        // Xử lý unread messages và topics
+        const read = channel.state.read[userId];
+        if (read) {
+          const unreadMessage = read.unread_messages;
+          let unreadTopics = [];
+
+          // Xử lý unread topics cho team channels
+          if (channel.type === ChatType.TEAM && channel.data?.topics_enabled && channel.state.topics) {
+            channel.state.topics.forEach(topic => {
+              const topicRead = topic.state.read?.[userId];
+              const topicUnread = topicRead?.unread_messages;
+              if (topicUnread > 0) {
+                unreadTopics.push({
+                  id: topic.id,
+                  unreadCount: topicUnread,
+                });
+              }
+            });
+          }
+
+          // Thêm vào unread channels nếu có unread messages hoặc topics
+          if (unreadMessage > 0 || unreadTopics.length > 0) {
+            acc.unreadChannels.push({
+              id: channel.id,
+              unreadCount: unreadMessage,
+              unreadTopics,
+            });
+          }
+        }
+      }
+
+      // Xử lý muted channels
+      if (membership.muted) {
+        acc.mutedChannels.push(channel);
+      }
+
+      return acc;
+    },
+    {
+      activeChannels: [],
+      pendingChannels: [],
+      mutedChannels: [],
+      unreadChannels: [],
+      skippedChannels: [],
+      pinnedChannels: [],
+    },
+  );
+};
+
 export function FetchChannels(params) {
   return async (dispatch, getState) => {
     if (!client) return;
@@ -312,8 +380,17 @@ export function FetchChannels(params) {
     const options = {
       message_limit: 25,
     };
-    dispatch(slice.actions.fetchChannels({ activeChannels: [], pendingChannels: [] }));
-
+    dispatch(
+      slice.actions.fetchChannels({
+        activeChannels: [],
+        pendingChannels: [],
+        mutedChannels: [],
+        unreadChannels: [],
+        skippedChannels: [],
+        pinnedChannels: [],
+      }),
+    );
+    dispatch(slice.actions.setLoadingChannels(true));
     await client
       .queryChannels(filter, sort, options)
       .then(async response => {
@@ -325,69 +402,8 @@ export function FetchChannels(params) {
         //   return dateB - dateA;
         // });
 
-        const { activeChannels, pendingChannels, mutedChannels, unreadChannels, skippedChannels, pinnedChannels } =
-          response.reduce(
-            (acc, channel) => {
-              if (channel.state.membership.channel_role === RoleMember.PENDING) {
-                acc.pendingChannels.push(channel);
-              } else if (channel.state.membership.channel_role === RoleMember.SKIPPED) {
-                acc.skippedChannels.push(channel);
-              } else {
-                if (channel.data.is_pinned) {
-                  acc.pinnedChannels.push(channel);
-                } else {
-                  acc.activeChannels.push(channel);
-                }
-
-                const read = channel.state.read[user_id];
-                const unreadMessage = read.unread_messages;
-                let unreadTopics = [];
-                if (channel.type === ChatType.TEAM && channel.data?.topics_enabled && channel.state.topics) {
-                  channel.state.topics.forEach(topic => {
-                    const topicRead = topic.state.read?.[user_id];
-                    const topicUnread = topicRead?.unread_messages;
-                    if (topicUnread > 0) {
-                      unreadTopics.push({
-                        id: topic.id,
-                        unreadCount: topicUnread,
-                      });
-                    }
-                  });
-                }
-                if (unreadMessage > 0 || unreadTopics.length > 0) {
-                  acc.unreadChannels.push({
-                    id: channel.id,
-                    unreadCount: unreadMessage,
-                    unreadTopics,
-                  });
-                }
-              }
-
-              if (channel.state.membership.muted) {
-                acc.mutedChannels.push(channel);
-              }
-              return acc;
-            },
-            {
-              activeChannels: [],
-              pendingChannels: [],
-              mutedChannels: [],
-              unreadChannels: [],
-              skippedChannels: [],
-              pinnedChannels: [],
-            },
-          );
-
-        dispatch(
-          slice.actions.fetchChannels({
-            activeChannels,
-            pendingChannels,
-            mutedChannels,
-            unreadChannels,
-            skippedChannels,
-            pinnedChannels,
-          }),
-        );
+        const categorizedChannels = categorizeChannels(response, user_id);
+        dispatch(slice.actions.fetchChannels(categorizedChannels));
         dispatch(slice.actions.setLoadingChannels(false));
       })
       .catch(err => {
@@ -400,6 +416,32 @@ export function FetchChannels(params) {
           }),
         );
         dispatch(slice.actions.setLoadingChannels(false));
+        handleError(dispatch, err, t);
+      });
+  };
+}
+
+export function ReFetchChannels() {
+  return async (dispatch, getState) => {
+    if (!client) return;
+    const { user_id } = getState().auth;
+
+    const filter = {
+      type: ['messaging', 'team'],
+    };
+    const sort = [];
+    const options = {
+      message_limit: 25,
+    };
+    await client
+      .queryChannels(filter, sort, options)
+      .then(async response => {
+        dispatch(FetchAllMembers());
+
+        const categorizedChannels = categorizeChannels(response, user_id);
+        dispatch(slice.actions.fetchChannels(categorizedChannels));
+      })
+      .catch(err => {
         handleError(dispatch, err, t);
       });
   };

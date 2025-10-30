@@ -2,7 +2,7 @@ import React from 'react';
 import { Stack, styled, useTheme, Typography, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import ChannelAvatar from '../../components/ChannelAvatar';
-import { formatString, handleError } from '../../utils/commons';
+import { handleError } from '../../utils/commons';
 import { AvatarShape, ChatType, RoleMember } from '../../constants/commons-const';
 import { useTranslation } from 'react-i18next';
 
@@ -83,13 +83,14 @@ const ChannelInvitation = () => {
           shape={AvatarShape.Round}
         />
         <Typography variant="h6" sx={{ color: theme.palette.text.primary, margin: '15px 0' }}>
-          {formatString(currentChannel.data.name)}
+          {currentChannel.data.name}
         </Typography>
         <Typography
           variant="body1"
           sx={{ color: theme.palette.grey[600], margin: '0 0 15px', textAlign: 'center', fontSize: '14px' }}
         >
-          {t('channelInvitation.message')} {channelType === ChatType.TEAM ? t('channelInvitation.channel') : t('channelInvitation.conversation')}
+          {t('channelInvitation.message')}{' '}
+          {channelType === ChatType.TEAM ? t('channelInvitation.channel') : t('channelInvitation.conversation')}
         </Typography>
         <Stack direction="row" justifyContent="space-between">
           <StyledButton variant="contained" color="primary" onClick={onAcceptInvite}>
