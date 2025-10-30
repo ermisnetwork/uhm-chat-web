@@ -17,7 +17,6 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useDispatch, useSelector } from 'react-redux';
-import { formatString } from '../../utils/commons';
 import { callClient } from '../../client';
 import { CallStatus, CallType } from '../../constants/commons-const';
 import { DisconnectCallDirect, setCallDirectStatus, StartCallDirect } from '../../redux/slices/callDirect';
@@ -651,7 +650,7 @@ const CallDirectDialog2 = () => {
             }}
             className={callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? 'hoverShow' : ''}
           >
-            {user_id === callerInfo?.id ? formatString(receiverInfo?.name) : formatString(callerInfo?.name)}
+            {user_id === callerInfo?.id ? receiverInfo?.name : callerInfo?.name}
           </Typography>
 
           {callDirectStatus === CallStatus.CONNECTED && !remoteMicOn && (
