@@ -8,9 +8,9 @@ import HomeSearch from '../../components/Search/HomeSearch';
 import SkeletonChannels from '../../components/SkeletonChannels';
 import FlipMove from 'react-flip-move';
 import NoResult from '../../assets/Illustration/NoResult';
-import { MagnifyingGlass } from 'phosphor-react';
 import { SetOpenHomeSearch } from '../../redux/slices/app';
 import { useTranslation } from 'react-i18next';
+import { TRANSITION } from '../../config';
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({
   minHeight: 'auto',
@@ -183,28 +183,16 @@ const Channels = () => {
   return (
     <Stack spacing={2} sx={{ height: '100%', width: '100%', padding: '15px' }}>
       <Stack spacing={2}>
-        {isEnabledTopics ? (
-          <Button
-            size="large"
-            variant="contained"
-            color="inherit"
-            sx={{ borderRadius: '16px', backgroundColor: theme.palette.background.neutral, boxShadow: 'none' }}
-            onClick={onToggleHomeSearch}
-          >
-            <MagnifyingGlass size={22} color={theme.palette.text.primary} />
-          </Button>
-        ) : (
-          <HomeSearch />
-        )}
+        <HomeSearch />
 
         <StyledTabs
           value={tabSeledected}
           onChange={handleTabChange}
-          variant="scrollable"
+          variant="standard"
           sx={{
-            transition: 'all 0.2s ease',
-            marginLeft: isEnabledTopics ? '-15px !important' : '0px',
-            marginRight: isEnabledTopics ? '-15px !important' : '0px',
+            transition: TRANSITION,
+            opacity: openTopicPanel ? 0.5 : 1,
+            pointerEvents: openTopicPanel ? 'none' : 'auto',
           }}
         >
           {listTab.map((item, index) => {
@@ -225,7 +213,7 @@ const Channels = () => {
       </Stack>
 
       <Stack
-        className="customScrollbar"
+        className={`customScrollbar ${openTopicPanel ? 'noScrollBar' : ''}`}
         sx={{
           overflowY: 'auto',
           overflowX: 'hidden',

@@ -28,19 +28,16 @@ import { ClientEvents } from '../../constants/events-const';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AddPinnedTopic,
-  AddTopic,
   ConnectCurrentTopic,
   RemovePinnedTopic,
-  RemoveTopic,
   SetCurrentTopic,
   SetOpenTopicPanel,
 } from '../../redux/slices/topic';
 import { setSidebar } from '../../redux/slices/app';
-import { DEFAULT_PATH } from '../../config';
+import { DEFAULT_PATH, TRANSITION } from '../../config';
 import SkeletonChannels from '../../components/SkeletonChannels';
 import { client } from '../../client';
 import useResponsive from '../../hooks/useResponsive';
-import HomeSearch from '../../components/Search/HomeSearch';
 import { X } from 'phosphor-react';
 import { useTranslation } from 'react-i18next';
 
@@ -54,11 +51,9 @@ const TopicEmpty = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
-  const isMobileToMd = useResponsive('down', 'md');
-  const { currentChannel } = useSelector(state => state.channel);
-  const myRole = myRoleInChannel(currentChannel);
+  const { parentChannel } = useSelector(state => state.topic);
+  const myRole = myRoleInChannel(parentChannel);
 
-  if (isMobileToMd) return null;
   return (
     <Stack sx={{ flex: 1, width: '100%', minHeight: 'auto', alignItems: 'center', justifyContent: 'center' }}>
       <NoTopic />
@@ -108,10 +103,11 @@ const TopicHeader = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const isMobileToMd = useResponsive('down', 'md');
-  const { currentChannel, isGuest } = useSelector(state => state.channel);
+  const { isGuest } = useSelector(state => state.channel);
+  const { parentChannel } = useSelector(state => state.topic);
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const myRole = myRoleInChannel(currentChannel);
+  const myRole = myRoleInChannel(parentChannel);
 
   const ACTIONS = [
     {
@@ -119,7 +115,11 @@ const TopicHeader = () => {
       icon: <InfoIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
+        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+        setTimeout(() => {
+          dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
+        }, 100);
       },
     },
     {
@@ -127,9 +127,12 @@ const TopicHeader = () => {
       icon: <SearchIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
         dispatch(SetCurrentTopic(null));
-        navigate(`${DEFAULT_PATH}/${currentChannel.cid}`);
+        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+        setTimeout(() => {
+          dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+        }, 100);
       },
     },
     {
@@ -137,7 +140,11 @@ const TopicHeader = () => {
       icon: <ProfileAddIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        dispatch(SetOpenInviteFriendDialog(true));
+        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+        setTimeout(() => {
+          dispatch(SetOpenInviteFriendDialog(true));
+        }, 100);
       },
     },
     {
@@ -145,7 +152,11 @@ const TopicHeader = () => {
       icon: <StickyNoteIcon color={theme.palette.text.primary} />,
       onClick: () => {
         setAnchorEl(null);
-        dispatch(SetOpenNewTopicDialog(true));
+        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+        setTimeout(() => {
+          dispatch(SetOpenNewTopicDialog(true));
+        }, 100);
       },
       allowRoles: [RoleMember.OWNER, RoleMember.MOD],
     },
@@ -161,6 +172,8 @@ const TopicHeader = () => {
     dispatch(SetOpenTopicPanel(false));
   };
 
+  if (!parentChannel) return null;
+
   return (
     <Stack
       alignItems="center"
@@ -174,74 +187,72 @@ const TopicHeader = () => {
         borderBottom: `1px solid ${theme.palette.divider}`,
       }}
     >
-      {!isMobileToMd && (
-        <IconButton onClick={onCloseTopicPanel}>
-          <X size={20} color={theme.palette.text.primary} />
-        </IconButton>
-      )}
+      <IconButton onClick={onCloseTopicPanel}>
+        <X size={20} color={theme.palette.text.primary} />
+      </IconButton>
 
       <Box sx={{ width: '50px', height: '50px' }} onClick={onOpenPopover}>
-        <ChannelAvatar channel={currentChannel} width={50} height={50} openLightbox={true} shape={AvatarShape.Round} />
+        <ChannelAvatar channel={parentChannel} width={50} height={50} openLightbox={true} shape={AvatarShape.Round} />
       </Box>
 
-      {!isMobileToMd && (
-        <>
-          <Box
+      <Box
+        sx={{
+          overflow: 'hidden',
+          flex: 1,
+          minWidth: 'auto',
+        }}
+      >
+        <Button
+          onClick={() => {
+            if (!isGuest) {
+              navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+              setTimeout(() => {
+                dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
+              }, 100);
+            }
+          }}
+          sx={{
+            textTransform: 'none',
+            maxWidth: '100%',
+            minWidth: 'auto',
+            justifyContent: 'start',
+            textAlign: 'left',
+          }}
+        >
+          <Typography
+            variant="h6"
             sx={{
+              color: theme.palette.text.primary,
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              width: '100%',
               overflow: 'hidden',
-              flex: 1,
-              minWidth: 'auto',
             }}
           >
-            <Button
-              onClick={() => {
-                if (!isGuest) {
-                  dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
-                }
-              }}
+            {parentChannel.data?.name}
+            <Typography
+              variant="caption"
               sx={{
-                textTransform: 'none',
-                maxWidth: '100%',
-                minWidth: 'auto',
-                justifyContent: 'start',
-                textAlign: 'left',
+                display: 'block',
+                color: theme.palette.text.secondary,
+                fontSize: '12px',
+                fontWeight: 400,
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{
-                  color: theme.palette.text.primary,
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  width: '100%',
-                  overflow: 'hidden',
-                }}
-              >
-                {currentChannel.data?.name}
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: 'block',
-                    color: theme.palette.text.secondary,
-                    fontSize: '12px',
-                    fontWeight: 400,
-                  }}
-                >
-                  {`${currentChannel.data?.member_count} ${t('topicPanel.member')}`}
-                </Typography>
-              </Typography>
-            </Button>
-          </Box>
+              {`${parentChannel.data?.member_count} ${t('topicPanel.member')}`}
+            </Typography>
+          </Typography>
+        </Button>
+      </Box>
 
-          <IconButton
-            onClick={event => {
-              setAnchorEl(event.currentTarget);
-            }}
-          >
-            <DotsThreeIcon color={theme.palette.text.primary} />
-          </IconButton>
-        </>
-      )}
+      <IconButton
+        onClick={event => {
+          setAnchorEl(event.currentTarget);
+        }}
+      >
+        <DotsThreeIcon color={theme.palette.text.primary} />
+      </IconButton>
 
       <Popover
         id={Boolean(anchorEl) ? 'actions-channel-popover' : undefined}
@@ -282,70 +293,47 @@ const TopicHeader = () => {
 
 const TopicPanel = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
-  const { currentTopic, topics, loadingTopics, pinnedTopics, openTopicPanel } = useSelector(state => state.topic);
-  const { openHomeSearch } = useSelector(state => state.app);
+  const { currentTopic, topics, loadingTopics, pinnedTopics, openTopicPanel, parentChannel } = useSelector(
+    state => state.topic,
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
   const [idSelected, setIdSelected] = useState('');
-  const isMobileToMd = useResponsive('down', 'md');
 
   useEffect(() => {
-    const handleTopicCreated = event => {
-      const splitParentCID = splitChannelId(event.parent_cid);
-      const parentChannelId = splitParentCID.channelId;
-
-      if (parentChannelId === currentChannel?.id) {
-        dispatch(AddTopic(event.channel_id));
-      }
-    };
-
     const handleTopicPinned = event => {
+      if (!event.parent_cid) return;
+
       const splitParentCID = splitChannelId(event.parent_cid);
       const parentChannelId = splitParentCID.channelId;
 
-      if (parentChannelId === currentChannel?.id && event.channel_type === ChatType.TOPIC) {
+      if (parentChannelId === parentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(AddPinnedTopic(event.channel_id));
       }
     };
 
     const handleTopicUnPinned = event => {
+      if (!event.parent_cid) return;
+
       const splitParentCID = splitChannelId(event.parent_cid);
       const parentChannelId = splitParentCID.channelId;
 
-      if (parentChannelId === currentChannel?.id && event.channel_type === ChatType.TOPIC) {
+      if (parentChannelId === parentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(RemovePinnedTopic(event.channel_id));
       }
     };
 
-    const handleTopicDeleted = event => {
-      if (event.channel_type === ChatType.TOPIC) {
-        dispatch(RemovePinnedTopic(event.channel_id));
-        dispatch(RemoveTopic(event.channel_id));
-        if (currentTopic?.id === event.channel_id) {
-          dispatch(SetCurrentTopic(null));
-          setIdSelected(currentChannel?.id);
-          searchParams.delete('topicId');
-          setSearchParams(searchParams, { replace: true });
-        }
-      }
-    };
-
-    client.on(ClientEvents.ChannelTopicCreated, handleTopicCreated);
     client.on(ClientEvents.ChannelPinned, handleTopicPinned);
     client.on(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
-    client.on(ClientEvents.ChannelDeleted, handleTopicDeleted);
 
     return () => {
-      client.off(ClientEvents.ChannelTopicCreated, handleTopicCreated);
       client.off(ClientEvents.ChannelPinned, handleTopicPinned);
       client.off(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
-      client.off(ClientEvents.ChannelDeleted, handleTopicDeleted);
     };
-  }, [client, currentTopic, currentChannel]);
+  }, [client, currentTopic, parentChannel]);
 
   useEffect(() => {
     if (topicID) {
@@ -353,7 +341,9 @@ const TopicPanel = () => {
       setIdSelected(topicID);
     } else {
       dispatch(SetCurrentTopic(null));
-      setIdSelected(currentChannel.id);
+      if (currentChannel) {
+        setIdSelected(currentChannel.id);
+      }
     }
   }, [topicID, currentChannel]);
 
@@ -397,39 +387,37 @@ const TopicPanel = () => {
     }
   }, [topics, idSelected, loadingTopics, pinnedTopics]);
 
-  if (!currentChannel?.data?.topics_enabled || !openTopicPanel) return null;
+  // if (!parentChannel?.data?.topics_enabled || !openTopicPanel) return null;
 
   return (
     <>
       <Stack
         sx={{
-          width: isMobileToMd ? '73px' : '300px',
-          height: '100%',
-          borderRight: `1px solid ${theme.palette.divider}`,
+          width: openTopicPanel ? '300px' : '0px',
+          height: openTopicPanel ? '100%' : '0px',
+          borderLeft: `1px solid ${theme.palette.divider}`,
+          backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.grey[900],
+          borderRadius: '0 16px 16px 0',
+          marginLeft: '0px!important',
+          transition: TRANSITION,
+          transform: openTopicPanel ? 'translateZ(0)' : 'translateZ(200px)',
+          opacity: openTopicPanel ? 1 : 0,
         }}
       >
-        {openHomeSearch ? (
-          <Box sx={{ padding: '15px', width: '100%', height: '100%', position: 'relative' }}>
-            <HomeSearch />
-          </Box>
-        ) : (
-          <>
-            <TopicHeader />
+        <TopicHeader />
 
-            <Stack
-              sx={{
-                flex: 1,
-                overflowY: 'auto',
-                overflowX: 'hidden',
-                minHeight: 'auto',
-                padding: '0 15px',
-              }}
-              className="customScrollbar"
-            >
-              {renderedTopics}
-            </Stack>
-          </>
-        )}
+        <Stack
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            minHeight: 'auto',
+            padding: '0 15px',
+          }}
+          className="customScrollbar"
+        >
+          {renderedTopics}
+        </Stack>
       </Stack>
 
       <NewTopicDialog />

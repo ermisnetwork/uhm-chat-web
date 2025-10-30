@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { AvatarShape } from '../constants/commons-const';
 import getColorName from '../utils/getColorName';
 import capitalizeFirstLetter from '../utils/commons';
+import { TRANSITION } from '../config';
 
 const AvatarDefault = ({ name = '', width, height, shape = AvatarShape.Circle }) => {
   const theme = useTheme();
@@ -35,6 +36,7 @@ const AvatarDefault = ({ name = '', width, height, shape = AvatarShape.Circle })
       alignItems: 'center',
       borderRadius: computedValues.borderRadius,
       fontWeight: 700,
+      transition: TRANSITION,
     }),
     [
       computedValues.backgroundColor,

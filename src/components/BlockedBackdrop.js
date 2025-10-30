@@ -43,6 +43,8 @@ export default function BlockedBackdrop() {
     }
   }, [currentChannel, user_id]);
 
+  if (!isBlocked) return null;
+
   return (
     <Box
       sx={{

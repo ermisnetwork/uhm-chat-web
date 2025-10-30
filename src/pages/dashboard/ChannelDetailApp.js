@@ -22,24 +22,24 @@ import SidebarSearchMessage from '../../sections/dashboard/SidebarSearchMessage'
 import SidebarUserInfo from '../../sections/dashboard/SidebarUserInfo';
 import SidebarChannelTopic from '../../sections/dashboard/SidebarChannelTopic';
 import SidebarTopicInfo from '../../sections/dashboard/SidebarTopicInfo';
+import LoadingScreen from '../../components/LoadingScreen';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const hiddenTimeRef = useRef(null);
 
-  const { currentChannelStatus } = useSelector(state => state.channel);
+  const { currentChannelStatus, loadingChannels } = useSelector(state => state.channel);
   const { sideBar, isUserConnected } = useSelector(state => state.app);
   const users = client.state.users ? Object.values(client.state.users) : [];
 
   const { id } = useParams();
 
   useEffect(() => {
-    if (id && isUserConnected) {
+    if (id && isUserConnected && !loadingChannels) {
       const result = splitChannelId(id);
       if (result) {
         dispatch(ConnectCurrentChannel(result.channelId, result.channelType));
-
         // const handleVisibilityChange = () => {
         //   if (document.hidden) {
         //     hiddenTimeRef.current = Date.now();
@@ -52,9 +52,7 @@ const ChannelDetailApp = () => {
         //     hiddenTimeRef.current = null;
         //   }
         // };
-
         // document.addEventListener('visibilitychange', handleVisibilityChange);
-
         // return () => {
         //   document.removeEventListener('visibilitychange', handleVisibilityChange);
         // };
@@ -62,7 +60,15 @@ const ChannelDetailApp = () => {
         navigate(`${DEFAULT_PATH}`);
       }
     }
-  }, [dispatch, id, isUserConnected, navigate]);
+  }, [dispatch, id, isUserConnected, navigate, loadingChannels]);
+
+  if (loadingChannels) {
+    return (
+      <BoxContainer>
+        <LoadingScreen />
+      </BoxContainer>
+    );
+  }
 
   return (
     <>

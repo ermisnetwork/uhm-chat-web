@@ -96,12 +96,4 @@ AvatarComponent.propTypes = {
   shape: PropTypes.oneOf([AvatarShape.Circle, AvatarShape.Round]),
 };
 
-// Default props
-AvatarComponent.defaultProps = {
-  name: '',
-  url: '',
-  isPublic: false,
-  shape: AvatarShape.Circle,
-};
-
 export default AvatarComponent;

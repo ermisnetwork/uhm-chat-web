@@ -74,10 +74,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import UsersTyping from '../../components/UsersTyping';
 import NoMessageBox from '../../components/NoMessageBox';
 import { setSidebar, SetUserInfo } from '../../redux/slices/app';
-import TopicPanel from './TopicPanel';
 import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
-import { SetIsClosedTopic, SetOpenTopicPanel } from '../../redux/slices/topic';
+import { SetIsClosedTopic } from '../../redux/slices/topic';
 import { useTranslation } from 'react-i18next';
+import useMessageSound from '../../hooks/useMessageSound';
 
 const messageMotion = {
   layout: true,
@@ -381,7 +381,7 @@ const MessageList = React.memo(
                       <Typography
                         variant="body2"
                         color={theme.palette.grey[500]}
-                        sx={{ textAlign: 'center', fontWeight: 400, order: 2, width: '100%' }}
+                        sx={{ textAlign: 'center', fontWeight: 400, order: 2, width: '100%', marginBottom: '10px' }}
                         dangerouslySetInnerHTML={{ __html: msgSystem }}
                       />
                     </StyledMessage>
@@ -508,6 +508,7 @@ const ChatComponent = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const messageListRef = useRef(null);
+  const { playNewMessageSound, cleanup } = useMessageSound();
   const { currentChannel, isBlocked, isGuest, isBanned } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
   const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
@@ -603,6 +604,13 @@ const ChatComponent = () => {
       const handleMessages = event => {
         switch (event.type) {
           case ClientEvents.MessageNew:
+            const messageType = event.message.type;
+
+            // Phát âm thanh cho tin nhắn mới (trừ tin nhắn system/signal)
+            if (![MessageType.System, MessageType.Signal].includes(messageType)) {
+              playNewMessageSound();
+            }
+
             if (user_id !== event.user.id || [MessageType.System, MessageType.Signal].includes(event.message.type)) {
               setMessages(prev => {
                 return [...prev, event.message];
@@ -799,26 +807,7 @@ const ChatComponent = () => {
       };
 
       const handleChannelTruncate = event => {
-        const channelId = event.channel_id;
-        const channelType = event.channel_type;
-        setMessages([]);
-        dispatch(WatchCurrentChannel(channelId, channelType));
-      };
-
-      const handleChannelTopicEnabled = event => {
-        const splitCID = splitChannelId(event.cid);
-        const channelId = splitCID.channelId;
-        const channelType = splitCID.channelType;
-        dispatch(WatchCurrentChannel(channelId, channelType));
-        dispatch(SetOpenTopicPanel(true));
-      };
-
-      const handleChannelTopicDisabled = event => {
-        const splitCID = splitChannelId(event.cid);
-        const channelId = splitCID.channelId;
-        const channelType = splitCID.channelType;
-        dispatch(WatchCurrentChannel(channelId, channelType));
-        dispatch(SetOpenTopicPanel(false));
+        setMessages(currentChat.state.messages || []);
       };
 
       const handleChannelTopicClosed = event => {
@@ -848,8 +837,6 @@ const ChatComponent = () => {
       currentChat.on(ClientEvents.MemberUnBanned, handleMemberUnBanned);
       currentChat.on(ClientEvents.PollChoiceNew, handleMessages);
       currentChat.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
-      currentChat.on(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
-      currentChat.on(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
       currentChat.on(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
       currentChat.on(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
 
@@ -873,10 +860,11 @@ const ChatComponent = () => {
         currentChat.off(ClientEvents.MemberUnBanned, handleMemberUnBanned);
         currentChat.off(ClientEvents.PollChoiceNew, handleMessages);
         currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
-        currentChat.off(ClientEvents.ChannelTopicEnabled, handleChannelTopicEnabled);
-        currentChat.off(ClientEvents.ChannelTopicDisabled, handleChannelTopicDisabled);
         currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
         currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+
+        // Cleanup audio khi thay đổi chat hoặc component unmount
+        cleanup();
       };
     } else {
       if (messageListRef.current) {
@@ -1023,9 +1011,15 @@ const ChatComponent = () => {
 
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      {showTopicPanel && <TopicPanel />}
-
-      <Stack sx={{ minWidth: 'auto', height: '100%', position: 'relative', flex: 1, overflow: 'hidden' }}>
+      <Stack
+        sx={{
+          minWidth: 'auto',
+          height: '100%',
+          position: 'relative',
+          flex: 1,
+          overflow: 'hidden',
+        }}
+      >
         <ChatHeader />
 
         {currentChat && (
@@ -1151,7 +1145,7 @@ const ChatComponent = () => {
         {isClosedTopic && <ClosedTopicBackdrop />}
         {isPendingInvite && <ChannelInvitation />}
         {isBanned && <BannedBackdrop />}
-        {isBlocked && <BlockedBackdrop />}
+        <BlockedBackdrop />
       </Stack>
       {deleteMessage.openDialog && <DeleteMessageDialog />}
       {forwardMessage.openDialog && <ForwardMessageDialog />}

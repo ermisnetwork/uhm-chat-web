@@ -5,13 +5,13 @@ import { Badge, Stack, Box } from '@mui/material';
 import PropTypes from 'prop-types';
 
 import { AvatarShape, ChatType, OnlineStatusUser } from '../constants/commons-const';
-import { isPublicChannel } from '../utils/commons';
 import useOnlineStatus from '../hooks/useOnlineStatus';
 import AvatarComponent from './AvatarComponent';
 import AvatarDefault from './AvatarDefault';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
 import ImageCanvas from './ImageCanvas';
 import TopicAvatar from './TopicAvatar';
+import { TRANSITION } from '../config';
 
 const StyledBadgeOnline = styled(Badge, {
   shouldForwardProp: prop => prop !== 'status',
@@ -54,7 +54,7 @@ const TeamAvatarBox = ({ member1, member2, width = 48, height = 48, shape = 'cir
   );
 
   return (
-    <Box sx={{ position: 'relative', width, height }}>
+    <Box sx={{ position: 'relative', width, height, transition: TRANSITION }}>
       <Box
         sx={{
           position: 'absolute',
@@ -63,6 +63,7 @@ const TeamAvatarBox = ({ member1, member2, width = 48, height = 48, shape = 'cir
           zIndex: 1,
           width: sizes.member1,
           height: sizes.member1,
+          transition: TRANSITION,
         }}
       >
         {member1.avatar ? (
@@ -84,6 +85,7 @@ const TeamAvatarBox = ({ member1, member2, width = 48, height = 48, shape = 'cir
           zIndex: 2,
           width: sizes.member2,
           height: sizes.member2,
+          transition: TRANSITION,
         }}
       >
         {member2.avatar ? (
@@ -116,11 +118,11 @@ export default function ChannelAvatar({
     () => ({
       isDirect: channel?.type === ChatType.MESSAGING,
       channelAvatar: channel?.data?.image || '',
-      isPublic: isPublicChannel(channel),
+      isPublic: channel?.data?.public,
       isChannelTopic: channel?.type === ChatType.TOPIC,
       isEnabledTopics: channel?.data?.topics_enabled,
     }),
-    [channel?.type, channel?.data?.image, channel?.data?.topics_enabled, channel],
+    [channel?.type, channel?.data?.image, channel?.data?.topics_enabled, channel?.data?.public],
   );
 
   const { isDirect, channelAvatar, isPublic, isChannelTopic, isEnabledTopics } = channelData;

@@ -1,8 +1,7 @@
-
 import { LocalStorageKey } from '../constants/localStorage-const';
 import { formatString, getMemberInfo } from './commons';
 
-export function convertMessageSystem(input, all_members, isDirect, t, isNotify = false) {
+export function convertMessageSystem(input, all_members, isDirect, isNotify = false, t) {
   if (!input) return '';
   const parts = input.split(' ');
   const number = parseInt(parts[0]);
@@ -156,7 +155,7 @@ export function convertDuration(duration, t) {
       durationText = `30 ${t('messageSystem.seconds')}`;
       break;
     case '60000':
-      durationText = `1 ${t('messageSystem.minute')}`;
+      durationText = `1 ${t('messageSystem.minutes')}`;
       break;
     case '300000':
       durationText = `5 ${t('messageSystem.minutes')}`;

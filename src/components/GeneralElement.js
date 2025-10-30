@@ -10,8 +10,6 @@ import PropTypes from 'prop-types';
 import { ClientEvents } from '../constants/events-const';
 import { MessageType } from '../constants/commons-const';
 import { DEFAULT_PATH } from '../config';
-import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
-import { SetIsClosedTopic } from '../redux/slices/topic';
 import { convertMessageSystem } from '../utils/messageSystem';
 import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
@@ -49,7 +47,8 @@ const GeneralElement = ({ idSelected }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const { currentChannel, unreadChannels = [] } = useSelector(state => state.channel);
+  const { unreadChannels = [] } = useSelector(state => state.channel);
+  const { parentChannel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
 
   const [lastMessage, setLastMessage] = useState('');
@@ -59,11 +58,11 @@ const GeneralElement = ({ idSelected }) => {
   const users = useMemo(() => (client.state.users ? Object.values(client.state.users) : []), [client.state.users]);
 
   const hasUnread = useMemo(
-    () => unreadChannels?.some(item => item.id === currentChannel?.id && item.unreadCount > 0),
-    [unreadChannels, currentChannel?.id],
+    () => unreadChannels?.some(item => item.id === parentChannel?.id && item.unreadCount > 0),
+    [unreadChannels, parentChannel?.id],
   );
 
-  const isSelected = useMemo(() => idSelected === currentChannel?.id, [idSelected, currentChannel?.id]);
+  const isSelected = useMemo(() => idSelected === parentChannel?.id, [idSelected, parentChannel?.id]);
 
   // Memoized helper functions
   const replaceMentionsWithNames = useCallback(
@@ -141,13 +140,13 @@ const GeneralElement = ({ idSelected }) => {
         setLastMessageAt(getDisplayDate(date));
 
         if (message.type === MessageType.System) {
-          const messageSystem = convertMessageSystem(message.text, users, false, t);
+          const messageSystem = convertMessageSystem(message.text, users, false, false, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
         } else if (message.type === MessageType.Signal) {
           const messageSignal = convertMessageSignal(message.text);
           setLastMessage(messageSignal.text || '');
         } else if (message.type === MessageType.Sticker) {
-          setLastMessage(`${senderName}: ${t('message.sticker')}`);
+          setLastMessage(`${senderName}: ${t('chatElement.sticker')}`);
         } else if (message.attachments) {
           const attachmentLast = message.attachments[message.attachments.length - 1];
           setLastMessage(renderAttachmentPreview(attachmentLast, senderName));
@@ -156,62 +155,59 @@ const GeneralElement = ({ idSelected }) => {
           setLastMessage(`${senderName}: ${messagePreview}`);
         }
       } else {
-        setLastMessageAt(getDisplayDate(currentChannel?.data?.created_at));
-        setLastMessage(t('chat_element.no_messages'));
+        setLastMessageAt(getDisplayDate(parentChannel?.data?.created_at));
+        setLastMessage(t('chatElement.no_message'));
       }
     },
-    [user_id, users, t, currentChannel?.data?.created_at, renderAttachmentPreview, replaceMentionsWithNames],
+    [user_id, users, t, parentChannel?.data?.created_at, renderAttachmentPreview, replaceMentionsWithNames],
   );
 
   // Memoized event handlers
   const handleMessageNew = useCallback(
     event => {
-      if (event.channel_id === currentChannel?.data?.id) {
+      if (event.channel_id === parentChannel?.data?.id) {
         if (!(event.message.type === MessageType.Signal && CALL_SIGNALS_TO_IGNORE.includes(event.message.text[0]))) {
           getLastMessage(event.message);
         }
       }
     },
-    [currentChannel?.data?.id, getLastMessage],
+    [parentChannel?.data?.id, getLastMessage],
   );
 
   const handleMessageUpdated = useCallback(
     event => {
-      if (event.channel_id === currentChannel?.data?.id) {
+      if (event.channel_id === parentChannel?.data?.id) {
         const lastMsg =
-          currentChannel?.state?.messages?.length > 0
-            ? currentChannel.state.messages[currentChannel.state.messages.length - 1]
+          parentChannel?.state?.messages?.length > 0
+            ? parentChannel.state.messages[parentChannel.state.messages.length - 1]
             : null;
         getLastMessage(lastMsg);
       }
     },
-    [currentChannel?.data?.id, currentChannel?.state?.messages, getLastMessage],
+    [parentChannel?.data?.id, parentChannel?.state?.messages, getLastMessage],
   );
 
   const handleMessageDeleted = useCallback(
     event => {
-      if (event.channel_id === currentChannel?.data?.id) {
+      if (event.channel_id === parentChannel?.data?.id) {
         const lastMsg =
-          currentChannel?.state?.messages?.length > 0
-            ? currentChannel.state.messages[currentChannel.state.messages.length - 1]
+          parentChannel?.state?.messages?.length > 0
+            ? parentChannel.state.messages[parentChannel.state.messages.length - 1]
             : null;
         getLastMessage(lastMsg);
       }
     },
-    [currentChannel?.data?.id, currentChannel?.state?.messages, getLastMessage],
+    [parentChannel?.data?.id, parentChannel?.state?.messages, getLastMessage],
   );
 
   const onLeftClick = useCallback(() => {
-    navigate(`${DEFAULT_PATH}/${currentChannel?.cid}`);
-    dispatch(onReplyMessage(null));
-    dispatch(onEditMessage(null));
-    dispatch(SetIsClosedTopic(false));
-  }, [navigate, currentChannel?.cid, dispatch]);
+    navigate(`${DEFAULT_PATH}/${parentChannel?.cid}`);
+  }, [navigate, parentChannel?.cid]);
 
   useEffect(() => {
     const lastMsg =
-      currentChannel?.state?.messages?.length > 0
-        ? currentChannel.state.messages[currentChannel.state.messages.length - 1]
+      parentChannel?.state?.messages?.length > 0
+        ? parentChannel.state.messages[parentChannel.state.messages.length - 1]
         : null;
     getLastMessage(lastMsg);
 
@@ -224,7 +220,7 @@ const GeneralElement = ({ idSelected }) => {
       client.off(ClientEvents.MessageUpdated, handleMessageUpdated);
       client.off(ClientEvents.MessageDeleted, handleMessageDeleted);
     };
-  }, [currentChannel, getLastMessage, handleMessageNew, handleMessageUpdated, handleMessageDeleted]);
+  }, [parentChannel, getLastMessage, handleMessageNew, handleMessageUpdated, handleMessageDeleted]);
 
   // Memoized styles
   const containerStyle = useMemo(

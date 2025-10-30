@@ -405,6 +405,7 @@ const ChatHeader = () => {
                 onClick={() => {
                   dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
                 }}
+                disabled={isBlocked}
               >
                 <MagnifyingGlass color={theme.palette.text.primary} />
               </IconButton>
