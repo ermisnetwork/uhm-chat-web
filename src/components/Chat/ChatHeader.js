@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -61,7 +61,7 @@ const ActionsTopic = () => {
   const isTopicClosed = currentTopic?.data?.is_closed_topic;
   const isPinned = currentTopic?.data?.is_pinned;
 
-  const onCloseTopic = async () => {
+  const onCloseTopic = useCallback(async () => {
     try {
       const topicCID = currentTopic?.cid;
       await currentChannel.closeTopic(topicCID);
@@ -70,20 +70,20 @@ const ActionsTopic = () => {
     } catch (error) {
       handleError(dispatch, error, t);
     }
-  };
+  }, [currentChannel, currentTopic?.cid, dispatch, t]);
 
-  const onReopenTopic = async () => {
+  const onReopenTopic = useCallback(async () => {
     try {
       const topicCID = currentTopic?.cid;
       await currentChannel.reopenTopic(topicCID);
       setAnchorEl(null);
-      dispatch(showSnackbar({ message: t('chatHeader.snackbar_reopen_success'), severity: 'success' }));
+      dispatch(showSnackbar({ message: t('chatHeader.snackbar_reopened_success'), severity: 'success' }));
     } catch (error) {
       handleError(dispatch, error, t);
     }
-  };
+  }, [currentChannel, currentTopic?.cid, dispatch, t]);
 
-  const onPinTopic = async () => {
+  const onPinTopic = useCallback(async () => {
     try {
       if (isPinned) {
         await client.unpinChannel(ChatType.TOPIC, currentTopic?.id);
@@ -95,9 +95,9 @@ const ActionsTopic = () => {
     } finally {
       setAnchorEl(null);
     }
-  };
+  }, [isPinned, currentTopic?.id, dispatch, t]);
 
-  const onDeleteTopic = () => {
+  const onDeleteTopic = useCallback(() => {
     const payload = {
       openDialog: true,
       channel: currentTopic,
@@ -107,60 +107,76 @@ const ActionsTopic = () => {
 
     dispatch(setChannelConfirm(payload));
     setAnchorEl(null);
-  };
-  const onOpenTopicInfo = () => {
+  }, [currentTopic, user_id, dispatch]);
+
+  const onOpenTopicInfo = useCallback(() => {
     dispatch(setSidebar({ type: SidebarType.TopicInfo, open: true }));
     setAnchorEl(null);
-  };
+  }, [dispatch]);
 
-  const onEditTopicInfo = () => {
+  const onEditTopicInfo = useCallback(() => {
     dispatch(setSidebar({ type: SidebarType.TopicInfo, open: true, mode: SidebarMode.Edit }));
     setAnchorEl(null);
-  };
+  }, [dispatch]);
 
-  const ACTIONS = [
-    {
-      value: isPinned ? t('chatHeader.unpin') : t('chatHeader.pin'),
-      label: isPinned ? t('chatHeader.unpin') : t('chatHeader.pin_to_top'),
-      icon: isPinned ? (
-        <UnPinIcon color={theme.palette.text.primary} />
-      ) : (
-        <PinIcon color={theme.palette.text.primary} />
-      ),
-      onClick: onPinTopic,
-    },
-    {
-      value: t('chatHeader.info'),
-      label: t('chatHeader.topic_info'),
-      icon: <InfoIcon color={theme.palette.text.primary} />,
-      onClick: onOpenTopicInfo,
-    },
-    !isTopicClosed && {
-      value: t('chatHeader.topic'),
-      label: t('chatHeader.edit_topic'),
-      icon: <EditIcon color={theme.palette.text.primary} />,
-      onClick: onEditTopicInfo,
-      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
-    },
-    {
-      value: isTopicClosed ? t('chatHeader.reopen') : t('chatHeader.close'),
-      label: isTopicClosed ? t('chatHeader.reopen_topic') : t('chatHeader.close_topic'),
-      icon: isTopicClosed ? (
-        <PlayCircleIcon color={theme.palette.text.primary} />
-      ) : (
-        <PauseCircleRedIcon color={theme.palette.text.primary} />
-      ),
-      onClick: isTopicClosed ? onReopenTopic : onCloseTopic,
-      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
-    },
-    {
-      value: t('chatHeader.delete'),
-      label: t('chatHeader.delete_topic'),
-      icon: <TrashIcon color={theme.palette.error.main} />,
-      onClick: onDeleteTopic,
-      allowRoles: [RoleMember.OWNER],
-    },
-  ];
+  const ACTIONS = useMemo(
+    () => [
+      {
+        value: isPinned ? 'unpin' : 'pin',
+        label: isPinned ? t('chatHeader.unpin') : t('chatHeader.pin_to_top'),
+        icon: isPinned ? (
+          <UnPinIcon color={theme.palette.text.primary} />
+        ) : (
+          <PinIcon color={theme.palette.text.primary} />
+        ),
+        onClick: onPinTopic,
+      },
+      {
+        value: 'info',
+        label: t('chatHeader.topic_info'),
+        icon: <InfoIcon color={theme.palette.text.primary} />,
+        onClick: onOpenTopicInfo,
+      },
+      !isTopicClosed && {
+        value: 'edit',
+        label: t('chatHeader.edit_topic'),
+        icon: <EditIcon color={theme.palette.text.primary} />,
+        onClick: onEditTopicInfo,
+        allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+      },
+      {
+        value: isTopicClosed ? 'reopen' : 'close',
+        label: isTopicClosed ? t('chatHeader.reopen_topic') : t('chatHeader.close_topic'),
+        icon: isTopicClosed ? (
+          <PlayCircleIcon color={theme.palette.text.primary} />
+        ) : (
+          <PauseCircleRedIcon color={theme.palette.text.primary} />
+        ),
+        onClick: isTopicClosed ? onReopenTopic : onCloseTopic,
+        allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+      },
+      {
+        value: 'delete',
+        label: t('chatHeader.delete_topic'),
+        icon: <TrashIcon color={theme.palette.error.main} />,
+        onClick: onDeleteTopic,
+        allowRoles: [RoleMember.OWNER],
+      },
+    ],
+    [
+      isPinned,
+      isTopicClosed,
+      theme.palette.text.primary,
+      theme.palette.error.main,
+      t,
+      onPinTopic,
+      onOpenTopicInfo,
+      onEditTopicInfo,
+      onReopenTopic,
+      onCloseTopic,
+      onDeleteTopic,
+    ],
+  );
 
   return (
     <>
@@ -227,9 +243,10 @@ const ChatHeader = () => {
   const { user_id } = useSelector(state => state.auth);
   const { isGuest, isBlocked, currentChannel } = useSelector(state => state.channel);
   const { currentTopic } = useSelector(state => state.topic);
+  const { sideBar } = useSelector(state => state.app);
 
-  const isDirect = isChannelDirect(currentChannel);
-  const isEnabledTopics = currentChannel?.data?.topics_enabled;
+  const isDirect = useMemo(() => isChannelDirect(currentChannel), [currentChannel]);
+  const isEnabledTopics = useMemo(() => currentChannel?.data?.topics_enabled, [currentChannel?.data?.topics_enabled]);
 
   const [loadingJoin, setLoadingJoin] = useState(false);
 
@@ -244,11 +261,21 @@ const ChatHeader = () => {
 
   const onlineStatus = useOnlineStatus(isDirect ? otherMemberId : '');
 
-  const onStartCall = async callType => {
-    await callClient.createCall(callType, currentChannel.cid);
-  };
+  const onStartCall = useCallback(
+    async callType => {
+      await callClient.createCall(callType, currentChannel.cid);
+    },
+    [currentChannel?.cid],
+  );
 
-  const onJoinChannel = async () => {
+  const onStartVideoCall = useCallback(() => onStartCall(CallType.VIDEO), [onStartCall]);
+  const onStartAudioCall = useCallback(() => onStartCall(CallType.AUDIO), [onStartCall]);
+
+  const onOpenSearchMessage = useCallback(() => {
+    dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+  }, [dispatch]);
+
+  const onJoinChannel = useCallback(async () => {
     try {
       setLoadingJoin(true);
       const response = await currentChannel.acceptInvite('join');
@@ -266,9 +293,9 @@ const ChatHeader = () => {
       setLoadingJoin(false);
       handleError(dispatch, error, t);
     }
-  };
+  }, [currentChannel, dispatch, t]);
 
-  const renderName = () => {
+  const renderName = useCallback(() => {
     if (isEnabledTopics) {
       if (currentTopic) {
         return currentTopic.data?.name;
@@ -278,29 +305,48 @@ const ChatHeader = () => {
     } else {
       return currentChannel.data?.name;
     }
-  };
+  }, [isEnabledTopics, currentTopic, currentChannel?.data?.name, t]);
 
-  const renderCaption = () => {
+  const renderCaption = useCallback(() => {
     if (isEnabledTopics || currentTopic) {
       return currentChannel.data?.name;
     } else {
       return isDirect ? onlineStatus : `${currentChannel.data?.member_count} ${t('chatHeader.member')}`;
     }
-  };
+  }, [
+    isEnabledTopics,
+    currentTopic,
+    currentChannel?.data?.name,
+    currentChannel?.data?.member_count,
+    isDirect,
+    onlineStatus,
+    t,
+  ]);
 
-  const renderIconAction = () => {
+  const renderIconAction = useCallback(() => {
     if (isGuest || isBlocked) return null;
 
     if (currentTopic?.type === ChatType.TOPIC) {
       return <ActionsTopic />;
     }
-  };
+  }, [isGuest, isBlocked, currentTopic?.type]);
 
-  const onOpenChannelInfo = () => {
+  const onNavigateBack = useCallback(() => {
+    navigate(`${DEFAULT_PATH}`);
+    dispatch(setCurrentChannel(null));
+    dispatch(setCurrentChannelStatus(CurrentChannelStatus.IDLE));
+    dispatch(SetOpenTopicPanel(false));
+  }, [navigate, dispatch]);
+
+  const onOpenChannelInfo = useCallback(() => {
     if (!isGuest) {
-      dispatch(setSidebar({ type: currentTopic ? SidebarType.TopicInfo : SidebarType.Channel, open: true }));
+      if (sideBar && sideBar.open) {
+        dispatch(setSidebar({ type: SidebarType.Channel, open: false, mode: '' }));
+      } else {
+        dispatch(setSidebar({ type: currentTopic ? SidebarType.TopicInfo : SidebarType.Channel, open: true }));
+      }
     }
-  };
+  }, [isGuest, sideBar, currentTopic, dispatch]);
 
   return (
     <>
@@ -321,14 +367,7 @@ const ChatHeader = () => {
           {currentChannel ? (
             <Stack spacing={1} direction="row" alignItems="center" sx={{ flex: 1, overflow: 'hidden' }}>
               {isMobileToMd && (
-                <IconButton
-                  onClick={() => {
-                    navigate(`${DEFAULT_PATH}`);
-                    dispatch(setCurrentChannel(null));
-                    dispatch(setCurrentChannelStatus(CurrentChannelStatus.IDLE));
-                    dispatch(SetOpenTopicPanel(false));
-                  }}
-                >
+                <IconButton onClick={onNavigateBack}>
                   <CaretLeft />
                 </IconButton>
               )}
@@ -391,22 +430,17 @@ const ChatHeader = () => {
           <Stack direction={'row'} alignItems="center" spacing={isMobileToMd ? 1 : 2}>
             {isDirect && (
               <>
-                <IconButton onClick={() => onStartCall(CallType.VIDEO)} disabled={isBlocked}>
+                <IconButton onClick={onStartVideoCall} disabled={isBlocked}>
                   <VideoCamera color={theme.palette.text.primary} />
                 </IconButton>
-                <IconButton onClick={() => onStartCall(CallType.AUDIO)} disabled={isBlocked}>
+                <IconButton onClick={onStartAudioCall} disabled={isBlocked}>
                   <Phone color={theme.palette.text.primary} />
                 </IconButton>
               </>
             )}
 
             {!isGuest && (
-              <IconButton
-                onClick={() => {
-                  dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
-                }}
-                disabled={isBlocked}
-              >
+              <IconButton onClick={onOpenSearchMessage} disabled={isBlocked}>
                 <MagnifyingGlass color={theme.palette.text.primary} />
               </IconButton>
             )}

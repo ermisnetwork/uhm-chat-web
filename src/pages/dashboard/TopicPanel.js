@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   IconButton,
@@ -52,7 +52,11 @@ const TopicEmpty = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { parentChannel } = useSelector(state => state.topic);
-  const myRole = myRoleInChannel(parentChannel);
+  const myRole = useMemo(() => myRoleInChannel(parentChannel), [parentChannel]);
+
+  const onOpenNewTopicDialog = useCallback(() => {
+    dispatch(SetOpenNewTopicDialog(true));
+  }, [dispatch]);
 
   return (
     <Stack sx={{ flex: 1, width: '100%', minHeight: 'auto', alignItems: 'center', justifyContent: 'center' }}>
@@ -82,14 +86,7 @@ const TopicEmpty = () => {
       </Typography>
 
       {[RoleMember.OWNER, RoleMember.MOD].includes(myRole) && (
-        <Button
-          variant="contained"
-          size="large"
-          sx={{ marginTop: 3, width: '200px' }}
-          onClick={() => {
-            dispatch(SetOpenNewTopicDialog(true));
-          }}
-        >
+        <Button variant="contained" size="large" sx={{ marginTop: 3, width: '200px' }} onClick={onOpenNewTopicDialog}>
           {t('topicPanel.New_topic')}
         </Button>
       )}
@@ -105,72 +102,117 @@ const TopicHeader = () => {
   const isMobileToMd = useResponsive('down', 'md');
   const { isGuest } = useSelector(state => state.channel);
   const { parentChannel } = useSelector(state => state.topic);
+  const { sideBar } = useSelector(state => state.app);
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const myRole = myRoleInChannel(parentChannel);
+  const myRole = useMemo(() => myRoleInChannel(parentChannel), [parentChannel]);
 
-  const ACTIONS = [
-    {
-      label: t('topicPanel.info_channel'),
-      icon: <InfoIcon color={theme.palette.text.primary} />,
-      onClick: () => {
-        setAnchorEl(null);
-        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+  const onOpenPopover = useCallback(event => {
+    setAnchorEl(event.currentTarget);
+  }, []);
 
+  const onOpenPopoverMobile = useCallback(
+    event => {
+      if (isMobileToMd) {
+        setAnchorEl(event.currentTarget);
+      }
+    },
+    [isMobileToMd],
+  );
+
+  const onCloseTopicPanel = useCallback(() => {
+    dispatch(SetOpenTopicPanel(false));
+  }, [dispatch]);
+
+  const onClosePopover = useCallback(() => {
+    setAnchorEl(null);
+  }, []);
+
+  const onInfoChannelClick = useCallback(() => {
+    if (!parentChannel) return;
+
+    setAnchorEl(null);
+    navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+    setTimeout(() => {
+      dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
+    }, 100);
+  }, [navigate, parentChannel?.cid, dispatch]);
+
+  const onSearchClick = useCallback(() => {
+    if (!parentChannel) return;
+
+    setAnchorEl(null);
+    dispatch(SetCurrentTopic(null));
+    navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+    setTimeout(() => {
+      dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
+    }, 100);
+  }, [dispatch, navigate, parentChannel?.cid]);
+
+  const onAddMemberClick = useCallback(() => {
+    if (!parentChannel) return;
+
+    setAnchorEl(null);
+    navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+    setTimeout(() => {
+      dispatch(SetOpenInviteFriendDialog(true));
+    }, 100);
+  }, [navigate, parentChannel?.cid, dispatch]);
+
+  const onNewTopicClick = useCallback(() => {
+    if (!parentChannel) return;
+
+    setAnchorEl(null);
+    navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+    setTimeout(() => {
+      dispatch(SetOpenNewTopicDialog(true));
+    }, 100);
+  }, [navigate, parentChannel?.cid, dispatch]);
+
+  const ACTIONS = useMemo(
+    () => [
+      {
+        label: t('topicPanel.info_channel'),
+        icon: <InfoIcon color={theme.palette.text.primary} />,
+        onClick: onInfoChannelClick,
+      },
+      {
+        label: t('topicPanel.search'),
+        icon: <SearchIcon color={theme.palette.text.primary} />,
+        onClick: onSearchClick,
+      },
+      {
+        label: t('topicPanel.add_member'),
+        icon: <ProfileAddIcon color={theme.palette.text.primary} />,
+        onClick: onAddMemberClick,
+      },
+      {
+        label: t('topicPanel.new_topic'),
+        icon: <StickyNoteIcon color={theme.palette.text.primary} />,
+        onClick: onNewTopicClick,
+        allowRoles: [RoleMember.OWNER, RoleMember.MOD],
+      },
+    ],
+    [t, theme.palette.text.primary, onInfoChannelClick, onSearchClick, onAddMemberClick, onNewTopicClick],
+  );
+
+  const onOpenChannelInfo = useCallback(() => {
+    if (!isGuest && parentChannel) {
+      navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
+
+      if (sideBar && sideBar.open) {
+        dispatch(setSidebar({ type: SidebarType.Channel, open: false, mode: '' }));
+      } else {
         setTimeout(() => {
           dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
         }, 100);
-      },
-    },
-    {
-      label: t('topicPanel.search'),
-      icon: <SearchIcon color={theme.palette.text.primary} />,
-      onClick: () => {
-        setAnchorEl(null);
-        dispatch(SetCurrentTopic(null));
-        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
-
-        setTimeout(() => {
-          dispatch(setSidebar({ type: SidebarType.SearchMessage, open: true }));
-        }, 100);
-      },
-    },
-    {
-      label: t('topicPanel.add_member'),
-      icon: <ProfileAddIcon color={theme.palette.text.primary} />,
-      onClick: () => {
-        setAnchorEl(null);
-        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
-
-        setTimeout(() => {
-          dispatch(SetOpenInviteFriendDialog(true));
-        }, 100);
-      },
-    },
-    {
-      label: t('topicPanel.new_topic'),
-      icon: <StickyNoteIcon color={theme.palette.text.primary} />,
-      onClick: () => {
-        setAnchorEl(null);
-        navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
-
-        setTimeout(() => {
-          dispatch(SetOpenNewTopicDialog(true));
-        }, 100);
-      },
-      allowRoles: [RoleMember.OWNER, RoleMember.MOD],
-    },
-  ];
-
-  const onOpenPopover = event => {
-    if (isMobileToMd) {
-      setAnchorEl(event.currentTarget);
+      }
     }
-  };
-
-  const onCloseTopicPanel = () => {
-    dispatch(SetOpenTopicPanel(false));
-  };
+  }, [isGuest, sideBar, dispatch, parentChannel?.cid, navigate]);
 
   if (!parentChannel) return null;
 
@@ -191,8 +233,10 @@ const TopicHeader = () => {
         <X size={20} color={theme.palette.text.primary} />
       </IconButton>
 
-      <Box sx={{ width: '50px', height: '50px' }} onClick={onOpenPopover}>
-        <ChannelAvatar channel={parentChannel} width={50} height={50} openLightbox={true} shape={AvatarShape.Round} />
+      <Box sx={{ width: '50px', height: '50px', cursor: 'pointer' }} onClick={onOpenPopoverMobile}>
+        {parentChannel && (
+          <ChannelAvatar channel={parentChannel} width={50} height={50} openLightbox={true} shape={AvatarShape.Round} />
+        )}
       </Box>
 
       <Box
@@ -203,15 +247,7 @@ const TopicHeader = () => {
         }}
       >
         <Button
-          onClick={() => {
-            if (!isGuest) {
-              navigate(`${DEFAULT_PATH}/${parentChannel.cid}`);
-
-              setTimeout(() => {
-                dispatch(setSidebar({ type: SidebarType.Channel, open: true }));
-              }, 100);
-            }
-          }}
+          onClick={onOpenChannelInfo}
           sx={{
             textTransform: 'none',
             maxWidth: '100%',
@@ -230,7 +266,7 @@ const TopicHeader = () => {
               overflow: 'hidden',
             }}
           >
-            {parentChannel.data?.name}
+            {parentChannel?.data?.name}
             <Typography
               variant="caption"
               sx={{
@@ -240,17 +276,13 @@ const TopicHeader = () => {
                 fontWeight: 400,
               }}
             >
-              {`${parentChannel.data?.member_count} ${t('topicPanel.member')}`}
+              {`${parentChannel?.data?.member_count || 0} ${t('topicPanel.member')}`}
             </Typography>
           </Typography>
         </Button>
       </Box>
 
-      <IconButton
-        onClick={event => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
+      <IconButton onClick={onOpenPopover}>
         <DotsThreeIcon color={theme.palette.text.primary} />
       </IconButton>
 
@@ -258,9 +290,7 @@ const TopicHeader = () => {
         id={Boolean(anchorEl) ? 'actions-channel-popover' : undefined}
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
-        onClose={() => {
-          setAnchorEl(null);
-        }}
+        onClose={onClosePopover}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'right',
@@ -292,19 +322,16 @@ const TopicHeader = () => {
 };
 
 const TopicPanel = () => {
-  const { t } = useTranslation();
   const dispatch = useDispatch();
   const theme = useTheme();
   const { currentChannel } = useSelector(state => state.channel);
-  const { currentTopic, topics, loadingTopics, pinnedTopics, openTopicPanel, parentChannel } = useSelector(
-    state => state.topic,
-  );
+  const { topics, loadingTopics, pinnedTopics, openTopicPanel, parentChannel } = useSelector(state => state.topic);
   const [searchParams, setSearchParams] = useSearchParams();
   const topicID = searchParams.get('topicId');
   const [idSelected, setIdSelected] = useState('');
 
-  useEffect(() => {
-    const handleTopicPinned = event => {
+  const handleTopicPinned = useCallback(
+    event => {
       if (!event.parent_cid) return;
 
       const splitParentCID = splitChannelId(event.parent_cid);
@@ -313,9 +340,12 @@ const TopicPanel = () => {
       if (parentChannelId === parentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(AddPinnedTopic(event.channel_id));
       }
-    };
+    },
+    [parentChannel?.id, dispatch],
+  );
 
-    const handleTopicUnPinned = event => {
+  const handleTopicUnPinned = useCallback(
+    event => {
       if (!event.parent_cid) return;
 
       const splitParentCID = splitChannelId(event.parent_cid);
@@ -324,8 +354,11 @@ const TopicPanel = () => {
       if (parentChannelId === parentChannel?.id && event.channel_type === ChatType.TOPIC) {
         dispatch(RemovePinnedTopic(event.channel_id));
       }
-    };
+    },
+    [parentChannel?.id, dispatch],
+  );
 
+  useEffect(() => {
     client.on(ClientEvents.ChannelPinned, handleTopicPinned);
     client.on(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
 
@@ -333,7 +366,7 @@ const TopicPanel = () => {
       client.off(ClientEvents.ChannelPinned, handleTopicPinned);
       client.off(ClientEvents.ChannelUnPinned, handleTopicUnPinned);
     };
-  }, [client, currentTopic, parentChannel]);
+  }, [handleTopicPinned, handleTopicUnPinned]);
 
   useEffect(() => {
     if (topicID) {

@@ -8,13 +8,14 @@ import { Play } from 'phosphor-react';
 import PropTypes from 'prop-types';
 
 import { ClientEvents } from '../constants/events-const';
-import { MessageType } from '../constants/commons-const';
+import { MessageType, SidebarType } from '../constants/commons-const';
 import { DEFAULT_PATH } from '../config';
 import { convertMessageSystem } from '../utils/messageSystem';
 import { convertMessageSignal } from '../utils/messageSignal';
 import { getDisplayDate } from '../utils/formatTime';
 import { client } from '../client';
 import AvatarGeneralDefault from './AvatarGeneralDefault';
+import { setSidebar } from '../redux/slices/app';
 
 // Constants
 const ATTACHMENT_IMAGE_SIZE = 20;
@@ -202,6 +203,7 @@ const GeneralElement = ({ idSelected }) => {
 
   const onLeftClick = useCallback(() => {
     navigate(`${DEFAULT_PATH}/${parentChannel?.cid}`);
+    dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
   }, [navigate, parentChannel?.cid]);
 
   useEffect(() => {
