@@ -305,6 +305,8 @@ const TopicPanel = () => {
 
   useEffect(() => {
     const handleTopicPinned = event => {
+      if (!event.parent_cid) return;
+
       const splitParentCID = splitChannelId(event.parent_cid);
       const parentChannelId = splitParentCID.channelId;
 
@@ -314,6 +316,8 @@ const TopicPanel = () => {
     };
 
     const handleTopicUnPinned = event => {
+      if (!event.parent_cid) return;
+
       const splitParentCID = splitChannelId(event.parent_cid);
       const parentChannelId = splitParentCID.channelId;
 

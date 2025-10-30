@@ -280,6 +280,8 @@ export const SetOpenTopicPanel = isOpen => {
 
 export const SetParentChannel = channel => {
   return async (dispatch, getState) => {
+    if (!channel) return;
+
     dispatch(slice.actions.setParentChannel(channel));
     dispatch(FetchTopics(channel));
   };
