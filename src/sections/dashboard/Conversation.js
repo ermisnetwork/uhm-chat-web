@@ -979,7 +979,7 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
 const SignalMsg = ({ el }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const msg = convertMessageSignal(el.text);
+  const msg = convertMessageSignal(el.text, t);
 
   return (
     <Stack direction="row" justifyContent={el.isMyMessage ? 'end' : 'start'} alignItems="center">
