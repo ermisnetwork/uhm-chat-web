@@ -5,7 +5,6 @@ import { ClientEvents } from '../constants/events-const';
 import { ConfirmType } from '../constants/commons-const';
 import { setChannelConfirm } from '../redux/slices/dialog';
 import { SetIsBlocked } from '../redux/slices/channel';
-import { formatString } from '../utils/commons';
 import { useTranslation } from 'react-i18next';
 
 export default function BlockedBackdrop() {
@@ -72,7 +71,7 @@ export default function BlockedBackdrop() {
         }}
       >
         <Typography>
-          {t('blockedBackdrop.message')} <strong>{formatString(currentChannel?.data?.name)}</strong>
+          {t('blockedBackdrop.message')} <strong>{currentChannel?.data?.name}</strong>
         </Typography>
         <Button
           variant="contained"
