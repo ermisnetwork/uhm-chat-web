@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Box, useTheme, Drawer } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
-import { WIDTH_SIDEBAR_PANEL } from '../../config';
+import { TRANSITION, WIDTH_SIDEBAR_PANEL } from '../../config';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetIsEditing, setSidebar, ToggleSidebar } from '../../redux/slices/app';
 import { SidebarType } from '../../constants/commons-const';
@@ -49,11 +49,14 @@ const SidebarPanel = ({ children }) => {
   return (
     <Box
       sx={{
-        width: isScreenLgToXl ? '300px' : `${WIDTH_SIDEBAR_PANEL}px`,
+        width: sideBar.open ? (isScreenLgToXl ? '300px' : `${WIDTH_SIDEBAR_PANEL}px`) : 0,
         height: '100%',
         backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.grey[900],
         borderRadius: '16px',
         position: 'relative',
+        transition: TRANSITION,
+        transform: sideBar.open ? 'translateX(0)' : `translateX(${drawerWidth}px)`,
+        opacity: sideBar.open ? 1 : 0,
       }}
     >
       {children}

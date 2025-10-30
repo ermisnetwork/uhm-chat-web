@@ -35,7 +35,10 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
   };
 
   const NewGroupSchema = Yup.object().shape({
-    name: Yup.string().trim().required(t('sidebarTopicInfo.channel_name_required')).max(255, 'sidebarTopicInfo.max_characters'),
+    name: Yup.string()
+      .trim()
+      .required(t('sidebarTopicInfo.channel_name_required'))
+      .max(255, t('sidebarTopicInfo.max_characters')),
   });
 
   const defaultValues = {
@@ -150,6 +153,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
                 fontSize: '14px',
                 color: theme.palette.text.secondary,
                 fontWeight: 400,
+                textTransform: 'none',
                 '&:hover': {
                   backgroundColor: 'transparent',
                   color: theme.palette.text.primary,

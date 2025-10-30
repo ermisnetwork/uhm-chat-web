@@ -192,6 +192,15 @@ const ChannelInfoTab = ({ currentChat }) => {
       setListTab(prev => [{ label: t('channelInfoTab.members'), value: TabValueChannelInfo.Members }, ...prev]);
       setTabSelected(TabValueChannelInfo.Members);
     }
+
+    return () => {
+      setListTab([
+        { label: t('channelInfoTab.media'), value: TabValueChannelInfo.Media },
+        { label: t('channelInfoTab.links'), value: TabValueChannelInfo.Links },
+        { label: t('channelInfoTab.files'), value: TabValueChannelInfo.Files },
+      ]);
+      setTabSelected(TabValueChannelInfo.Media);
+    };
   }, [currentChat]);
 
   useEffect(() => {
@@ -205,6 +214,7 @@ const ChannelInfoTab = ({ currentChat }) => {
           setMedias(
             attachments
               .filter(attachment => ['image', 'video'].includes(attachment.attachment_type))
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
               .map(item => {
                 const isVideo = item.content_type.startsWith('video/');
 
