@@ -106,5 +106,5 @@ export const formatDuration = duration => {
   const minutes = Math.floor(totalSeconds / 60); // Số phút
   const seconds = totalSeconds % 60; // Số giây còn lại
 
-  return `${minutes} min, ${seconds} sec`;
+  return `${minutes} ${t('messageSignal.min')}, ${seconds} ${t('messageSignal.sec')}`;
 };

@@ -22,7 +22,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().required(t('register.email_required')).email(t('register.email.valid')),
+    email: Yup.string().required(t('register.email_required')).email(t('register.email_valid')),
     password: Yup.string().required(t('register.password_required')),
   });
 

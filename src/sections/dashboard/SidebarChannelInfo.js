@@ -106,7 +106,7 @@ const FormTeamChannelInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading })
     name: Yup.string()
       .trim()
       .required(t('sidebarChannelInfo.channel_name_required'))
-      .max(255, t('sidebarChannelInfo.max_chartacters')),
+      .max(255, t('sidebarChannelInfo.max_characters')),
   });
 
   const defaultValues = {

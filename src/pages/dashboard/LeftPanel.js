@@ -161,7 +161,7 @@ const LeftPanel = () => {
                   voiceRecording: t('leftPanel.voiceRecording'),
                   linkPreview: t('leftPanel.linkPreview'),
                 };
-                return `${senderName} ${t('leftPanel.sent')} ${typeMap[attachments[0].type] || 'an attachment'}`;
+                return `${senderName} ${t('leftPanel.sent')} ${typeMap[attachments[0].type] || t('leftPanel.attachment')}`;
               }
 
               if (image && video && !file && !voiceRecording && !linkPreview) {

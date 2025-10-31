@@ -334,13 +334,6 @@
     "enabled": "bật",
     "disabled": "tắt"
   },
-  "sidebarMember": {
-    "title": "Thành viên",
-    "no_result": "Không có kết quả",
-    "members": "Thành viên",
-    "invite_members": "Mời thành viên",
-    "search": "Tìm kiếm"
-  },
   "friendList": {
     "noResult": "Không có kết quả cho"
   },
@@ -690,7 +683,7 @@
     "new_password": "Mật khẩu mới",
     "password": "mật khẩu",
     "text": "mật khẩu",
-    "reset_passsword": "Đặt lại mật khẩu",
+    "reset_password": "Đặt lại mật khẩu",
     "email_required": "Vui lòng nhập email",
     "email_invalid": "Địa chỉ email không hợp lệ",
     "title": "Quên mật khẩu?",
@@ -732,7 +725,7 @@
     "password_reset_success": "Mật khẩu của bạn đã được đặt lại thành công. Vui lòng sử dụng mật khẩu mới để đăng nhập!"
   },
   "recordingAudioBox": {
-    "upload_audio_failed": "Tải đoạn ghi âm không thành công",
+    "snackbar_upload_failed": "Tải đoạn ghi âm không thành công",
     "snackbar_cannot_microphone": "Không thể truy cập microphone",
     "cancel": "Quay lại"
   },
