@@ -263,7 +263,7 @@ const UploadFilesDialog = ({ setMessages }) => {
 
   const renderTitle = () => {
     const getTitleByMimeType = attachments => {
-      if (!attachments?.length) return 'Sent file';
+      if (!attachments?.length) return t('uploadFilesDialog.sent_file');
 
       const counts = { image: 0, video: 0, file: 0 };
 
