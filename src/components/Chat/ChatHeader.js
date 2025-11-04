@@ -311,7 +311,7 @@ const ChatHeader = () => {
     if (isEnabledTopics || currentTopic) {
       return currentChannel.data?.name;
     } else {
-      return isDirect ? onlineStatus : `${currentChannel.data?.member_count} ${t('chatHeader.member')}`;
+      return isDirect ? t(onlineStatus) : `${currentChannel.data?.member_count} ${t('chatHeader.member')}`;
     }
   }, [
     isEnabledTopics,

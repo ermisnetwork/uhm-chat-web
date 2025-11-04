@@ -13,7 +13,6 @@ import { ForgotPasswordByEmail, ResetPasswordByEmail } from '../../redux/slices/
 import { Eye, EyeSlash } from 'phosphor-react';
 import { setIsResetEmailSent } from '../../redux/slices/app';
 import { useTranslation } from 'react-i18next';
-import { t } from 'i18next';
 
 const ResetPassword = () => {
   const dispatch = useDispatch();

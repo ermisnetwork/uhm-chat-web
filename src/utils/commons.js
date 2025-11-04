@@ -372,20 +372,10 @@ export const replaceMentionsWithNames = (text, mentions) => {
 export const replaceMentionsWithIds = (text, mentions) => {
   if (!mentions) return text;
 
-  const queues = mentions.reduce((acc, m) => {
-    (acc[m.mentionName] ??= []).push(m);
-    return acc;
-  }, {});
-
-  return text
-    .split(/(@\S+)/g)
-    .map(part => {
-      if (queues[part]?.length) {
-        return queues[part].shift().mentionId;
-      }
-      return part;
-    })
-    .join('');
+  mentions.forEach(user => {
+    text = text.replaceAll(user.mentionName, user.mentionId);
+  });
+  return text;
 };
 
 export function removeVietnameseTones(str) {
