@@ -466,6 +466,7 @@ const TextLine = ({ message }) => {
         );
       } else if (part.match(mentionRegex)) {
         const mentionObj = mentions.find(m => m.mentionId === part || m.mentionName === part);
+<<<<<<< HEAD
         if (!mentionObj) return <React.Fragment key={index}>{part}</React.Fragment>;
 
         // Nếu có message.mentioned_users → thêm class đặc biệt
@@ -486,6 +487,17 @@ const TextLine = ({ message }) => {
             @{mentionObj.name}
           </span>
         );
+=======
+        if (mentionObj) {
+          const customClass =
+            mentionObj.mentionId === '@all' ? 'mentionAll' : mentionObj.id === user_id ? 'mentionMe' : '';
+          return (
+            <span key={index} className={`mentionHighlight ${customClass}`}>
+              {mentionObj.mentionName}
+            </span>
+          );
+        }
+>>>>>>> c1804347f0b1c7e70a5f2fcedc0cc506a783da53
       }
 
       return <React.Fragment key={index}>{part}</React.Fragment>;
