@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -47,6 +47,8 @@ import {
 import { setChannelConfirm } from '../../redux/slices/dialog';
 import { SetOpenTopicPanel } from '../../redux/slices/topic';
 import { useTranslation } from 'react-i18next';
+import { useMediaPublisher } from '../../hooks/useMediaPublisher';
+import { useMediaConsumer } from '../../hooks/useMediaConsumer';
 
 const ActionsTopic = () => {
   const { t } = useTranslation();
@@ -235,6 +237,7 @@ const ActionsTopic = () => {
 };
 
 const ChatHeader = () => {
+  const videoRef = useRef(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -348,6 +351,11 @@ const ChatHeader = () => {
     }
   }, [isGuest, sideBar, currentTopic, dispatch]);
 
+  const { connectPublisher } = useMediaPublisher('1234');
+  const { connectConsumer } = useMediaConsumer('1234', videoRef);
+
+  // const { connectAudioPublisher } = useAudioPublisher('1234', videoRef, audioRef);
+
   return (
     <>
       <Box
@@ -358,6 +366,40 @@ const ChatHeader = () => {
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
+        {/* Video element để hiển thị decoded video */}
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 150,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            controls={false}
+            style={{
+              maxWidth: '80vw',
+              maxHeight: '80vh',
+              width: 'auto',
+              height: 'auto',
+              aspectRatio: '16/9',
+              border: '2px solid #fff',
+              borderRadius: '12px',
+              backgroundColor: '#000',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+            }}
+          />
+        </Box>
         <Stack
           alignItems={'center'}
           direction={'row'}
@@ -430,6 +472,9 @@ const ChatHeader = () => {
           <Stack direction={'row'} alignItems="center" spacing={isMobileToMd ? 1 : 2}>
             {isDirect && (
               <>
+                <Button onClick={connectPublisher}>Publish call</Button>
+                <Button onClick={connectConsumer}>Consume call</Button>
+
                 <IconButton onClick={onStartVideoCall} disabled={isBlocked}>
                   <VideoCamera color={theme.palette.text.primary} />
                 </IconButton>
