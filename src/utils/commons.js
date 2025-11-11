@@ -375,8 +375,16 @@ export const replaceMentionsWithIds = (text, mentions) => {
   mentions.forEach(user => {
     text = text.replaceAll(user.mentionName, user.mentionId);
   });
+<<<<<<< HEAD
 
   return text;
+=======
+<<<<<<< HEAD
+  return text;
+=======
+
+  return text;
+>>>>>>> 7157fe0f36a514b4c082494f0c5172e0e7ecb0cc
 
   // const queues = mentions.reduce((acc, m) => {
   //   (acc[m.mentionName] ??= []).push(m);
@@ -392,6 +400,10 @@ export const replaceMentionsWithIds = (text, mentions) => {
   //     return part;
   //   })
   //   .join('');
+<<<<<<< HEAD
+=======
+>>>>>>> c1804347f0b1c7e70a5f2fcedc0cc506a783da53
+>>>>>>> 7157fe0f36a514b4c082494f0c5172e0e7ecb0cc
 };
 
 export function removeVietnameseTones(str) {

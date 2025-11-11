@@ -466,6 +466,31 @@ const TextLine = ({ message }) => {
         );
       } else if (part.match(mentionRegex)) {
         const mentionObj = mentions.find(m => m.mentionId === part || m.mentionName === part);
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        if (!mentionObj) return <React.Fragment key={index}>{part}</React.Fragment>;
+
+        // Nếu có message.mentioned_users → thêm class đặc biệt
+        const hasMentionUsers = !!message?.mentioned_users;
+        const customClass =
+          hasMentionUsers && mentionObj.mentionId === '@all'
+            ? 'mentionAll'
+            : hasMentionUsers && mentionObj.id === user_id
+            ? 'mentionMe'
+            : '';
+
+        const className = hasMentionUsers
+          ? `mentionHighlight ${customClass}`.trim()
+          : '';
+
+        return (
+          <span key={index} className={className}>
+            @{mentionObj.name}
+          </span>
+        );
+=======
+>>>>>>> 7157fe0f36a514b4c082494f0c5172e0e7ecb0cc
         if (mentionObj) {
           const customClass =
             mentionObj.mentionId === '@all' ? 'mentionAll' : mentionObj.id === user_id ? 'mentionMe' : '';
@@ -475,6 +500,10 @@ const TextLine = ({ message }) => {
             </span>
           );
         }
+<<<<<<< HEAD
+=======
+>>>>>>> c1804347f0b1c7e70a5f2fcedc0cc506a783da53
+>>>>>>> 7157fe0f36a514b4c082494f0c5172e0e7ecb0cc
       }
 
       return <React.Fragment key={index}>{part}</React.Fragment>;
