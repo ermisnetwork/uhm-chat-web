@@ -375,9 +375,6 @@ export const replaceMentionsWithIds = (text, mentions) => {
   mentions.forEach(user => {
     text = text.replaceAll(user.mentionName, user.mentionId);
   });
-<<<<<<< HEAD
-  return text;
-=======
 
   return text;
 
@@ -395,7 +392,6 @@ export const replaceMentionsWithIds = (text, mentions) => {
   //     return part;
   //   })
   //   .join('');
->>>>>>> c1804347f0b1c7e70a5f2fcedc0cc506a783da53
 };
 
 export function removeVietnameseTones(str) {
