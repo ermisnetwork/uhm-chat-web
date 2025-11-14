@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useLibAV } from './useLibAV';
+import { useCallback, useRef } from 'react';
 
 export const useMediaConsumer = (channelId, videoRef) => {
-  const { LibAVWebCodecs } = useLibAV();
   const videoDecoderRef = useRef(null);
   const videoWriterRef = useRef(null);
   const audioDecoderRef = useRef(null);
@@ -11,7 +9,6 @@ export const useMediaConsumer = (channelId, videoRef) => {
   const audioContextRef = useRef(null);
   const mediaDestinationRef = useRef(null);
   const nextStartTimeRef = useRef(0);
-  const firstPacketRef = useRef(true);
 
   const initAudioContext = useCallback(async () => {
     if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
@@ -31,59 +28,55 @@ export const useMediaConsumer = (channelId, videoRef) => {
 
   const playDecodedAudio = useCallback(async audioData => {
     try {
-      // Lấy thông tin cơ bản từ audioData
-      const { numberOfChannels, numberOfFrames, sampleRate, _data } = audioData;
+      const { numberOfChannels, numberOfFrames, sampleRate, format } = audioData;
       const audioContext = audioContextRef.current;
       if (!audioContext) return;
 
-      // Nếu là packet đầu tiên thì bỏ qua 80 frame đầu (tránh tiếng pop/noise)
-      // const PRE_SKIP = firstPacketRef.current ? 80 : 0;
-      // firstPacketRef.current = false;
+      // Tạo AudioBuffer
+      const audioBuffer = audioContext.createBuffer(numberOfChannels, numberOfFrames, sampleRate);
 
-      // Tính số frame thực sự sẽ phát (đã bỏ qua PRE_SKIP)
-      // const framesToPlay = numberOfFrames - PRE_SKIP;
-      const framesToPlay = numberOfFrames;
-      // Tạo AudioBuffer với số kênh, số frame và sample rate tương ứng
-      const audioBuffer = audioContext.createBuffer(numberOfChannels, framesToPlay, sampleRate);
+      // ✅ Tạo buffer để copy dữ liệu
+      const dataSize = numberOfFrames * numberOfChannels;
+      const tempBuffer = new Float32Array(dataSize);
 
-      // Chuyển dữ liệu từ dạng interleaved (xen kẽ các kênh) sang planar (mỗi kênh 1 mảng riêng)
-      // Ví dụ: [L0, R0, L1, R1, ...] -> kênh 0: [L0, L1, ...], kênh 1: [R0, R1, ...]
+      // ✅ Copy dữ liệu từ AudioData với format f32-planar
+      audioData.copyTo(tempBuffer, {
+        planeIndex: 0,
+        format: 'f32-planar',
+      });
+
+      // Copy dữ liệu vào từng kênh
       for (let ch = 0; ch < numberOfChannels; ch++) {
         const channelData = audioBuffer.getChannelData(ch);
-        // for (let i = PRE_SKIP; i < numberOfFrames; i++) {
-        //   channelData[i - PRE_SKIP] = _data[i * numberOfChannels + ch];
-        // }
+        const offset = ch * numberOfFrames; // offset cho từng kênh trong planar format
 
         for (let i = 0; i < numberOfFrames; i++) {
-          channelData[i] = _data[i * numberOfChannels + ch];
+          channelData[i] = tempBuffer[offset + i];
         }
       }
 
-      // Tạo nguồn phát âm thanh từ AudioBuffer
+      // Tạo nguồn phát âm thanh
       const source = audioContext.createBufferSource();
       source.buffer = audioBuffer;
 
-      // Tạo gainNode để điều chỉnh âm lượng (ở đây để mặc định 1.0)
       const gainNode = audioContext.createGain();
       gainNode.gain.value = 1.0;
-      // Kết nối nguồn phát qua gainNode tới MediaStreamDestination (để phát ra loa hoặc stream)
       source.connect(gainNode).connect(mediaDestinationRef.current);
 
-      // Đảm bảo các đoạn âm thanh phát nối tiếp nhau, không bị chồng tiếng
-      if (nextStartTimeRef.current < audioContext.currentTime) nextStartTimeRef.current = audioContext.currentTime;
+      // Đảm bảo phát liên tục
+      if (nextStartTimeRef.current < audioContext.currentTime) {
+        nextStartTimeRef.current = audioContext.currentTime;
+      }
 
-      // Phát đoạn âm thanh tại thời điểm đã tính toán
       source.start(nextStartTimeRef.current);
-      // Cập nhật thời điểm phát cho đoạn tiếp theo
-      nextStartTimeRef.current += framesToPlay / sampleRate;
+      nextStartTimeRef.current += numberOfFrames / sampleRate;
 
-      // Giải phóng bộ nhớ cho audioData nếu có
+      // Giải phóng bộ nhớ
       if (audioData && typeof audioData.close === 'function') {
         audioData.close();
       }
     } catch (err) {
       console.error('Error in playDecodedAudio:', err);
-      // Đảm bảo luôn giải phóng audioData kể cả khi lỗi
       if (audioData && typeof audioData.close === 'function') {
         audioData.close();
       }
@@ -138,7 +131,7 @@ export const useMediaConsumer = (channelId, videoRef) => {
     videoDecoderRef.current = videoDecoder;
 
     // Init audio decoder
-    const audioDecoder = new LibAVWebCodecs.AudioDecoder({
+    const audioDecoder = new AudioDecoder({
       output: async audioData => {
         // console.log('--audioData--', audioData);
         playDecodedAudio(audioData);
@@ -266,7 +259,7 @@ export const useMediaConsumer = (channelId, videoRef) => {
             return;
           }
           try {
-            const chunk = new LibAVWebCodecs.EncodedAudioChunk({
+            const chunk = new EncodedAudioChunk({
               type: 'key',
               timestamp: timestamp * 1000,
               data: payload,

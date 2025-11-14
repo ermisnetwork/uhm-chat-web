@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useLibAV } from './useLibAV';
+import { useCallback, useRef } from 'react';
 
 export const useMediaPublisher = channelId => {
-  const { LibAVWebCodecs } = useLibAV();
   const videoEncoderRef = useRef(null);
   const audioEncoderRef = useRef(null);
   const publishSocketRef = useRef(null);
@@ -66,104 +64,19 @@ export const useMediaPublisher = channelId => {
     return packet;
   }, []);
 
-  const initAudioEncoder = useCallback(async () => {
-    const encoder = new LibAVWebCodecs.AudioEncoder({
-      output: (chunk, metadata) => {
-        console.log('----chunk---', chunk);
-        console.log('----metadata---', metadata);
-
-        // Lưu audio config từ metadata
-        if (metadata?.decoderConfig && !audioConfigRef.current) {
-          const description = metadata.decoderConfig.description;
-          const base64Description = base64Encode(description);
-
-          audioConfigRef.current = {
-            codec: metadata.decoderConfig.codec ?? 'opus',
-            sampleRate: metadata.decoderConfig.sampleRate ?? 48000,
-            numberOfChannels: metadata.decoderConfig.numberOfChannels ?? 2,
-            description: base64Description,
-          };
-
-          sendDecoderConfigs();
-        }
-
-        if (publishSocketRef.current?.readyState === WebSocket.OPEN) {
-          const data = new ArrayBuffer(chunk.byteLength);
-          chunk.copyTo(data);
-          const packet = createPacketWithHeader(data, chunk.timestamp, 'audio');
-          sendPacketOrQueue(packet);
-        }
-      },
-      error: console.error,
-    });
-
-    encoder.configure({
-      codec: 'opus',
-      sampleRate: 48000,
-      numberOfChannels: 2,
-      bitrate: 128000,
-    });
-
-    audioEncoderRef.current = encoder;
-  }, []);
-
-  const initVideoEncoder = useCallback(async () => {
-    const encoder = new VideoEncoder({
-      output: (chunk, metadata) => {
-        if (metadata?.decoderConfig && !configSentRef.current) {
-          const description = metadata.decoderConfig.description;
-          const base64Description = base64Encode(description);
-
-          videoConfigRef.current = {
-            codec: metadata.decoderConfig.codec ?? 'hev1.1.6.L93.B0',
-            codedWidth: metadata.decoderConfig.codedWidth ?? 1280,
-            codedHeight: metadata.decoderConfig.codedHeight ?? 720,
-            frameRate: metadata.decoderConfig.framerate ?? 30.0,
-            description: base64Description,
-          };
-
-          sendDecoderConfigs();
-        }
-
-        if (publishSocketRef.current?.readyState === WebSocket.OPEN) {
-          const data = new ArrayBuffer(chunk.byteLength);
-          chunk.copyTo(data);
-          const type = chunk.type === 'key' ? 'video-key' : 'video-delta';
-          const packet = createPacketWithHeader(data, chunk.timestamp, type);
-          sendPacketOrQueue(packet);
-        }
-      },
-      error: console.error,
-    });
-
-    encoder.configure({
-      codec: 'hev1.1.6.L93.B0',
-      width: 1280,
-      height: 720,
-      bitrate: 1500000,
-      framerate: 30,
-      latencyMode: 'realtime',
-      hardwareAcceleration: 'prefer-hardware',
-      // hevc: { format: 'annexb', maxBFrames: 0 },
-    });
-
-    videoEncoderRef.current = encoder;
-  }, [createPacketWithHeader]);
-
   const processAudioFrames = useCallback(async reader => {
     try {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
-        const audioData = LibAVWebCodecs.AudioData.fromNative(value);
+        const frame = value;
 
         try {
-          audioEncoderRef.current.encode(audioData);
+          audioEncoderRef.current.encode(frame);
         } catch (err) {
-          console.error('Audio encode error:', err);
+          console.error('Encoding error:', err);
         } finally {
-          audioData.close();
+          frame.close();
         }
       }
     } catch (error) {
@@ -195,9 +108,92 @@ export const useMediaPublisher = channelId => {
     }
   }, []);
 
+  const initEncoders = useCallback(async () => {
+    // init video encoder
+    const videoEncoder = new VideoEncoder({
+      output: (chunk, metadata) => {
+        if (metadata?.decoderConfig && !configSentRef.current) {
+          const description = metadata.decoderConfig.description;
+          const base64Description = base64Encode(description);
+
+          videoConfigRef.current = {
+            codec: metadata.decoderConfig.codec ?? 'hev1.1.6.L93.B0',
+            codedWidth: metadata.decoderConfig.codedWidth ?? 1280,
+            codedHeight: metadata.decoderConfig.codedHeight ?? 720,
+            frameRate: metadata.decoderConfig.framerate ?? 30.0,
+            description: base64Description,
+          };
+
+          sendDecoderConfigs();
+        }
+
+        if (publishSocketRef.current?.readyState === WebSocket.OPEN) {
+          const data = new ArrayBuffer(chunk.byteLength);
+          chunk.copyTo(data);
+          const type = chunk.type === 'key' ? 'video-key' : 'video-delta';
+          const packet = createPacketWithHeader(data, chunk.timestamp, type);
+          sendPacketOrQueue(packet);
+        }
+      },
+      error: console.error,
+    });
+
+    videoEncoder.configure({
+      codec: 'hev1.1.6.L93.B0',
+      width: 1280,
+      height: 720,
+      bitrate: 1500000,
+      framerate: 30,
+      latencyMode: 'realtime',
+      hardwareAcceleration: 'prefer-hardware',
+      // hevc: { format: 'annexb', maxBFrames: 0 },
+    });
+
+    videoEncoderRef.current = videoEncoder;
+
+    // init audio encoder
+    const audioEncoder = new AudioEncoder({
+      output: (chunk, metadata) => {
+        // console.log('----chunk---', chunk);
+        // console.log('----metadata---', metadata);
+
+        // Lưu audio config từ metadata
+        if (metadata?.decoderConfig && !audioConfigRef.current) {
+          const description = metadata.decoderConfig.description;
+          const base64Description = base64Encode(description);
+
+          audioConfigRef.current = {
+            codec: metadata.decoderConfig.codec ?? 'opus',
+            sampleRate: metadata.decoderConfig.sampleRate ?? 48000,
+            numberOfChannels: metadata.decoderConfig.numberOfChannels ?? 2,
+            description: base64Description,
+          };
+
+          sendDecoderConfigs();
+        }
+
+        if (publishSocketRef.current?.readyState === WebSocket.OPEN) {
+          const data = new ArrayBuffer(chunk.byteLength);
+          chunk.copyTo(data);
+          const packet = createPacketWithHeader(data, chunk.timestamp, 'audio');
+          sendPacketOrQueue(packet);
+        }
+      },
+      error: console.error,
+    });
+
+    audioEncoder.configure({
+      codec: 'opus',
+      sampleRate: 48000,
+      numberOfChannels: 1,
+      bitrate: 128000,
+    });
+
+    audioEncoderRef.current = audioEncoder;
+  }, []);
+
   const startCapture = useCallback(async () => {
-    initVideoEncoder();
-    initAudioEncoder();
+    initEncoders();
 
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
@@ -212,7 +208,7 @@ export const useMediaPublisher = channelId => {
     const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
     const audioReader = audioProcessor.readable.getReader();
     processAudioFrames(audioReader);
-  }, [initVideoEncoder, initAudioEncoder, processVideoFrames, processAudioFrames]);
+  }, [initEncoders, processVideoFrames, processAudioFrames]);
 
   const connectPublisher = useCallback(() => {
     const ws = new WebSocket(`wss://4044.bandia.vn/publish/${channelId}`);
