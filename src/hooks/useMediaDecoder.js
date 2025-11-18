@@ -1,10 +1,9 @@
 import { useCallback, useRef } from 'react';
 
-export const useMediaConsumer2 = (videoRef, nodeRef) => {
+export const useMediaDecoder = (remoteVideoRef, nodeRef) => {
   const videoDecoderRef = useRef(null);
   const videoWriterRef = useRef(null);
   const audioDecoderRef = useRef(null);
-  const combinedStreamRef = useRef(null);
   const isWaitingForKeyFrame = useRef(true);
   const audioContextRef = useRef(null);
   const mediaDestinationRef = useRef(null);
@@ -22,7 +21,6 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
       }
 
       nextStartTimeRef.current = audioContextRef.current.currentTime;
-      // firstPacketRef.current = true;
     }
   }, []);
 
@@ -103,12 +101,11 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
     const audioTrack = mediaDestinationRef.current.stream.getAudioTracks()[0];
 
     const combinedStream = new MediaStream([videoTrackGenerator, audioTrack]);
-    combinedStreamRef.current = combinedStream;
 
-    // Gán cho videoRef
-    if (videoRef.current) {
-      videoRef.current.srcObject = combinedStream;
-      videoRef.current.muted = false;
+    // Gán cho remoteVideoRef
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = combinedStream;
+      remoteVideoRef.current.muted = false;
     }
 
     isWaitingForKeyFrame.current = true;
@@ -133,7 +130,6 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
     // Init audio decoder
     const audioDecoder = new AudioDecoder({
       output: async audioData => {
-        // console.log('--audioData--', audioData);
         playDecodedAudio(audioData);
       },
       error: err => {
@@ -142,16 +138,10 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
     });
 
     audioDecoderRef.current = audioDecoder;
-  }, [videoRef]);
+  }, [remoteVideoRef]);
 
-  const connectConsumer = useCallback(async () => {
+  const mediaDecoder = useCallback(async () => {
     initDecoders();
-
-    await nodeRef.current.acceptConnection();
-    console.log('-----acceptConnection----');
-
-    await nodeRef.current.acceptBidiStream();
-    console.log('-----acceptBidiStream----');
 
     while (true) {
       try {
@@ -159,8 +149,6 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
 
         // ✅ Chuyển Uint8Array thành ArrayBuffer
         const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        console.log('-----buffer.byteLength----', buffer.byteLength);
-
         if (buffer.byteLength < 5) {
           console.warn('⚠️ Invalid packet: too small', buffer.byteLength);
           continue;
@@ -171,7 +159,6 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
         // Byte 0 = Type, Byte 1-4 = Timestamp
         const frameType = view.getUint8(0); // Byte 0: Type code
         const timestamp = view.getUint32(1, false); // Byte 1-4: Timestamp
-        console.log('---frameType--', frameType);
 
         let payload;
         if (frameType === 0) {
@@ -238,7 +225,7 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
           try {
             const chunk = new EncodedVideoChunk({
               type: isKeyFrame ? 'key' : 'delta',
-              timestamp: timestamp,
+              timestamp: timestamp * 1000,
               data: payload,
             });
 
@@ -267,10 +254,11 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
             console.warn('⚠️ AudioDecoder not ready, state:', audioDecoderRef.current?.state);
             continue;
           }
+
           try {
             const chunk = new EncodedAudioChunk({
               type: 'key',
-              timestamp: timestamp,
+              timestamp: timestamp * 1000,
               data: payload,
             });
             audioDecoderRef.current.decode(chunk);
@@ -292,7 +280,7 @@ export const useMediaConsumer2 = (videoRef, nodeRef) => {
         }
       } catch (error) {}
     }
-  }, [initDecoders]);
+  }, []);
 
-  return { connectConsumer };
+  return { mediaDecoder };
 };

@@ -1,13 +1,11 @@
 import { useCallback, useRef } from 'react';
 
-export const useMediaPublisher2 = (address, localStream, nodeRef) => {
+export const useMediaEncoder = nodeRef => {
   const videoEncoderRef = useRef(null);
   const audioEncoderRef = useRef(null);
   const configSentRef = useRef(false);
   const videoConfigRef = useRef(null);
   const audioConfigRef = useRef(null);
-  // Thêm queue để lưu packets chờ gửi
-  const pendingPacketsRef = useRef([]);
 
   const sendDecoderConfigs = useCallback(async () => {
     if (videoConfigRef.current && audioConfigRef.current && !configSentRef.current) {
@@ -20,26 +18,13 @@ export const useMediaPublisher2 = (address, localStream, nodeRef) => {
       // Gửi config qua packet với type=0
       const configPacket = createPacketWithHeader(null, null, 'config', configMsg);
       await nodeRef.current.asyncSend(configPacket);
-      console.log('-----sent decoder configs----', configPacket.byteLength);
-
       configSentRef.current = true;
-
-      // Gửi tất cả packets đang chờ
-      // while (pendingPacketsRef.current.length > 0) {
-      //   const packet = pendingPacketsRef.current.shift();
-      //   await nodeRef.current.asyncSend(packet);
-      //   console.log('-----sent packet----', packet.byteLength);
-      // }
     }
   }, []);
 
   const sendPacketOrQueue = useCallback(async (packet, type) => {
     if (configSentRef.current) {
       await nodeRef.current.asyncSend(packet);
-      console.log(`-----sent ${type} packet----`, packet.byteLength);
-    } else {
-      // Lưu packet vào queue nếu chưa gửi config
-      // pendingPacketsRef.current.push(packet);
     }
   }, []);
 
@@ -86,8 +71,6 @@ export const useMediaPublisher2 = (address, localStream, nodeRef) => {
 
     // Byte 5+: Data
     packet.set(payload, HEADER_SIZE);
-
-    console.log(`----packet of type ${type}----`, packet.byteLength);
 
     return packet;
   }, []);
@@ -160,8 +143,9 @@ export const useMediaPublisher2 = (address, localStream, nodeRef) => {
           const data = new ArrayBuffer(chunk.byteLength);
           chunk.copyTo(data);
           const type = chunk.type === 'key' ? 'video-key' : 'video-delta';
-          console.log('----video chunk---', chunk);
-          const packet = createPacketWithHeader(data, chunk.timestamp / 1000, type);
+          const timestamp = chunk.timestamp / 1000;
+
+          const packet = createPacketWithHeader(data, timestamp, type);
           sendPacketOrQueue(packet, 'video');
         }
       },
@@ -184,18 +168,14 @@ export const useMediaPublisher2 = (address, localStream, nodeRef) => {
     // init audio encoder
     const audioEncoder = new AudioEncoder({
       output: (chunk, metadata) => {
-        // console.log('----chunk---', chunk);
-        // console.log('----metadata---', metadata);
-
-        // Lưu audio config từ metadata
-        if (metadata?.decoderConfig && !audioConfigRef.current) {
+        if (metadata?.decoderConfig && !configSentRef.current) {
           const description = metadata.decoderConfig.description;
           const base64Description = base64Encode(description);
 
           audioConfigRef.current = {
             codec: metadata.decoderConfig.codec ?? 'opus',
             sampleRate: metadata.decoderConfig.sampleRate ?? 48000,
-            numberOfChannels: metadata.decoderConfig.numberOfChannels ?? 2,
+            numberOfChannels: metadata.decoderConfig.numberOfChannels ?? 1,
             description: base64Description,
           };
           sendDecoderConfigs();
@@ -205,9 +185,8 @@ export const useMediaPublisher2 = (address, localStream, nodeRef) => {
           const data = new ArrayBuffer(chunk.byteLength);
           chunk.copyTo(data);
 
-          console.log('----audio chunk---', chunk);
-
-          const packet = createPacketWithHeader(data, chunk.timestamp / 1000, 'audio');
+          const timestamp = chunk.timestamp / 1000;
+          const packet = createPacketWithHeader(data, timestamp, 'audio');
           sendPacketOrQueue(packet, 'audio');
         }
       },
@@ -224,32 +203,21 @@ export const useMediaPublisher2 = (address, localStream, nodeRef) => {
     audioEncoderRef.current = audioEncoder;
   }, []);
 
-  const startCapture = useCallback(
-    async address => {
-      initEncoders();
-      await nodeRef.current.connect(address);
-      await nodeRef.current.openBidiStream();
-      console.log('-----opened BidiStream----');
-      const stream = localStream;
+  const mediaEncoder = useCallback(localStream => {
+    initEncoders();
 
-      // Process video
-      const videoTrack = stream.getVideoTracks()[0];
-      const videoProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
-      const videoReader = videoProcessor.readable.getReader();
-      processVideoFrames(videoReader);
+    // Process video
+    const videoTrack = localStream.getVideoTracks()[0];
+    const videoProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
+    const videoReader = videoProcessor.readable.getReader();
+    processVideoFrames(videoReader);
 
-      // Process audio
-      const audioTrack = stream.getAudioTracks()[0];
-      const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
-      const audioReader = audioProcessor.readable.getReader();
-      processAudioFrames(audioReader);
-    },
-    [initEncoders, processVideoFrames, processAudioFrames, localStream],
-  );
+    // Process audio
+    const audioTrack = localStream.getAudioTracks()[0];
+    const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
+    const audioReader = audioProcessor.readable.getReader();
+    processAudioFrames(audioReader);
+  }, []);
 
-  const connectPublisher = useCallback(() => {
-    startCapture(address);
-  }, [address, startCapture]);
-
-  return { connectPublisher };
+  return { mediaEncoder };
 };
