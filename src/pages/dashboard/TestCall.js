@@ -3,7 +3,8 @@ import { Box, Button, Typography, Paper, Grid, TextField } from '@mui/material';
 import init, { ErmisCall } from '../../assets/wasm/ermis_call_node_wasm';
 import ClipboardCopy from '../../components/ClipboardCopy';
 import { useMediaEncoder } from '../../hooks/useMediaEncoder';
-import { useMediaDecoder } from '../../hooks/useMediaDecoder';
+// import { useMediaDecoder } from '../../hooks/useMediaDecoder';
+import { useMediaDecoderSync } from '../../hooks/useMediaDecoderSync';
 
 const TestCall = () => {
   const nodeRef = useRef(null);
@@ -14,7 +15,7 @@ const TestCall = () => {
   const [address, setAddress] = useState('');
 
   const { mediaEncoder } = useMediaEncoder(nodeRef);
-  const { mediaDecoder } = useMediaDecoder(remoteVideoRef, nodeRef);
+  const { mediaDecoder } = useMediaDecoderSync(remoteVideoRef, nodeRef);
 
   useEffect(() => {
     const initWasm = async () => {

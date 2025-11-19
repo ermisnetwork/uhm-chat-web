@@ -143,7 +143,15 @@ export const useMediaEncoder = nodeRef => {
           const data = new ArrayBuffer(chunk.byteLength);
           chunk.copyTo(data);
           const type = chunk.type === 'key' ? 'video-key' : 'video-delta';
-          const timestamp = chunk.timestamp / 1000;
+          // const timestamp = chunk.timestamp / 1000;
+          const timestamp = Math.floor(chunk.timestamp / 1000);
+
+          console.log('🎥 Video Frame:', {
+            type: chunk.type,
+            timestamp: `${timestamp}ms`,
+            originalTimestamp: `${chunk.timestamp}µs`,
+            size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
+          });
 
           const packet = createPacketWithHeader(data, timestamp, type);
           sendPacketOrQueue(packet, 'video');
@@ -156,11 +164,10 @@ export const useMediaEncoder = nodeRef => {
       codec: 'hev1.1.6.L93.B0',
       width: 1280,
       height: 720,
-      bitrate: 1500000,
+      bitrate: 800000,
       framerate: 30,
       latencyMode: 'realtime',
       hardwareAcceleration: 'prefer-hardware',
-      // hevc: { format: 'annexb', maxBFrames: 0 },
     });
 
     videoEncoderRef.current = videoEncoder;
@@ -185,7 +192,15 @@ export const useMediaEncoder = nodeRef => {
           const data = new ArrayBuffer(chunk.byteLength);
           chunk.copyTo(data);
 
-          const timestamp = chunk.timestamp / 1000;
+          // const timestamp = chunk.timestamp / 1000;
+          const timestamp = Math.floor(chunk.timestamp / 1000);
+
+          console.log('🔊 Audio Chunk:', {
+            timestamp: `${timestamp}ms`,
+            originalTimestamp: `${chunk.timestamp}µs`,
+            size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
+          });
+
           const packet = createPacketWithHeader(data, timestamp, 'audio');
           sendPacketOrQueue(packet, 'audio');
         }
@@ -197,7 +212,7 @@ export const useMediaEncoder = nodeRef => {
       codec: 'opus',
       sampleRate: 48000,
       numberOfChannels: 1,
-      bitrate: 128000,
+      bitrate: 64000,
     });
 
     audioEncoderRef.current = audioEncoder;
