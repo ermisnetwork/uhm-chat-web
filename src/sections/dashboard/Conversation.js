@@ -466,16 +466,28 @@ const TextLine = ({ message }) => {
         );
       } else if (part.match(mentionRegex)) {
         const mentionObj = mentions.find(m => m.mentionId === part || m.mentionName === part);
-        if (mentionObj) {
-          const customClass =
-            mentionObj.mentionId === '@all' ? 'mentionAll' : mentionObj.id === user_id ? 'mentionMe' : '';
-          return (
-            <span key={index} className={`mentionHighlight ${customClass}`}>
-              {mentionObj.mentionName}
-            </span>
-          );
-        }
+        if (!mentionObj) return <React.Fragment key={index}>{part}</React.Fragment>;
+
+        const hasMentionUsers = !!message?.mentioned_users;
+        const customClass =
+          hasMentionUsers && mentionObj.mentionId === '@all'
+            ? 'mentionAll'
+            : hasMentionUsers && mentionObj.id === user_id
+            ? 'mentionMe'
+            : '';
+
+        const className = hasMentionUsers
+          ? `mentionHighlight ${customClass}`.trim()
+          : '';
+
+        return (
+          <span key={index} className={className}>
+            @{mentionObj.name}
+          </span>
+        );
       }
+
+
       return <React.Fragment key={index}>{part}</React.Fragment>;
     });
   };
