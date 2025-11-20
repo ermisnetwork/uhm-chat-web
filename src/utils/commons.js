@@ -376,6 +376,7 @@ export const replaceMentionsWithIds = (text, mentions) => {
     text = text.replaceAll(user.mentionName, user.mentionId);
   });
 
+
   return text;
 
   // const queues = mentions.reduce((acc, m) => {

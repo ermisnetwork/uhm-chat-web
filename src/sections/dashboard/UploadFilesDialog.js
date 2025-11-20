@@ -263,7 +263,7 @@ const UploadFilesDialog = ({ setMessages }) => {
 
   const renderTitle = () => {
     const getTitleByMimeType = attachments => {
-      if (!attachments?.length) return 'Sent file';
+      if (!attachments?.length) return t('uploadFilesDialog.sent_file');
 
       const counts = { image: 0, video: 0, file: 0 };
 
@@ -278,7 +278,7 @@ const UploadFilesDialog = ({ setMessages }) => {
 
       if (image === 1 && !video && !file) return t('uploadFilesDialog.sent_photo');
       if (video === 1 && !image && !file) return t('uploadFilesDialog.sent_video');
-      if (image && video && !file) return `${t('uploadFilesDialog.sent')} ${image + video} ${t('uploadFilesDialog.photos_videos')}`;
+      if (image && video && !file) return `${t('uploadFilesDialog.sent')} ${image + video} ${t('uploadFilesDialog.photo_videos')}`;
       if (image && !video && !file) return `${t('uploadFilesDialog.sent')} ${image} ${t('uploadFilesDialog.photos')}`;
       if (video && !image && !file) return `${t('uploadFilesDialog.sent')} ${video} ${t('uploadFilesDialog.videos')}`;
 

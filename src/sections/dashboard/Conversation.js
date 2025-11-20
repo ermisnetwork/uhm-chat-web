@@ -487,7 +487,10 @@ const TextLine = ({ message }) => {
         );
       }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2cafba0aec1125fb381fc4e401ef933e3ab74217
       return <React.Fragment key={index}>{part}</React.Fragment>;
     });
   };

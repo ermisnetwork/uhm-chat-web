@@ -21,7 +21,7 @@ export default function LoginEmail() {
   const { isLoading, user } = useSelector(state => state.app);
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().required(t('login_email.email_required')).email(t('login_email.email_invalid')),
+    email: Yup.string().required(t('login_email.email_required')).email(t('login_email.email_valid')),
     password: Yup.string().required(t('login_email.password_required')),
   });
 

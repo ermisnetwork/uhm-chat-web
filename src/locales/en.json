@@ -327,13 +327,6 @@
     "enabled": "enabled",
     "disabled": "disabled"
   },
-  "sidebarMember": {
-    "title": "Members",
-    "no_result": "No result",
-    "members": "Members",
-    "invite_members": "Invited Members",
-    "search": "Search"
-  },
   "friendList": {
     "noResult": "No result for"
   },
@@ -344,24 +337,6 @@
     "title": "THIS TOPIC IS CLOSED",
     "message": "Reopen Topic",
     "snackbar_success": "Topic reopened successfully"
-  },
-  "sidebarPermission": {
-    "title": "Permissions",
-    "off": "Off",
-    "send_messages": "Send Messages",
-    "send_links": "Send Links",
-    "edit_messages": "Edit Messages",
-    "delete_messages": "Delete Messages",
-    "react_messages": "React Messages",
-    "pin_messages": "Pin Message",
-    "create_poll": "Create Poll",
-    "vote_poll": "Vote Poll",
-    "update_cooldown_success": "Update cooldown messages successfully!",
-    "update_capabilities_success": "Update capabilities successfully!",
-    "save": "SAVE",
-    "member_actions": "MEMBER ACTIONS",
-    "slow_mode": "SLOW MODE",
-    "message": "Set how long each member has to wait before sending their next mesage."
   },
   "sidebarAdministrators": {
     "title": "Administrators",
@@ -690,7 +665,7 @@
     "new_password": "New password",
     "password": "password",
     "text": "text",
-    "reset_passsword": "Reset Password",
+    "reset_password": "Reset Password",
     "email_required": "Email is required",
     "email_invalid": "Invalid email address",
     "title": "Forgot your password?",
@@ -732,7 +707,7 @@
     "password_reset_success": "Your password has been successfully reset. Please use the new password to log in!"
   },
   "recordingAudioBox": {
-    "upload_audio_failed": "Upload audio failed",
+    "snackbar_upload_failed": "Upload audio failed",
     "snackbar_cannot_microphone": "Cannot access microphone",
     "cancel": "CANCEL"
   },
@@ -742,6 +717,7 @@
     "sent_photo": "Sent an photo",
     "sent_video": "Sent a video",
     "sent": "Sent",
+    "sent_file": "Sent file",
     "photo_videos": "photos and videos",
     "photos": "photos",
     "videos": "videos",

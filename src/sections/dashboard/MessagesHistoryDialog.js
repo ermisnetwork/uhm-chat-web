@@ -34,7 +34,7 @@ const MessagesHistoryDialog = () => {
         },
       }}
     >
-      <DialogTitle>{t('messagesHistoryDialog.title')}</DialogTitle>
+      <DialogTitle>{t('messageHistoryDialog.title')}</DialogTitle>
       <DialogContent sx={{ maxHeight: '250px' }} className="customScrollbar">
         <List>
           {messages.map((msg, index) => {

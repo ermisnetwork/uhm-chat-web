@@ -247,6 +247,7 @@ const ChannelInfoTab = ({ currentChat }) => {
           setFiles(
             attachments
               .filter(attachment => attachment.attachment_type === 'file')
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
               .map(item => {
                 return {
                   asset_url: item.url,
@@ -262,6 +263,7 @@ const ChannelInfoTab = ({ currentChat }) => {
           setLinks(
             attachments
               .filter(attachment => attachment.attachment_type === 'linkPreview')
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
               .map(item => {
                 const user = currentChat.state?.members[item.user_id]?.user || {};
                 return {

@@ -96,15 +96,15 @@ export function convertMessageSignal(input, t) {
       color = '';
   }
 
-  return { text, duration: formatDuration(duration), callType, color };
+  return { text, duration: formatDuration(duration, t), callType, color };
 }
 
-export const formatDuration = duration => {
+export const formatDuration = (duration, t) => {
   if (!duration) return '';
 
   const totalSeconds = Math.floor(duration / 1000); // Chuyển từ ms sang giây
   const minutes = Math.floor(totalSeconds / 60); // Số phút
   const seconds = totalSeconds % 60; // Số giây còn lại
 
-  return `${minutes} min, ${seconds} sec`;
+  return `${minutes} ${t('messageSignal.min')}, ${seconds} ${t('messageSignal.sec')}`;
 };
