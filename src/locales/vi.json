@@ -3,128 +3,135 @@
   "you": "Bạn",
   "sticker": "Nhãn dán",
   "profile": {
-    "edit": "Chỉnh sửa hồ sơ",
-    "language": "Ngôn ngữ",
-    "logout": "Đăng xuất"
+  "edit": "Chỉnh sửa hồ sơ",
+  "language": "Ngôn ngữ",
+  "logout": "Đăng xuất"
   },
-  "newchat": {
-    "add_friend": "Thêm bạn",
-    "new_chat": "Chat mới",
-    "channel": "Kênh mới",
-    "message": "Tin nhắn mới"
+  "newchat": 
+  {
+    "add_friend": "Thêm liên hệ mới",
+    "new_chat": "Trò chuyện mới",
+    "channel": "Tạo nhóm",
+    "message": "Nhắn tin riêng"
   },
-  "renderTitle": {
-    "conversations": "Cuộc trò chuyện",
-    "contacts": "Liên hệ",
+  "renderTitle": 
+  {
+    "conversations": "Trò chuyện",
+    "contacts": "Danh bạ",
     "calls": "Cuộc gọi",
-    "more": "Thêm"
+    "more": "Khác"
   },
-  "channel": {
-    "message_large": "Hãy lan tỏa thông điệp!",
-    "message_small": "Không gian này đang chờ những lời bạn viết — hãy khơi gợi một cuộc trò chuyện và cùng nhau tạo nên điều tuyệt vời."
+  "channel": 
+  {
+    "message_large": "Hãy để câu chuyện bắt đầu!",
+    "message_small": "Những kết nối tuyệt vời đang chờ bạn mở lời"
   },
-  "Homesearch": {
+  "Homesearch": 
+  {
     "search": "Tìm kiếm",
-    "your_channel": "Kênh của bạn",
-    "public_channel": "Kênh công khai"
+    "your_channel": "Trò chuyện của ban",
+    "public_channel": "Nhóm công khai"
   },
-  "chatComponent": {
+  "chatComponent": 
+  {
     "today": "Hôm nay",
     "yesterday": "Hôm qua",
-    "message": "Cần chấp nhận lời mời của bạn để xem những tin nhắn mà bạn đã gửi.",
-    "message_delete": "Xóa tin nhắn",
-    "no_message": "Chưa có tin nhắn nào ở đây...",
+    "message": "cần chấp nhận lời mời để xem nội dung bạn đã gửi",
+    "message_delete": "Tin nhắn đã xóa",
+    "no_message": "Chưa có tin nhắn nào.",
     "sending": "Đang gửi",
     "unread_message": "Tin nhắn chưa đọc"
   },
-  "chatElement": {
-    "general": "General",
-    "blocked": "Bạn đã chặn người dùng này.",
-    "unpinned": "Bỏ ghim đầu",
+  "chatElement": 
+  {
+    "general": "Nhóm chung",
+    "blocked": "Bạn đã chặn người này",
+    "unpinned": "Bỏ ghim",
     "pinned": "Ghim lên đầu",
-    "delete_channel": "Xóa kênh",
-    "leave_channel": "Rời khỏi kênh",
+    "delete_channel": "Xóa nhóm",
+    "leave_channel": "Rời nhóm",
     "clear_chat_history": "Xóa lịch sử trò chuyện",
     "you": "Bạn",
     "sticker": "Nhãn dán",
     "photo": "Ảnh",
-    "no_message": "Chưa có tin nhắn nào ở đây"
+    "no_message": "Chưa có tin nhắn nào"
   },
-  "Profile": {
-    "title": "Thông tin cá nhân",
+  "Profile": 
+  {
+    "title": "Hồ sơ của tôi",
     "label": "Tên",
-    "about_me": "Giới thiệu về tôi",
+    "about_me": "Giới thiệu bản thân",
     "delete_profile": "Xóa tài khoản",
-    "update_photo": "Cập nhật ảnh",
+    "update_photo": "Cập nhật ảnh đại diện",
     "cancel": "Hủy",
     "Save": "Lưu",
-    "snackbar_image_error": "Vui lòng chọn tệp hình ảnh."
+    "snackbar_image_error": "Vui lòng chọn file ảnh"
   },
-  "navbuttons": {
-    "convertions": "Cuộc trò chuyện",
-    "contacts": "Liên hệ"
+  "navbuttons": 
+  {
+    "convertions": "Trò chuyện",
+    "contacts": "Danh bạ"
   },
-  "addfriend": {
-    "title": "Thêm bạn",
+  "addfriend": 
+  {
+    "title": "Thêm liên hệ mới",
     "search": "Tìm kiếm",
-    "message": "Tìm liên hệ mới bằng cách nhập số điện thoại hoặc địa chỉ email của họ.",
-    "nothing": "Không có gì ở đây",
-    "message_small": "Không tìm thấy kết quả phù hợp.",
+    "message": "Tìm liên hệ mới bằng cách nhập số điện thoại hoặc địa chỉ email.",
+    "nothing": "Không có kết quả phù hợp",
+    "message_small": "Có vẻ như không có ai khớp với tìm kiếm của bạn.",
     "noResult": "Không có kết quả cho",
-    "snackbar_success": "Đã gửi lời mời thành công",
-    "snackbar_failed": "Gửi lời mời thất bại. Vui lòng thử lại."
+    "snackbar_success": "Đã gửi lời mời",
+    "snackbar_failed": "Không thể gửi lời mời. Vui lòng thử lại."
   },
-  "create_channel": {
-    "title": "Tạo kênh mới",
-    "type": "Trạng thái kênh",
-    "public": "Công khai",
-    "private": "Riêng tư",
-    "channel_required": "Vui lòng nhập tên kênh",
-    "create_success": "Đã tạo kênh thành công",
-    "create_failed": "Tạo kênh thất bại. Vui lòng thử lại.",
-    "message_public": "Kênh công khai cho phép mọi người tìm kiếm, xem nội dung và tham gia.",
-    "message_private": "Chỉ những thành viên được mời mới có thể tìm và tham gia kênh riêng tư.",
-    "info": "THÔNG TIN",
-    "channel_name": "Tên kênh",
-    "description": "Mô tả",
-    "words": "ký tự",
-    "cancel": "HỦY",
-    "next": "TIẾP THEO",
-    "title_addMember": "Bạn muốn thêm ai?",
-    "back": "QUAY LẠI",
-    "create": "TẠO",
+  "create_channel": 
+  {
+    "title": "Tạo nhóm mới",
+    "type": "Loại nhóm",
+    "public": "Nhóm công khai",
+    "private": "Nhóm kín",
+    "channel_required": "Vui lòng nhập tên nhóm",
+    "create_success": "Tạo nhóm thành công",
+    "create_failed": "Tạo nhóm thất bại",
+    "message_public": "Nhóm công khai cho phép mọi người tìm kiếm, xem nội dung và tham gia nhóm.",
+    "message_private": "Chỉ thành viên được mời mới có thể tìm kiếm và tham gia vào nhóm kín.",
+    "info": "Thông tin nhóm",
+    "channel_name": "Tên nhóm",
+    "description": "Mô tả nhóm",
+    "words": "từ",
+    "cancel": "Hủy",
+    "next": "Tiếp theo",
+    "title_addMember": "Bạn muốn thêm thành viên nào?",
+    "back": "Quay lại",
+    "create": "Tạo nhóm",
     "search": "Tìm kiếm"
   },
-  "new_message": {
-    "title": "Bắt đầu cuộc trò chuyện mới",
+  "new_message": 
+  {
+    "title": "Tin nhắn mới",
+    "search": "Tìm kiếm trong danh bạ",
+    "create_success": "Đã gửi lời mời!",
+    "create_failed": "Không thể gửi lời mời. Vui lòng thử lại."
+  },
+  "contact": 
+  {
     "search": "Tìm kiếm",
-    "create_success": "Đã tạo cuộc trò chuyện thành công",
-    "create_failed": "Tạo cuộc trò chuyện thất bại. Vui lòng thử lại."
+    "friends_list": "Bạn bè",
+    "channel_list": "Nhóm",
+    "channel_request": "Lời mời kết bạn/Lời mời vào nhóm",
+    "noResult": "Không tìm thấy kết quả phù hợp"
   },
-  "contact": {
-    "search": "Tìm kiếm",
-    "friends_list": "Danh sách bạn bè",
-    "channel_list": "Danh sách kênh",
-    "channel_request": "Yêu cầu kết bạn/kênh",
-    "noResult": "Không có kết quả cho"
+  "invite": 
+  {
+    "message": "đã gửi lời mời kết bạn tới bạn",
+    "admin_invite": "Quản trị viên nhóm đã mời bạn",
+    "skip": "Bỏ qua",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối",
+    "join": "Tham gia"
   },
-  "invite": {
-    "message": "Đã gửi lời mời kết bạn",
-    "admin_invite": "Được quản trị viên mời vào kênh",
-    "skip": "BỎ QUA",
-    "accept": "CHẤP NHẬN",
-    "decline": "TỪ CHỐI",
-    "join": "THAM GIA"
-  },
-  "inviteFriendDialog": {
-    "title": "Mời thành viên vào kênh này",
-    "search": "Tìm kiếm",
-    "invite": "MỜI",
-    "members": "THANH VIÊN",
-    "snackbar_success": "Đã thêm thành viên thành công"
-  },
-  "chatHeader": {
-    "general": "General",
+  "chatHeader": 
+  {
+    "general": "Nhóm chung",
     "member": "Thành viên",
     "join": "Tham gia",
     "pin": "Ghim",
@@ -140,101 +147,109 @@
     "close_topic": "Đóng chủ đề",
     "delete": "Xóa",
     "delete_topic": "Xóa chủ đề",
-    "snackbar_closed_success": "Đã đóng chủ đề thành công",
-    "snackbar_reopened_success": "Đã mở lại chủ đề thành công"
+    "snackbar_closed_success": "Đã đóng chủ đề.",
+    "snackbar_reopened_success": "Đã mở lại chủ đề"
   },
-  "chat_element": {
-    "general": "General",
-    "no_message": "Chưa có tin nhắn nào ở đây",
-    "last_message": "Bạn đã chặn người dùng này."
+  "chat_element": 
+  {
+    "general": "Nhóm chung",
+    "no_message": "Chưa có tin nhắn nào",
+    "last_message": "Bạn đã chặn người này"
   },
-  "channelList": {
+  "channelList": 
+  {
     "all": "Tất cả",
     "group": "Nhóm",
     "unread": "Chưa đọc",
-    "no_channel": "Không có kênh nào ở đây"
+    "no_channel": "Không có nhóm nào"
   },
-  "chatFooter": {
-    "send_message": "Bạn không có quyền gửi tin nhắn trong kênh này",
-    "check_filterWords": "Nội dung tin nhắn của bạn có chứa từ ngữ bị cấm",
-    "check_sendLinks": "Thành viên trong kênh này không được phép gửi liên kết",
-    "placeholder": "Nhập tin nhắn..."
+  "chatFooter": 
+  {
+    "send_message": "Bạn không được gửi tin nhắn trong nhóm này",
+    "check_filterWords": "Nội dung bạn  nhập có chứa từ khóa bị chặn",
+    "check_sendLinks": "Thành viên trong nhóm không được gửi link",
+    "placeholder": "Nhập tin nhắn"
   },
-  "popover": {
-    "share_file": "Chia sẻ tệp",
-    "create_poll": "Tạo cuộc thăm dò"
+  "popover": 
+  {
+    "share_file": "Gửi tệp tin",
+    "create_poll": "Tạo bình chọn"
   },
-  "create_poll": {
-    "title": "Tạo một cuộc thăm dò",
-    "question": "CÂU HỎI",
-    "question_name": "Tiêu đề câu hỏi",
-    "option": "Lựa chọn",
+  "create_poll": 
+  {
+    "title": "Tạo bình chọn",
+    "question": "Câu hỏi",
+    "question_name": "Nhập câu hỏi",
+    "option": "Option",
     "question_required": "Vui lòng nhập câu hỏi",
-    "question_empty": "Câu hỏi không được để trống",
-    "options": "LỰA CHỌN",
-    "add_option": "THÊM LỰA CHỌN",
-    "cancel": "HỦY",
-    "create": "TẠO",
-    "min_options": "Ít nhất 2 lựa chọn",
-    "multiple_answers": "Cho phép chọn nhiều câu trả lời"
+    "question_empty": "Vui lòng nhập phương án",
+    "options": "Phương án",
+    "add_option": "Thêm phương án",
+    "cancel": "Hủy",
+    "create": "Tạo",
+    "min_options": "Phải có ít nhất 2 phương án",
+    "multiple_answers": "Chọn nhiều phương án"
   },
-  "recordingAudio": {
-    "upload_error": "Lỗi tải lên tệp âm thanh",
-    "microphone_error": "Lỗi truy cập micrô",
-    "cancel": "HỦY"
+  "recordingAudio": 
+  {
+    "upload_error": "Tải tệp âm thanh thất bại",
+    "microphone_error": "Không thể truy cập mic",
+    "cancel": "Hủy"
   },
-  "messageSystem": {
-    "public": "Công khai",
-    "private": "Riêng tư",
-    "channel_update_name": "đã thay đổi tên kênh",
-    "channel_update_name_to": "đã đổi tên kênh thành",
-    "channel_update_avatar": "đã thay đổi ảnh đại diện kênh",
-    "channel_update_description": "đã cập nhật mô tả kênh",
-    "member_removed": "đã bị xóa",
-    "member_removed_from_channel": "đã bị xóa khỏi kênh này",
-    "member_banned": "đã bị chặn",
-    "member_banned_by_admin": "đã bị quản trị viên kênh chặn",
-    "member_unbanned": "đã bị bỏ chặn",
-    "member_unbanned_channel": "đã bị bỏ chặn khỏi trong kênh này",
-    "member_promoted": "đã trở thành quản trị viên",
-    "member_promoted_channel": "đã trở thành quản trị viên của kênh này",
-    "member_demoted": "đã gỡ khỏi làm quản trị viên",
-    "member_demoted_channel": "đã gỡ khỏi làm quản trị viên của kênh này",
-    "channel_update_member_capabilities": "đã cập nhật quyền hạn thành viên của kênh",
+  "messageSystem": 
+  {
+    "public": "Nhóm công khai",
+    "private": "Nhóm kín",
+    "channel_update_name": "đã đổi tên nhóm",
+    "channel_update_name_to": "đã đổi tên nhóm thành",
+    "channel_update_avatar": "đã đổi ảnh đại diện nhóm",
+    "channel_update_description": "đã đổi mô tả nhóm",
+    "member_removed": "đã bị xóa khỏi nhóm",
+    "member_removed_from_channel": "đã bị xóa khỏi nhóm",
+    "member_banned": "have been banned from interacting",
+    "member_banned_by_admin": "has been banned from interacting in this channel by Channel Admin",
+    "member_unbanned": "đã được gỡ cấm",
+    "member_unbanned_channel": "have been unbanned and now can interact in this channel",
+    "member_promoted": "đã được chỉ định là Quản trị viên",
+    "member_promoted_channel": "has been assigned as the moderator for this channel",
+    "member_demoted": "đã bị gỡ quyền Quản trị viên",
+    "member_demoted_channel": "has been removed as the moderator from this channel",
+    "channel_update_member_capabilities": "đã cập nhật quyền cho thành viên nhóm",
     "conversation": "cuộc trò chuyện",
-    "channel": "kênh",
+    "channel": "nhóm",
     "member_joined": "đã tham gia",
     "joined_channel": "đã tham gia",
-    "invite_rejected": "đã từ chối lời mời",
-    "invite_rejected_channel": "đã từ chối lời mời vào kênh này",
-    "member_leaved": "đã rời đi",
-    "member_leaved_channel": "đã rời khỏi kênh này",
+    "invite_rejected": "đã từ chối tham gia",
+    "invite_rejected_channel": "đã từ chối tham gia",
+    "member_leaved": "đã rời nhóm",
+    "member_leaved_channel": "đã rời nhóm",
     "channel_truncate_messages": "đã xóa tất cả tin nhắn",
-    "channel_truncate_messages_all": "đã xóa tất cả tin nhắn trong kênh này",
-    "channel_update_public": "đã chuyển kênh thành ",
-    "channel_update_public_this": "đã chuyển kênh này thành",
-    "channel_update_cooldown_disabled": "Đã tắt thời gian chờ",
-    "channel_update_cooldown_enabled": "Tính năng thời gian chờ đã được bật. Thời gian chờ được đặt là",
-    "channel_update_filter_words": "đã cập nhật từ ngữ bị cấm",
-    "member_joined_channel": "đã tham gia kênh",
-    "member_joined_this_channel": "đã tham gia kênh này",
-    "message_pinned": "đã ghim một tin nhắn",
-    "message_unpinned": "đã bỏ ghim một tin nhắn",
+    "channel_truncate_messages_all": "đã xóa tất cả tin nhắn",
+    "channel_update_public": "đã chuyển nhóm thành",
+    "channel_update_public_this": "đã chuyển nhóm thành",
+    "channel_update_cooldown_disabled": "Đã tắt chế độ gửi chậm",
+    "channel_update_cooldown_enabled": "Đã bật chế độ gửi chậm. Thời gian chờ là",
+    "channel_update_filter_words": "đã cập nhật danh sách từ khóa",
+    "member_joined_channel": "đã tham gia nhóm",
+    "member_joined_this_channel": "đã tham gia nhóm",
+    "message_pinned": "đã ghim tin nhắn",
+    "message_unpinned": "đã bỏ ghim tin nhắn",
     "seconds": "giây",
     "minutes": "phút",
     "You": "Bạn"
   },
-  "conversation": {
-    "copy_text": "Sao chép văn bản thành công!",
-    "copy_failed": "Sao chép không thành công!",
-    "snackbar_delete": "Bạn không có quyền xóa tin nhắn trong kênh này",
-    "snackbar_edit": "Bạn không có quyền chỉnh sửa tin nhắn trong kênh này",
-    "snackbar_pin": "Bạn không có quyền ghim tin nhắn trong kênh này",
-    "snackbar_pinned": "Tin nhắn đã được ghim",
-    "snackbar_pin_failed": "Ghim tin nhắn không thành công. Vui lòng thử lại.",
+  "conversation": 
+  {
+    "copy_text": "Đã sao chép tin nhắn!",
+    "copy_failed": "Không thể sao chép!",
+    "snackbar_delete": "Bạn không có quyền xóa tin nhắn trong nhóm này",
+    "snackbar_edit": "Bạn không có quyền chỉnh sửa tin nhắn trong nhóm này",
+    "snackbar_pin": "Bạn không có quyền ghim tin nhắn trong nhóm này",
+    "snackbar_pinned": "Đã ghim tin nhắn",
+    "snackbar_pin_failed": "Không thể ghim tin nhắn. Vui lòng thử lại.",
     "unpin": "Bỏ ghim",
     "pin": "Ghim",
-    "download": "Tải xuống",
+    "download": "Tải về",
     "edit": "Chỉnh sửa",
     "copy": "Sao chép",
     "delete": "Xóa",
@@ -242,552 +257,623 @@
     "reply": "Trả lời",
     "forward": "Chuyển tiếp",
     "forward_from": "Chuyển tiếp từ",
-    "unknown_channel": "Kênh không xác định",
-    "edited": "Đã chỉnh sửa",
-    "snackbar_vote": "Vui lòng chọn một tùy chọn để bỏ phiếu",
-    "vote": "BỎ PHIẾU",
-    "result": "KẾT QUẢ",
-    "votes": "Bỏ phiếu",
-    "message_deleted": "Tin nhắn đã bị xóa"
+    "unknown_channel": "Nhóm không tồn tại",
+    "edited": "Đã sửa",
+    "snackbar_vote": "Vui lòng chọn phương án bình chọn",
+    "vote": "Bình chọn",
+    "result": "Kết quả",
+    "votes": "lượt bình chọn",
+    "message_deleted": "Tin nhắn đã xóa"
   },
-  "muteNotificationsDialog": {
+  "muteNotificationsDialog": 
+  {
     "title": "Tắt thông báo",
     "cancel": "Hủy",
-    "accept": "Chấp nhận",
-    "mute_15_minutes": "Tắt trong 15 phút",
-    "mute_1_hour": "Tắt trong 1 giờ",
-    "mute_8_hours": "Tắt trong 8 giờ",
-    "until_i_turn_it_back_on": "Cho đến khi tôi bật lại"
+    "accept": "Đồng ý",
+    "mute_15_minutes": "Trong 15 phút",
+    "mute_1_hour": "Trong 1 giờ",
+    "mute_8_hours": "Trong 8 giờ",
+    "until_i_turn_it_back_on": "Đến khi tôi bật lại"
   },
-  "sidebarChannelInfo": {
-    "channel_name_required": "Vui lòng nhập tên kênh",
+  "sidebarChannelInfo": 
+  {
+    "channel_name_required": "Vui lòng nhập tên nhóm",
     "max_characters": "Tối đa 255 ký tự",
     "description": "Mô tả",
-    "snackbar_upload_error": "Vui lòng tải lên tệp hình ảnh.",
-    "snackbar_update_success": "Cập nhật kênh thành công",
-    "channel_name": "Tên kênh",
+    "snackbar_upload_error": "Vui lòng chọn ảnh!",
+    "snackbar_update_success": "Đã cập nhật thành công",
+    "channel_name": "Tên nhóm",
     "snackbar_notifications_muted": "Đã tắt thông báo",
     "snackbar_notifications_unmuted": "Đã bật thông báo",
-    "save": "LƯU",
-    "copied_clipboard": "Đã sao chép thành công",
+    "save": "Lưu",
+    "copied_clipboard": "Đã sao chép vào bộ nhớ tạm",
     "notifications": "Thông báo",
-    "unmute": "Bật tiếng",
-    "mute": "Tắt tiếng",
-    "invite_friend": "Mời bạn bè",
+    "unmute": "Bật thông báo",
+    "mute": "Tắt thông báo",
+    "invite_friend": "Thêm thành viên",
     "unblock_user": "Bỏ chặn người dùng",
     "block_user": "Chặn người dùng",
-    "channel_type": "Loại kênh",
-    "public": "Công khai",
-    "private": "Riêng tư",
-    "channel_topics": "Chủ đề kênh",
+    "channel_type": "Loại nhóm",
+    "public": "Nhóm công khai",
+    "private": "Nhóm kín",
+    "channel_topics": "Chủ đề nhóm",
     "enabled": "Bật",
     "disabled": "Tắt",
     "member": "Thành viên",
     "permission": "Quyền hạn",
     "administrators": "Quản trị viên",
-    "banned_members": "Thành viên bị chặn",
+    "banned_members": "Thành viên bị cấm",
     "keyword_filtering": "Lọc từ khóa",
     "clear_chat_history": "Xóa lịch sử trò chuyện",
-    "leave_channel": "Rời khỏi kênh",
-    "delete_channel": "Xóa kênh",
-    "words": "ký tự"
+    "leave_channel": "Rời nhóm",
+    "delete_channel": "Xóa nhóm",
+    "words": "từ"
   },
-  "callDirectDialog": {
-    "chat": "Trò chuyện",
+  "callDirectDialog": 
+  {
+    "chat": "Nhắn tin",
     "mute": "Tắt tiếng",
     "unmute": "Bật tiếng",
     "stop_video": "Dừng video",
-    "start_video": "Bắt đầu video",
-    "screencast": "Chia sẻ màn hình",
-    "decline": "từ chối",
-    "accept": "chấp nhận",
-    "end_call": "kết thúc cuộc gọi",
+    "start_video": "Phát video",
+    "screencast": "Quay màn hình",
+    "decline": "Từ chối",
+    "accept": "Chập nhận",
+    "end_call": "Kết thúc",
     "cancel": "Hủy",
     "Connected": "Đã kết nối",
-    "request_switch_video_call": "Yêu cầu chuyển sang cuộc gọi video",
+    "request_switch_video_call": "Chuyển sang cuộc gọi video",
     "ringing": "Đang đổ chuông"
   },
-  "sidebarChannelType": {
-    "title": "Loại kênh",
-    "invite_link": "LIÊN KẾT MỜI",
-    "type": "Loại",
-    "public": "Công khai",
-    "private": "Riêng tư",
-    "copy": "SAO CHÉP",
-    "message": "Cho phép người khác tìm thấy kênh bằng cách chia sẻ liên kết.",
-    "save": "LƯU",
-    "snackbar_update_success": "Cập nhật kênh thành công",
-    "snackbar_copy_success": "Sao chép thành công",
-    "snackbar_copy_failed": "Sao chép liên kết không thành công. Vui lòng thử lại.",
-    "public_message": "Kênh công khai cho phép bất kỳ ai cũng có thể tìm kiếm, xem nội dung và tham gia.",
-    "private_message": "Chỉ những thành viên được mời mới có thể tìm và tham gia kênh riêng tư."
+  "sidebarChannelType": 
+  {
+    "title": "Loại nhóm",
+    "invite_link": "Link mời vào nhóm",
+    "type": "Chọn loại nhóm",
+    "public": "Nhóm công khai",
+    "private": "Nhóm kín",
+    "copy": "Sao chép",
+    "message": "Thành viên có thể chia sẻ link mời để người nhận có thể tìm thấy nhóm này.",
+    "save": "Lưu",
+    "snackbar_update_success": "Đã cập nhật thông tin",
+    "snackbar_copy_success": "Đã sao chép",
+    "snackbar_copy_failed": "Không thể sao chép. Vui lòng thử lại.",
+    "public_message": "Nhóm công khai cho phép mọi người tìm kiếm, xem nội dung và tham gia nhóm.",
+    "private_message": "Chỉ thành viên được mời mới có thể tìm kiếm và tham gia vào nhóm kín."
   },
-  "sidebarChannelTopic": {
-    "title": "Chủ đề kênh",
-    "save": "LƯU",
-    "topics": "CHỦ ĐỀ",
+  "sidebarChannelTopic": 
+  {
+    "title": "Chủ đề nhóm",
+    "save": "Lưu",
+    "topics": "Chủ đề",
     "Enabled": "Bật",
     "Disabled": "Tắt",
-    "message": "Cuộc trò chuyện nhóm sẽ được chia thành các chủ đề do quản trị viên hoặc người dùng tạo.",
-    "snackbar_message": "Chủ đề kênh",
-    "success": "thành công",
-    "enabled": "bật",
-    "disabled": "tắt"
+    "message": "Nhóm chat sẽ được chia thành các chủ đề đã tạo.",
+    "snackbar_message": "Chủ đề nhóm",
+    "success": "Thành công!",
+    "enabled": "Bật",
+    "disabled": "Tắt"
   },
-  "friendList": {
-    "noResult": "Không có kết quả cho"
+  "sidebarMember": 
+  {
+    "title": "Thành viên",
+    "no_result": "Không tìm thấy thành viên phù hợp",
+    "members": "Thành viên",
+    "invite_members": "Thành viên đã mời",
+    "search": "Tìm kiếm"
   },
-  "contactElement": {
+  "friendList": 
+  {
+    "noResult": "Không tìm thấy kết quả cho"
+  },
+  "contactElement": 
+  {
     "member": "Thành viên"
   },
-  "closedTopicBackdrop": {
-    "title": "CHỦ ĐỀ NÀY ĐÃ ĐÓNG",
+  "closedTopicBackdrop": 
+  {
+    "title": "Chủ đề này đã bị đóng",
     "message": "Mở lại chủ đề",
-    "snackbar_success": "Đã mở lại chủ đề thành công"
+    "snackbar_success": "Đã mở lại chủ đề."
   },
-  "sidebarPermission": {
+  "sidebarPermission": 
+  {
     "title": "Quyền hạn",
     "off": "Tắt",
     "send_messages": "Gửi tin nhắn",
-    "send_links": "Gửi liên kết",
+    "send_links": "Gửi link",
     "edit_messages": "Chỉnh sửa tin nhắn",
     "delete_messages": "Xóa tin nhắn",
-    "react_messages": "Phản ứng tin nhắn",
-    "pin_messages": "Ghim tin nhắn",
-    "create_poll": "Tạo khảo sát",
-    "vote_poll": "Bỏ phiếu",
-    "update_cooldown_success": "Cập nhật thời gian chờ tin nhắn thành công!",
-    "update_capabilities_success": "Cập nhật quyền hạn thành công!",
+    "react_messages": "Thả biểu tượng cảm xúc",
+    "pin_messages": "Ghim/bỏ ghim tin nhắn",
+    "create_poll": "Tạo bình chọn",
+    "vote_poll": "Bình chọn",
+    "update_cooldown_success": "Đã cập nhật chế độ gửi chậm.",
+    "update_capabilities_success": "Đã cập nhật quyền hạn thành viên.",
     "save": "Lưu",
-    "member_actions": "HÀNH ĐỘNG THÀNH VIÊN",
-    "slow_mode": "CHẾ ĐỘ CHẬM",
-    "message": "Đặt thời gian chờ mà mỗi thành viên phải đợi trước khi gửi tin nhắn tiếp theo."
+    "member_actions": "CHO PHÉP THÀNH VIÊN NHÓM THỰC HIỆN",
+    "slow_mode": "CHẾ ĐỘ GỬI CHẬM",
+    "message": "Đặt khoảng thời gian mỗi thành viên phải chờ trước khi gửi tin nhắn tiếp theo."
   },
-  "sidebarAdministrators": {
+  "sidebarAdministrators": 
+  {
     "title": "Quản trị viên",
-    "snackbar_added_success": "Thêm quản trị viên thành công",
+    "snackbar_added_success": "Đã thêm quản trị viên.",
     "add": "Thêm",
-    "channel_members": "Thành viên kênh",
+    "channel_members": "Chọn từ thành viên nhóm",
     "add_moderator": "Thêm quản trị viên"
   },
-  "sidebarBannedMembers": {
-    "title": "Thành viên bị chặn",
-    "no_banned_member": "Chưa có thành viên bị chặn!",
-    "message": "Chỉ có không khí vui vẻ - Chưa có ai bị chặn.",
-    "banned_button": "Chặn",
-    "channel_members": "Thành viên kênh",
-    "Banned": "CHẶN",
-    "saveClick": "Đã chặn thành viên thành công"
+  "sidebarBannedMembers": 
+  {
+    "title": "Thành viên bị cấm",
+    "no_banned_member": "Không thành viên nào bị cấm!",
+    "message": "Tuyệt vời - Không ai bị cấm",
+    "banned_button": "Cấm",
+    "channel_members": "Thành viên nhóm",
+    "Banned": "CẤM",
+    "saveClick": "Đã cấm thành viên!"
   },
-  "sidebarKeywordFiltering": {
+  "sidebarKeywordFiltering": 
+  {
     "title": "Lọc từ khóa",
     "save": "Lưu",
     "add_keyword": "Thêm từ khóa",
-    "add_message": "Thêm từ khóa để tự động xóa tin nhắn chứa nội dung không mong muốn trong kênh này",
-    "on_this_channel": "Trong kênh này",
-    "no_keyword": "Chưa có từ khóa nào.",
-    "max_characters": "Vui lòng nhập tối đa 3 ký tự",
-    "keyword_exists": "Từ khóa này đã tồn tại",
-    "add_success": "Từ khóa đã được thêm thành công!"
+    "add_message": "Thêm từ khóa để tự động xóa các nội dung không phù hợp trong nhóm này",
+    "on_this_channel": "TRONG NHÓM NÀY",
+    "no_keyword": "Chưa có từ khóa.",
+    "max_characters": "Từ khóa phải chứa ít nhất 3 ký tự",
+    "keyword_exists": "Từ khóa đã có trong danh sách",
+    "add_success": "Đã thêm từ khóa thành công!"
   },
-  "sidebarSearchMessage": {
-    "title": "Tìm kiếm tin nhắn",
+  "sidebarSearchMessage": 
+  {
+    "title": "Tìm tin nhắn",
     "search": "Tìm kiếm",
-    "no_message": "Không tìm thấy tin nhắn nào!",
-    "message": "Chúng tôi không tìm thấy tin nhắn nào. Thử từ khóa khác hoặc chia sẻ gì đó để bắt đầu."
+    "no_message": "Không tìm thấy tin nhắn!",
+    "message": "Không có tin nhắn nào phù hợp với tìm kiếm của bạn. Hãy thử một từ khác nhé"
   },
-  "newTopicDialog": {
-    "title": "Bắt đầu chủ đề mới",
-    "topic_name": "TÊN CHỦ ĐỀ",
-    "name_placeholder": "Bạn muốn thảo luận về điều gì?",
-    "topic_icon": "BIỂU TƯỢNG CHỦ ĐỀ",
-    "create_topic": "TẠO CHỦ ĐỀ",
+  "inviteFriendDialog": 
+  {
+    "title": "Thêm thành viên vào nhóm",
+    "search": "Tìm kiếm",
+    "invite": "MỜI",
+    "members": "THÀNH VIÊN",
+    "snackbar_success": "Đã gửi lời mời."
+  },
+  "newTopicDialog": 
+  {
+    "title": "Start a new topic",
+    "topic_name": "Tên chủ đề",
+    "name_placeholder": "Nội dung nào bạn muốn thảo luận?",
+    "topic_icon": "Biểu tượng cho chủ đề",
+    "create_topic": "TẠO",
     "topic_required": "Vui lòng nhập tên chủ đề",
-    "topic_success": "Đã tạo chủ đề thành công"
+    "topic_success": "Đã tạo chủ đề!"
   },
-  "noFile": {
-    "title": "Chưa có tệp nào ở đây",
-    "message": "Chia sẻ gì đó với bạn bè — tệp, liên kết hoặc media — và nó sẽ hiển thị ngay lập tức."
+  "noFile": 
+  {
+    "title": "Hmm.. Ở đây hơi trống nhỉ!",
+    "message": "Hãy chia sẻ gì đó với bạn bè - tệp tin, link hoặc tin nhắn thoại - và chúng sẽ xuất hiện ngay."
   },
-  "channelNotFound": {
-    "title": "Kênh không tìm thấy",
-    "message_up": "Liên kết bạn truy cập không khớp với bất kỳ kênh trò chuyện nào hiện có.",
-    "message_down": "Vui lòng kiểm tra lại liên kết hoặc quay lại trang chủ.",
-    "btn_message": "TRỞ LẠI"
+  "channelNotFound": 
+  {
+    "title": "Không tìm thấy nhóm nào",
+    "message_up": "Đường dẫn của bạn không được liên kết tới nhóm trò chuyện nào.",
+    "message_down": "Vui lòng kiểm tra lại đường dẫn hoặc quay về Trang chủ nhé.",
+    "btn_message": "Quay về Trang chủ"
   },
-  "channelConfirmDialog": {
-    "snackbar_leave": "Bạn đã rời khỏi kênh",
-    "snackbar_remove_member": "Xóa thành viên thành công!",
-    "snackbar_delete_channel": "Xóa kênh thành công!",
-    "snackbar_delete_moder": "Gỡ quản trị viên thành công!",
-    "snackbar_delete_history": "Xóa lịch sử trò chuyện thành công!",
-    "snackbar_blocked": "Đã chặn thành công",
-    "snackbar_unblocked": "Bỏ chặn thành công",
-    "snackbar_unbanned": "Bỏ cấm thành công",
-    "snackbar_delete_topic": "Xóa chủ đề thành công!",
-    "snackbar_confirm_leave_channel": "Bạn có chắc muốn rời kênh này không?",
-    "snackbar_confirm_remove_member": "Bạn có chắc muốn xóa thành viên này không?",
-    "snackbar_confirm_delete_one": "Khi kênh",
-    "snackbar_confirm_delete_two": "bị xóa, toàn bộ nội dung và lịch sử trò chuyện sẽ bị mất vĩnh viễn. Hành động này không thể hoàn tác.",
-    "snackbar_confirm_delete_three": "Bạn có chắc muốn tiếp tục không?",
-    "snackbar_confirm_remove_moder": "Bạn có chắc muốn gỡ vai trò quản trị viên của người dùng này không?",
+  "channelConfirmDialog": 
+  {
+    "snackbar_leave": "Bạn đã rời nhóm",
+    "snackbar_remove_member": "Đã xóa thành viên khỏi nhóm!",
+    "snackbar_delete_channel": "'Đã xóa nhóm!'",
+    "snackbar_delete_moder": "'Đã gỡ quyền quản trị viên!'",
+    "snackbar_delete_history": "'Đã xóa lịch sử trò chuyện!'",
+    "snackbar_blocked": "'Đã chặn người dùng'",
+    "snackbar_unblocked": "'Đã bỏ chặn người dùng.'",
+    "snackbar_unbanned": "'Đã gỡ cấm thành viên'",
+    "snackbar_delete_topic": "'Đã xóa chủ đề!'",
+    "snackbar_confirm_leave_channel": "'Bạn có chắc muốn rời nhóm này?'",
+    "snackbar_confirm_remove_member": "'Bạn có chắc muốn xóa thành viên này?'",
+    "snackbar_confirm_delete_one": "'Khi nhóm'",
+    "snackbar_confirm_delete_two": "'bị xóa, tất cả nội dung và lịch sử nhắn tin sẽ bị xóa vĩnh viễn và không thể hoàn tác.'",
+    "snackbar_confirm_delete_three": "'Bạn có tiếp tục xóa không?'",
+    "snackbar_confirm_remove_moder": "Bạn có chắc muốn gỡ quyền Quản trị viên của người này?",
     "snackbar_confirm_delete_conversation": "Toàn bộ lịch sử trò chuyện sẽ bị xóa vĩnh viễn.",
-    "snackbar_confirm_delete": "Bạn có chắc muốn xóa không?",
-    "snackbar_confirm_block": "Bạn có chắc muốn chặn người này không?",
-    "snackbar_confirm_block_message": "Người này sẽ không thể gửi tin nhắn cho bạn nữa",
-    "snackbar_confirm_unblock": "Bạn có chắc muốn bỏ chặn người này không?",
-    "snackbar_confirm_unblock_message": "Người này sẽ có thể gửi tin nhắn cho bạn trở lại",
-    "snackbar_confirm_unban": "Bạn có chắc muốn bỏ cấm người này không?",
-    "snackbar_confirm_unban_message": "Người này sẽ có thể gửi tin nhắn cho bạn trở lại",
-    "snackbar_confirm_delete_topic_one": "Khi chủ đề",
-    "snackbar_confirm_delete_topic_two": "bị xóa, toàn bộ nội dung và lịch sử trò chuyện sẽ bị mất vĩnh viễn. Hành động này không thể hoàn tác.",
-    "snackbar_confirm_proceed": "Bạn có chắc muốn tiếp tục không?",
-    "dialog_title_leave_channel": "Rời kênh này",
-    "dialog_title_remove_member_action": "Xóa thành viên này",
-    "dialog_title_delete_channel": "Bạn có chắc muốn xóa kênh này không?",
-    "dialog_title_remove_moderator": "Gỡ quản trị viên này",
-    "dialog_title_clear_history": "Xóa lịch sử trò chuyện",
-    "dialog_title_block_user": "Chặn người dùng này",
-    "dialog_title_unblock_user": "Bỏ chặn người dùng này",
-    "dialog_title_unban_user": "Bỏ cấm người dùng này",
-    "dialog_title_delete_topic": "Bạn có chắc muốn xóa chủ đề này không?",
-    "leave": "Rời",
-    "remove": "Xóa",
+    "snackbar_confirm_delete": "Bạn có chắc chắn muốn xóa?",
+    "snackbar_confirm_block": "Bạn có chắc muốn chặn người này?",
+    "snackbar_confirm_block_message": "Họ sẽ không thể gửi tin nhắn tới bạn nữa.",
+    "snackbar_confirm_unblock": "Bạn có chắc muốn bỏ chặn người này?",
+    "snackbar_confirm_unblock_message": "Họ sẽ có thể tiếp tục gửi tin nhắn tới bạn",
+    "snackbar_confirm_unban": "Bạn có chắc muốn gỡ cấm người này?",
+    "snackbar_confirm_unban_message": "Họ sẽ tiếp tục được gửi tin nhắn trong nhóm.",
+    "snackbar_confirm_delete_topic_one": "Khi chủ đề bị xóa,",
+    "snackbar_confirm_delete_topic_two": "tất cả nội dung và lịch sử trò chuyện sẽ bị xóa vĩnh viễn và không thể hoàn tác.",
+    "snackbar_confirm_proceed": "Bạn vẫn muốn xóa?",
+    "dialog_title_leave_channel": "Rời nhóm",
+    "dialog_title_remove_member_action": "Xóa thành viên",
+    "dialog_title_delete_channel": "Bạn có chắc muốn xóa nhóm này?",
+    "dialog_title_remove_moderator": "Gỡ quyền Quản trị viên",
+    "dialog_title_clear_history": "Xóa lịch sử tin nhắn",
+    "dialog_title_block_user": "Chặn người dùng",
+    "dialog_title_unblock_user": "Bỏ chặn người dùng",
+    "dialog_title_unban_user": "Gỡ cấm người dùng",
+    "dialog_title_delete_topic": "Bạn có chắc muốn xóa chủ đề này?",
+    "leave": "Rời nhóm",
+    "remove": "Gỡ",
     "delete": "Xóa",
     "clear": "Xóa",
     "block": "Chặn",
     "unblock": "Bỏ chặn",
-    "unban": "Bỏ cấm",
+    "unban": "Gỡ cấm",
     "yes": "Có",
-    "snackbar_error_delete_channel": "Xóa kênh thất bại. Vui lòng thử lại",
-    "snackbar_error_delete_chat": "Xóa trò chuyện thất bại. Vui lòng thử lại",
-    "snackbar_error_block_user": "Chặn người dùng thất bại. Vui lòng thử lại",
-    "snackbar_error_unblock_user": "Bỏ chặn người dùng thất bại. Vui lòng thử lại",
-    "snackbar_error_unban_user": "Bỏ cấm người dùng thất bại. Vui lòng thử lại",
-    "snackbar_error_delete_topic": "Xóa chủ đề thất bại. Vui lòng thử lại",
+    "snackbar_error_delete_channel": "Không thể xóa nhóm. Vui lòng thử lại",
+    "snackbar_error_delete_chat": "Không thể xóa cuộc trò chuyện. Vui lòng thử lại",
+    "snackbar_error_block_user": "Không thể chặn người dùng. Vui lòng thử lại",
+    "snackbar_error_unblock_user": "Không thể bỏ chặn người dùng. Vui lòng thử lại",
+    "snackbar_error_unban_user": "Không thể gỡ cấm thành viên. Vui lòng thử lại",
+    "snackbar_error_delete_topic": "Không thể xóa chủ đề. Vui lòng thử lại",
     "cancel": "Hủy"
   },
-  "topicPanel": {
-    "topic_waiting": "Chủ đề đang chờ!",
-    "message": "Chúng tôi đã chuyển các tin nhắn cũ sang “General”. Bắt đầu một chủ đề mới bất cứ lúc nào!",
-    "New_topic": "CHỦ ĐỀ MỚI",
-    "info_channel": "Thông tin kênh",
-    "search": "Tìm tin nhắn",
+  "topicPanel": 
+  {
+    "topic_waiting": "Chủ đề đã sẵn sàng!",
+    "message": "Tin nhắn cũ đã được chuyển tới Chủ đề chung. Hãy tạo thêm chủ đề khác!",
+    "New_topic": "Chủ đề mới",
+    "info_channel": "Thông tin nhóm",
+    "search": "Tìm kiếm tin nhắn",
     "add_member": "Thêm thành viên",
-    "new_topic": "Chủ đề mới",
+    "new_topic": "Thêm chủ đề mới",
     "member": "thành viên"
   },
-  "topicElement": {
+  "topicElement": 
+  {
     "sticker": "Nhãn dán",
-    "no_message": "Chưa có tin nhắn nào ở đây",
-    "unpinned": "Bỏ ghim khỏi đầu",
+    "no_message": "Không có tin nhắn nào",
+    "unpinned": "Bỏ ghim",
     "pinned": "Ghim lên đầu",
     "delete_topic": "Xóa chủ đề",
     "you": "Bạn",
     "photo": "Ảnh"
   },
-  "sidebarMembers": {
+  "sidebarMembers": 
+  {
     "title": "Thành viên",
-    "no_result": "Không có kết quả cho",
+    "no_result": "Không tìm thấy kết quả phù hợp cho",
     "members": "Thành viên",
-    "invite_members": "Mời thành viên",
+    "invite_members": "Thành viên đã mời",
     "search": "Tìm kiếm"
   },
-  "sidebarTopicInfo": {
-    "topic_name": "TÊN CHỦ ĐỀ",
-    "topic_icon": "BIỂU TƯỢNG CHỦ ĐỀ",
-    "save": "LƯU",
-    "placeholder": "Bạn muốn thảo luận về điều gì?",
-    "Description": "MÔ TẢ",
-    "description_placeholder": "Mô tả",
-    "words": "ký tự",
+  "sidebarTopicInfo": 
+  {
+    "topic_name": "Tên chủ đề",
+    "topic_icon": "Biểu tượng chủ đề",
+    "save": "Lưu",
+    "placeholder": "Bạn muốn thảo luận nội dung gì?",
+    "Description": "Mô tả",
+    "description_placeholder": "Nhập mô tả",
+    "words": "từ",
     "max_characters": "Tối đa 255 ký tự",
     "channel_name_required": "Vui lòng nhập tên chủ đề",
-    "snackbar_update_success": "Cập nhật kênh thành công",
-    "snackbar_update_error": "Cập nhật chủ đề thất bại. Vui lòng thử lại."
+    "snackbar_update_success": "Đã cập nhật cho chủ đề thành công",
+    "snackbar_update_error": "Không thể cập nhật chủ đề. Vui lòng thử lại"
   },
-  "leftPanel": {
-    "sent": "gửi",
-    "file": "một tệp",
+  "leftPanel": 
+  {
+    "sent": "đã gửi",
+    "file": "một tệp tin",
     "photo": "một ảnh",
-    "linkPreview": "một bản xem trước liên kết",
+    "linkPreview": "Bản xem trước link",
     "video": "một video",
-    "voiceRecording": "một bản ghi âm",
+    "voiceRecording": "một tin nhắn thoại",
     "attachment": "một tệp đính kèm",
     "photo_videos": "ảnh và video",
-    "files": "tệp",
-    "mention_all": "đã nhắc đến tất cả mọi người trong ",
-    "mentioned_by": "Bạn được nhắc đến bởi ",
+    "files": "tệp tin",
+    "mention_all": "nhắc đến mọi người trong",
+    "mentioned_by": "Bạn được nhắc đến bởi",
     "in": "trong",
-    "reacted": "đã phản ứng ",
+    "reacted": "bày tỏ cảm xúc",
     "your_message": "với tin nhắn của bạn",
-    "alert": "Trình duyệt của bạn không hỗ trợ tính năng thông báo này.",
-    "chat_type_team": "Bạn có lời mời tham gia kênh mới",
-    "chat_type_dm": "Bạn có lời mời tham gia tin nhắn trực tiếp mới",
-    "member_banned": "Bạn đã bị chặn trong kênh này",
-    "member_unbanned": "Bạn đã được bỏ chặn trong kênh này"
+    "alert": "Không được hỗ trợ thông báo cho trình duyệt này!",
+    "chat_type_team": "Bạn có lời mời vào nhóm",
+    "chat_type_dm": "Bạn có lời mời kết bạn",
+    "member_banned": "Bạn bị cấm tương tác trong nhóm này",
+    "member_unbanned": "Bạn được gỡ cấm"
   },
-  "snackbar_profile_success": "Cập nhật hồ sơ thành công",
-  "channelInfoTab": {
-    "media": "Ảnh,Video",
-    "files": "Thư mục",
-    "links": "Liên kết",
+  "snackbar_profile_success": "Đã cập nhật hồ sơ cá nhân!",
+  "channelInfoTab": 
+  {
+    "media": "Ảnh, video",
+    "files": "Tệp tin",
+    "links": "Links",
     "members": "Thành viên"
   },
-  "readBy": {
+  "readBy": 
+  {
     "invalid": "Ngày không hợp lệ",
     "tooltip": "thành viên đã xem",
     "member": "thành viên",
-    "members": "Thành viên",
-    "message": "đã xem tin nhắn",
+    "members": "thành viên",
+    "message": "đã xem",
     "sent": "Đã gửi"
   },
-  "memberElement": {
+  "memberElement": 
+  {
     "moderator": "Quản trị viên",
-    "owner": "Chủ kênh",
+    "owner": "Chủ nhóm",
     "member": "Thành viên",
-    "pending": "Đang chờ"
+    "pending": "Đã mời"
   },
-  "blockedBackdrop": {
-    "message": "Bạn đã chặn",
+  "blockedBackdrop": 
+  {
+    "message": "Đã chặn",
     "unblock": "Bỏ chặn"
   },
-  "messageSignal": {
+  "messageSignal": 
+  {
     "outgoing_audio_call": "Cuộc gọi thoại đi",
-    "missed_audio_call": "Bạn đã bỏ lỡ cuộc gọi thoại",
+    "missed_audio_call": "Bạn bị nhỡ cuộc gọi thoại",
     "incoming_audio_call": "Cuộc gọi thoại đến",
-    "cancel_audio_call": "Bạn đã hủy cuộc gọi thoại",
+    "cancel_audio_call": "Bạn hủy cuộc gọi thoại",
     "outgoing_video_call": "Cuộc gọi video đi",
-    "missed_video_call": "Bạn đã bỏ lỡ cuộc gọi video",
+    "missed_video_call": "Bạn bị nhỡ cuộc gọi video",
     "incoming_video_call": "Cuộc gọi video đến",
-    "cancel_video_call": "Bạn đã hủy cuộc gọi video",
-    "recipient_rejected_audio_call": "Người nhận đã từ chối cuộc gọi thoại",
-    "rejected_audio_call": "Bạn đã từ chối cuộc gọi thoại",
-    "recipient_rejected_video_call": "Người nhận đã từ chối cuộc gọi video",
-    "rejected_video_call": "Bạn đã từ chối cuộc gọi video",
-    "recipient_was_busy": "Người nhận đang bận",
+    "cancel_video_call": "Bạn hủy cuộc gọi video",
+    "recipient_rejected_audio_call": "Người nhận từ chối cuộc gọi thoại",
+    "rejected_audio_call": "Bạn từ chối cuộc gọi thoại",
+    "recipient_rejected_video_call": "Người nhận từ chối cuộc gọi video",
+    "rejected_video_call": "Bạn từ chối cuộc gọi video",
+    "recipient_was_busy": "Người nhận bận",
     "min": "phút",
     "sec": "giây"
   },
-  "forwardMessageDialog": {
+  "forwardMessageDialog": 
+  {
     "title": "Chuyển tiếp tin nhắn",
-    "search": "Chuyển tiếp đến...",
-    "sent": "Gửi",
+    "search": "Chuyển đến...",
+    "sent": "Đã gửi",
     "resend": "Gửi lại",
     "send": "Gửi",
     "noResult": "Không có kết quả",
-    "snackbar_sendForward_error": "Bạn không có quyền chuyển tiếp tin nhắn trong kênh này",
-    "snackbar_sendForward_success": "Chuyển tiếp tin nhắn thành công",
-    "snackbar_sendForward_failed": "Chuyển tiếp tin nhắn thất bại. Vui lòng thử lại."
+    "snackbar_sendForward_error": "Bạn không được gửi tin nhắn trong nhóm này",
+    "snackbar_sendForward_success": "Đã chuyển tiếp tin nhắn!",
+    "snackbar_sendForward_failed": "Không thể chuyển tiếp tin nhắn. Vui lòng thử lại"
   },
-  "from": "từ",
-  "unpinMessageDialog": {
-    "title": "Bỏ ghim tin nhắn này?",
-    "message_up": "Bạn có chắc muốn bỏ ghim tin nhắn này không?",
-    "message_down": "Nó sẽ không còn xuất hiện ở đầu cuộc trò chuyện.",
+  "from": "Từ",
+  "unpinMessageDialog": 
+  {
+    "title": "Bỏ ghim tin nhắn?",
+    "message_up": "Bạn có chắc muốn bỏ ghim tin nhắn này?",
+    "message_down": "Tin nhắn sẽ không hiển thị ở đầu cuộc trò chuyện nữa.",
     "cancel": "Hủy",
     "unpin": "Bỏ ghim",
-    "snackbar_submit_error": "Bỏ ghim tin nhắn không thành công. Vui lòng thử lại.",
-    "snackbar_submit_success": "Đã bỏ ghim tin nhắn thành công"
+    "snackbar_submit_error": "Không thể bỏ ghim tin nhắn. Vui lòng thử lại",
+    "snackbar_submit_success": "Đã bỏ ghim tin nhắn!"
   },
-  "deleteMessageDialog": {
-    "title": "Xóa tin nhắn này?",
-    "message": "Bạn có chắc muốn xóa tin nhắn này không?",
+  "deleteMessageDialog": 
+  {
+    "title": "Xóa tin nhắn?",
+    "message": "Bạn có chắc muốn xóa tin nhắn?",
     "cancel": "Hủy",
-    "yes": "Có"
+    "yes": "Xóa tin nhắn"
   },
-  "replyMessageBox": {
-    "reply_to": "Trả lời đến"
+  "replyMessageBox": 
+  {
+    "reply_to": "Trả lời"
   },
-  "inviteElement": {
-    "admin_invite": "Được quản trị viên mời vào kênh",
-    "join": "THAM GIA",
-    "decline": "TỪ CHỐI",
-    "skip": "BỎ QUA",
-    "accept": "CHẤP NHẬN",
-    "message": "Bạn có lời mời tham gia kênh mới",
-    "snackbar_onSkip_success": "Bạn đã bỏ qua lời mời thành công!",
-    "snackbar_onAccept_success": "Bạn đã chấp nhận lời mời thành công!",
-    "snackbar_onDecline_success": "Bạn đã từ chối lời mời thành công!"
+  "inviteElement": 
+  {
+    "admin_invite": "Quản trị viên đã mời bạn",
+    "join": "Tham gia",
+    "decline": "Từ chối",
+    "skip": "Bỏ qua",
+    "accept": "Chấp nhận",
+    "message": "đã gửi lời mời kết bạn tới bạn",
+    "snackbar_onAccept_success": "Đã chấp nhận lời mời!",
+    "snackbar_onDecline_success": "Đã từ chối lời mời!"
   },
-  "quickReactions": {
-    "snackbar_error": "Bạn không có quyền phản ứng với tin nhắn trong kênh này"
+  "quickReactions": 
+  {
+    "snackbar_error": "Bạn không được thả biểu tượng cảm xúc trong nhóm này"
   },
-  "sidebarPermissions": {
+  "sidebarPermissions": 
+  {
     "permissions": "Quyền hạn",
     "off": "Tắt",
     "send_messages": "Gửi tin nhắn",
-    "send_links": "Gửi liên kết",
+    "send_links": "Gửi Links",
     "edit_messages": "Chỉnh sửa tin nhắn",
     "delete_messages": "Xóa tin nhắn",
-    "react_messages": "Phản ứng tin nhắn",
+    "react_messages": "Thả biểu tượng cảm xúc",
     "pin_messages": "Ghim tin nhắn",
-    "create_poll": "Tạo cuộc khảo sát",
-    "vote_poll": "Bỏ phiếu",
-    "update_cooldown_success": "Cập nhật thời gian chờ tin nhắn thành công!",
-    "update_capabilities_success": "Cập nhật quyền hạn thành công!",
-    "save": "LƯU",
-    "member_actions": "HÀNH ĐỘNG THÀNH VIÊN",
-    "slow_mode": "CHẾ ĐỘ CHẬM",
-    "message": "Thiết lập khoảng thời gian chờ giữa các tin nhắn mà mỗi thành viên có thể gửi."
+    "create_poll": "Tạo bình chọn",
+    "vote_poll": "Lựa chọn phương án bình chọn",
+    "update_cooldown_success": "Đã cập nhật cho chế độ gửi chậm!",
+    "update_capabilities_success": "Đã cập nhật quyền hạn thành viên!",
+    "save": "Lưu",
+    "member_actions": "Cho phép thành viên",
+    "slow_mode": "Chế độ gửi chậm",
+    "message": "Cài đặt thời gian cho phép thành viên được gửi tin nhắn tiếp theo."
   },
-  "editMessageBox": {
+  "editMessageBox": 
+  {
     "edit_messages": "Chỉnh sửa tin nhắn"
   },
-  "new_login": {
+  "new_login": 
+  {
     "phone_required": "Vui lòng nhập số điện thoại",
     "phone_invalid": "Số điện thoại không hợp lệ",
-    "email_required": "Vui lòng nhập email",
+    "email_required": "Vui lòng nhập địa chỉ email",
     "email_invalid": "Địa chỉ email không hợp lệ",
-    "otp_send_failed": "Gửi mã OTP thất bại. Vui lòng thử lại",
-    "otp_verification_failed": "Xác minh OTP không thành công. Vui lòng thử lại.",
-    "otp_resent_success": "Mã OTP đã được gửi lại thành công.",
-    "otp_resend_failed": "Gửi lại OTP không thành công. Vui lòng thử lại.",
-    "title": "Kiểm tra tin nhắn của bạn",
-    "verification_one_time_code": "Mã xác minh một lần của bạn đã được gửi tới",
-    "verify_otp": "XÁC MINH OTP",
+    "otp_send_failed": "Không thể gửi OTP. Vui lòng thử lại.",
+    "otp_verification_failed": "Xác minh OTP thất bại. Vui lòng thử lại.",
+    "otp_resent_success": "Đã gửi lại mã OTP.",
+    "otp_resend_failed": "Không thể gửi lại OTP. Vui lòng thử lại.",
+    "title": "Vui lòng kiểm tra tin nhắn của bạn",
+    "verification_one_time_code": "Mã OTP đã được gửi đến",
+    "verify_otp": "Xác minh OTP",
     "send_again": "Gửi lại",
-    "enter_phone": "Nhập số điện thoại của bạn để đăng nhập.",
+    "enter_phone": "Nhập số điện thoại để đăng nhập",
     "phone_placeholder": "Số điện thoại",
     "message_up": "Tôi đồng ý với",
     "message_down": "Điều khoản dịch vụ",
     "message_policy": "Chính sách",
     "sign_in": "ĐĂNG NHẬP",
-    "enter_email": "Nhập email của bạn để đăng nhập.",
-    "or_sign_in": "Hoặc đăng nhập bằng",
-    "snackbar_google_login_failed": "Đăng nhập bằng Google không thành công. Vui lòng thử lại."
+    "enter_email": "Nhập email để đăng nhập",
+    "or_sign_in": "Hoặc đăng nhập với",
+    "snackbar_google_login_failed": "Đăng nhập Google đã thất bại. Vui lòng thử lại."
   },
-  "index_login": {
-    "title_one": "Chào mừng đến với Uhmm...",
-    "description_one": "Uhmm... không chỉ là một ứng dụng chat — mà còn là trung tâm phi tập trung cho sự cộng tác nhóm an toàn, thời gian thực.\nĐược xây dựng cho Web3, tạo ra dành cho bạn.",
-    "title_two": "Thông minh. An toàn. On-Chain.",
-    "description_two": "Được hỗ trợ bởi blockchain, tin nhắn của bạn luôn được mã hóa, xác thực,\nvà chống giả mạo - với quyền sở hữu dữ liệu nằm trong tay bạn.",
-    "title_three": "Sẵn sàng cho lực lượng lao động",
-    "description_three": "Được thiết kế cho DAO, startup và các nhóm toàn cầu đang đón nhận sự phi tập trung.\nUhmm... là lớp giao tiếp tất cả trong một, sẵn sàng cho tương lai."
+  "index_login": 
+  {
+  "title_one": "Chào mừng đến với Uhmm...",
+  "description_one": "Uhmm... không chỉ là ứng dụng chat - mà còn là không gian giao tiếp an toàn và linh hoạt cho mọi đội nhóm. \nXây dựng trên Web3, dành riêng cho bạn.",
+  "title_two": "Thông minh. Bảo mật. On-Chain.",
+  "description_two": "Ứng dụng vận hành bằng công nghệ blockchain, giúp tin nhắn luôn được mã hóa, xác thực,\nvà chống chỉnh sửa — quyền dữ liệu thuộc về chính bạn.",
+  "title_three": "Sẵn sàng cho công việc",
+  "description_three": "Phù hợp cho DAOs, startup và các nhóm làm việc toàn cầu. \nUhmm... mang đến một nền tảng trò chuyện hiện đại, tiện lợi và bền vững."
   },
-  "register": {
-    "title": "Hãy bắt đầu với Ermis.",
-    "message": "Đã có tài khoản",
+  "register": 
+  {
+    "title": "Bắt đầu ngay với Ermis.",
+    "message": "Đã có tài khoản?",
     "sign_in": "Đăng nhập",
-    "email_label": "Địa chỉ Email",
+    "email_label": "Địa chỉ email",
     "password_label": "Mật khẩu",
-    "text": "mật khẩu",
+    "text": "text",
     "create_account": "Tạo tài khoản",
     "email_required": "Vui lòng nhập email",
-    "email_valid": "Địa chỉ email này đã tồn tại",
+    "email_valid": "Địa chỉ email phải hợp lệ",
     "password_required": "Vui lòng nhập mật khẩu"
   },
-  "forgot_password": {
+  "forgot_password": 
+  {
     "code_required": "Vui lòng nhập mã xác minh",
     "password_required": "Vui lòng nhập mật khẩu",
     "new_password": "Mật khẩu mới",
     "password": "mật khẩu",
-    "text": "mật khẩu",
-    "reset_password": "Đặt lại mật khẩu",
+    "text": "text",
+    "reset_passsword": "Đặt lại mật khẩu",
     "email_required": "Vui lòng nhập email",
-    "email_invalid": "Địa chỉ email không hợp lệ",
+    "email_invalid": "Email không hợp lệ",
     "title": "Quên mật khẩu?",
-    "message": "Vui lòng nhập địa chỉ email liên kết với tài khoản của bạn, chúng tôi sẽ gửi mã xác minh qua email để bạn đặt lại mật khẩu.",
-    "email_label": "Địa chỉ Email",
+    "message": "Hãy nhập địa chỉ email bạn dùng để đăng ký tài khoản. Chúng tôi sẽ gửi cho bạn mã xác minh để đặt lại mật khẩu.",
+    "email_label": "Địa chỉ email",
     "send_request": "Gửi yêu cầu",
     "return_sign_in": "Quay lại đăng nhập"
   },
-  "login_email": {
+  "login_email": 
+  {
     "title": "Quên mật khẩu?",
     "login": "Đăng nhập",
-    "email_label": "Địa chỉ Email",
-    "password_label": "Password",
-    "text": "Mật khẩu",
-    "email_required": "Vui lòng nhập email",
-    "email_valid": "Địa chỉ email này đã tồn tại",
-    "password_required": "Vui lòng nhập mật khẩu"
+    "email_label": "Địa chỉ email",
+    "password_label": "Mật khẩu",
+    "text": "text",
+    "email_required":"Vui lòng nhập email",
+    "email_valid":"Email không hợp lệ",
+    "password_required":"Vui lòng nhập mật khẩu"
   },
-  "login_wallet": {
-    "address": "Địa chỉ",
+  "login_wallet": 
+  {
+    "address": "Địa chỉ ví",
     "wallet": "Ví",
     "network": "Mạng",
-    "disconnect": "Mất kết nối",
-    "sign": "Kí xác thực",
-    "login_wallet": "Đăng nhập qua ví"
+    "disconnect": "Ngắt kết nối",
+    "sign": "Ký",
+    "login_wallet": "Đăng nhập bằng Ví"
   },
-  "login_token": {
+  "login_token": 
+  {
     "login": "Đăng nhập",
-    "user_id": "ID người dùng",
-    "token": "mã xác minh",
-    "user_required": "Vui lòng nhập tên người dùng",
-    "token_required": "Vui lòng nhập mã xác minh"
+    "user_id": "User ID",
+    "token": "Token",
+    "user_required": "Vui lòng nhập User ID",
+    "token_required": "Vui lòng nhập Token"
   },
-  "login_ermis": {
-    "login": "Đăng nhập đến Ermis"
+  "login_ermis": 
+  {
+    "login": "Đăng nhập vào Ermis"
   },
   "auth": {
-    "password_forgot_success": "Yêu cầu đặt lại mật khẩu của bạn đã được gửi thành công. Vui lòng kiểm tra email của bạn để tiếp tục!",
-    "password_reset_success": "Mật khẩu của bạn đã được đặt lại thành công. Vui lòng sử dụng mật khẩu mới để đăng nhập!"
+  "password_forgot_success": "Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng kiểm tra email để tiếp tục!",
+  "password_reset_success": "Bạn đã đặt lại mật khẩu thành công. Vui lòng đăng nhập lại!"
   },
-  "recordingAudioBox": {
-    "snackbar_upload_failed": "Tải đoạn ghi âm không thành công",
-    "snackbar_cannot_microphone": "Không thể truy cập microphone",
-    "cancel": "Quay lại"
+  "recordingAudioBox": 
+  {
+    "upload_audio_failed": "Tải lên thất bại",
+    "snackbar_cannot_microphone": "Không thể truy cập micro",
+    "cancel": "Hủy"
   },
-  "uploadFilesDialog": {
-    "file_size_maximum": "Kích thước tệp vượt quá giới hạn. Dung lượng tối đa cho phép: 100MB.",
-    "upload_file_failed": "Tải lên thất bại. Vui lòng thử lại.",
-    "sent_photo": "Gửi ảnh",
-    "sent_video": "Gửi video",
-    "sent": "Gửi",
-    "sent_file": "Gửi file",
+  "uploadFilesDialog": 
+  {
+    "file_size_maximum": "Kích thước tệp tin vượt quá giới hạn 100MB",
+    "upload_file_failed": "Tải lên thất bại. Vui lòng thử lại",
+    "sent_photo": "Đã gửi 1 ảnh",
+    "sent_video": "Đã gửi 1 video",
+    "sent": "Đã gửi",
     "photo_videos": "ảnh và video",
-    "photos": "Ảnh",
-    "videos": "videos",
-    "file": "Tệp",
-    "files": "Tệp"
+    "photos": "ảnh",
+    "videos": "video",
+    "file": "tệp tin",
+    "files": "tệp tin"
   },
-  "emojiPickerPopover": {
-    "emoji": "Cảm xúc",
+  "emojiPickerPopover": 
+  {
+    "emoji": "Biểu tượng cảm xúc",
     "sticker": "Nhãn dán",
-    "title": "Trình chọn nhãn dán"
+    "title": "Chọn nhãn dán"
   },
-  "pollResultDialog": {
-    "title": "Kết quả bỏ phiếu",
-    "no_voted": "Không ai bỏ phiếu"
+  "pollResultDialog": 
+  {
+    "title": "Kết quả bình chọn",
+    "no_voted": "Không có lượt bình chọn"
   },
-  "delete_account": {
+  "delete_account": 
+  {
     "title": "Xác nhận xóa tài khoản",
-    "message": "Việc xóa tài khoản của bạn sẽ dẫn đến:",
+    "message": "Xóa tài khoản sẽ khiến:",
     "list_message_fisrt-strong": "Mất toàn bộ dữ liệu",
-    "list_message_fisrt": ":Tất cả thông tin cá nhân, lịch sử trò chuyện và danh bạ trên nền tảng Ermis sẽ bị xóa vĩnh viễn và không thể khôi phục.",
-    "list_message_two-strong": "Không ảnh hưởng đến các cuộc trò chuyện được tích hợp qua SDK.",
-    "list_message_two": ": Mọi cuộc trò chuyện được tích hợp thông qua SDK sẽ không bị ảnh hưởng.",
-    "message_question": "Bạn có chắc muốn xóa tài khoản?",
+    "list_message_fisrt": ": Mọi thông tin cá nhân, lịch sử trò chuyện và liên hệ trên Uhm sẽ bị xóa vĩnh viễn và không thể khôi phục.",
+    "list_message_two-strong": "Không ảnh hưởng đến các đoạn chat tích hợp qua SDK",
+    "list_message_two": ": Những đoạn hội thoại được tích hợp thông qua SDK sẽ vẫn được giữ nguyên.",
+    "message_question": "Bạn có chắc chắn muốn xóa không?",
     "cancel": "Hủy",
     "delete": "Xóa",
-    "connect_wallet": "Kết nối ví"
+    "connect_wallet": "Liên kết Ví"
+  },
+  "commons": 
+  {
+    "snackbar_wrong_error": "Có lỗi xảy ra",
+    "snackbar_server_error": "Lỗi hệ thống"
   },
   "wallet": {
-    "delete_account": "Tài khoản của bạn đã được xóa thành công"
+    "delete_account": "Tài khoản của bạn đã bị xóa!"
   },
-  "channelInvitation": {
-    "message": "Chấp nhận lời mời để xem tất cả tin nhắn của mục này",
-    "channel": "kênh",
+  "channelInvitation": 
+  {
+    "message": "Chấp nhận lời mời để xem được tất cả tin nhắn trong",
+    "channel": "nhóm",
     "conversation": "cuộc trò chuyện",
     "accept": "Chấp nhận",
     "decline": "Từ chối",
     "skip": "Bỏ qua"
   },
-  "messageHistoryDialog": {
+  "messageHistoryDialog": 
+  {
     "title": "Lịch sử tin nhắn"
   },
-  "sidebarUserInfo": {
+  "sidebarUserInfo": 
+  {
     "invitation": "Đã gửi lời mời",
-    "invite_failed": "Gửi lời mời thất bại. Vui lòng thử lại",
-    "chat": "Trò chuyện",
-    "add_contact": "Thêm liên hệ",
+    "invite_failed": "Không thể gửi lời mời. Vui lòng thử lại.",
+    "chat": "Nhắn tin",
+    "add_contact": "Thêm vào danh bạ",
     "unblock": "Bỏ chặn người dùng",
     "block": "Chặn người dùng"
   },
-  "noMessageBox": {
-    "no_message": "Hãy bắt đầu cuộc trò chuyện này bằng những câu chuyện thật hay nhé!"
+  "noMessageBox": 
+  {
+    "no_message": "Bắt đầu hành trình trò chuyện với những điều thật thú vị nhé!"
   },
-  "online": "Trực tuyến",
-  "offline": "Ngoại tuyến"
+  "online": "Đang hoạt động",
+  "offline": "Không hoạt động"
 }
