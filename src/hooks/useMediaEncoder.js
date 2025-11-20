@@ -119,7 +119,11 @@ export const useMediaEncoder = nodeRef => {
     }
   }, []);
 
-  const initEncoders = useCallback(async () => {
+  const initEncoders = useCallback(async videoTrack => {
+    const settings = videoTrack.getSettings();
+    const videoWidth = settings.width || 1280;
+    const videoHeight = settings.height || 720;
+
     // init video encoder
     const videoEncoder = new VideoEncoder({
       output: (chunk, metadata) => {
@@ -129,8 +133,8 @@ export const useMediaEncoder = nodeRef => {
 
           videoConfigRef.current = {
             codec: metadata.decoderConfig.codec ?? 'hev1.1.6.L93.B0',
-            codedWidth: metadata.decoderConfig.codedWidth ?? 1280,
-            codedHeight: metadata.decoderConfig.codedHeight ?? 720,
+            codedWidth: metadata.decoderConfig.codedWidth ?? videoWidth,
+            codedHeight: metadata.decoderConfig.codedHeight ?? videoHeight,
             frameRate: metadata.decoderConfig.framerate ?? 30.0,
             description: base64Description,
             orientation: 0,
@@ -146,12 +150,12 @@ export const useMediaEncoder = nodeRef => {
           // const timestamp = chunk.timestamp / 1000;
           const timestamp = Math.floor(chunk.timestamp / 1000);
 
-          console.log('🎥 Video Frame:', {
-            type: chunk.type,
-            timestamp: `${timestamp}ms`,
-            originalTimestamp: `${chunk.timestamp}µs`,
-            size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
-          });
+          // console.log('🎥 Video Frame:', {
+          //   type: chunk.type,
+          //   timestamp: `${timestamp}ms`,
+          //   originalTimestamp: `${chunk.timestamp}µs`,
+          //   size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
+          // });
 
           const packet = createPacketWithHeader(data, timestamp, type);
           sendPacketOrQueue(packet, 'video');
@@ -162,8 +166,8 @@ export const useMediaEncoder = nodeRef => {
 
     videoEncoder.configure({
       codec: 'hev1.1.6.L93.B0',
-      width: 1280,
-      height: 720,
+      width: videoWidth,
+      height: videoHeight,
       bitrate: 800000,
       framerate: 30,
       latencyMode: 'realtime',
@@ -195,11 +199,11 @@ export const useMediaEncoder = nodeRef => {
           // const timestamp = chunk.timestamp / 1000;
           const timestamp = Math.floor(chunk.timestamp / 1000);
 
-          console.log('🔊 Audio Chunk:', {
-            timestamp: `${timestamp}ms`,
-            originalTimestamp: `${chunk.timestamp}µs`,
-            size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
-          });
+          // console.log('🔊 Audio Chunk:', {
+          //   timestamp: `${timestamp}ms`,
+          //   originalTimestamp: `${chunk.timestamp}µs`,
+          //   size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
+          // });
 
           const packet = createPacketWithHeader(data, timestamp, 'audio');
           sendPacketOrQueue(packet, 'audio');
@@ -219,16 +223,16 @@ export const useMediaEncoder = nodeRef => {
   }, []);
 
   const mediaEncoder = useCallback(localStream => {
-    initEncoders();
+    const videoTrack = localStream.getVideoTracks()[0];
+    const audioTrack = localStream.getAudioTracks()[0];
+    initEncoders(videoTrack);
 
     // Process video
-    const videoTrack = localStream.getVideoTracks()[0];
     const videoProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
     const videoReader = videoProcessor.readable.getReader();
     processVideoFrames(videoReader);
 
     // Process audio
-    const audioTrack = localStream.getAudioTracks()[0];
     const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
     const audioReader = audioProcessor.readable.getReader();
     processAudioFrames(audioReader);

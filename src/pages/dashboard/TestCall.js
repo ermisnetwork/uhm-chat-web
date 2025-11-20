@@ -5,6 +5,7 @@ import ClipboardCopy from '../../components/ClipboardCopy';
 import { useMediaEncoder } from '../../hooks/useMediaEncoder';
 // import { useMediaDecoder } from '../../hooks/useMediaDecoder';
 import { useMediaDecoderSync } from '../../hooks/useMediaDecoderSync';
+// import { useMediaDecoderLowLatency } from '../../hooks/useMediaDecoderLowLatency';
 
 const TestCall = () => {
   const nodeRef = useRef(null);
@@ -39,7 +40,14 @@ const TestCall = () => {
 
   const startLocalStream = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 48000,
+        },
+      });
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
