@@ -1,43 +1,27 @@
-import {
-  Stack,
-  Box,
-  Typography,
-  IconButton,
-  Tooltip,
-  Popover,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Radio,
-  Button,
-  LinearProgress,
-  styled,
-  useTheme,
-} from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
-import { MessageType } from '../../constants/commons-const';
-import {
-  onDeleteMessage,
-  onEditMessage,
-  onForwardMessage,
-  onReplyMessage,
-  onUnPinMessage,
-} from '../../redux/slices/messages';
-import { ForwardIcon, QuoteDownIcon, ThreeDotsIcon } from '../Icons';
-import { checkPermissionDeleteMessage, downloadFile } from '../../utils/commons';
-import { SetCooldownTime } from '../../redux/slices/channel';
 import { 
-  Copy, 
-  PushPin, 
-  PushPinSimpleSlash, 
-  Trash, 
-  Download, 
-  PencilSimple
-} from 'phosphor-react';
+    Box, 
+    IconButton, 
+    List, 
+    ListItem, 
+    ListItemButton, 
+    ListItemIcon, 
+    ListItemText, 
+    Popover, 
+    styled, 
+    Tooltip,
+    useTheme, 
+} from '@mui/material';
+import { showSnackbar } from '../../redux/slices/app';
+import { onDeleteMessage, onEditMessage, onReplyMessage } from '../../redux/slices/conversation';
+import { onUnPinMessage } from '../../redux/slices/channel';
+import { SetCooldownTime } from '../../redux/slices/cooldown';
+import { MessageType } from '../../constants/commons-const';
+import { ThreeDotsIcon } from '../Icons';
+import { checkPermissionDeleteMessage, downloadFile } from '../../utils/commons';
+import { useTranslation } from 'react-i18next';
+import { Copy, Download, PencilSimple, PushPin, PushPinSimpleSlash, Trash } from 'phosphor-react';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.background.neutral,
@@ -268,65 +252,4 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
   );
 };
 
-const MessageOption = ({ isMyMessage, message }) => {
-  const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const { isGuest } = useSelector(state => state.channel);
-
-  const [isOpen, setIsOpen] = useState(false);
-  const isForward = [MessageType.Regular, MessageType.Sticker].includes(message.type);
-  const orderReply = isMyMessage ? 3 : 1;
-  const orderForward = 2;
-  const orderMore = isMyMessage ? 1 : 3;
-
-  const onReply = () => {
-    dispatch(onReplyMessage(message));
-    dispatch(onEditMessage(null));
-  };
-
-  const onForward = () => {
-    dispatch(
-      onForwardMessage({
-        openDialog: true,
-        message,
-      }),
-    );
-  };
-
-  if (isGuest) return null;
-
-  return (
-    <Box className={`messageActions ${isOpen ? 'open' : ''}`} sx={{ visibility: 'hidden' }}>
-      <Stack
-        direction="row"
-        alignItems="center"
-        gap={1}
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: isMyMessage ? 'auto' : '100%',
-          right: isMyMessage ? '100%' : 'auto',
-          transform: 'translateY(-50%)',
-          padding: '8px',
-        }}
-      >
-        <Tooltip title={t('conversation.reply')}>
-          <StyledIconButton sx={{ order: orderReply }} onClick={onReply}>
-            <QuoteDownIcon size={14} />
-          </StyledIconButton>
-        </Tooltip>
-        {isForward && (
-          <Tooltip title={t('conversation.forward')}>
-            <StyledIconButton sx={{ order: orderForward }} onClick={onForward}>
-              <ForwardIcon size={14} />
-            </StyledIconButton>
-          </Tooltip>
-        )}
-
-        <MoreOptions message={message} setIsOpen={setIsOpen} orderMore={orderMore} isMyMessage={isMyMessage} />
-      </Stack>
-    </Box>
-  );
-};
-
-export default MessageOption;
+export default MoreOptions;
