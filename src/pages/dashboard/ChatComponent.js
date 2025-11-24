@@ -3,15 +3,23 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { styled, useTheme } from '@mui/material/styles';
 import { ChatHeader, ChatFooter } from '../../components/Chat';
 import useResponsive from '../../hooks/useResponsive';
-import {
-  AttachmentMsg,
-  LinkPreviewMsg,
-  PollMsg,
-  ReplyMsg,
-  SignalMsg,
-  TextMsg,
-  StickerMsg,
-} from '../../sections/dashboard/Conversation';
+// import {
+//   AttachmentMsg,
+//   LinkPreviewMsg,
+//   PollMsg,
+//   ReplyMsg,
+//   SignalMsg,
+//   TextMsg,
+//   StickerMsg,
+// } from '../../sections/dashboard/Conversation';
+import AttachmentMsg from '../../components/message/AttachmentMsg';
+import LinkPreviewMsg from '../../components/message/LinkPreviewMsg';
+import PollMsg from '../../components/message/PollMsg';
+import ReplyMsg from '../../components/message/ReplyMsg';
+import SignalMsg from '../../components/message/SignalMsg';
+import TextMsg from '../../components/message/TextMsg';
+import StickerMsg from '../../components/message/StickerMsg';
+
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkMyMessage,
@@ -251,7 +259,7 @@ const MessageList = React.memo(
 
         // Handle quoted messages
         if (quotedMessage) {
-          return <ReplyMsg el={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />;
+          return <ReplyMsg message={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />;
         }
 
         // Handle different message types
@@ -264,38 +272,38 @@ const MessageList = React.memo(
                   ['video', 'image', 'file', 'voiceRecording'].includes(attachment.type),
                 )
               ) {
-                return <AttachmentMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
+                return <AttachmentMsg message={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
               } else {
                 const linkPreview = el.attachments[0]; // chỉ hiển thị linkPreview đầu tiên
                 const isLinkPreview = linkPreview?.title;
 
                 if (isLinkPreview) {
-                  return <LinkPreviewMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
+                  return <LinkPreviewMsg message={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
                 } else {
-                  return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
+                  return <TextMsg message={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
                 }
               }
             } else {
-              return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
+              return <TextMsg message={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
             }
 
           case MessageType.Reply:
             if (el.quoted_message) {
               return (
-                <ReplyMsg el={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />
+                <ReplyMsg message={{ ...el, isMyMessage }} all_members={users} onScrollToReplyMsg={onScrollToReplyMsg} />
               );
             } else {
-              return <TextMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
+              return <TextMsg message={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
             }
 
           case MessageType.Signal:
-            return <SignalMsg el={{ ...el, isMyMessage }} />;
+            return <SignalMsg message={{ ...el, isMyMessage }} />;
 
           case MessageType.Poll:
-            return <PollMsg el={{ ...el, isMyMessage }} all_members={users} />;
+            return <PollMsg message={{ ...el, isMyMessage }} all_members={users} />;
 
           case MessageType.Sticker:
-            return <StickerMsg el={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
+            return <StickerMsg message={{ ...el, isMyMessage }} forwardChannelName={forwardChannelName} />;
 
           default:
             return null;
