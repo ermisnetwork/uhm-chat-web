@@ -265,7 +265,10 @@ const ChatHeader = () => {
   const onStartCall = useCallback(
     async callType => {
       const address = await nodeCall.getLocalEndpointAddr();
-      await callClient.createCall(callType, currentChannel.cid, address);
+      const metadata = {
+        address,
+      };
+      await callClient.createCall(callType, currentChannel.cid, metadata);
     },
     [currentChannel?.cid, nodeCall],
   );

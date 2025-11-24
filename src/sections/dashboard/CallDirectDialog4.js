@@ -153,7 +153,7 @@ const CallDirectDialog4 = () => {
   const { callDirectStatus, callDirectData, openCallDirectDialog } = useSelector(state => state.callDirect);
   const callerInfo = callDirectData?.callerInfo;
   const receiverInfo = callDirectData?.receiverInfo;
-  const address = callDirectData?.address;
+  const address = callDirectData?.metadata?.address;
   const { user_id } = useSelector(state => state.auth);
 
   const [micOn, setMicOn] = useState(true);
@@ -179,6 +179,8 @@ const CallDirectDialog4 = () => {
   const [micMenuAnchor, setMicMenuAnchor] = useState(null);
   const [cameraMenuAnchor, setCameraMenuAnchor] = useState(null);
 
+  const [localStream, setLocalStream] = useState(null);
+
   const { mediaEncoder } = useMediaEncoder();
   const { mediaDecoder } = useMediaDecoderSync(remoteVideoRef);
 
@@ -195,6 +197,7 @@ const CallDirectDialog4 = () => {
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
+      setLocalStream(stream);
       return stream;
     } catch (error) {
       console.error('Error accessing media devices.', error);
@@ -292,21 +295,40 @@ const CallDirectDialog4 = () => {
   useEffect(() => {
     if (!callClient) return;
 
-    callClient.onCallEvent = data => {
+    let localStream = null;
+
+    callClient.onCallEvent = async data => {
+      console.log('--data-', data);
       dispatch(StartCallDirect(data));
       setLocalCameraOn(data.callType === CallType.VIDEO);
       setRemoteCameraOn(data.callType === CallType.VIDEO);
+
+      localStream = await startLocalStream();
+      mediaEncoder(localStream);
+
+      if (data.type === 'incoming') {
+        const address = data?.metadata?.address;
+        await nodeCall.connect(address);
+        await nodeCall.openBidiStream();
+        console.log('-----opened BidiStream----');
+        // mediaEncoder(localStream);
+        // mediaDecoder();
+      } else {
+        // mediaDecoder();
+        // mediaEncoder(localStream);
+      }
     };
 
     callClient.onAcceptCallEvent = async event => {
+      mediaDecoder();
       if (event.user_id !== user_id) {
-        const localStream = await startLocalStream();
+        // const localStream = await startLocalStream();
 
         await nodeCall.acceptConnection();
         await nodeCall.acceptBidiStream();
         console.log('-----acceptBidiStream----');
-        mediaDecoder();
-        mediaEncoder(localStream);
+        // mediaDecoder();
+        // mediaEncoder(localStream);
       }
     };
 
@@ -412,13 +434,13 @@ const CallDirectDialog4 = () => {
     setLoadingButton(true);
     await callClient.acceptCall();
 
-    const localStream = await startLocalStream();
+    // const localStream = await startLocalStream();
 
     await nodeCall.connect(address);
     await nodeCall.openBidiStream();
     console.log('-----opened BidiStream----');
-    mediaEncoder(localStream);
-    mediaDecoder();
+    // mediaEncoder(localStream);
+    // mediaDecoder();
   };
 
   const onSendEndCall = async () => {

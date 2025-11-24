@@ -15,7 +15,8 @@ import ChannelConfirmDialog from '../../sections/dashboard/ChannelConfirmDialog'
 import ProfileDialog from '../../sections/dashboard/ProfileDialog';
 import ClientsTabPanel from '../../pages/dashboard/ClientsTabPanel';
 import useFaviconBadge from '../../hooks/useFaviconBadge';
-import CallDirectDialog2 from '../../sections/dashboard/CallDirectDialog2';
+// import CallDirectDialog2 from '../../sections/dashboard/CallDirectDialog2';
+import CallDirectDialog4 from '../../sections/dashboard/CallDirectDialog4';
 import Header from './Header';
 import { SetIsUserConnected } from '../../redux/slices/app';
 import TopicPanel from '../../pages/dashboard/TopicPanel';
@@ -161,7 +162,7 @@ const DashboardLayout = () => {
       </Stack>
 
       {/* <CallDirectDialog3 /> */}
-      <CallDirectDialog2 />
+      <CallDirectDialog4 />
       {openDialogCreateChannel && <CreateChannel />}
       {openDialogNewDirectMessage && <NewDirectMessage />}
       {openAddFriendDialog && <AddFriendDialog />}
