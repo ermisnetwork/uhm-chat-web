@@ -47,6 +47,7 @@ import {
 import { setChannelConfirm } from '../../redux/slices/dialog';
 import { SetOpenTopicPanel } from '../../redux/slices/topic';
 import { useTranslation } from 'react-i18next';
+import { nodeCall } from '../../nodeCall';
 
 const ActionsTopic = () => {
   const { t } = useTranslation();
@@ -235,7 +236,6 @@ const ActionsTopic = () => {
 };
 
 const ChatHeader = () => {
-  const videoRef = useRef(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -264,9 +264,10 @@ const ChatHeader = () => {
 
   const onStartCall = useCallback(
     async callType => {
-      await callClient.createCall(callType, currentChannel.cid);
+      const address = await nodeCall.getLocalEndpointAddr();
+      await callClient.createCall(callType, currentChannel.cid, address);
     },
-    [currentChannel?.cid],
+    [currentChannel?.cid, nodeCall],
   );
 
   const onStartVideoCall = useCallback(() => onStartCall(CallType.VIDEO), [onStartCall]);

@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
+import { nodeCall } from '../nodeCall';
 
-export const useMediaEncoder = nodeRef => {
+export const useMediaEncoder = () => {
   const videoEncoderRef = useRef(null);
   const audioEncoderRef = useRef(null);
   const configSentRef = useRef(false);
@@ -17,14 +18,14 @@ export const useMediaEncoder = nodeRef => {
 
       // Gửi config qua packet với type=0
       const configPacket = createPacketWithHeader(null, null, 'config', configMsg);
-      await nodeRef.current.asyncSend(configPacket);
+      await nodeCall.asyncSend(configPacket);
       configSentRef.current = true;
     }
   }, []);
 
   const sendPacketOrQueue = useCallback(async (packet, type) => {
     if (configSentRef.current) {
-      await nodeRef.current.asyncSend(packet);
+      await nodeCall.asyncSend(packet);
     }
   }, []);
 

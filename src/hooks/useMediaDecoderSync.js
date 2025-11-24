@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
+import { nodeCall } from '../nodeCall';
 
-export const useMediaDecoderSync = (remoteVideoRef, nodeRef) => {
+export const useMediaDecoderSync = remoteVideoRef => {
   const videoDecoderRef = useRef(null);
   const videoWriterRef = useRef(null);
   const audioDecoderRef = useRef(null);
@@ -164,8 +165,8 @@ export const useMediaDecoderSync = (remoteVideoRef, nodeRef) => {
 
     while (true) {
       try {
-        if (!nodeRef.current) break;
-        const data = await nodeRef.current.asyncRecv();
+        if (!nodeCall) break;
+        const data = await nodeCall.asyncRecv();
 
         const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         if (buffer.byteLength < 5) continue;
