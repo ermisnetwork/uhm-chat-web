@@ -270,5 +270,49 @@ export const useMediaDecoderSync = remoteVideoRef => {
     }
   }, [initDecoders, playDecodedAudio, setupVideoDecoder]);
 
-  return { mediaDecoder };
+  const resetDecoders = useCallback(() => {
+    // Đóng VideoDecoder
+    if (videoDecoderRef.current) {
+      try {
+        videoDecoderRef.current.close?.();
+      } catch (e) {
+        console.warn('Error closing video decoder:', e);
+      }
+      videoDecoderRef.current = null;
+    }
+
+    // Đóng AudioDecoder
+    if (audioDecoderRef.current) {
+      try {
+        audioDecoderRef.current.close?.();
+      } catch (e) {
+        console.warn('Error closing audio decoder:', e);
+      }
+      audioDecoderRef.current = null;
+    }
+
+    // Đóng AudioContext
+    if (audioContextRef.current) {
+      try {
+        audioContextRef.current.close?.();
+      } catch (e) {
+        console.warn('Error closing audio context:', e);
+      }
+      audioContextRef.current = null;
+    }
+
+    // Reset các ref khác
+    videoWriterRef.current = null;
+    isWaitingForKeyFrame.current = true;
+    mediaDestinationRef.current = null;
+    nextStartTimeRef.current = 0;
+    lastVideoConfigRef.current = null;
+
+    // Xóa srcObject của video nếu cần
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+  }, [remoteVideoRef]);
+
+  return { mediaDecoder, resetDecoders };
 };

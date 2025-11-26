@@ -145,9 +145,7 @@ const CallDirectDialog4 = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const localVideoRef = useRef(null);
-  const localAudioRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const remoteAudioRef = useRef(null);
   const timerIntervalRef = useRef(null);
   const ringtone = useRef();
   const { callDirectStatus, callDirectData, openCallDirectDialog } = useSelector(state => state.callDirect);
@@ -179,30 +177,8 @@ const CallDirectDialog4 = () => {
   const [micMenuAnchor, setMicMenuAnchor] = useState(null);
   const [cameraMenuAnchor, setCameraMenuAnchor] = useState(null);
 
-  const [localStream, setLocalStream] = useState(null);
-
-  const { mediaEncoder } = useMediaEncoder();
-  const { mediaDecoder } = useMediaDecoderSync(remoteVideoRef);
-
-  const startLocalStream = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 48000,
-        },
-      });
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-      }
-      setLocalStream(stream);
-      return stream;
-    } catch (error) {
-      console.error('Error accessing media devices.', error);
-    }
-  };
+  const { mediaEncoder, resetEncoders } = useMediaEncoder();
+  const { mediaDecoder, resetDecoders } = useMediaDecoderSync(remoteVideoRef);
 
   const onCancelCall = () => {
     setMicOn(true);
@@ -227,8 +203,6 @@ const CallDirectDialog4 = () => {
 
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
-    if (localAudioRef.current) localAudioRef.current.srcObject = null;
-    if (remoteAudioRef.current) remoteAudioRef.current.srcObject = null;
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
       timerIntervalRef.current = null;
@@ -237,6 +211,9 @@ const CallDirectDialog4 = () => {
       ringtone.current.stop();
       ringtone.current = null;
     }
+
+    resetEncoders();
+    resetDecoders();
   };
 
   const startTimer = () => {
@@ -295,22 +272,25 @@ const CallDirectDialog4 = () => {
   useEffect(() => {
     if (!callClient) return;
 
-    let localStream = null;
-
     callClient.onCallEvent = async data => {
-      console.log('--data-', data);
       dispatch(StartCallDirect(data));
       setLocalCameraOn(data.callType === CallType.VIDEO);
       setRemoteCameraOn(data.callType === CallType.VIDEO);
 
-      localStream = await startLocalStream();
-      mediaEncoder(localStream);
+      const localStream = callClient.localStream;
+
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = localStream;
+      }
+
+      // mediaEncoder(localStream);
+      // mediaDecoder();
 
       if (data.type === 'incoming') {
-        const address = data?.metadata?.address;
-        await nodeCall.connect(address);
-        await nodeCall.openBidiStream();
-        console.log('-----opened BidiStream----');
+        // const address = data?.metadata?.address;
+        // await nodeCall.connect(address);
+        // await nodeCall.openBidiStream();
+        // console.log('-----opened BidiStream----');
         // mediaEncoder(localStream);
         // mediaDecoder();
       } else {
@@ -320,46 +300,15 @@ const CallDirectDialog4 = () => {
     };
 
     callClient.onAcceptCallEvent = async event => {
-      mediaDecoder();
       if (event.user_id !== user_id) {
-        // const localStream = await startLocalStream();
-
         await nodeCall.acceptConnection();
         await nodeCall.acceptBidiStream();
         console.log('-----acceptBidiStream----');
-        // mediaDecoder();
-        // mediaEncoder(localStream);
+        const localStream = callClient.localStream;
+        mediaDecoder();
+        mediaEncoder(localStream);
       }
     };
-
-    // callClient.onLocalStream = stream => {
-    //   const videoTrack = stream.getVideoTracks()[0];
-    //   if (videoTrack && localVideoRef.current) {
-    //     const videoStream = new MediaStream([videoTrack]);
-    //     localVideoRef.current.srcObject = videoStream;
-    //   }
-
-    //   const audioTrack = stream.getAudioTracks()[0];
-    //   if (audioTrack && localAudioRef.current) {
-    //     const audioStream = new MediaStream([audioTrack]);
-    //     localAudioRef.current.srcObject = audioStream;
-    //   }
-    // };
-
-    // callClient.onRemoteStream = stream => {
-    //   const videoTrack = stream.getVideoTracks()[0];
-    //   const audioTrack = stream.getAudioTracks()[0];
-
-    //   if (remoteVideoRef.current && videoTrack) {
-    //     const videoStream = new MediaStream([videoTrack]);
-    //     remoteVideoRef.current.srcObject = videoStream;
-    //   }
-
-    //   if (remoteAudioRef.current && audioTrack) {
-    //     const audioStream = new MediaStream([audioTrack]);
-    //     remoteAudioRef.current.srcObject = audioStream;
-    //   }
-    // };
 
     callClient.onConnectionMessageChange = msg => {
       setConnectionStatus(msg);
@@ -382,26 +331,6 @@ const CallDirectDialog4 = () => {
           onCancelCall();
           break;
       }
-    };
-
-    callClient.onDataChannelMessage = msg => {
-      if (msg.type === 'transciver_state') {
-        const remoteVideoEnable = msg.body.video_enable;
-        const remoteAudioEnable = msg.body.audio_enable;
-        setRemoteCameraOn(remoteVideoEnable);
-        setRemoteMicOn(remoteAudioEnable);
-      }
-    };
-
-    callClient.onUpgradeCall = user => {
-      setIsUpgradeCall(true);
-      if (user.id !== user_id) {
-        setRequestVideoCall(true);
-      }
-    };
-
-    callClient.onScreenShareChange = isShare => {
-      setIsScreenShare(isShare);
     };
 
     callClient.onError = msg => {
@@ -433,14 +362,12 @@ const CallDirectDialog4 = () => {
   const onSendAcceptCall = async () => {
     setLoadingButton(true);
     await callClient.acceptCall();
-
-    // const localStream = await startLocalStream();
-
     await nodeCall.connect(address);
     await nodeCall.openBidiStream();
     console.log('-----opened BidiStream----');
-    // mediaEncoder(localStream);
-    // mediaDecoder();
+    const localStream = callClient.localStream;
+    mediaEncoder(localStream);
+    mediaDecoder();
   };
 
   const onSendEndCall = async () => {
@@ -829,7 +756,6 @@ const CallDirectDialog4 = () => {
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: localCameraOn ? 'block' : 'none' }}
               muted
             />
-            {/* <audio ref={localAudioRef} autoPlay muted /> */}
           </Stack>
           <Stack
             sx={{
@@ -875,7 +801,6 @@ const CallDirectDialog4 = () => {
                 display: remoteCameraOn && !requestVideoCall ? 'block' : 'none',
               }}
             />
-            {/* <audio ref={remoteAudioRef} autoPlay /> */}
           </Stack>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center' }}>

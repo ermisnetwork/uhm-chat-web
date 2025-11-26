@@ -239,5 +239,34 @@ export const useMediaEncoder = () => {
     processAudioFrames(audioReader);
   }, []);
 
-  return { mediaEncoder };
+  const resetEncoders = useCallback(() => {
+    // Reset and close video encoder
+    if (videoEncoderRef.current) {
+      try {
+        videoEncoderRef.current.flush?.();
+        videoEncoderRef.current.close?.();
+      } catch (e) {
+        console.warn('Error closing video encoder:', e);
+      }
+      videoEncoderRef.current = null;
+    }
+
+    // Reset and close audio encoder
+    if (audioEncoderRef.current) {
+      try {
+        audioEncoderRef.current.flush?.();
+        audioEncoderRef.current.close?.();
+      } catch (e) {
+        console.warn('Error closing audio encoder:', e);
+      }
+      audioEncoderRef.current = null;
+    }
+
+    // Reset configs and flags
+    configSentRef.current = false;
+    videoConfigRef.current = null;
+    audioConfigRef.current = null;
+  }, []);
+
+  return { mediaEncoder, resetEncoders };
 };
