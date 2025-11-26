@@ -156,6 +156,8 @@ const MessageList = React.memo(
 
     const renderMessage = useCallback(
       el => {
+        if (!el) return null;
+
         const isMyMessage = checkMyMessage(user_id, el.user.id);
         const messageType = el.type;
         const forwardChannelName = getForwardChannelName(el?.forward_cid);
