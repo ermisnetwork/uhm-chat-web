@@ -12,10 +12,11 @@ import {
   Grid,
   Skeleton,
   Chip,
+  styled,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { onFilesMessage, onSetAttachmentsMessage } from '../../redux/slices/messages';
-import { Trash, X } from 'phosphor-react';
+import { Plus, Trash, X } from 'phosphor-react';
 import { UploadType } from '../../constants/commons-const';
 import { formatFileSize, processImageFile } from '../../utils/commons';
 import FileTypeBadge from '../../components/FileTypeBadge';
@@ -27,6 +28,18 @@ const MAX_SIZE_MB = 100; // Giới hạn 100MB
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
+});
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
 });
 
 const formatTime = seconds => {
@@ -278,7 +291,7 @@ const UploadFilesDialog = ({ setMessages }) => {
 
       if (image === 1 && !video && !file) return t('uploadFilesDialog.sent_photo');
       if (video === 1 && !image && !file) return t('uploadFilesDialog.sent_video');
-      if (image && video && !file) return `${t('uploadFilesDialog.sent')} ${image + video} ${t('uploadFilesDialog.photos_videos')}`;
+      if (image && video && !file) return `${t('uploadFilesDialog.sent')} ${image + video} ${t('uploadFilesDialog.photo_videos')}`;
       if (image && !video && !file) return `${t('uploadFilesDialog.sent')} ${image} ${t('uploadFilesDialog.photos')}`;
       if (video && !image && !file) return `${t('uploadFilesDialog.sent')} ${video} ${t('uploadFilesDialog.videos')}`;
 
@@ -383,11 +396,55 @@ const UploadFilesDialog = ({ setMessages }) => {
   };
 
   const onRemoveAttachment = index => {
+    const removed = attachments[index];
     const updatedAttachments = attachments.filter((_, i) => i !== index);
     setAttachments(updatedAttachments);
-    if (updatedAttachments.length === 0) {
-      onCloseDialog();
+
+    const updatedFiles = (files || []).filter(f => {
+      const sameName = f.name === removed.name;
+      const sameSize = f.size === removed.size;
+      const sameModified = typeof f.lastModified !== 'undefined' && typeof removed.lastModified !== 'undefined'
+        ? f.lastModified === removed.lastModified
+        : true;
+      return !(sameName && sameSize && sameModified);
+    });
+
+    dispatch(onFilesMessage({
+      openDialog: updatedFiles.length > 0,
+      files: updatedFiles,
+      uploadType: uploadType || UploadType.PhotoOrVideo,
+    }));
+
+    if (updatedFiles.length === 0) {
+      dispatch(onSetAttachmentsMessage([]));
+      setAttachments([]);
+      dispatch(onFilesMessage({ openDialog: false, files: [], uploadType: '' }));
     }
+  };
+  
+  const onAddFiles = (event, type) => {
+    const newFiles = Array.from(event.target.files || []);
+    if (newFiles.length === 0) return;
+
+    const mergedFiles = [...files, ...newFiles]; 
+    const seen = new Map();
+    const unique = [];
+    for (const f of mergedFiles) {
+      const key = `${f.name}_${f.size}_${f.lastModified}`;
+      if (!seen.has(key)) {
+        seen.set(key, true);
+        unique.push(f);
+      }
+    }
+
+    const isPhotoOrVideo = unique.every(
+      file =>
+        ['video/mp4', 'video/webm', 'video/quicktime'].includes(file.type) || file.type.startsWith('image/'),
+    );
+
+    dispatch(onFilesMessage({ openDialog: true, files: unique, uploadType: isPhotoOrVideo ? type : UploadType.File }));
+
+    event.target.value = '';
   };
 
   return (
@@ -401,9 +458,20 @@ const UploadFilesDialog = ({ setMessages }) => {
     >
       <DialogTitle sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {renderTitle()}
-        <IconButton onClick={onCloseDialog}>
-          <X />
-        </IconButton>
+        <Box>
+          <IconButton component="label">
+            <VisuallyHiddenInput
+              type="file"
+              multiple
+              accept="image/*,video/mp4,video/webm,video/quicktime"
+              onChange={event => onAddFiles(event, UploadType.PhotoOrVideo)}
+            />
+            <Plus />
+          </IconButton>
+          <IconButton onClick={onCloseDialog}>
+            <X />
+          </IconButton>
+        </Box>
       </DialogTitle>
       <DialogContent>
         <Box sx={{ maxHeight: '376px', overflowY: 'auto' }} className="customScrollbar">

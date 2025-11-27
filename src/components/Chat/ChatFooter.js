@@ -74,6 +74,12 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     setSelectedMentions,
   } = useMentions(value, inputRef);
 
+  // Keep a ref to the latest selectedMentions to avoid stale closures
+  const selectedMentionsRef = useRef(selectedMentions);
+  useEffect(() => {
+    selectedMentionsRef.current = selectedMentions;
+  }, [selectedMentions]);
+
   const onTyping = useCallback(async () => {
     try {
       await currentChat.keystroke();
@@ -81,9 +87,22 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       // handleError(dispatch, error);
     }
   }, [currentChat]);
-
   // Debounced version of onTyping để giảm số lần gọi API
   const debouncedOnTyping = useDebounce(onTyping, 500);
+  const handleChange = (text) => {
+
+    const key = getDraftKey();
+    localStorage.setItem(key, text, replaceMentionsWithIds(text, selectedMentionsRef.current));
+
+    window.dispatchEvent(
+      new CustomEvent("draft-changed", {
+        detail: {
+          key,
+          value: text
+        }
+      })
+    );
+  };
 
   const checkSendLinks = useCallback(
     value => {
@@ -130,9 +149,17 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     return false;
   }, [value, attachmentsMessage, hasLinksError, hasFilterWordsError]);
 
+
+  
   useEffect(() => {
     const timeout = setTimeout(() => {
       inputRef.current.focus();
+      const key = getDraftKey();
+      const Draft = localStorage.getItem(key);
+      
+      if (Draft != null){
+        setValue(Draft);
+      }
 
       if (editMessage) {
         // Tìm các mentionId xuất hiện trong editMessage.text
@@ -141,7 +168,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
 
         // Đổi value từ mentionId sang mentionName để hiển thị đúng
         setValue(replaceMentionsWithNames(editMessage.text, mentions));
-      } else if (currentChat || quotesMessage) {
+      } else if (!Draft && currentChat || quotesMessage) {
         setValue('');
       }
     }, 100);
@@ -343,6 +370,17 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   };
 
   const onResetData = () => {
+    const key = getDraftKey();
+    localStorage.removeItem(key);
+    window.dispatchEvent(
+      new CustomEvent("draft-changed", {
+        detail: {
+          key,
+          value: ''
+        }
+      })
+    );
+
     setValue('');
     setSelectedMentions([]);
     setStickerUrl('');
@@ -523,6 +561,9 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     }
   };
 
+  const getDraftKey = () => `${currentChat.id}`;
+
+
   const onKeyUp = useCallback(
     e => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -578,6 +619,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
         const newValue = value.slice(0, start) + mentionText + ' ' + value.slice(end);
 
         setValue(newValue);
+        handleChange(newValue);
 
         // Đặt lại vị trí con trỏ sau mention vừa thêm
         setTimeout(() => {
@@ -594,7 +636,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       setAnchorElMention(null);
       inputRef.current.focus();
     },
-    [setSelectedMentions, setHighlightedIndex, setAnchorElMention],
+    [setSelectedMentions, setHighlightedIndex, setAnchorElMention, handleChange],
   );
 
   const onPaste = event => {
@@ -623,6 +665,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
               event.preventDefault();
               const newValue = event.target.value;
               setValue(newValue);
+              handleChange(newValue);
 
               // Sử dụng debounced typing để giảm tải
               debouncedOnTyping();

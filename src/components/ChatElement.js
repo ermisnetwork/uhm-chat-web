@@ -170,13 +170,14 @@ const ChatElement = ({ channel }) => {
   const [isRightClick, setIsRightClick] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [lastMessageAt, setLastMessageAt] = useState('');
-
+  const [Draft, setDraft] = useState('');
   const showItemLeaveChannel = !isDirect && [RoleMember.MOD, RoleMember.MEMBER].includes(myRole);
   const showItemDeleteChannel = !isDirect && [RoleMember.OWNER].includes(myRole);
   const showItemDeleteConversation = isDirect;
   const showItemMarkAsRead =
     unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadCount > 0);
   const isCurrentChannelEnabledTopic = currentChannel?.data?.topics_enabled;
+  const getDraftKey = () => `${channelId}`;
 
   const isActiveChannel = useCallback(() => {
     const isCurrentChannel = currentChannel?.id === channel?.id;
@@ -351,6 +352,27 @@ const ChatElement = ({ channel }) => {
     const channelTimestamp = new Date(channelLastMsg.updated_at || channelLastMsg.created_at).getTime();
     return latestTopicTimestamp > channelTimestamp ? latestTopicMessage : channelLastMsg;
   }, []);
+
+  useEffect(() => {
+    // load initial value
+    const key = `${channelId}`;
+    const stored = localStorage.getItem(key);
+
+    if (stored) {
+      setDraft(`Draft: ${stored}`);
+    }
+    const handler = (event) => {
+      if (event.detail.value && event.detail.key === key) {
+        setDraft(`Draft: ${event.detail.value}`);
+      } else {
+        setDraft('');
+      }
+    };
+
+    window.addEventListener("draft-changed", handler);
+
+    return () => window.removeEventListener("draft-changed", handler);
+  }, [channelId]);
 
   // Memoize tin nhắn cuối cùng để tránh tính toán lại không cần thiết
   const optimizedLastMessage = useMemo(() => {
@@ -712,7 +734,7 @@ const ChatElement = ({ channel }) => {
                   fontWeight: hasUnread ? 600 : 400,
                 }}
               >
-                {isBlocked ? t('chatElement.blocked') : lastMessage}
+                {isBlocked ? t('chatElement.blocked') : Draft ? Draft : lastMessage}
               </Typography>
 
               {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}
