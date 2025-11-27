@@ -160,6 +160,18 @@ export const useMediaDecoderSync = remoteVideoRef => {
     });
   }, [remoteVideoRef, initAudioContext, playDecodedAudio, setupVideoDecoder]);
 
+  function replaceNumbers(input) {
+    const map = {
+      2048: 123,
+      4096: 153,
+      8192: 156,
+      16384: 183,
+      32768: 186,
+    };
+
+    return input.replace(/2048|4096|8192|16384|32768/g, match => map[match]);
+  }
+
   const mediaDecoder = useCallback(async () => {
     initDecoders();
 
@@ -184,6 +196,8 @@ export const useMediaDecoderSync = remoteVideoRef => {
             if (configMsg.videoConfig) {
               isWaitingForKeyFrame.current = true;
               const desc = Uint8Array.from(atob(configMsg.videoConfig.description), c => c.charCodeAt(0)).buffer;
+              const codec = replaceNumbers(configMsg.videoConfig.codec);
+              configMsg.videoConfig.codec = codec;
 
               // Lưu config lại để dùng cho việc phục hồi sau lỗi
               const videoConfig = { ...configMsg.videoConfig, description: desc };
