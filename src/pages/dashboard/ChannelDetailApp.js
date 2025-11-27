@@ -32,6 +32,8 @@ import SidebarSearchMessage from '../../sections/dashboard/SidebarSearchMessage'
 import SidebarUserInfo from '../../sections/dashboard/SidebarUserInfo';
 import SidebarChannelTopic from '../../sections/dashboard/SidebarChannelTopic';
 import SidebarTopicInfo from '../../sections/dashboard/SidebarTopicInfo';
+import { ChatHeader } from '../../components/Chat';
+import ChatList from './ChatList';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();
@@ -91,7 +93,11 @@ const ChannelDetailApp = () => {
         ) : currentChannelStatus === CurrentChannelStatus.ERROR ? (
           <ChannelNotFound />
         ) : (
-          <ChatComponent />
+          // <ChatComponent />
+          <>
+            <ChatHeader />
+            <ChatList />
+          </>
         )}
         <InviteFriendDialog />
       </BoxContainer>

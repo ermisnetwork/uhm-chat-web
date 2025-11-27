@@ -56,6 +56,7 @@
     "react-router-dom": "^6.4.2",
     "react-slick": "^0.30.3",
     "react-syntax-highlighter": "^15.6.1",
+    "react-virtuoso": "^4.15.0",
     "react-window": "^1.8.11",
     "redux": "^4.2.0",
     "redux-persist": "^6.0.0",
