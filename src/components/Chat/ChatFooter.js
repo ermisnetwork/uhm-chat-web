@@ -63,6 +63,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   const myRole = myRoleInChannel(currentChannel);
   const isDirect = isChannelDirect(currentChannel);
   const currentChat = currentTopic ? currentTopic : currentChannel;
+  const getDraftKey = () => `${currentChat.id}`;
 
   const {
     filteredMentions,
@@ -73,12 +74,6 @@ const ChatFooter = ({ setMessages, isDialog }) => {
     selectedMentions,
     setSelectedMentions,
   } = useMentions(value, inputRef);
-
-  // Keep a ref to the latest selectedMentions to avoid stale closures
-  const selectedMentionsRef = useRef(selectedMentions);
-  useEffect(() => {
-    selectedMentionsRef.current = selectedMentions;
-  }, [selectedMentions]);
 
   const onTyping = useCallback(async () => {
     try {
@@ -92,7 +87,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   const handleChange = (text) => {
 
     const key = getDraftKey();
-    localStorage.setItem(key, text, replaceMentionsWithIds(text, selectedMentionsRef.current));
+    localStorage.setItem(key, text);
 
     window.dispatchEvent(
       new CustomEvent("draft-changed", {
@@ -560,9 +555,6 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       // onTyping();
     }
   };
-
-  const getDraftKey = () => `${currentChat.id}`;
-
 
   const onKeyUp = useCallback(
     e => {
