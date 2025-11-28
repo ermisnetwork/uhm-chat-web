@@ -177,7 +177,6 @@ const ChatElement = ({ channel }) => {
   const showItemMarkAsRead =
     unreadChannels && unreadChannels.some(item => item.id === channelId && item.unreadCount > 0);
   const isCurrentChannelEnabledTopic = currentChannel?.data?.topics_enabled;
-  const getDraftKey = () => `${channelId}`;
 
   const isActiveChannel = useCallback(() => {
     const isCurrentChannel = currentChannel?.id === channel?.id;

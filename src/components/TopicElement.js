@@ -80,6 +80,8 @@ const TopicElement = ({ topic, idSelected }) => {
   const openMenu = useMemo(() => Boolean(anchorEl), [anchorEl]);
   const myRole = useMemo(() => myRoleInChannel(parentChannel), [parentChannel]);
   const showItemDeleteTopic = useMemo(() => [RoleMember.OWNER].includes(myRole), [myRole]);
+  const [Draft, setDraft] = useState('');
+  
 
   const replaceMentionsWithNames = useCallback(
     inputValue => {
@@ -201,6 +203,27 @@ const TopicElement = ({ topic, idSelected }) => {
     },
     [user_id, users, t, replaceMentionsWithNames, topic.data.created_at],
   );
+  
+  useEffect(() => {
+    // load initial value
+    const key = `${topicId}`;
+    const stored = localStorage.getItem(key);
+
+    if (stored) {
+      setDraft(`Draft: ${stored}`);
+    }
+    const handler = (event) => {
+      if (event.detail.value && event.detail.key === key) {
+        setDraft(`Draft: ${event.detail.value}`);
+      } else {
+        setDraft('');
+      }
+    };
+
+    window.addEventListener("draft-changed", handler);
+
+    return () => window.removeEventListener("draft-changed", handler);
+  }, [topicId]);
 
   useEffect(() => {
     const lastMsg = topic.state.messages.length > 0 ? topic.state.messages[topic.state.messages.length - 1] : null;
@@ -366,7 +389,7 @@ const TopicElement = ({ topic, idSelected }) => {
                 fontWeight: hasUnread ? 600 : 400,
               }}
             >
-              {lastMessage}
+              {Draft ? Draft : lastMessage}
             </Typography>
 
             {hasUnread ? <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} /> : null}

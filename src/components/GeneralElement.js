@@ -51,9 +51,10 @@ const GeneralElement = ({ idSelected }) => {
   const { unreadChannels = [] } = useSelector(state => state.channel);
   const { parentChannel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
-
+  const [Draft, setDraft] = useState('');
   const [lastMessage, setLastMessage] = useState('');
   const [lastMessageAt, setLastMessageAt] = useState('');
+
 
   // Memoized values
   const users = useMemo(() => (client.state.users ? Object.values(client.state.users) : []), [client.state.users]);
@@ -227,6 +228,22 @@ const GeneralElement = ({ idSelected }) => {
         : null;
     getLastMessage(lastMsg);
 
+    // load initial value
+    const key = `${parentChannel?.data?.id}`;
+    const stored = localStorage.getItem(key);
+
+    if (stored) {
+      setDraft(`Draft: ${stored}`);
+    }
+    const handler = (event) => {
+      if (event.detail.value && event.detail.key === key) {
+        setDraft(`Draft: ${event.detail.value}`);
+      } else {
+        setDraft('');
+      }
+    };
+    window.addEventListener("draft-changed", handler);
+
     client.on(ClientEvents.MessageNew, handleMessageNew);
     client.on(ClientEvents.MessageUpdated, handleMessageUpdated);
     client.on(ClientEvents.MessageDeleted, handleMessageDeleted);
@@ -235,6 +252,7 @@ const GeneralElement = ({ idSelected }) => {
       client.off(ClientEvents.MessageNew, handleMessageNew);
       client.off(ClientEvents.MessageUpdated, handleMessageUpdated);
       client.off(ClientEvents.MessageDeleted, handleMessageDeleted);
+      window.removeEventListener("draft-changed", handler);
     };
   }, [parentChannel, getLastMessage, handleMessageNew, handleMessageUpdated, handleMessageDeleted]);
 
@@ -296,7 +314,7 @@ const GeneralElement = ({ idSelected }) => {
               fontWeight: hasUnread ? 600 : 400,
             }}
           >
-            {lastMessage}
+            {Draft ? Draft : lastMessage}
           </Typography>
 
           {hasUnread && <Badge variant="dot" color="error" sx={{ margin: '0 10px 0 15px' }} />}
