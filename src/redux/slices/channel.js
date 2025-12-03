@@ -375,6 +375,7 @@ export function FetchChannels(params) {
 
     const filter = {
       type: ['messaging', 'team'],
+      include_pinned_messages: true,
     };
     const sort = [];
     const options = {
