@@ -47,7 +47,8 @@ export const useMediaDecoderSync = remoteVideoRef => {
 
       // --- XỬ LÝ LATENCY & SYNC ---
       if (nextStartTimeRef.current < currentTime) {
-        nextStartTimeRef.current = currentTime + MIN_BUFFER_AHEAD;
+        // nextStartTimeRef.current = currentTime + MIN_BUFFER_AHEAD;
+        nextStartTimeRef.current = currentTime;
       } else if (nextStartTimeRef.current > currentTime + MAX_AUDIO_LATENCY) {
         // console.log('⚡ Audio latency too high, resetting sync...');
         nextStartTimeRef.current = currentTime + MIN_BUFFER_AHEAD;
@@ -136,29 +137,29 @@ export const useMediaDecoderSync = remoteVideoRef => {
     if (audioDecoderRef.current) audioDecoderRef.current.close();
 
     // Video Stream Setup
-    const videoTrackGenerator = new MediaStreamTrackGenerator({ kind: 'video' });
-    videoWriterRef.current = videoTrackGenerator.writable.getWriter();
+    // const videoTrackGenerator = new MediaStreamTrackGenerator({ kind: 'video' });
+    // videoWriterRef.current = videoTrackGenerator.writable.getWriter();
 
     initAudioContext();
     const audioTrack = mediaDestinationRef.current.stream.getAudioTracks()[0];
-    const combinedStream = new MediaStream([videoTrackGenerator, audioTrack]);
+    // const combinedStream = new MediaStream([videoTrackGenerator, audioTrack]);
 
     if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = combinedStream;
+      const audioOnlyStream = new MediaStream([audioTrack]);
+      remoteVideoRef.current.srcObject = audioOnlyStream;
       remoteVideoRef.current.muted = false;
+      // remoteVideoRef.current.srcObject = combinedStream;
+      // remoteVideoRef.current.muted = false;
     }
 
     isWaitingForKeyFrame.current = true;
-
-    // Gọi hàm setup Video Decoder tách biệt
-    setupVideoDecoder();
 
     // Audio Decoder Setup
     audioDecoderRef.current = new AudioDecoder({
       output: audioData => playDecodedAudio(audioData),
       error: err => console.error('AudioDecoder error:', err),
     });
-  }, [remoteVideoRef, initAudioContext, playDecodedAudio, setupVideoDecoder]);
+  }, [remoteVideoRef, initAudioContext, playDecodedAudio]);
 
   function replaceNumbers(input) {
     const map = {
@@ -172,117 +173,313 @@ export const useMediaDecoderSync = remoteVideoRef => {
     return input.replace(/2048|4096|8192|16384|32768/g, match => map[match]);
   }
 
-  const mediaDecoder = useCallback(async () => {
-    initDecoders();
-
+  // Loop xử lý Audio & Config (Normal Recv)
+  const runAudioConfigLoop = useCallback(async () => {
     while (true) {
+      if (!nodeCall) break;
       try {
-        if (!nodeCall) break;
+        // Chỉ gọi hàm nhận Audio/Config
         const data = await nodeCall.asyncRecv();
+
+        const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+        if (buffer.byteLength < 5) continue;
+
+        const view = new DataView(buffer);
+        const frameType = view.getUint8(0);
+        const timestamp = view.getUint32(1, false);
+        const payload = frameType === 0 ? buffer.slice(1) : buffer.slice(5);
+
+        // Handle Config
+        if (frameType === 0) {
+          const decoder = new TextDecoder();
+          const configMsg = JSON.parse(decoder.decode(payload));
+
+          console.log('--configMsg--', configMsg);
+
+          if (configMsg.videoConfig) {
+            if (!videoWriterRef.current) {
+              const videoTrackGenerator = new MediaStreamTrackGenerator({ kind: 'video' });
+              videoWriterRef.current = videoTrackGenerator.writable.getWriter();
+
+              // Thêm video track vào stream hiện tại
+              const audioTrack = mediaDestinationRef.current.stream.getAudioTracks()[0];
+              const combinedStream = new MediaStream([videoTrackGenerator, audioTrack]);
+
+              if (remoteVideoRef.current) {
+                remoteVideoRef.current.srcObject = combinedStream;
+              }
+            }
+
+            if (!videoDecoderRef.current) {
+              setupVideoDecoder();
+            }
+
+            isWaitingForKeyFrame.current = true;
+            const desc = Uint8Array.from(atob(configMsg.videoConfig.description), c => c.charCodeAt(0)).buffer;
+            const codec = replaceNumbers(configMsg.videoConfig.codec);
+            configMsg.videoConfig.codec = codec;
+
+            // Lưu config lại để dùng cho việc phục hồi sau lỗi
+            const videoConfig = { ...configMsg.videoConfig, description: desc };
+            lastVideoConfigRef.current = videoConfig;
+
+            if (videoDecoderRef.current && videoDecoderRef.current.state !== 'closed') {
+              videoDecoderRef.current.configure(videoConfig);
+            }
+          }
+          if (configMsg.audioConfig) {
+            if (audioDecoderRef.current && audioDecoderRef.current.state !== 'closed') {
+              const audioConfig = configMsg.audioConfig;
+              audioDecoderRef.current.configure({
+                codec: audioConfig.codec,
+                sampleRate: audioConfig.sampleRate,
+                numberOfChannels: audioConfig.numberOfChannels,
+              });
+            }
+          }
+        }
+        // Handle Audio
+        else if (frameType === 3) {
+          if (audioDecoderRef.current && audioDecoderRef.current.state === 'configured') {
+            audioDecoderRef.current.decode(
+              new EncodedAudioChunk({
+                type: 'key',
+                timestamp: timestamp * 1000,
+                data: payload,
+              }),
+            );
+          }
+        }
+      } catch (e) {
+        console.error('Audio/Config Loop Error', e);
+        break;
+      }
+    }
+  }, [setupVideoDecoder, remoteVideoRef]);
+
+  // Loop xử lý Video (RaptorQ)
+  const runVideoLoop = useCallback(async () => {
+    while (true) {
+      if (!nodeCall) break;
+      try {
+        // Chỉ gọi hàm nhận Video
+        const data = await nodeCall.asyncRecvRaptorQ();
 
         const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         if (buffer.byteLength < 5) continue;
         const view = new DataView(buffer);
         const frameType = view.getUint8(0);
         const timestamp = view.getUint32(1, false);
-        let payload = frameType === 0 ? buffer.slice(1) : buffer.slice(5);
+        const payload = frameType === 0 ? buffer.slice(1) : buffer.slice(5);
 
-        // HANDLE CONFIG
-        if (frameType === 0) {
-          try {
-            const decoder = new TextDecoder();
-            const configMsg = JSON.parse(decoder.decode(payload));
-
-            if (configMsg.videoConfig) {
-              isWaitingForKeyFrame.current = true;
-              const desc = Uint8Array.from(atob(configMsg.videoConfig.description), c => c.charCodeAt(0)).buffer;
-              const codec = replaceNumbers(configMsg.videoConfig.codec);
-              configMsg.videoConfig.codec = codec;
-
-              // Lưu config lại để dùng cho việc phục hồi sau lỗi
-              const videoConfig = { ...configMsg.videoConfig, description: desc };
-              lastVideoConfigRef.current = videoConfig;
-
-              if (videoDecoderRef.current && videoDecoderRef.current.state !== 'closed') {
-                videoDecoderRef.current.configure(videoConfig);
-              }
-            }
-            if (configMsg.audioConfig) {
-              if (audioDecoderRef.current && audioDecoderRef.current.state !== 'closed') {
-                const audioConfig = configMsg.audioConfig;
-                audioDecoderRef.current.configure({
-                  codec: audioConfig.codec,
-                  sampleRate: audioConfig.sampleRate,
-                  numberOfChannels: audioConfig.numberOfChannels,
-                });
-              }
-            }
-          } catch (e) {
-            console.error('Config Error', e);
-          }
-          continue;
-        }
-
-        // HANDLE VIDEO
         if (frameType === 1 || frameType === 2) {
-          // Kiểm tra kỹ trạng thái decoder trước khi gọi decode
+          // if (videoDecoderRef.current && videoDecoderRef.current.state === 'configured') {
+          //   const isKeyFrame = frameType === 1;
+
+          //   if (isWaitingForKeyFrame.current) {
+          //     if (!isKeyFrame) continue; // Skip delta
+          //     console.log('✅ Resumed decoding at KeyFrame');
+          //     isWaitingForKeyFrame.current = false;
+          //   }
+
+          //   // Drop frame logic if decoder is overwhelmed
+          //   if (videoDecoderRef.current.decodeQueueSize > 15 && !isKeyFrame) {
+          //     continue;
+          //   }
+
+          //   try {
+          //     videoDecoderRef.current.decode(
+          //       new EncodedVideoChunk({
+          //         type: isKeyFrame ? 'key' : 'delta',
+          //         timestamp: timestamp * 1000,
+          //         data: payload,
+          //       }),
+          //     );
+          //   } catch (decodeErr) {
+          //     // Bắt lỗi decode đồng bộ (Synchronous errors)
+          //     console.error('Decode call failed:', decodeErr);
+          //     // Nếu lỗi State, buộc reset
+          //     if (videoDecoderRef.current.state === 'closed') {
+          //       // Trigger logic phục hồi (thường error callback sẽ chạy trước, nhưng phòng hờ)
+          //       setupVideoDecoder();
+          //       if (lastVideoConfigRef.current) videoDecoderRef.current.configure(lastVideoConfigRef.current);
+          //       isWaitingForKeyFrame.current = true;
+          //     }
+          //   }
+          // }
+
+          if (!videoDecoderRef.current) {
+            // Audio-only call, skip video frames
+            continue;
+          }
+
           if (videoDecoderRef.current && videoDecoderRef.current.state === 'configured') {
             const isKeyFrame = frameType === 1;
+            if (isWaitingForKeyFrame.current && !isKeyFrame) continue;
+            if (isWaitingForKeyFrame.current) isWaitingForKeyFrame.current = false;
+            if (videoDecoderRef.current.decodeQueueSize > 15 && !isKeyFrame) continue;
 
-            if (isWaitingForKeyFrame.current) {
-              if (!isKeyFrame) continue; // Skip delta
-              console.log('✅ Resumed decoding at KeyFrame');
-              isWaitingForKeyFrame.current = false;
-            }
-
-            // Drop frame logic if decoder is overwhelmed
-            if (videoDecoderRef.current.decodeQueueSize > 10 && !isKeyFrame) {
-              continue;
-            }
-
-            try {
-              videoDecoderRef.current.decode(
-                new EncodedVideoChunk({
-                  type: isKeyFrame ? 'key' : 'delta',
-                  timestamp: timestamp * 1000,
-                  data: payload,
-                }),
-              );
-            } catch (decodeErr) {
-              // Bắt lỗi decode đồng bộ (Synchronous errors)
-              console.error('Decode call failed:', decodeErr);
-              // Nếu lỗi State, buộc reset
-              if (videoDecoderRef.current.state === 'closed') {
-                // Trigger logic phục hồi (thường error callback sẽ chạy trước, nhưng phòng hờ)
-                setupVideoDecoder();
-                if (lastVideoConfigRef.current) videoDecoderRef.current.configure(lastVideoConfigRef.current);
-                isWaitingForKeyFrame.current = true;
-              }
-            }
+            videoDecoderRef.current.decode(
+              new EncodedVideoChunk({
+                type: isKeyFrame ? 'key' : 'delta',
+                timestamp: timestamp * 1000,
+                data: payload,
+              }),
+            );
           }
         }
-        // HANDLE AUDIO
-        else if (frameType === 3) {
-          if (audioDecoderRef.current && audioDecoderRef.current.state === 'configured') {
-            try {
-              audioDecoderRef.current.decode(
-                new EncodedAudioChunk({
-                  type: 'key',
-                  timestamp: timestamp * 1000,
-                  data: payload,
-                }),
-              );
-            } catch (e) {
-              console.error('Audio decode err', e);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Stream loop error', error);
+      } catch (e) {
+        console.error('Video Loop Error', e);
         break;
       }
     }
-  }, [initDecoders, playDecodedAudio, setupVideoDecoder]);
+  }, []);
+
+  const mediaDecoder = useCallback(async () => {
+    initDecoders();
+
+    // Chạy song song 2 luồng độc lập, không đợi lẫn nhau
+    // Dùng Promise.all để giữ hàm mediaDecoder không bị kết thúc
+    try {
+      await Promise.all([runVideoLoop(), runAudioConfigLoop()]);
+    } catch (e) {
+      console.error('Media loops stopped:', e);
+    }
+  }, [initDecoders, runVideoLoop, runAudioConfigLoop]);
+
+  // const mediaDecoder = useCallback(async () => {
+  //   initDecoders();
+
+  //   // Hàm tiện ích để lắng nghe gói tin từ cả hai nguồn
+  //   const getNextPacket = async () => {
+  //     // Tạo Promise để lắng nghe Audio/Config
+  //     const recvPromise = nodeCall.asyncRecv().then(data => ({ data }));
+
+  //     // Tạo Promise để lắng nghe Video
+  //     const recvRaptorQPromise = nodeCall.asyncRecvRaptorQ().then(data => ({ data }));
+
+  //     // Chờ gói tin nào đến trước (race)
+  //     return Promise.race([recvPromise, recvRaptorQPromise]);
+  //   };
+
+  //   while (true) {
+  //     try {
+  //       if (!nodeCall) break;
+
+  //       // --- 1. Nhận gói tin từ luồng đến trước ---
+  //       const receivedPacket = await getNextPacket();
+  //       const data = receivedPacket.data;
+
+  //       // const data = await nodeCall.asyncRecv();
+
+  //       const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+
+  //       console.log('---buffer.byteLength--', buffer.byteLength);
+
+  //       if (buffer.byteLength < 5) continue;
+  //       const view = new DataView(buffer);
+  //       const frameType = view.getUint8(0);
+  //       const timestamp = view.getUint32(1, false);
+  //       let payload = frameType === 0 ? buffer.slice(1) : buffer.slice(5);
+
+  //       // HANDLE CONFIG
+  //       if (frameType === 0) {
+  //         try {
+  //           const decoder = new TextDecoder();
+  //           const configMsg = JSON.parse(decoder.decode(payload));
+
+  //           console.log('--configMsg--', configMsg);
+
+  //           if (configMsg.videoConfig) {
+  //             isWaitingForKeyFrame.current = true;
+  //             const desc = Uint8Array.from(atob(configMsg.videoConfig.description), c => c.charCodeAt(0)).buffer;
+  //             const codec = replaceNumbers(configMsg.videoConfig.codec);
+  //             configMsg.videoConfig.codec = codec;
+
+  //             // Lưu config lại để dùng cho việc phục hồi sau lỗi
+  //             const videoConfig = { ...configMsg.videoConfig, description: desc };
+  //             lastVideoConfigRef.current = videoConfig;
+
+  //             if (videoDecoderRef.current && videoDecoderRef.current.state !== 'closed') {
+  //               videoDecoderRef.current.configure(videoConfig);
+  //             }
+  //           }
+  //           if (configMsg.audioConfig) {
+  //             if (audioDecoderRef.current && audioDecoderRef.current.state !== 'closed') {
+  //               const audioConfig = configMsg.audioConfig;
+  //               audioDecoderRef.current.configure({
+  //                 codec: audioConfig.codec,
+  //                 sampleRate: audioConfig.sampleRate,
+  //                 numberOfChannels: audioConfig.numberOfChannels,
+  //               });
+  //             }
+  //           }
+  //         } catch (e) {
+  //           console.error('Config Error', e);
+  //         }
+  //         continue;
+  //       }
+
+  //       // HANDLE VIDEO
+  //       if (frameType === 1 || frameType === 2) {
+  //         // Kiểm tra kỹ trạng thái decoder trước khi gọi decode
+  //         if (videoDecoderRef.current && videoDecoderRef.current.state === 'configured') {
+  //           const isKeyFrame = frameType === 1;
+
+  //           if (isWaitingForKeyFrame.current) {
+  //             if (!isKeyFrame) continue; // Skip delta
+  //             console.log('✅ Resumed decoding at KeyFrame');
+  //             isWaitingForKeyFrame.current = false;
+  //           }
+
+  //           // Drop frame logic if decoder is overwhelmed
+  //           if (videoDecoderRef.current.decodeQueueSize > 10 && !isKeyFrame) {
+  //             continue;
+  //           }
+
+  //           try {
+  //             videoDecoderRef.current.decode(
+  //               new EncodedVideoChunk({
+  //                 type: isKeyFrame ? 'key' : 'delta',
+  //                 timestamp: timestamp * 1000,
+  //                 data: payload,
+  //               }),
+  //             );
+  //           } catch (decodeErr) {
+  //             // Bắt lỗi decode đồng bộ (Synchronous errors)
+  //             console.error('Decode call failed:', decodeErr);
+  //             // Nếu lỗi State, buộc reset
+  //             if (videoDecoderRef.current.state === 'closed') {
+  //               // Trigger logic phục hồi (thường error callback sẽ chạy trước, nhưng phòng hờ)
+  //               setupVideoDecoder();
+  //               if (lastVideoConfigRef.current) videoDecoderRef.current.configure(lastVideoConfigRef.current);
+  //               isWaitingForKeyFrame.current = true;
+  //             }
+  //           }
+  //         }
+  //       }
+  //       // HANDLE AUDIO
+  //       else if (frameType === 3) {
+  //         if (audioDecoderRef.current && audioDecoderRef.current.state === 'configured') {
+  //           try {
+  //             audioDecoderRef.current.decode(
+  //               new EncodedAudioChunk({
+  //                 type: 'key',
+  //                 timestamp: timestamp * 1000,
+  //                 data: payload,
+  //               }),
+  //             );
+  //           } catch (e) {
+  //             console.error('Audio decode err', e);
+  //           }
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error('Stream loop error', error);
+  //       break;
+  //     }
+  //   }
+  // }, [initDecoders, playDecodedAudio, setupVideoDecoder]);
 
   const resetDecoders = useCallback(() => {
     // Đóng VideoDecoder

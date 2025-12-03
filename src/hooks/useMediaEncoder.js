@@ -8,15 +8,20 @@ export const useMediaEncoder = () => {
   const videoConfigRef = useRef(null);
   const audioConfigRef = useRef(null);
 
-  const sendDecoderConfigs = useCallback(async () => {
-    if (videoConfigRef.current && audioConfigRef.current && !configSentRef.current) {
+  const sendDecoderConfigs = useCallback(async (hasVideo, hasAudio) => {
+    const videoReady = !hasVideo || videoConfigRef.current !== null;
+    const audioReady = !hasAudio || audioConfigRef.current !== null;
+
+    const hasVideoConfig = videoConfigRef.current !== null;
+    const hasAudioConfig = audioConfigRef.current !== null;
+
+    if (videoReady && audioReady && !configSentRef.current) {
       const configMsg = {
         type: 'DecoderConfigs',
-        videoConfig: videoConfigRef.current,
-        audioConfig: audioConfigRef.current,
+        ...(hasVideoConfig && { videoConfig: videoConfigRef.current }),
+        ...(hasAudioConfig && { audioConfig: audioConfigRef.current }),
       };
 
-      // Gửi config qua packet với type=0
       const configPacket = createPacketWithHeader(null, null, 'config', configMsg);
       await nodeCall.asyncSend(configPacket);
       configSentRef.current = true;
@@ -25,7 +30,12 @@ export const useMediaEncoder = () => {
 
   const sendPacketOrQueue = useCallback(async (packet, type) => {
     if (configSentRef.current) {
-      await nodeCall.asyncSend(packet);
+      // await nodeCall.asyncSend(packet);
+      if (type === 'audio') {
+        await nodeCall.asyncSend(packet);
+      } else if (type === 'video') {
+        await nodeCall.sendRaptorQ(packet);
+      }
     }
   }, []);
 
@@ -37,7 +47,7 @@ export const useMediaEncoder = () => {
     return btoa(binary);
   };
 
-  const createPacketWithHeader = useCallback((data, timestamp, type, configMsg = null) => {
+  const createPacketWithHeader = useCallback((data, timestamp, type, configMsg) => {
     let HEADER_SIZE = 5; // 5 bytes cho header
 
     let payload;
@@ -120,123 +130,123 @@ export const useMediaEncoder = () => {
     }
   }, []);
 
-  const initEncoders = useCallback(async videoTrack => {
-    const settings = videoTrack.getSettings();
-    const videoWidth = settings.width || 1280;
-    const videoHeight = settings.height || 720;
+  const initEncoders = useCallback(
+    async (videoTrack, audioTrack) => {
+      const hasVideo = !!videoTrack;
+      const hasAudio = !!audioTrack;
 
-    // init video encoder
-    const videoEncoder = new VideoEncoder({
-      output: (chunk, metadata) => {
-        if (metadata?.decoderConfig && !configSentRef.current) {
-          const description = metadata.decoderConfig.description;
-          const base64Description = base64Encode(description);
+      if (videoTrack) {
+        const settings = videoTrack.getSettings();
+        const videoWidth = settings.width || 1280;
+        const videoHeight = settings.height || 720;
 
-          videoConfigRef.current = {
-            codec: metadata.decoderConfig.codec ?? 'hev1.1.6.L93.B0',
-            codedWidth: metadata.decoderConfig.codedWidth ?? videoWidth,
-            codedHeight: metadata.decoderConfig.codedHeight ?? videoHeight,
-            frameRate: metadata.decoderConfig.framerate ?? 30.0,
-            description: base64Description,
-            orientation: 0,
-          };
+        // init video encoder
+        const videoEncoder = new VideoEncoder({
+          output: (chunk, metadata) => {
+            if (metadata?.decoderConfig && !configSentRef.current) {
+              const description = metadata.decoderConfig.description;
+              const base64Description = base64Encode(description);
 
-          sendDecoderConfigs();
-        }
+              videoConfigRef.current = {
+                codec: metadata.decoderConfig.codec ?? 'hev1.1.6.L93.B0',
+                codedWidth: metadata.decoderConfig.codedWidth ?? videoWidth,
+                codedHeight: metadata.decoderConfig.codedHeight ?? videoHeight,
+                frameRate: metadata.decoderConfig.framerate ?? 30.0,
+                description: base64Description,
+                orientation: 0,
+              };
 
-        if (chunk && configSentRef.current) {
-          const data = new ArrayBuffer(chunk.byteLength);
-          chunk.copyTo(data);
-          const type = chunk.type === 'key' ? 'video-key' : 'video-delta';
-          // const timestamp = chunk.timestamp / 1000;
-          const timestamp = Math.floor(chunk.timestamp / 1000);
+              sendDecoderConfigs(hasVideo, hasAudio);
+            }
 
-          // console.log('🎥 Video Frame:', {
-          //   type: chunk.type,
-          //   timestamp: `${timestamp}ms`,
-          //   originalTimestamp: `${chunk.timestamp}µs`,
-          //   size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
-          // });
+            if (chunk && configSentRef.current) {
+              const data = new ArrayBuffer(chunk.byteLength);
+              chunk.copyTo(data);
+              const type = chunk.type === 'key' ? 'video-key' : 'video-delta';
+              // const timestamp = chunk.timestamp / 1000;
+              const timestamp = Math.floor(chunk.timestamp / 1000);
+              const packet = createPacketWithHeader(data, timestamp, type, null);
+              sendPacketOrQueue(packet, 'video');
+            }
+          },
+          error: console.error,
+        });
 
-          const packet = createPacketWithHeader(data, timestamp, type);
-          sendPacketOrQueue(packet, 'video');
-        }
-      },
-      error: console.error,
-    });
+        videoEncoder.configure({
+          codec: 'hev1.1.6.L93.B0',
+          width: videoWidth,
+          height: videoHeight,
+          bitrate: 800000,
+          framerate: 30,
+          latencyMode: 'realtime',
+          hardwareAcceleration: 'prefer-hardware',
+        });
 
-    videoEncoder.configure({
-      codec: 'hev1.1.6.L93.B0',
-      width: videoWidth,
-      height: videoHeight,
-      bitrate: 800000,
-      framerate: 30,
-      latencyMode: 'realtime',
-      hardwareAcceleration: 'prefer-hardware',
-    });
+        videoEncoderRef.current = videoEncoder;
+      }
 
-    videoEncoderRef.current = videoEncoder;
+      // init audio encoder
+      if (audioTrack) {
+        const audioEncoder = new AudioEncoder({
+          output: (chunk, metadata) => {
+            if (metadata?.decoderConfig && !configSentRef.current) {
+              const description = metadata.decoderConfig.description;
+              const base64Description = base64Encode(description);
 
-    // init audio encoder
-    const audioEncoder = new AudioEncoder({
-      output: (chunk, metadata) => {
-        if (metadata?.decoderConfig && !configSentRef.current) {
-          const description = metadata.decoderConfig.description;
-          const base64Description = base64Encode(description);
+              audioConfigRef.current = {
+                codec: metadata.decoderConfig.codec ?? 'opus',
+                sampleRate: metadata.decoderConfig.sampleRate ?? 48000,
+                numberOfChannels: metadata.decoderConfig.numberOfChannels ?? 1,
+                description: base64Description,
+              };
+              sendDecoderConfigs(hasVideo, hasAudio);
+            }
 
-          audioConfigRef.current = {
-            codec: metadata.decoderConfig.codec ?? 'opus',
-            sampleRate: metadata.decoderConfig.sampleRate ?? 48000,
-            numberOfChannels: metadata.decoderConfig.numberOfChannels ?? 1,
-            description: base64Description,
-          };
-          sendDecoderConfigs();
-        }
+            if (chunk && configSentRef.current) {
+              const data = new ArrayBuffer(chunk.byteLength);
+              chunk.copyTo(data);
 
-        if (chunk && configSentRef.current) {
-          const data = new ArrayBuffer(chunk.byteLength);
-          chunk.copyTo(data);
+              // const timestamp = chunk.timestamp / 1000;
+              const timestamp = Math.floor(chunk.timestamp / 1000);
 
-          // const timestamp = chunk.timestamp / 1000;
-          const timestamp = Math.floor(chunk.timestamp / 1000);
+              const packet = createPacketWithHeader(data, timestamp, 'audio', null);
+              sendPacketOrQueue(packet, 'audio');
+            }
+          },
+          error: console.error,
+        });
 
-          // console.log('🔊 Audio Chunk:', {
-          //   timestamp: `${timestamp}ms`,
-          //   originalTimestamp: `${chunk.timestamp}µs`,
-          //   size: `${(chunk.byteLength / 1024).toFixed(2)} KB`,
-          // });
+        audioEncoder.configure({
+          codec: 'opus',
+          sampleRate: 48000,
+          numberOfChannels: 1,
+          bitrate: 64000,
+        });
 
-          const packet = createPacketWithHeader(data, timestamp, 'audio');
-          sendPacketOrQueue(packet, 'audio');
-        }
-      },
-      error: console.error,
-    });
-
-    audioEncoder.configure({
-      codec: 'opus',
-      sampleRate: 48000,
-      numberOfChannels: 1,
-      bitrate: 64000,
-    });
-
-    audioEncoderRef.current = audioEncoder;
-  }, []);
+        audioEncoderRef.current = audioEncoder;
+      }
+    },
+    [sendDecoderConfigs],
+  );
 
   const mediaEncoder = useCallback(localStream => {
     const videoTrack = localStream.getVideoTracks()[0];
     const audioTrack = localStream.getAudioTracks()[0];
-    initEncoders(videoTrack);
+    initEncoders(videoTrack, audioTrack);
 
     // Process video
-    const videoProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
-    const videoReader = videoProcessor.readable.getReader();
-    processVideoFrames(videoReader);
+    if (videoTrack) {
+      const videoProcessor = new MediaStreamTrackProcessor({ track: videoTrack });
+      const videoReader = videoProcessor.readable.getReader();
+      processVideoFrames(videoReader);
+    }
 
     // Process audio
-    const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
-    const audioReader = audioProcessor.readable.getReader();
-    processAudioFrames(audioReader);
+    if (audioTrack) {
+      const audioProcessor = new MediaStreamTrackProcessor({ track: audioTrack });
+      const audioReader = audioProcessor.readable.getReader();
+      processAudioFrames(audioReader);
+    }
   }, []);
 
   const resetEncoders = useCallback(() => {

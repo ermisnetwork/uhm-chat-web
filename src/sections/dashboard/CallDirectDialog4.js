@@ -283,30 +283,18 @@ const CallDirectDialog4 = () => {
         localVideoRef.current.srcObject = localStream;
       }
 
-      mediaEncoder(localStream);
+      // mediaEncoder(localStream);
       // mediaDecoder();
-
-      if (data.type === 'incoming') {
-        // const address = data?.metadata?.address;
-        // await nodeCall.connect(address);
-        // await nodeCall.openBidiStream();
-        // console.log('-----opened BidiStream----');
-        // mediaEncoder(localStream);
-        // mediaDecoder();
-      } else {
-        // mediaDecoder();
-        // mediaEncoder(localStream);
-      }
     };
 
     callClient.onAcceptCallEvent = async event => {
-      mediaDecoder();
+      // mediaDecoder();
       if (event.user_id !== user_id) {
         await nodeCall.acceptConnection();
         await nodeCall.acceptBidiStream();
         console.log('-----acceptBidiStream----');
         // const localStream = callClient.localStream;
-        // mediaDecoder();
+        mediaDecoder();
         // mediaEncoder(localStream);
       }
     };
@@ -366,8 +354,8 @@ const CallDirectDialog4 = () => {
     await nodeCall.connect(address);
     await nodeCall.openBidiStream();
     console.log('-----opened BidiStream----');
-    // const localStream = callClient.localStream;
-    // mediaEncoder(localStream);
+    const localStream = callClient.localStream;
+    mediaEncoder(localStream);
     // mediaDecoder();
   };
 
