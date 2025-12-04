@@ -955,7 +955,17 @@ const ReplyMsg = ({ el, all_members, onScrollToReplyMsg }) => {
           {linkPreviewMsg && <LinkPreview linkPreview={linkPreviewMsg} />}
           {attachmentsOfMsg && <Attachments attachments={attachmentsOfMsg} />}
           {voiceMsg && <VoiceLine voiceMsg={voiceMsg} />}
-          {el.sticker_url ? (
+          {el.sticker_url && el.sticker_url.endsWith('.tgs') ? (
+            <Box sx={{ mt: 0.5 }}>
+              <tgs-player
+                autoplay
+                loop
+                mode="normal"
+                src={el.sticker_url}
+                style={{ width: '200px', height: '200px' }}
+              ></tgs-player>
+            </Box>
+          ) : el.sticker_url ? (
             <Box sx={{ mt: 0.5 }}>
               <ImageCanvas
                 dataUrl={el.sticker_url}
