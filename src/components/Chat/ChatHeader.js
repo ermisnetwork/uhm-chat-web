@@ -265,6 +265,9 @@ const ChatHeader = () => {
   const onStartCall = useCallback(
     async callType => {
       const address = await nodeCall.getLocalEndpointAddr();
+
+      console.log('--address--', address);
+
       const metadata = {
         address,
       };

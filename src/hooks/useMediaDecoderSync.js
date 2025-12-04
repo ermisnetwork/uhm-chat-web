@@ -9,13 +9,16 @@ export const useMediaDecoderSync = remoteVideoRef => {
   const audioContextRef = useRef(null);
   const mediaDestinationRef = useRef(null);
   const nextStartTimeRef = useRef(0);
-
-  // Lưu cấu hình Video gần nhất để khôi phục khi Decoder bị crash
   const lastVideoConfigRef = useRef(null);
+  const canReceiveDataRef = useRef(false);
 
   // Cấu hình độ trễ chấp nhận được (giây)
   const MAX_AUDIO_LATENCY = 0.1; // 100ms
   const MIN_BUFFER_AHEAD = 0.02; // 20ms
+
+  const setCanReceiveData = useCallback(canReceive => {
+    canReceiveDataRef.current = canReceive;
+  }, []);
 
   const initAudioContext = useCallback(async () => {
     if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
@@ -35,6 +38,11 @@ export const useMediaDecoderSync = remoteVideoRef => {
 
   const playDecodedAudio = useCallback(async audioData => {
     try {
+      if (!canReceiveDataRef.current) {
+        audioData.close();
+        return;
+      }
+
       const audioContext = audioContextRef.current;
       if (!audioContext) {
         audioData.close();
@@ -92,6 +100,11 @@ export const useMediaDecoderSync = remoteVideoRef => {
     const videoDecoder = new VideoDecoder({
       output: async frame => {
         try {
+          if (!canReceiveDataRef.current) {
+            frame.close();
+            return;
+          }
+
           // Backpressure logic
           if (videoWriterRef.current && videoWriterRef.current.desiredSize <= 0) {
             frame.close();
@@ -178,68 +191,85 @@ export const useMediaDecoderSync = remoteVideoRef => {
     while (true) {
       if (!nodeCall) break;
       try {
-        // Chỉ gọi hàm nhận Audio/Config
         const data = await nodeCall.asyncRecv();
-
+        if (!canReceiveDataRef.current) {
+          continue;
+        }
         const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        if (buffer.byteLength < 5) continue;
+
+        // Config packets có 1 byte header, data packets có 5 bytes
+        if (buffer.byteLength < 1) continue;
 
         const view = new DataView(buffer);
         const frameType = view.getUint8(0);
-        const timestamp = view.getUint32(1, false);
-        const payload = frameType === 0 ? buffer.slice(1) : buffer.slice(5);
 
-        // Handle Config
+        // Type mapping: videoConfig=0, audioConfig=1, video-key=2, video-delta=3, audio=4
+
+        // Handle VideoConfig (frameType = 0)
         if (frameType === 0) {
+          const payload = buffer.slice(1); // Chỉ có 1 byte header
           const decoder = new TextDecoder();
-          const configMsg = JSON.parse(decoder.decode(payload));
+          const videoConfig = JSON.parse(decoder.decode(payload));
 
-          console.log('--configMsg--', configMsg);
+          console.log('--videoConfig--', videoConfig);
 
-          if (configMsg.videoConfig) {
-            if (!videoWriterRef.current) {
-              const videoTrackGenerator = new MediaStreamTrackGenerator({ kind: 'video' });
-              videoWriterRef.current = videoTrackGenerator.writable.getWriter();
+          // Tạo video track nếu chưa có
+          if (!videoWriterRef.current) {
+            const videoTrackGenerator = new MediaStreamTrackGenerator({ kind: 'video' });
+            videoWriterRef.current = videoTrackGenerator.writable.getWriter();
 
-              // Thêm video track vào stream hiện tại
-              const audioTrack = mediaDestinationRef.current.stream.getAudioTracks()[0];
-              const combinedStream = new MediaStream([videoTrackGenerator, audioTrack]);
+            const audioTrack = mediaDestinationRef.current.stream.getAudioTracks()[0];
+            const combinedStream = new MediaStream([videoTrackGenerator, audioTrack]);
 
-              if (remoteVideoRef.current) {
-                remoteVideoRef.current.srcObject = combinedStream;
-              }
-            }
-
-            if (!videoDecoderRef.current) {
-              setupVideoDecoder();
-            }
-
-            isWaitingForKeyFrame.current = true;
-            const desc = Uint8Array.from(atob(configMsg.videoConfig.description), c => c.charCodeAt(0)).buffer;
-            const codec = replaceNumbers(configMsg.videoConfig.codec);
-            configMsg.videoConfig.codec = codec;
-
-            // Lưu config lại để dùng cho việc phục hồi sau lỗi
-            const videoConfig = { ...configMsg.videoConfig, description: desc };
-            lastVideoConfigRef.current = videoConfig;
-
-            if (videoDecoderRef.current && videoDecoderRef.current.state !== 'closed') {
-              videoDecoderRef.current.configure(videoConfig);
+            if (remoteVideoRef.current) {
+              remoteVideoRef.current.srcObject = combinedStream;
             }
           }
-          if (configMsg.audioConfig) {
-            if (audioDecoderRef.current && audioDecoderRef.current.state !== 'closed') {
-              const audioConfig = configMsg.audioConfig;
-              audioDecoderRef.current.configure({
-                codec: audioConfig.codec,
-                sampleRate: audioConfig.sampleRate,
-                numberOfChannels: audioConfig.numberOfChannels,
-              });
-            }
+
+          // Tạo video decoder nếu chưa có
+          if (!videoDecoderRef.current) {
+            setupVideoDecoder();
+          }
+
+          isWaitingForKeyFrame.current = true;
+          const desc = Uint8Array.from(atob(videoConfig.description), c => c.charCodeAt(0)).buffer;
+          const codec = replaceNumbers(videoConfig.codec);
+
+          const decoderConfig = {
+            codec: codec,
+            codedWidth: videoConfig.codedWidth,
+            codedHeight: videoConfig.codedHeight,
+            description: desc,
+          };
+
+          lastVideoConfigRef.current = decoderConfig;
+
+          if (videoDecoderRef.current && videoDecoderRef.current.state !== 'closed') {
+            videoDecoderRef.current.configure(decoderConfig);
           }
         }
-        // Handle Audio
-        else if (frameType === 3) {
+        // Handle AudioConfig (frameType = 1)
+        else if (frameType === 1) {
+          const payload = buffer.slice(1); // Chỉ có 1 byte header
+          const decoder = new TextDecoder();
+          const audioConfig = JSON.parse(decoder.decode(payload));
+
+          console.log('--audioConfig--', audioConfig);
+
+          if (audioDecoderRef.current && audioDecoderRef.current.state !== 'closed') {
+            audioDecoderRef.current.configure({
+              codec: audioConfig.codec,
+              sampleRate: audioConfig.sampleRate,
+              numberOfChannels: audioConfig.numberOfChannels,
+            });
+          }
+        }
+        // Handle Audio Data (frameType = 4)
+        else if (frameType === 4) {
+          if (buffer.byteLength < 5) continue;
+          const timestamp = view.getUint32(1, false);
+          const payload = buffer.slice(5);
+
           if (audioDecoderRef.current && audioDecoderRef.current.state === 'configured') {
             audioDecoderRef.current.decode(
               new EncodedAudioChunk({
@@ -262,70 +292,56 @@ export const useMediaDecoderSync = remoteVideoRef => {
     while (true) {
       if (!nodeCall) break;
       try {
-        // Chỉ gọi hàm nhận Video
         const data = await nodeCall.asyncRecvRaptorQ();
+
+        if (!canReceiveDataRef.current) {
+          continue;
+        }
 
         const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         if (buffer.byteLength < 5) continue;
+
         const view = new DataView(buffer);
         const frameType = view.getUint8(0);
         const timestamp = view.getUint32(1, false);
-        const payload = frameType === 0 ? buffer.slice(1) : buffer.slice(5);
+        const payload = buffer.slice(5);
 
-        if (frameType === 1 || frameType === 2) {
-          // if (videoDecoderRef.current && videoDecoderRef.current.state === 'configured') {
-          //   const isKeyFrame = frameType === 1;
-
-          //   if (isWaitingForKeyFrame.current) {
-          //     if (!isKeyFrame) continue; // Skip delta
-          //     console.log('✅ Resumed decoding at KeyFrame');
-          //     isWaitingForKeyFrame.current = false;
-          //   }
-
-          //   // Drop frame logic if decoder is overwhelmed
-          //   if (videoDecoderRef.current.decodeQueueSize > 15 && !isKeyFrame) {
-          //     continue;
-          //   }
-
-          //   try {
-          //     videoDecoderRef.current.decode(
-          //       new EncodedVideoChunk({
-          //         type: isKeyFrame ? 'key' : 'delta',
-          //         timestamp: timestamp * 1000,
-          //         data: payload,
-          //       }),
-          //     );
-          //   } catch (decodeErr) {
-          //     // Bắt lỗi decode đồng bộ (Synchronous errors)
-          //     console.error('Decode call failed:', decodeErr);
-          //     // Nếu lỗi State, buộc reset
-          //     if (videoDecoderRef.current.state === 'closed') {
-          //       // Trigger logic phục hồi (thường error callback sẽ chạy trước, nhưng phòng hờ)
-          //       setupVideoDecoder();
-          //       if (lastVideoConfigRef.current) videoDecoderRef.current.configure(lastVideoConfigRef.current);
-          //       isWaitingForKeyFrame.current = true;
-          //     }
-          //   }
-          // }
-
+        // Handle Video Data (frameType = 2: key, frameType = 3: delta)
+        if (frameType === 2 || frameType === 3) {
           if (!videoDecoderRef.current) {
             // Audio-only call, skip video frames
             continue;
           }
 
           if (videoDecoderRef.current && videoDecoderRef.current.state === 'configured') {
-            const isKeyFrame = frameType === 1;
+            const isKeyFrame = frameType === 2;
+
             if (isWaitingForKeyFrame.current && !isKeyFrame) continue;
-            if (isWaitingForKeyFrame.current) isWaitingForKeyFrame.current = false;
+            if (isWaitingForKeyFrame.current) {
+              console.log('✅ Resumed decoding at KeyFrame');
+              isWaitingForKeyFrame.current = false;
+            }
+
             if (videoDecoderRef.current.decodeQueueSize > 15 && !isKeyFrame) continue;
 
-            videoDecoderRef.current.decode(
-              new EncodedVideoChunk({
-                type: isKeyFrame ? 'key' : 'delta',
-                timestamp: timestamp * 1000,
-                data: payload,
-              }),
-            );
+            try {
+              videoDecoderRef.current.decode(
+                new EncodedVideoChunk({
+                  type: isKeyFrame ? 'key' : 'delta',
+                  timestamp: timestamp * 1000,
+                  data: payload,
+                }),
+              );
+            } catch (decodeErr) {
+              console.error('Decode call failed:', decodeErr);
+              if (videoDecoderRef.current.state === 'closed') {
+                setupVideoDecoder();
+                if (lastVideoConfigRef.current) {
+                  videoDecoderRef.current.configure(lastVideoConfigRef.current);
+                }
+                isWaitingForKeyFrame.current = true;
+              }
+            }
           }
         }
       } catch (e) {
@@ -333,7 +349,7 @@ export const useMediaDecoderSync = remoteVideoRef => {
         break;
       }
     }
-  }, []);
+  }, [setupVideoDecoder]);
 
   const mediaDecoder = useCallback(async () => {
     initDecoders();
@@ -518,12 +534,8 @@ export const useMediaDecoderSync = remoteVideoRef => {
     mediaDestinationRef.current = null;
     nextStartTimeRef.current = 0;
     lastVideoConfigRef.current = null;
+    canReceiveDataRef.current = false;
+  }, []);
 
-    // Xóa srcObject của video nếu cần
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = null;
-    }
-  }, [remoteVideoRef]);
-
-  return { mediaDecoder, resetDecoders };
+  return { mediaDecoder, resetDecoders, setCanReceiveData };
 };

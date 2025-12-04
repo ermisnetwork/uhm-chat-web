@@ -177,8 +177,8 @@ const CallDirectDialog4 = () => {
   const [micMenuAnchor, setMicMenuAnchor] = useState(null);
   const [cameraMenuAnchor, setCameraMenuAnchor] = useState(null);
 
-  const { mediaEncoder, resetEncoders } = useMediaEncoder();
-  const { mediaDecoder, resetDecoders } = useMediaDecoderSync(remoteVideoRef);
+  const { mediaEncoder, resetEncoders, setCanSendData } = useMediaEncoder();
+  const { mediaDecoder, resetDecoders, setCanReceiveData } = useMediaDecoderSync(remoteVideoRef);
 
   const onCancelCall = () => {
     setMicOn(true);
@@ -214,6 +214,7 @@ const CallDirectDialog4 = () => {
 
     resetEncoders();
     resetDecoders();
+    nodeCall.close();
   };
 
   const startTimer = () => {
@@ -283,19 +284,17 @@ const CallDirectDialog4 = () => {
         localVideoRef.current.srcObject = localStream;
       }
 
-      // mediaEncoder(localStream);
-      // mediaDecoder();
+      mediaEncoder(localStream);
+      mediaDecoder();
     };
 
     callClient.onAcceptCallEvent = async event => {
-      // mediaDecoder();
       if (event.user_id !== user_id) {
         await nodeCall.acceptConnection();
         await nodeCall.acceptBidiStream();
         console.log('-----acceptBidiStream----');
-        // const localStream = callClient.localStream;
-        mediaDecoder();
-        // mediaEncoder(localStream);
+        setCanSendData(true);
+        setCanReceiveData(true);
       }
     };
 
@@ -354,9 +353,8 @@ const CallDirectDialog4 = () => {
     await nodeCall.connect(address);
     await nodeCall.openBidiStream();
     console.log('-----opened BidiStream----');
-    const localStream = callClient.localStream;
-    mediaEncoder(localStream);
-    // mediaDecoder();
+    setCanSendData(true);
+    setCanReceiveData(true);
   };
 
   const onSendEndCall = async () => {
