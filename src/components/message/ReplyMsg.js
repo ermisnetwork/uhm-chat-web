@@ -7,10 +7,10 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import Attachments from './AttachmentMsg';
+import Attachments from '../Attachments';
 import VoiceLine from './VoiceLine';
 import TextLine from './TextLine';
-import LinkPreview from './LinkPreviewMsg';
+import LinkPreview from '../LinkPreview';
 import MessageOption from '../message/MessageOption';
 import { formatString, displayMessageWithMentionName } from '../../utils/commons';
 import ImageCanvas from '../ImageCanvas';
