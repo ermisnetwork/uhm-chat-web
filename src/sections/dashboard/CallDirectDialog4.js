@@ -214,7 +214,7 @@ const CallDirectDialog4 = () => {
 
     resetEncoders();
     resetDecoders();
-    nodeCall.close();
+    nodeCall.closeConnection();
   };
 
   const startTimer = () => {
@@ -291,7 +291,7 @@ const CallDirectDialog4 = () => {
     callClient.onAcceptCallEvent = async event => {
       if (event.user_id !== user_id) {
         await nodeCall.acceptConnection();
-        await nodeCall.acceptBidiStream();
+        // await nodeCall.acceptBidiStream();
         console.log('-----acceptBidiStream----');
         setCanSendData(true);
         setCanReceiveData(true);
@@ -351,7 +351,7 @@ const CallDirectDialog4 = () => {
     setLoadingButton(true);
     await callClient.acceptCall();
     await nodeCall.connect(address);
-    await nodeCall.openBidiStream();
+    // await nodeCall.openBidiStream();
     console.log('-----opened BidiStream----');
     setCanSendData(true);
     setCanReceiveData(true);

@@ -25,7 +25,7 @@ export const useMediaEncoder = () => {
   const sendVideoConfig = useCallback(async () => {
     if (videoConfigRef.current && !videoConfigSentRef.current && canSendDataRef.current) {
       const configPacket = createPacketWithHeader(null, null, 'videoConfig', videoConfigRef.current);
-      await nodeCall.asyncSend(configPacket);
+      await nodeCall.sendControlFrame(configPacket);
       videoConfigSentRef.current = true;
     }
   }, []);
@@ -33,7 +33,13 @@ export const useMediaEncoder = () => {
   const sendAudioConfig = useCallback(async () => {
     if (audioConfigRef.current && !audioConfigSentRef.current && canSendDataRef.current) {
       const configPacket = createPacketWithHeader(null, null, 'audioConfig', audioConfigRef.current);
-      await nodeCall.asyncSend(configPacket);
+      await nodeCall.sendControlFrame(configPacket);
+
+      // if (hasVideoRef.current) {
+      //   await nodeCall.sendControlFrame(configPacket);
+      // } else {
+      //   await nodeCall.sendKeyFrame(configPacket);
+      // }
       audioConfigSentRef.current = true;
     }
   }, []);
@@ -59,15 +65,19 @@ export const useMediaEncoder = () => {
   }, []);
 
   const sendPacketOrQueue = useCallback(
-    async (packet, type) => {
+    async (packet, type, frameType) => {
       if (!isReadyToSendData(type)) {
         return; // Chưa sẵn sàng, bỏ qua packet
       }
 
       if (type === 'audio') {
-        await nodeCall.asyncSend(packet);
+        await nodeCall.sendFrame(packet);
       } else if (type === 'video') {
-        await nodeCall.sendRaptorQ(packet);
+        if (frameType === 'video-key') {
+          await nodeCall.beginWithGop(packet);
+        } else if (frameType === 'video-delta') {
+          await nodeCall.sendFrame(packet);
+        }
       }
     },
     [isReadyToSendData],
@@ -183,7 +193,7 @@ export const useMediaEncoder = () => {
         const frame = value;
 
         frameCounter += 1;
-        const keyFrame = frameCounter % 30 === 0;
+        const keyFrame = frameCounter % 60 === 0;
         try {
           videoEncoderRef.current.encode(frame, { keyFrame });
         } catch (err) {
@@ -229,11 +239,11 @@ export const useMediaEncoder = () => {
             if (chunk && isReadyToSendData('video')) {
               const data = new ArrayBuffer(chunk.byteLength);
               chunk.copyTo(data);
-              const type = chunk.type === 'key' ? 'video-key' : 'video-delta';
+              const frameType = chunk.type === 'key' ? 'video-key' : 'video-delta';
               // const timestamp = chunk.timestamp / 1000;
               const timestamp = Math.floor(chunk.timestamp / 1000);
-              const packet = createPacketWithHeader(data, timestamp, type, null);
-              sendPacketOrQueue(packet, 'video');
+              const packet = createPacketWithHeader(data, timestamp, frameType, null);
+              sendPacketOrQueue(packet, 'video', frameType);
             }
           },
           error: console.error,
@@ -277,7 +287,7 @@ export const useMediaEncoder = () => {
               const timestamp = Math.floor(chunk.timestamp / 1000);
 
               const packet = createPacketWithHeader(data, timestamp, 'audio', null);
-              sendPacketOrQueue(packet, 'audio');
+              sendPacketOrQueue(packet, 'audio', null);
             }
           },
           error: console.error,
@@ -293,7 +303,7 @@ export const useMediaEncoder = () => {
         audioEncoderRef.current = audioEncoder;
       }
     },
-    [sendVideoConfig, sendAudioConfig, isReadyToSendData],
+    [isReadyToSendData],
   );
 
   // const initEncoders = useCallback(
