@@ -1,16 +1,11 @@
 import React from 'react';
-import { 
-    Box, 
-    Stack, 
-    Typography,
-    useTheme,
-} from '@mui/material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import Attachments from './AttachmentMsg';
+import Attachments from '../Attachments';
 import VoiceLine from './VoiceLine';
 import TextLine from './TextLine';
-import LinkPreview from './LinkPreviewMsg';
+import LinkPreview from '../LinkPreview';
 import MessageOption from '../message/MessageOption';
 import { formatString, displayMessageWithMentionName } from '../../utils/commons';
 import ImageCanvas from '../ImageCanvas';
@@ -29,9 +24,13 @@ const ReplyMsg = ({ message, all_members, onScrollToReplyMsg }) => {
   const attachmentsOfMsg = message.attachments
     ? message.attachments.filter(attachment => !['linkPreview', 'voiceRecording'].includes(attachment.type))
     : null;
-  const voiceMsg = message.attachments ? message.attachments.find(attachment => attachment.type === 'voiceRecording') : null;
+  const voiceMsg = message.attachments
+    ? message.attachments.find(attachment => attachment.type === 'voiceRecording')
+    : null;
   const linkPreviewMsg =
-    message.attachments && message.attachments[0]?.type === 'linkPreview' && message.attachments[0]?.title ? message.attachments[0] : null;
+    message.attachments && message.attachments[0]?.type === 'linkPreview' && message.attachments[0]?.title
+      ? message.attachments[0]
+      : null;
   const stickerOfQuoted = quotedMessage?.sticker_url ? quotedMessage.sticker_url : null;
 
   return (
@@ -42,7 +41,7 @@ const ReplyMsg = ({ message, all_members, onScrollToReplyMsg }) => {
         sx={{
           backgroundColor: message.isMyMessage ? theme.palette.primary.main : theme.palette.background.neutral,
           borderRadius: 1.5,
-          maxWidth: '100%',
+          maxWidth: '400px',
           position: 'relative',
         }}
       >
@@ -154,12 +153,22 @@ const ReplyMsg = ({ message, all_members, onScrollToReplyMsg }) => {
           {voiceMsg && <VoiceLine voiceMsg={voiceMsg} />}
           {message.sticker_url ? (
             <Box sx={{ mt: 0.5 }}>
-              <ImageCanvas
-                dataUrl={message.sticker_url}
-                width={'150px'}
-                height={'150px'}
-                styleCustom={{ borderRadius: '6px' }}
-              />
+              {message.sticker_url.endsWith('.tgs') ? (
+                <tgs-player
+                  autoplay
+                  loop
+                  mode="normal"
+                  src={message.sticker_url}
+                  style={{ width: '150px', height: '150px' }}
+                ></tgs-player>
+              ) : (
+                <ImageCanvas
+                  dataUrl={message.sticker_url}
+                  width={'150px'}
+                  height={'150px'}
+                  styleCustom={{ borderRadius: '6px' }}
+                />
+              )}
             </Box>
           ) : (
             <TextLine message={message} />
