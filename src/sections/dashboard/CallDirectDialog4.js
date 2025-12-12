@@ -38,9 +38,6 @@ import {
 import { Howl } from 'howler';
 import { showSnackbar } from '../../redux/slices/app';
 import { useTranslation } from 'react-i18next';
-import { useMediaEncoder } from '../../hooks/useMediaEncoder';
-import { useMediaDecoderSync } from '../../hooks/useMediaDecoderSync';
-import { nodeCall } from '../../nodeCall';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -57,7 +54,7 @@ const StyledCallDirectDialog = styled(Dialog, {
       maxHeight: isFullScreen ? '100vh' : 'none',
       margin: isFullScreen ? 0 : 'auto',
       borderRadius: isFullScreen ? 0 : theme.shape.borderRadius,
-      background: theme.palette.mode === 'light' ? '#F0F4FA' : theme.palette.background.paper,
+      background: '#000',
       '&:hover .hoverShow': {
         opacity: 1,
       },
@@ -151,7 +148,6 @@ const CallDirectDialog4 = () => {
   const { callDirectStatus, callDirectData, openCallDirectDialog } = useSelector(state => state.callDirect);
   const callerInfo = callDirectData?.callerInfo;
   const receiverInfo = callDirectData?.receiverInfo;
-  const address = callDirectData?.metadata?.address;
   const { user_id } = useSelector(state => state.auth);
 
   const [micOn, setMicOn] = useState(true);
@@ -177,8 +173,8 @@ const CallDirectDialog4 = () => {
   const [micMenuAnchor, setMicMenuAnchor] = useState(null);
   const [cameraMenuAnchor, setCameraMenuAnchor] = useState(null);
 
-  const { mediaEncoder, resetEncoders, setCanSendData } = useMediaEncoder();
-  const { mediaDecoder, resetDecoders, setCanReceiveData } = useMediaDecoderSync(remoteVideoRef);
+  // const { mediaEncoder, resetEncoders, setCanSendData } = useMediaEncoder();
+  // const { mediaDecoder, resetDecoders, setCanReceiveData } = useMediaDecoderSync(remoteVideoRef);
 
   const onCancelCall = () => {
     setMicOn(true);
@@ -211,10 +207,6 @@ const CallDirectDialog4 = () => {
       ringtone.current.stop();
       ringtone.current = null;
     }
-
-    resetEncoders();
-    resetDecoders();
-    nodeCall.closeConnection();
   };
 
   const startTimer = () => {
@@ -277,25 +269,37 @@ const CallDirectDialog4 = () => {
       dispatch(StartCallDirect(data));
       setLocalCameraOn(data.callType === CallType.VIDEO);
       setRemoteCameraOn(data.callType === CallType.VIDEO);
-
-      const localStream = callClient.localStream;
-
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = localStream;
-      }
-
-      mediaEncoder(localStream);
-      mediaDecoder();
     };
 
-    callClient.onAcceptCallEvent = async event => {
-      if (event.user_id !== user_id) {
-        await nodeCall.acceptConnection();
-        // await nodeCall.acceptBidiStream();
-        console.log('-----acceptBidiStream----');
-        setCanSendData(true);
-        setCanReceiveData(true);
+    callClient.onLocalStream = stream => {
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
       }
+    };
+
+    callClient.onRemoteStream = stream => {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+      }
+    };
+
+    callClient.onScreenShareChange = isShare => {
+      setIsScreenShare(isShare);
+    };
+
+    callClient.onUpgradeCall = user => {
+      setIsUpgradeCall(true);
+      setRemoteCameraOn(true);
+      if (user.id !== user_id) {
+        setRequestVideoCall(true);
+      }
+    };
+
+    callClient.onDataChannelMessage = data => {
+      const remoteVideoEnable = data.video_enable;
+      const remoteAudioEnable = data.audio_enable;
+      setRemoteCameraOn(remoteVideoEnable);
+      setRemoteMicOn(remoteAudioEnable);
     };
 
     callClient.onConnectionMessageChange = msg => {
@@ -333,7 +337,6 @@ const CallDirectDialog4 = () => {
     return () => {
       if (callClient) {
         callClient.onCallEvent = undefined;
-        callClient.onAcceptCallEvent = undefined;
         callClient.onLocalStream = undefined;
         callClient.onRemoteStream = undefined;
         callClient.onConnectionMessageChange = undefined;
@@ -345,16 +348,11 @@ const CallDirectDialog4 = () => {
         callClient.onDeviceChange = undefined;
       }
     };
-  }, [dispatch, callClient, user_id, nodeCall]);
+  }, [dispatch, callClient, user_id]);
 
   const onSendAcceptCall = async () => {
     setLoadingButton(true);
     await callClient.acceptCall();
-    await nodeCall.connect(address);
-    // await nodeCall.openBidiStream();
-    console.log('-----opened BidiStream----');
-    setCanSendData(true);
-    setCanReceiveData(true);
   };
 
   const onSendEndCall = async () => {
@@ -365,8 +363,8 @@ const CallDirectDialog4 = () => {
     await callClient.rejectCall();
   };
 
-  const onSwitchToVideoCall = () => {
-    callClient.toggleCamera(!localCameraOn);
+  const onSwitchToVideoCall = async () => {
+    await callClient.requestUpgradeCall(true);
     setLocalCameraOn(!localCameraOn);
     setRequestVideoCall(false);
   };
@@ -630,7 +628,7 @@ const CallDirectDialog4 = () => {
               transition: 'all .1s',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              color: callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? '#fff' : 'inherit',
+              color: '#fff',
             }}
             className={callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? 'hoverShow' : ''}
           >
@@ -784,13 +782,16 @@ const CallDirectDialog4 = () => {
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover',
-                display: remoteCameraOn && !requestVideoCall ? 'block' : 'none',
+                objectFit: 'contain',
+                display: remoteCameraOn ? 'block' : 'none',
               }}
             />
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center' }}>
+        <DialogActions
+          className={callDirectStatus === CallStatus.CONNECTED && remoteCameraOn ? 'hoverShow' : ''}
+          sx={{ justifyContent: 'center' }}
+        >
           {requestVideoCall ? (
             <StyledButton>
               <LoadingButton onClick={onSwitchToVideoCall} variant="contained" color="success">

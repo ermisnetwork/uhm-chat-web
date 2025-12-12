@@ -23,7 +23,6 @@ import TopicPanel from '../../pages/dashboard/TopicPanel';
 import useResponsive from '../../hooks/useResponsive';
 import { ReFetchChannels, WatchCurrentChannel } from '../../redux/slices/channel';
 import { splitChannelId } from '../../utils/commons';
-import { initNodeCall } from '../../nodeCall';
 
 const DashboardLayout = () => {
   const hiddenTimeRef = useRef(null);
@@ -109,7 +108,6 @@ const DashboardLayout = () => {
       };
       onConnectUser();
       fetchDataInitial();
-      initNodeCall();
     }
   }, [isLoggedIn]);
 
