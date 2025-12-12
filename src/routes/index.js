@@ -48,11 +48,6 @@ export default function Router() {
       ],
     },
 
-    {
-      path: '/test-call',
-      element: <TestCallPage />,
-    },
-
     { path: '*', element: <Navigate to="/404" replace /> },
   ]);
 }
@@ -62,7 +57,6 @@ const ChannelDetailApp = Loadable(lazy(() => import('../pages/dashboard/ChannelD
 const PageDeleteAccount = Loadable(lazy(() => import('../pages/dashboard/DeleteAccount')));
 const PageContact = Loadable(lazy(() => import('../pages/dashboard/Contacts')));
 const Page404 = Loadable(lazy(() => import('../pages/Page404')));
-const TestCallPage = Loadable(lazy(() => import('../pages/dashboard/TestCall')));
 
 const LoginPage = Loadable(lazy(() => import('../pages/auth/Login')));
 const RegisterPage = Loadable(lazy(() => import('../pages/auth/Register')));
