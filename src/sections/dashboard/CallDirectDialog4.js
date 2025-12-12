@@ -173,9 +173,6 @@ const CallDirectDialog4 = () => {
   const [micMenuAnchor, setMicMenuAnchor] = useState(null);
   const [cameraMenuAnchor, setCameraMenuAnchor] = useState(null);
 
-  // const { mediaEncoder, resetEncoders, setCanSendData } = useMediaEncoder();
-  // const { mediaDecoder, resetDecoders, setCanReceiveData } = useMediaDecoderSync(remoteVideoRef);
-
   const onCancelCall = () => {
     setMicOn(true);
     setIsScreenShare(false);
