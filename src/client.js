@@ -36,7 +36,9 @@ const connectUser = async (projectId, user_id, token, dispatch) => {
     );
     const sessionID =
       window.localStorage.getItem(LocalStorageKey.SessionId) || `cb1a4db8-33f0-43dd-a48a-${user_id.slice(-12)}`;
-    callClient = new ErmisCallNode(client, sessionID, '/ermis_call_node_wasm_bg.wasm');
+    const wasmPath = '/ermis_call_node_wasm_bg.wasm';
+    const relayUrl = 'https://iroh-relay.ermis.network:8443';
+    callClient = new ErmisCallNode(client, sessionID, wasmPath, relayUrl);
     return true;
   } catch (error) {
     handleError(dispatch, error);
