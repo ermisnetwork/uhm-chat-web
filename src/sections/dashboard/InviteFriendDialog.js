@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, Slide, Stack, Chip, alpha, useTheme } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Slide, Stack, Chip, alpha, useTheme, IconButton } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetOpenInviteFriendDialog } from '../../redux/slices/dialog';
 import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { MagnifyingGlass } from 'phosphor-react';
+import { MagnifyingGlass, X } from 'phosphor-react';
 import FriendList from './FriendList';
 import { LoadingButton } from '@mui/lab';
 import MemberAvatar from '../../components/MemberAvatar';
@@ -55,7 +55,12 @@ const InviteFriendDialog = () => {
       keepMounted
       onClose={onCloseDialog}
     >
-      <DialogTitle>{t('inviteFriendDialog.title')}</DialogTitle>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {t('inviteFriendDialog.title')}
+        <IconButton onClick={onCloseDialog}>
+          <X />
+        </IconButton>
+      </DialogTitle>
 
       <DialogContent sx={{ mt: 4 }}>
         <Stack spacing={3} sx={{ position: 'relative' }}>

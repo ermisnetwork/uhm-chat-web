@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, useTheme, Typography, Box, IconButton } from '@mui/material';
+import { Stack, useTheme, Typography, Box, IconButton, Card, CardActionArea, CardMedia, CardContent } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { Quotes, X } from 'phosphor-react';
 import { displayMessageWithMentionName, formatString } from '../../utils/commons';
@@ -18,6 +18,10 @@ const ReplyMessageBox = ({ quotesMessage }) => {
   const attachment = quotesMessage && quotesMessage.attachments ? quotesMessage.attachments[0] : null;
   const memberInfo = quotesMessage?.user;
   const name = formatString(memberInfo?.name || memberInfo?.id);
+  
+  const onOpenLink = () => {
+    window.open(attachment.link_url, '_blank');
+  };
 
   return (
     <Stack
@@ -70,12 +74,22 @@ const ReplyMessageBox = ({ quotesMessage }) => {
 
             {quotesMessage.type === MessageType.Sticker && quotesMessage.sticker_url && (
               <Box sx={{ mt: 0.5 }}>
-                <ImageCanvas
-                  dataUrl={quotesMessage.sticker_url}
-                  width={'50px'}
-                  height={'auto'}
-                  styleCustom={{ borderRadius: '6px' }}
-                />
+                {quotesMessage.sticker_url.endsWith('.tgs') ? (
+                  <tgs-player
+                    autoplay
+                    loop
+                    mode="normal"
+                    src={quotesMessage.sticker_url}
+                    style={{ width: '50px', height: '50px' }}
+                  ></tgs-player>
+                ): (
+                  <ImageCanvas
+                    dataUrl={quotesMessage.sticker_url}
+                    width={'50px'}
+                    height={'auto'}
+                    styleCustom={{ borderRadius: '6px' }}
+                  />
+                )}
               </Box>
             )}
 

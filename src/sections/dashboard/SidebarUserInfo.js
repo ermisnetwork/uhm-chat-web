@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { IconButton, Stack, styled, Typography } from '@mui/material';
-import { X } from 'phosphor-react';
+import { CaretLeft, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { showSnackbar, ToggleSidebar } from '../../redux/slices/app';
-import { AvatarShape, ChatType, ConfirmType } from '../../constants/commons-const';
+import { showSnackbar, ToggleSidebar, UpdateSidebarType } from '../../redux/slices/app';
+import { AvatarShape, ChatType, ConfirmType, SidebarType } from '../../constants/commons-const';
 import MemberAvatar from '../../components/MemberAvatar';
 import useOnlineStatus from '../../hooks/useOnlineStatus';
 import { IdentityIcon, NewChatIcon, ProfileAddIcon, UserOctagonIcon } from '../../components/Icons';
@@ -136,10 +136,10 @@ const SidebarUserInfo = () => {
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ padding: '10px 15px' }}>
         <IconButton
           onClick={() => {
-            dispatch(ToggleSidebar());
+            dispatch(UpdateSidebarType(SidebarType.Channel));
           }}
         >
-          <X size={20} color={theme.palette.text.primary} />
+          <CaretLeft size={20} color={theme.palette.text.primary} />
         </IconButton>
 
         {/* <Typography variant="subtitle2" sx={{ flex: 1, textAlign: 'center', fontSize: '18px' }}>

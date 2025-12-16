@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { IconButton, InputAdornment, Stack, Typography, Box, Button } from '@mui/material';
-import { CaretRight, X } from 'phosphor-react';
+import { CaretLeft, CaretRight, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ToggleSidebar, setSidebar, showSnackbar } from '../../redux/slices/app';
+import { ToggleSidebar, UpdateSidebarType, setSidebar, showSnackbar } from '../../redux/slices/app';
 import ChannelAvatar from '../../components/ChannelAvatar';
 import { handleError, myRoleInChannel } from '../../utils/commons';
 import { AvatarShape, ChatType, RoleMember, SidebarMode, SidebarType } from '../../constants/commons-const';
@@ -126,7 +126,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
   if (!isModeEdit) {
     return (
       <Stack gap={1} alignItems="center">
-        <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
+        <Stack direction="row" alignItems="center" justifyContent="center" gap={1} padding={1}>
           <ChannelAvatar channel={currentTopic} width={60} height={60} openLightbox={true} shape={AvatarShape.Round} />
           <Box sx={{ flex: 1, minWidth: 'auto', overflow: 'hidden' }}>
             {/* --------------------topic name-------------------- */}
@@ -157,7 +157,7 @@ const FormTopicInfo = ({ formSubmitRef, setSaveDisabled, setSaveLoading }) => {
                 '&:hover': {
                   backgroundColor: 'transparent',
                   color: theme.palette.text.primary,
-                  textDecoration: 'underline',
+                  // textDecoration: 'underline',
                 },
               }}
               onClick={onOpenChannelInfo}
@@ -357,13 +357,23 @@ const SidebarTopicInfo = () => {
   return (
     <Stack sx={{ width: '100%', height: '100%', position: 'relative' }}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ padding: '10px 15px' }}>
-        <IconButton
-          onClick={() => {
-            dispatch(ToggleSidebar());
-          }}
-        >
-          <X size={20} color={theme.palette.text.primary} />
-        </IconButton>
+        {isModeEdit ? (
+          <IconButton
+            onClick={() => {
+              dispatch(setSidebar({ type: SidebarType.TopicInfo, open: true }));
+            }}
+          >
+            <CaretLeft size={20} color={theme.palette.text.primary} />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() => {
+              dispatch(ToggleSidebar());
+            }}
+          >
+            <X size={20} color={theme.palette.text.primary} />
+          </IconButton>
+        )}
 
         {showEditTopic && (
           <>
