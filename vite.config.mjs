@@ -25,7 +25,8 @@ export default defineConfig({
   ],
   server: {
     open: true,
-    port: 5511,
+    port: 3001,
+    allowedHosts: ['tuanmua.bandia.vn'],
     hmr: {
       host: 'localhost',
       protocol: 'ws',
