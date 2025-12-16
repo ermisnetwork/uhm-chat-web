@@ -164,7 +164,6 @@ const ChatList = () => {
       } else {
         queryMessagesGreaterThanId(targetMessageId);
         console.warn('Tin nhắn không tồn tại trong danh sách đã tải (cần xử lý load thêm nếu cần)');
-        // TODO: Nếu tin nhắn chưa tải, bạn cần gọi API load tin nhắn đó rồi mới scroll (logic phức tạp hơn)
       }
     },
     [messages, firstItemIndex],
