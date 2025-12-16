@@ -241,7 +241,8 @@
     "vote": "VOTE",
     "result": "RESULT",
     "votes": "votes",
-    "message_deleted": "Message deleted"
+    "message_deleted": "Message deleted",
+    "forwarded_message": "Forwarded message"
   },
   "muteNotificationsDialog": {
     "title": "Mute Notifications",
@@ -397,11 +398,11 @@
     "message": "We couldn’t find any messages. Try a different keyword or share something to get started."
   },
   "inviteFriendDialog": {
-   "title": "Invite members to this channel",
-   "search": "Search", 
-   "invite": "INVITE", 
-   "members": "MEMBERS",
-   "snackbar_success": "Members added successfully"
+    "title": "Invite members to this channel",
+    "search": "Search",
+    "invite": "INVITE",
+    "members": "MEMBERS",
+    "snackbar_success": "Members added successfully"
   },
   "newTopicDialog": {
     "title": "Start a new topic",
@@ -705,9 +706,9 @@
     "email_label": "Email address",
     "password_label": "Password",
     "text": "text",
-    "email_required":"Email is required",
-    "email_valid":"Email must be a valid email address",
-    "password_required":"Password is required"
+    "email_required": "Email is required",
+    "email_valid": "Email must be a valid email address",
+    "password_required": "Password is required"
   },
   "login_wallet": {
     "address": "Address",

@@ -3,13 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { MessageType } from '../../constants/commons-const';
 import { ArrowBendUpRight } from 'phosphor-react';
 
-const ForwardTo = ({ message, forwardChannelName }) => {
+const ForwardTo = ({ type, isMyMessage }) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
-  if (!message.forward_cid) return null;
-  const isSticker = message.type === MessageType.Sticker;
-  const color = message.isMyMessage ? theme.palette.grey[200] : theme.palette.grey[500];
+  const isSticker = type === MessageType.Sticker;
+  const color = isMyMessage ? theme.palette.grey[200] : theme.palette.grey[500];
 
   return (
     <Typography
@@ -21,8 +20,7 @@ const ForwardTo = ({ message, forwardChannelName }) => {
       }}
     >
       <ArrowBendUpRight size={14} weight="fill" color={color} />
-      &nbsp;{t('conversation.forward_from')}{' '}
-      <strong>{forwardChannelName ? forwardChannelName : t('conversation.unknown_channel')}</strong>
+      &nbsp;{t('conversation.forwarded_message')}{' '}
     </Typography>
   );
 };

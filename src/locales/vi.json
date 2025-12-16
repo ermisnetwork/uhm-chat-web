@@ -248,7 +248,8 @@
     "vote": "BỎ PHIẾU",
     "result": "KẾT QUẢ",
     "votes": "Bỏ phiếu",
-    "message_deleted": "Tin nhắn đã bị xóa"
+    "message_deleted": "Tin nhắn đã bị xóa",
+    "forwarded_message": "Tin nhắn đã được chuyển tiếp"
   },
   "muteNotificationsDialog": {
     "title": "Tắt thông báo",

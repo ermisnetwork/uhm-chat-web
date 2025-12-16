@@ -5,7 +5,6 @@ import { showSnackbar } from '../../redux/slices/app';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy } from 'phosphor-react';
-import DateLine from './DateLine';
 
 const StyledTextLine = styled(Typography)(({ theme }) => ({
   wordBreak: 'break-word',
@@ -24,7 +23,7 @@ const StyledTextLine = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const TextLine = ({ message }) => {
+const TextLine = ({ text, isMyMessage }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { mentions } = useSelector(state => state.channel);
@@ -103,8 +102,8 @@ const TextLine = ({ message }) => {
   };
 
   const renderMsg = () => {
-    if (isCode(message.text)) {
-      const codeContent = message.text.slice(3, -3).trim();
+    if (isCode(text)) {
+      const codeContent = text.slice(3, -3).trim();
       return (
         <Box sx={{ position: 'relative' }}>
           <SyntaxHighlighter language="javascript" style={atomDark} showLineNumbers customStyle={{ width: '100%' }}>
@@ -132,26 +131,14 @@ const TextLine = ({ message }) => {
       );
     } else {
       return (
-        <StyledTextLine variant="body2" color={message.isMyMessage ? '#fff' : theme.palette.text}>
-          {processMessage(message.text)}
+        <StyledTextLine variant="body2" color={isMyMessage ? '#fff' : theme.palette.text}>
+          {processMessage(text)}
         </StyledTextLine>
       );
     }
   };
 
-  const isEdited = message.updated_at;
-
-  return (
-    <>
-      {renderMsg()}
-
-      <DateLine
-        date={isEdited ? message.updated_at : message.created_at}
-        isEdited={isEdited}
-        isMyMessage={message.isMyMessage}
-      />
-    </>
-  );
+  return <>{renderMsg()}</>;
 };
 
 export default TextLine;

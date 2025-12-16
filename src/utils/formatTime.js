@@ -1,4 +1,4 @@
-import { format, getTime, formatDistanceToNow } from 'date-fns';
+import { format, getTime, formatDistanceToNow, isSameDay, isToday, isYesterday } from 'date-fns';
 import dayjs from 'dayjs';
 
 // ----------------------------------------------------------------------
@@ -53,4 +53,42 @@ export const getDisplayDate = timestamp => {
 
   // Otherwise return the date in DD/MM/YYYY format
   return date.format('DD/MM/YYYY');
+};
+
+export const getMessageGroupingProps = (currentMessage, previousMessage, nextMessage) => {
+  if (!currentMessage || !currentMessage.user) {
+    return { isFirstInGroup: true, isLastInGroup: true };
+  }
+
+  const currentUserId = currentMessage.user.id;
+  const currentDate = new Date(currentMessage.created_at);
+
+  // 1. Kiểm tra với tin nhắn trước đó
+  const isPreviousFromSameUser = previousMessage && previousMessage.user && previousMessage.user.id === currentUserId;
+  const isPreviousSameDay = previousMessage && isSameDay(currentDate, new Date(previousMessage.created_at));
+
+  // 2. Kiểm tra với tin nhắn tiếp theo
+  const isNextFromSameUser = nextMessage && nextMessage.user && nextMessage.user.id === currentUserId;
+  const isNextSameDay = nextMessage && isSameDay(currentDate, new Date(nextMessage.created_at));
+
+  // isFirstInGroup: Bắt đầu một nhóm mới nếu người gửi/ngày khác với tin nhắn trước
+  const isFirstInGroup = !isPreviousFromSameUser || !isPreviousSameDay;
+
+  // isLastInGroup: Kết thúc một nhóm nếu người gửi/ngày khác với tin nhắn sau
+  const isLastInGroup = !isNextFromSameUser || !isNextSameDay;
+
+  return { isFirstInGroup, isLastInGroup };
+};
+
+export const shouldShowDateHeader = (currentMessage, previousMessage) => {
+  if (!currentMessage) return false;
+
+  // Nếu KHÔNG CÓ tin nhắn trước đó -> Đây là tin nhắn đầu tiên của list -> HIỆN
+  if (!previousMessage) return true;
+
+  const currentDate = new Date(currentMessage.created_at);
+  const prevDate = new Date(previousMessage.created_at);
+
+  // Nếu khác ngày -> HIỆN
+  return !isSameDay(currentDate, prevDate);
 };

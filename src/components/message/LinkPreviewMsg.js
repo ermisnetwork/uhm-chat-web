@@ -1,15 +1,8 @@
 import React from 'react';
-import { 
-    Stack, 
-    Box,
-    useTheme, 
-} from '@mui/material';
+import { Stack, Box, useTheme } from '@mui/material';
 import LinkPreview from '../LinkPreview';
-import TextLine from './TextLine';
-import ForwardTo from './ForwardTo';
-import MessageOption from '../message/MessageOption';
 
-const LinkPreviewMsg = ({ message, forwardChannelName }) => {
+const LinkPreviewMsg = ({ message }) => {
   const theme = useTheme();
   const linkPreview = message.attachments[0]; // chỉ hiển thị linkPreview đầu tiên
 
@@ -26,16 +19,8 @@ const LinkPreviewMsg = ({ message, forwardChannelName }) => {
         }}
       >
         <Stack spacing={1}>
-          <ForwardTo message={message} forwardChannelName={forwardChannelName} />
           <LinkPreview linkPreview={linkPreview} />
-
-          {message.text && (
-            <>
-              <TextLine message={message} />
-            </>
-          )}
         </Stack>
-        <MessageOption isMyMessage={message.isMyMessage} message={message} />
       </Box>
     </Stack>
   );

@@ -1,22 +1,15 @@
 import { t } from 'i18next';
 import React, { useState } from 'react';
-import { 
-    Box, 
-    Button, 
-    Typography, 
-    Stack, 
-    Radio, 
-    LinearProgress,
-    useTheme, 
-} from '@mui/material';
+import { Box, Button, Typography, Stack, Radio, LinearProgress, useTheme } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { showSnackbar } from '../../redux/slices/app';
 import { setPollResult } from '../../redux/slices/dialog';
 import { getMemberInfo } from '../../utils/commons';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import { useTranslation } from 'react-i18next';
+import { client } from '../../client';
 
-const PollBox = ({ message, all_members }) => {
+const PollBox = ({ message }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -27,6 +20,7 @@ const PollBox = ({ message, all_members }) => {
   const pollType = message.poll_type; // 'single' hoặc 'multiple'
   const pollOptions = message.poll_choice_counts || {}; // {option: count, ...}
   const [selected, setSelected] = useState(pollType === 'multiple' ? [] : '');
+  const users = client.state.users ? Object.values(client.state.users) : [];
 
   const hasVoted = Array.isArray(message.latest_poll_choices)
     ? message.latest_poll_choices.some(choice => choice.user_id === user_id)
@@ -63,7 +57,7 @@ const PollBox = ({ message, all_members }) => {
       const users = message.latest_poll_choices
         .filter(choice => choice.text === option)
         .map(choice => {
-          const memberInfo = getMemberInfo(choice.user_id, all_members);
+          const memberInfo = getMemberInfo(choice.user_id, users);
           return {
             id: choice.user_id,
             name: memberInfo ? memberInfo.name : choice.user_id,
