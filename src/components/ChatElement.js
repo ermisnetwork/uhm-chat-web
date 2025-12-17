@@ -356,10 +356,15 @@ const ChatElement = ({ channel }) => {
     // load initial value
     const key = `${channelId}`;
     const stored = localStorage.getItem(key);
+    
+    const data = JSON.parse(stored);
 
-    if (stored) {
-      setDraft(`Draft: ${stored}`);
+    if (data && data.text) {
+      setDraft(`Draft: ${data.text}`);
+    } else {
+      setDraft('');
     }
+
     const handler = (event) => {
       if (event.detail.value && event.detail.key === key) {
         setDraft(`Draft: ${event.detail.value}`);

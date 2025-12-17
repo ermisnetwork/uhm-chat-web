@@ -209,9 +209,14 @@ const TopicElement = ({ topic, idSelected }) => {
     const key = `${topicId}`;
     const stored = localStorage.getItem(key);
 
-    if (stored) {
-      setDraft(`Draft: ${stored}`);
+    const data = JSON.parse(stored);
+
+    if (data && data.text) {
+      setDraft(`Draft: ${data.text}`);
+    } else {
+      setDraft('');
     }
+    
     const handler = (event) => {
       if (event.detail.value && event.detail.key === key) {
         setDraft(`Draft: ${event.detail.value}`);

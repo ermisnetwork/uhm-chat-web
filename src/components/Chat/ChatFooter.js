@@ -84,16 +84,25 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   }, [currentChat]);
   // Debounced version of onTyping để giảm số lần gọi API
   const debouncedOnTyping = useDebounce(onTyping, 500);
-  const handleChange = (text) => {
-
+  const handleChange = (text, selectedMentions) => {
     const key = getDraftKey();
-    localStorage.setItem(key, text);
+    
+    if (selectedMentions) {
+      const data = {
+        text,
+        selectedMentions,
+      }
+      localStorage.setItem(key, JSON.stringify(data));
+    } else {
+      localStorage.setItem(key, text);
+    }
 
     window.dispatchEvent(
       new CustomEvent("draft-changed", {
         detail: {
           key,
-          value: text
+          value: text,
+          selectedMentions,
         }
       })
     );
@@ -151,9 +160,21 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       inputRef.current.focus();
       const key = getDraftKey();
       const Draft = localStorage.getItem(key);
-      
-      if (Draft != null){
-        setValue(Draft);
+
+      const parsedDraft = (() => {
+        try {
+          return JSON.parse(Draft);
+        } catch (error) {
+          return null;
+        }
+      })();
+
+      if (parsedDraft){
+        setValue(parsedDraft.text);
+        setSelectedMentions(parsedDraft.selectedMentions);
+      } else {
+        setValue('');
+        setSelectedMentions([]);
       }
 
       if (editMessage) {
@@ -165,6 +186,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
         setValue(replaceMentionsWithNames(editMessage.text, mentions));
       } else if (!Draft && currentChat || quotesMessage) {
         setValue('');
+        setSelectedMentions([]);
       }
     }, 100);
 
@@ -605,13 +627,22 @@ const ChatFooter = ({ setMessages, isDialog }) => {
       const beforeCursor = value.slice(0, cursorPos);
       const match = beforeCursor.match(/@\w*$/);
 
+      const addMentionAndSave = (newValue, mention) => {
+        setValue(newValue);
+        setSelectedMentions(prev => {
+          const updatedMentions = [...prev, mention];
+          const uniqueMentions = Array.from(new Map(updatedMentions.map(item => [item.id, item])).values());
+          handleChange(newValue, uniqueMentions);
+          return uniqueMentions;
+        });
+      };
+
       if (match) {
         const start = match.index;
         const end = cursorPos;
         const newValue = value.slice(0, start) + mentionText + ' ' + value.slice(end);
 
-        setValue(newValue);
-        handleChange(newValue);
+        addMentionAndSave(newValue, mention);
 
         // Đặt lại vị trí con trỏ sau mention vừa thêm
         setTimeout(() => {
@@ -619,16 +650,11 @@ const ChatFooter = ({ setMessages, isDialog }) => {
         }, 0);
       }
 
-      setSelectedMentions(prev => {
-        const updatedMentions = [...prev, mention];
-        const uniqueMentions = Array.from(new Map(updatedMentions.map(item => [item.id, item])).values());
-        return uniqueMentions;
-      });
       setHighlightedIndex(0);
       setAnchorElMention(null);
       inputRef.current.focus();
     },
-    [setSelectedMentions, setHighlightedIndex, setAnchorElMention, handleChange],
+    [setSelectedMentions, setHighlightedIndex, setAnchorElMention, handleChange, selectedMentions, value],
   );
 
   const onPaste = event => {
@@ -657,12 +683,12 @@ const ChatFooter = ({ setMessages, isDialog }) => {
               event.preventDefault();
               const newValue = event.target.value;
               setValue(newValue);
-              handleChange(newValue);
+              handleChange(newValue, selectedMentions);
 
               // Sử dụng debounced typing để giảm tải
               debouncedOnTyping();
             },
-            [debouncedOnTyping],
+            [debouncedOnTyping, selectedMentions],
           )}
           onPaste={onPaste}
           fullWidth
