@@ -1,0 +1,643 @@
+import { Stack, Box, Chip, Alert } from '@mui/material';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useTheme } from '@mui/material/styles';
+import { ChatHeader, ChatFooter } from '../../components/Chat';
+import useResponsive from '../../hooks/useResponsive';
+
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  checkPendingInvite,
+  formatString,
+  getChannelName,
+  handleError,
+  isChannelDirect,
+  isGuestInPublicChannel,
+  myRoleInChannel,
+  splitChannelId,
+} from '../../utils/commons';
+import dayjs from 'dayjs';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { LoadingSpinner } from '../../components/animate';
+import { ClientEvents } from '../../constants/events-const';
+import ChannelInvitation from '../../sections/dashboard/ChannelInvitation';
+import {
+  AddActiveChannel,
+  AddMention,
+  SetCooldownTime,
+  SetFilterWords,
+  SetIsBanned,
+  SetIsGuest,
+  SetMarkReadChannel,
+  SetMemberCapabilities,
+  WatchCurrentChannel,
+} from '../../redux/slices/channel';
+import ScrollToBottom from '../../components/ScrollToBottom';
+import DeleteMessageDialog from '../../sections/dashboard/DeleteMessageDialog';
+import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '../../constants/commons-const';
+import BannedBackdrop from '../../components/BannedBackdrop';
+import { client } from '../../client';
+import { onFilesMessage } from '../../redux/slices/messages';
+import BlockedBackdrop from '../../components/BlockedBackdrop';
+import { useNavigate } from 'react-router-dom';
+import { DEFAULT_PATH } from '../../config';
+import MessagesHistoryDialog from '../../sections/dashboard/MessagesHistoryDialog';
+import { SetMessagesHistoryDialog } from '../../redux/slices/dialog';
+import ForwardMessageDialog from '../../sections/dashboard/ForwardMessageDialog';
+import PinnedMessages from '../../components/PinnedMessages';
+import UploadFilesDialog from '../../sections/dashboard/UploadFilesDialog';
+import Dropzone from 'react-dropzone';
+import CreatePollDialog from '../../sections/dashboard/CreatePollDialog';
+import PollResultDialog from '../../sections/dashboard/PollResultDialog';
+import UsersTyping from '../../components/UsersTyping';
+import NoMessageBox from '../../components/NoMessageBox';
+import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
+import { SetIsClosedTopic } from '../../redux/slices/topic';
+import { useTranslation } from 'react-i18next';
+import useMessageSound from '../../hooks/useMessageSound';
+import ChatList from './ChatList';
+
+const MESSAGE_LIMIT = 25;
+
+const ChatComponent2 = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const messageListRef = useRef(null);
+  const { playNewMessageSound, cleanup } = useMessageSound();
+  const { currentChannel, isBlocked, isGuest, isBanned } = useSelector(state => state.channel);
+  const { user_id } = useSelector(state => state.auth);
+  const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
+    state => state.messages,
+  );
+  const { currentTopic, isClosedTopic } = useSelector(state => state.topic);
+  const [messages, setMessages] = useState([]);
+  const [usersTyping, setUsersTyping] = useState([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [isPendingInvite, setIsPendingInvite] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [lastReadMessageId, setLastReadMessageId] = useState('');
+  const [isAlertInvitePending, setIsAlertInvitePending] = useState(false);
+  const [targetId, setTargetId] = useState('');
+  const [showChipUnread, setShowChipUnread] = useState(false);
+  const [highlightMsg, setHighlightMsg] = useState('');
+  const [noMessageTitle, setNoMessageTitle] = useState('');
+
+  // Memoize derived values
+  const isDirect = useMemo(() => isChannelDirect(currentChannel), [currentChannel]);
+  const users = useMemo(() => (client.state.users ? Object.values(client.state.users) : []), [client.state.users]);
+  const isLgToXl = useResponsive('between', null, 'lg', 'xl');
+  const isMobileToLg = useResponsive('down', 'lg');
+  const currentChat = useMemo(() => (currentTopic ? currentTopic : currentChannel), [currentTopic, currentChannel]);
+
+  useEffect(() => {
+    setUsersTyping([]);
+    setMessages([]);
+
+    if (currentChat) {
+      const channelName = currentChat.data.name ? currentChat.data.name : getChannelName(currentChat, users);
+      document.title = channelName;
+      if (messageListRef.current) {
+        messageListRef.current.scrollTop = 0;
+      }
+      const listMessage = currentChat.state.messages || [];
+      const members = Object.values(currentChat.state.members);
+      const receiverInfo = members.find(member => member.user_id !== user_id);
+      setIsAlertInvitePending(
+        isDirect && [RoleMember.PENDING, RoleMember.SKIPPED].includes(receiverInfo?.channel_role),
+      );
+      setMessages(listMessage);
+      setIsPendingInvite(checkPendingInvite(currentChat));
+      setUnreadCount(currentChat.state.unreadCount);
+      dispatch(SetIsGuest(isGuestInPublicChannel(currentChat)));
+      setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
+
+      const read = currentChat.state.read[user_id];
+      const lastReadMsgId = read && read?.unread_messages ? read.last_read_message_id : '';
+      setLastReadMessageId(lastReadMsgId);
+      let lastSend = (read && read?.last_send) || DefaultLastSend;
+      let duration = currentChat.data.member_message_cooldown || 0;
+
+      const onSetCooldownTime = event => {
+        const myRole = myRoleInChannel(currentChat);
+        if (event.type === ClientEvents.MessageNew) {
+          if (event.user.id === user_id && event.channel_type === ChatType.TEAM && myRole === RoleMember.MEMBER) {
+            lastSend = event.message.created_at;
+
+            if (duration) {
+              dispatch(SetCooldownTime({ duration, lastSend }));
+            } else {
+              dispatch(SetCooldownTime(null));
+            }
+          }
+        }
+
+        if (event.type === ClientEvents.ChannelUpdated) {
+          if (event.user.id !== user_id && event.channel_type === ChatType.TEAM && myRole === RoleMember.MEMBER) {
+            duration = event.channel.member_message_cooldown ? event.channel.member_message_cooldown : 0;
+
+            if (duration) {
+              dispatch(SetCooldownTime({ duration, lastSend }));
+            } else {
+              dispatch(SetCooldownTime(null));
+            }
+          }
+        }
+      };
+
+      const onSetFilterWords = event => {
+        if (event.type === ClientEvents.ChannelUpdated && event.channel_type === ChatType.TEAM) {
+          dispatch(SetFilterWords(event.channel.filter_words || []));
+        }
+      };
+
+      if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRoleInChannel(currentChat))) {
+        setTimeout(() => {
+          dispatch(SetMarkReadChannel(currentChat));
+        }, 100);
+      }
+
+      const handleMessages = event => {
+        switch (event.type) {
+          case ClientEvents.MessageNew:
+            const messageType = event.message.type;
+
+            // Phát âm thanh cho tin nhắn mới (trừ tin nhắn system/signal)
+            if (![MessageType.System, MessageType.Signal].includes(messageType)) {
+              playNewMessageSound();
+            }
+
+            if (user_id !== event.user.id || [MessageType.System, MessageType.Signal].includes(event.message.type)) {
+              setMessages(prev => {
+                return [...prev, event.message];
+              });
+              const myRole = myRoleInChannel(currentChat);
+              if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
+                setTimeout(() => {
+                  dispatch(SetMarkReadChannel(currentChat));
+                }, 100);
+              }
+            } else {
+              setMessages(prev => {
+                if (prev.some(item => item.id === event.message.id)) {
+                  return prev.map(item => (item.id === event.message.id ? event.message : item));
+                } else {
+                  return [...prev, event.message];
+                }
+              });
+
+              // messageListRef.current.scrollTop = 0;
+              if (messageListRef.current) {
+                messageListRef.current.scrollTop = 0;
+              }
+            }
+
+            setLastReadMessageId('');
+            setUnreadCount(0);
+            // messageListRef.current.scrollTop = messageListRef.current?.scrollHeight;
+            onSetCooldownTime(event);
+            setNoMessageTitle('');
+            break;
+          case ClientEvents.ReactionDeleted:
+            setMessages(prev => {
+              return prev.map(item => (item.id === event.message.id ? event.message : item));
+            });
+            break;
+          case ClientEvents.ReactionNew:
+            setMessages(prev => {
+              return prev.map(item => (item.id === event.message.id ? event.message : item));
+            });
+            break;
+          case ClientEvents.MessageDeleted:
+            setMessages(prev =>
+              prev
+                .filter(item => item.id !== event.message.id) // Loại bỏ message bị xoá
+                .map(item => {
+                  // Nếu là reply tới message bị xoá thì xoá dữ liệu reply
+                  if (item.quoted_message_id === event.message.id) {
+                    return {
+                      ...item,
+                      quoted_message: undefined,
+                      quoted_message_id: undefined,
+                    };
+                  }
+                  return item;
+                }),
+            );
+            break;
+          case ClientEvents.MessageUpdated:
+            setMessages(prev => {
+              return prev.map(item => (item.id === event.message.id ? event.message : item));
+            });
+            dispatch(SetMessagesHistoryDialog({ openDialog: false, messages: event.message?.old_texts || [] }));
+            break;
+          case ClientEvents.PollChoiceNew:
+            setMessages(prev => {
+              return prev.map(item => (item.id === event.message.id ? event.message : item));
+            });
+            break;
+          default:
+            setMessages([]);
+            break;
+        }
+      };
+
+      const handleTypingStart = event => {
+        if (user_id !== event.user.id) {
+          const name = event.user?.name ? event.user?.name : formatString(event.user.id);
+
+          const item = {
+            name: name,
+            id: event.user.id,
+          };
+
+          setUsersTyping(prev => {
+            const updatedItems = [...prev, item];
+
+            // lọc các item trùng nhau theo id
+            const uniqueItems = Object.values(
+              updatedItems.reduce((acc, item) => {
+                acc[item.id] = item;
+                return acc;
+              }, {}),
+            );
+
+            return uniqueItems;
+          });
+        } else {
+          setUsersTyping([]);
+        }
+      };
+
+      const handleTypingStop = event => {
+        if (user_id !== event.user.id) {
+          setUsersTyping(prev => prev.filter(item => item.id !== event.user.id));
+        } else {
+          setUsersTyping([]);
+        }
+      };
+
+      const handleInviteAccept = async event => {
+        const splitCID = splitChannelId(event.cid);
+        const channelId = splitCID.channelId;
+        const channelType = splitCID.channelType;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+
+        if (event.member.user_id === user_id) {
+          setIsPendingInvite(false);
+        } else {
+          setIsAlertInvitePending(false);
+          dispatch(AddMention(event.member.user_id));
+        }
+      };
+
+      const handleInviteSkipped = async event => {
+        if (event.member.user_id === user_id) {
+          navigate(`${DEFAULT_PATH}`);
+          setIsPendingInvite(false);
+        }
+      };
+
+      const handleChannelUpdated = event => {
+        const member_capabilities = event.channel.member_capabilities;
+        dispatch(SetMemberCapabilities(member_capabilities));
+        onSetCooldownTime(event);
+        onSetFilterWords(event);
+      };
+
+      const handleMemberJoined = event => {
+        const splitCID = splitChannelId(event.cid);
+        const channelId = splitCID.channelId;
+        const channelType = splitCID.channelType;
+
+        if (event.member.user_id === user_id) {
+          dispatch(SetIsGuest(false));
+          dispatch(AddActiveChannel(event.cid));
+        } else {
+          dispatch(WatchCurrentChannel(channelId, channelType));
+          dispatch(AddMention(event.member.user_id));
+        }
+      };
+
+      const handleMemberPromoted = event => {
+        const channelId = event.channel_id;
+        const channelType = event.channel_type;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+      };
+
+      const handleMemberDemoted = event => {
+        const channelId = event.channel_id;
+        const channelType = event.channel_type;
+        dispatch(WatchCurrentChannel(channelId, channelType));
+      };
+
+      const handleMemberBanned = event => {
+        if (event.member.user_id === user_id) {
+          dispatch(SetIsBanned(event.member.banned));
+        }
+      };
+
+      const handleMemberUnBanned = event => {
+        if (event.member.user_id === user_id) {
+          dispatch(SetIsBanned(event.member.banned));
+        }
+      };
+
+      const handleChannelTruncate = event => {
+        setMessages(currentChat.state.messages || []);
+      };
+
+      const handleChannelTopicClosed = event => {
+        dispatch(SetIsClosedTopic(true));
+      };
+
+      const handleChannelTopicReopen = event => {
+        dispatch(SetIsClosedTopic(false));
+      };
+
+      currentChat.on(ClientEvents.MessageNew, handleMessages);
+      currentChat.on(ClientEvents.ReactionNew, handleMessages);
+      currentChat.on(ClientEvents.ReactionDeleted, handleMessages);
+      currentChat.on(ClientEvents.MessageDeleted, handleMessages);
+      currentChat.on(ClientEvents.MessageUpdated, handleMessages);
+      currentChat.on(ClientEvents.TypingStart, handleTypingStart);
+      currentChat.on(ClientEvents.TypingStop, handleTypingStop);
+      currentChat.on(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
+      currentChat.on(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
+      currentChat.on(ClientEvents.ChannelUpdated, handleChannelUpdated);
+      currentChat.on(ClientEvents.MemberJoined, handleMemberJoined);
+      currentChat.on(ClientEvents.MemberPromoted, handleMemberPromoted);
+      currentChat.on(ClientEvents.MemberDemoted, handleMemberDemoted);
+      currentChat.on(ClientEvents.MemberBanned, handleMemberBanned);
+      currentChat.on(ClientEvents.MemberUnBanned, handleMemberUnBanned);
+      currentChat.on(ClientEvents.PollChoiceNew, handleMessages);
+      currentChat.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
+      currentChat.on(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
+      currentChat.on(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+
+      return () => {
+        currentChat.off(ClientEvents.MessageNew, handleMessages);
+        currentChat.off(ClientEvents.ReactionNew, handleMessages);
+        currentChat.off(ClientEvents.ReactionDeleted, handleMessages);
+        currentChat.off(ClientEvents.MessageDeleted, handleMessages);
+        currentChat.off(ClientEvents.MessageUpdated, handleMessages);
+        currentChat.off(ClientEvents.TypingStart, handleTypingStart);
+        currentChat.off(ClientEvents.TypingStop, handleTypingStop);
+        currentChat.off(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
+        currentChat.off(ClientEvents.Notification.InviteSkipped, handleInviteSkipped);
+        currentChat.off(ClientEvents.ChannelUpdated, handleChannelUpdated);
+        currentChat.off(ClientEvents.MemberJoined, handleMemberJoined);
+        currentChat.off(ClientEvents.MemberPromoted, handleMemberPromoted);
+        currentChat.off(ClientEvents.MemberDemoted, handleMemberDemoted);
+        currentChat.off(ClientEvents.MemberBanned, handleMemberBanned);
+        currentChat.off(ClientEvents.MemberUnBanned, handleMemberUnBanned);
+        currentChat.off(ClientEvents.PollChoiceNew, handleMessages);
+        currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
+        currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
+        currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+
+        // Cleanup audio khi thay đổi chat hoặc component unmount
+        cleanup();
+      };
+    } else {
+      if (messageListRef.current) {
+        messageListRef.current.scrollTop = 0;
+      }
+      setMessages([]);
+      setUsersTyping([]);
+    }
+  }, [currentChat, user_id, messageListRef]);
+
+  useEffect(() => {
+    if (messageIdError) {
+      setMessages(prev => prev.filter(item => item.id !== messageIdError));
+    }
+  }, [messageIdError]);
+
+  useEffect(() => {
+    if (searchMessageId) {
+      setHighlightMsg(searchMessageId);
+      const message = messages.find(item => item.id === searchMessageId);
+      if (message) {
+        setTargetId(message.id);
+      } else {
+        queryMessages(searchMessageId);
+      }
+    }
+  }, [searchMessageId, messages]);
+
+  const fetchMoreMessages = useCallback(async () => {
+    try {
+      setLoadingMore(true);
+      const msgId = messages[0]?.id;
+
+      const response = await currentChat.queryMessagesLessThanId(msgId);
+
+      if (response && Array.isArray(response) && response.length > 0) {
+        setMessages(prev => {
+          return [...response, ...prev];
+        });
+      }
+      setLoadingMore(false);
+    } catch (error) {
+      setLoadingMore(false);
+      handleError(dispatch, error, t);
+    }
+  }, [messages, currentChat, dispatch, t]);
+
+  const queryMessages = useCallback(
+    async msgId => {
+      const channelType = currentChat.data.type;
+      const channelId = currentChat.data.id;
+      const channel = client.channel(channelType, channelId);
+
+      const response = await channel.query({
+        messages: { limit: MESSAGE_LIMIT, id_gt: msgId },
+      });
+
+      if (response) {
+        const messages = channel.state.messages;
+
+        setMessages(messages);
+        setTargetId(msgId);
+      }
+    },
+    [currentChat],
+  );
+
+  const onScrollToReplyMsg = useCallback(
+    msgId => {
+      setHighlightMsg(msgId);
+      const message = messages.find(item => item.id === msgId);
+      if (message) {
+        setTargetId(message.id);
+      } else {
+        queryMessages(msgId);
+      }
+    },
+    [messages, queryMessages],
+  );
+
+  const onDeleteUnread = useCallback(() => {
+    setShowChipUnread(false);
+    setUnreadCount(0);
+  }, []);
+
+  const onScrollToFirstUnread = useCallback(() => {
+    if (lastReadMessageId) {
+      const message = messages.find(item => item.id === lastReadMessageId);
+      if (message) {
+        setTargetId(message.id);
+      } else {
+        queryMessages(lastReadMessageId);
+      }
+
+      setTimeout(() => {
+        onDeleteUnread();
+      }, 1000);
+    }
+  }, [lastReadMessageId, messages, queryMessages, onDeleteUnread]);
+
+  const onDropFiles = useCallback(
+    (acceptedFiles, fileRejections, event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      dispatch(onFilesMessage({ openDialog: true, files: acceptedFiles, uploadType: UploadType.File }));
+    },
+    [dispatch],
+  );
+
+  const addDateLabels = useCallback(
+    messages => {
+      let lastDate = null;
+      const today = dayjs().startOf('day');
+      const yesterday = today.subtract(1, 'day');
+
+      return messages.map((msg, idx) => {
+        const msgDate = dayjs(msg.created_at).startOf('day');
+        let date_label = null;
+
+        if (!lastDate || !msgDate.isSame(lastDate)) {
+          if (msgDate.isSame(today)) date_label = t('chatComponent.today');
+          else if (msgDate.isSame(yesterday)) date_label = t('chatComponent.yesterday');
+          else date_label = msgDate.format('DD/MM/YYYY');
+          lastDate = msgDate;
+        }
+
+        return date_label ? { ...msg, date_label } : msg;
+      });
+    },
+    [t],
+  );
+
+  // Memoize derived values for render
+  const showChatFooter = useMemo(() => !isGuest && !isBanned && !isClosedTopic, [isGuest, isBanned, isClosedTopic]);
+  const showButtonScrollToBottom = useMemo(() => !isBlocked || !isBanned, [isBlocked, isBanned]);
+  const disabledScroll = useMemo(() => isBlocked || isBanned, [isBlocked, isBanned]);
+  const showTopicPanel = useMemo(
+    () => !isGuest && !isDirect && currentChannel?.data?.topics_enabled,
+    [isGuest, isDirect, currentChannel?.data?.topics_enabled],
+  );
+
+  // Memoize processed messages with date labels
+  const messagesWithDateLabels = useMemo(() => addDateLabels(messages), [addDateLabels, messages]);
+
+  return (
+    <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+      <Stack
+        sx={{
+          minWidth: 'auto',
+          height: '100%',
+          position: 'relative',
+          flex: 1,
+          overflow: 'hidden',
+        }}
+      >
+        <ChatHeader />
+
+        {currentChat && (
+          <Box
+            sx={{
+              width: '100%',
+              position: 'absolute',
+              top: '75px',
+              zIndex: 2,
+              padding: isMobileToLg ? '4px 20px' : isLgToXl ? '4px 50px' : '4px 90px',
+            }}
+          >
+            {isAlertInvitePending && (
+              <Box sx={{ width: '100%' }}>
+                <Alert severity="info" sx={{ fontWeight: 400 }}>
+                  <strong>{formatString(currentChat?.data.name)}</strong>
+                  &nbsp;{t('chatComponent.message')}
+                </Alert>
+              </Box>
+            )}
+
+            <PinnedMessages />
+          </Box>
+        )}
+
+        <Dropzone onDrop={onDropFiles} noClick noKeyboard noDragEventsBubbling>
+          {({ getRootProps, isDragActive }) => (
+            <Box
+              {...getRootProps()}
+              sx={{
+                position: 'relative',
+                overflow: 'hidden',
+                display: 'flex',
+                minWidth: 'auto',
+                minHeight: 'auto',
+                flex: 1,
+              }}
+              className={`${isDragActive ? 'isDragActive' : ''}`}
+            >
+              <Box
+                id="scrollableDiv"
+                className="customScrollbar"
+                ref={messageListRef}
+                width={'100%'}
+                sx={{
+                  position: 'relative',
+                  flexGrow: 1,
+                  overflowY: disabledScroll ? 'hidden' : 'auto',
+                  overflowX: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column-reverse',
+                }}
+              >
+                <ChatList messages={messagesWithDateLabels} setMessages={setMessages} />
+                {noMessageTitle && <NoMessageBox channel={currentChat} />}
+              </Box>
+            </Box>
+          )}
+        </Dropzone>
+
+        {showButtonScrollToBottom && <ScrollToBottom messageListRef={messageListRef} />}
+        {showChatFooter && (
+          <Box
+            sx={{
+              padding: '15px',
+              position: 'relative',
+            }}
+          >
+            {usersTyping && usersTyping.length > 0 && <UsersTyping usersTyping={usersTyping} />}
+            <ChatFooter setMessages={setMessages} isDialog={false} />
+          </Box>
+        )}
+        {isClosedTopic && <ClosedTopicBackdrop />}
+        {isPendingInvite && <ChannelInvitation />}
+        {isBanned && <BannedBackdrop />}
+        <BlockedBackdrop />
+      </Stack>
+      {deleteMessage.openDialog && <DeleteMessageDialog />}
+      {forwardMessage.openDialog && <ForwardMessageDialog />}
+      <MessagesHistoryDialog />
+      {filesMessage.openDialog && <UploadFilesDialog setMessages={setMessages} />}
+      <CreatePollDialog />
+      <PollResultDialog />
+    </Stack>
+  );
+};
+
+export default ChatComponent2;

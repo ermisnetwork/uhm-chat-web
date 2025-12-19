@@ -34,6 +34,7 @@ import SidebarChannelTopic from '../../sections/dashboard/SidebarChannelTopic';
 import SidebarTopicInfo from '../../sections/dashboard/SidebarTopicInfo';
 import { ChatHeader } from '../../components/Chat';
 import ChatList from './ChatList';
+import ChatComponent2 from './ChatComponent2';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();
@@ -94,10 +95,11 @@ const ChannelDetailApp = () => {
           <ChannelNotFound />
         ) : (
           // <ChatComponent />
-          <>
-            <ChatHeader />
-            <ChatList />
-          </>
+          <ChatComponent2 />
+          // <>
+          //   <ChatHeader />
+          //   <ChatList />
+          // </>
         )}
         <InviteFriendDialog />
       </BoxContainer>
