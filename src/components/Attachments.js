@@ -11,52 +11,13 @@ import ImageListItem from '@mui/material/ImageListItem';
 import LightboxMedia from './LightboxMedia';
 
 const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
-  const processedImages = medias.map((item, index) => {
-    const totalImages = medias.length;
-
-    if (totalImages === 1) return { ...item, cols: 1, rows: 1 }; // Full width
-    if (totalImages === 2) return { ...item, cols: 1, rows: 1 }; // 2 ảnh chia 2 cột
-    if (totalImages >= 3) {
-      const position = index % 6; // Lặp lại logic theo nhóm 6 ảnh
-      let cols;
-      let rows;
-      if (position === 0) {
-        cols = 2;
-        rows = 2;
-      }
-      if (position === 1 || position === 2) {
-        cols = 1;
-        rows = 1;
-      }
-      if (position === 3) {
-        cols = 3;
-        rows = 1;
-      }
-      if (position === 4) {
-        cols = 2;
-        rows = 1;
-      }
-      if (position === 5) {
-        cols = 1;
-        rows = 1;
-      }
-
-      return {
-        ...item,
-        cols,
-        rows,
-      };
-    }
-  });
-
   const columnCount = medias.length === 1 ? 1 : medias.length === 2 ? 2 : 3;
-
   if (medias.length === 0) return null;
 
   return (
-    <ImageList variant="quilted" cols={columnCount} rowHeight={medias.length === 1 ? 'auto' : 180}>
-      {processedImages.map((item, index) => (
-        <ImageListItem key={index} cols={item.cols} rows={item.rows}>
+    <ImageList variant="quilted" cols={columnCount} rowHeight={200}>
+      {medias.map((item, index) => (
+        <ImageListItem key={index} cols={1} rows={1}>
           <Paper
             elevation={3}
             sx={{
@@ -74,9 +35,9 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
           >
             <ImageCanvas
               dataUrl={item.type === MediaType.VIDEO ? item.poster : item.src}
-              width={'100%'}
-              height={'100%'}
-              styleCustom={{ borderRadius: '12px' }}
+              width={'200px'}
+              height={'200px'}
+              styleCustom={{ borderRadius: '12px', objectFit: 'contain' }}
             />
             {item.type === MediaType.VIDEO && (
               <PlayCircle
@@ -203,7 +164,7 @@ export default function Attachments({ attachments }) {
   if (!attachments.length) return null;
 
   return (
-    <Box sx={{ maxWidth: attachments.length === 1 ? '20rem' : '30rem' }}>
+    <Box>
       <Stack direction="row" justifyContent="flex-end">
         <QuiltedMediaList medias={medias} setIsOpen={setIsOpen} setIndexMedia={setIndexMedia} />
       </Stack>

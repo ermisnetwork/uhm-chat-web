@@ -10,6 +10,8 @@ import RegularMsg from '../../components/message/RegularMsg';
 import SignalMsg from '../../components/message/SignalMsg';
 import { getMessageGroupingProps, shouldShowDateHeader } from '../../utils/formatTime';
 import DateSeparator from '../../components/message/DateSeparator';
+import ReadBy from '../../components/ReadBy';
+import ScrollToBottom from '../../components/ScrollToBottom';
 
 const StyledMessageItem = styled(Box)(({ theme }) => ({
   '&:hover': {
@@ -35,6 +37,27 @@ const StyledMessageItem = styled(Box)(({ theme }) => ({
   },
 }));
 
+const MessageItemContent = React.memo(({ message, prevMsg, nextMsg, isHighlighted, onScrollToReplyMsg }) => {
+  const groupingProps = useMemo(() => getMessageGroupingProps(message, prevMsg, nextMsg), [message, prevMsg, nextMsg]);
+
+  const showDate = useMemo(() => shouldShowDateHeader(message, prevMsg), [message, prevMsg]);
+
+  const isMyMessage = message.user.id === message.myUserId;
+
+  const contextProps = {
+    onScrollToReplyMsg,
+    isHighlighted,
+    ...groupingProps,
+  };
+
+  return (
+    <StyledMessageItem className={`${isMyMessage ? 'myMessage' : ''}`}>
+      {showDate && <DateSeparator dateString={message.created_at} />}
+      {renderMessageContent({ ...message, isMyMessage }, contextProps)}
+    </StyledMessageItem>
+  );
+});
+
 const INDEX_OFFSET = 10000;
 
 const MessageComponentMap = {
@@ -51,9 +74,9 @@ const renderMessageContent = (message, contextProps) => {
   return <SpecificComponent message={message} {...contextProps} />;
 };
 
-const ChatList = ({ messages, setMessages }) => {
+const ChatList = React.memo(({ messages, setMessages }) => {
   // Lấy data từ Redux
-  const { currentChannel } = useSelector(state => state.channel);
+  const { currentChannel, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
 
   const { user_id } = useSelector(state => state.auth);
   const { currentTopic } = useSelector(state => state.topic);
@@ -63,6 +86,7 @@ const ChatList = ({ messages, setMessages }) => {
   const [firstItemIndex, setFirstItemIndex] = useState(INDEX_OFFSET);
   const [hasMore, setHasMore] = useState(true);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
 
   const virtuosoRef = useRef(null);
   const isScrollingToMsgRef = useRef(false);
@@ -81,6 +105,7 @@ const ChatList = ({ messages, setMessages }) => {
     // setMessages(listMessage);
 
     isScrollingToMsgRef.current = false;
+    setShowScrollBottom(false);
   }, [currentChat]);
 
   const scrollToIndex = useCallback(
@@ -99,6 +124,16 @@ const ChatList = ({ messages, setMessages }) => {
     },
     [virtuosoRef],
   );
+
+  const handleScrollToBottom = useCallback(() => {
+    if (virtuosoRef.current && messages.length > 0) {
+      virtuosoRef.current.scrollToIndex({
+        index: messages.length,
+        align: 'end',
+        behavior: 'auto',
+      });
+    }
+  }, [messages.length]);
 
   const queryMessagesGreaterThanId = useCallback(
     async targetMessageId => {
@@ -120,11 +155,9 @@ const ChatList = ({ messages, setMessages }) => {
       } catch (error) {
         console.error('Lỗi khi tải tin nhắn cũ:', error);
       } finally {
-        // 3. TẮT CỜ CHẶN: Nhưng phải set Timeout để đợi animation scroll hoàn tất
-        // Nếu tắt ngay lập tức, startReached vẫn có thể bị trigger do quán tính scroll
         setTimeout(() => {
           isScrollingToMsgRef.current = false;
-        }, 1000); // Thời gian delay tùy thuộc vào animation time, 1s là an toàn
+        }, 1000);
       }
     },
     [currentChat],
@@ -170,58 +203,79 @@ const ChatList = ({ messages, setMessages }) => {
     [messages, firstItemIndex],
   );
 
+  const virtuosoComponents = useMemo(
+    () => ({
+      Footer: () => {
+        if (isGuest || isBlocked || isBanned) return null;
+        return (
+          <Box sx={{ pb: 0, px: 2 }}>
+            <ReadBy />
+          </Box>
+        );
+      },
+    }),
+    [isGuest, isBlocked, isBanned],
+  );
+
+  const itemContent = useCallback(
+    (index, message) => {
+      const realIndex = index - firstItemIndex;
+      const previousMessage = messages[realIndex - 1];
+      const nextMessage = messages[realIndex + 1];
+      const msgWithMyId = { ...message, myUserId: user_id };
+
+      return (
+        <MessageItemContent
+          message={msgWithMyId}
+          prevMsg={previousMessage}
+          nextMsg={nextMessage}
+          isHighlighted={message.id === highlightedMessageId}
+          onScrollToReplyMsg={handleScrollToMessage}
+        />
+      );
+    },
+    [messages, firstItemIndex, highlightedMessageId, user_id, handleScrollToMessage],
+  );
+
   return (
     <Paper
       elevation={0}
       sx={{
         width: '100%',
-        height: '600px',
+        height: '100%',
         mx: 'auto',
-        my: 4,
+        // my: 4,
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
       }}
     >
-      <Box sx={{ flex: 1 }}>
-        <Virtuoso
-          ref={virtuosoRef}
-          key={chatKey}
-          className="customScrollbar"
-          style={{ height: '100%', overflowX: 'hidden' }}
-          data={messages}
-          firstItemIndex={firstItemIndex}
-          initialTopMostItemIndex={messages.length - 1}
-          // followOutput={'smooth'}
-          overscan={500}
-          startReached={queryMessagesLessThanId}
-          itemContent={(index, message) => {
-            const realIndex = index - firstItemIndex;
-            const isMyMessage = message.user.id === user_id;
-            const previousMessage = messages[realIndex - 1];
-            const nextMessage = messages[realIndex + 1];
+      <Virtuoso
+        ref={virtuosoRef}
+        key={chatKey}
+        className="customScrollbar"
+        style={{ height: '100%', overflowX: 'hidden' }}
+        data={messages}
+        firstItemIndex={firstItemIndex}
+        initialTopMostItemIndex={messages.length}
+        // initialTopMostItemIndex={{ index: messages.length, align: 'end' }}
+        followOutput={'smooth'}
+        overscan={{
+          reverse: 800, // load sẵn tin nhắn cũ
+          main: 300, // load sẵn tin nhắn mới
+        }}
+        startReached={queryMessagesLessThanId}
+        atBottomThreshold={200}
+        atBottomStateChange={atBottom => {
+          setShowScrollBottom(!atBottom);
+        }}
+        itemContent={itemContent}
+        components={virtuosoComponents}
+      />
 
-            const groupingProps = getMessageGroupingProps(message, previousMessage, nextMessage);
-            const showDate = shouldShowDateHeader(message, previousMessage);
-            const isHighlighted = message.id === highlightedMessageId;
-
-            const commonProps = {
-              messages,
-              onScrollToReplyMsg: handleScrollToMessage,
-              isHighlighted,
-              ...groupingProps,
-            };
-
-            return (
-              <StyledMessageItem className={`${isMyMessage ? 'myMessage' : ''}`}>
-                {showDate && <DateSeparator dateString={message.created_at} />}
-                {renderMessageContent({ ...message, isMyMessage }, commonProps)}
-              </StyledMessageItem>
-            );
-          }}
-        />
-      </Box>
+      <ScrollToBottom showScrollBottom={showScrollBottom} handleScrollToBottom={handleScrollToBottom} />
     </Paper>
   );
-};
+});
 
 export default ChatList;

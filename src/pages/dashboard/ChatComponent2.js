@@ -15,9 +15,6 @@ import {
   myRoleInChannel,
   splitChannelId,
 } from '../../utils/commons';
-import dayjs from 'dayjs';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { LoadingSpinner } from '../../components/animate';
 import { ClientEvents } from '../../constants/events-const';
 import ChannelInvitation from '../../sections/dashboard/ChannelInvitation';
 import {
@@ -31,7 +28,6 @@ import {
   SetMemberCapabilities,
   WatchCurrentChannel,
 } from '../../redux/slices/channel';
-import ScrollToBottom from '../../components/ScrollToBottom';
 import DeleteMessageDialog from '../../sections/dashboard/DeleteMessageDialog';
 import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '../../constants/commons-const';
 import BannedBackdrop from '../../components/BannedBackdrop';
@@ -56,8 +52,6 @@ import { useTranslation } from 'react-i18next';
 import useMessageSound from '../../hooks/useMessageSound';
 import ChatList from './ChatList';
 
-const MESSAGE_LIMIT = 25;
-
 const ChatComponent2 = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -73,14 +67,8 @@ const ChatComponent2 = () => {
   const { currentTopic, isClosedTopic } = useSelector(state => state.topic);
   const [messages, setMessages] = useState([]);
   const [usersTyping, setUsersTyping] = useState([]);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [isPendingInvite, setIsPendingInvite] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [lastReadMessageId, setLastReadMessageId] = useState('');
   const [isAlertInvitePending, setIsAlertInvitePending] = useState(false);
-  const [targetId, setTargetId] = useState('');
-  const [showChipUnread, setShowChipUnread] = useState(false);
-  const [highlightMsg, setHighlightMsg] = useState('');
   const [noMessageTitle, setNoMessageTitle] = useState('');
 
   // Memoize derived values
@@ -97,9 +85,6 @@ const ChatComponent2 = () => {
     if (currentChat) {
       const channelName = currentChat.data.name ? currentChat.data.name : getChannelName(currentChat, users);
       document.title = channelName;
-      if (messageListRef.current) {
-        messageListRef.current.scrollTop = 0;
-      }
       const listMessage = currentChat.state.messages || [];
       const members = Object.values(currentChat.state.members);
       const receiverInfo = members.find(member => member.user_id !== user_id);
@@ -108,13 +93,10 @@ const ChatComponent2 = () => {
       );
       setMessages(listMessage);
       setIsPendingInvite(checkPendingInvite(currentChat));
-      setUnreadCount(currentChat.state.unreadCount);
       dispatch(SetIsGuest(isGuestInPublicChannel(currentChat)));
       setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
 
       const read = currentChat.state.read[user_id];
-      const lastReadMsgId = read && read?.unread_messages ? read.last_read_message_id : '';
-      setLastReadMessageId(lastReadMsgId);
       let lastSend = (read && read?.last_send) || DefaultLastSend;
       let duration = currentChat.data.member_message_cooldown || 0;
 
@@ -185,16 +167,8 @@ const ChatComponent2 = () => {
                   return [...prev, event.message];
                 }
               });
-
-              // messageListRef.current.scrollTop = 0;
-              if (messageListRef.current) {
-                messageListRef.current.scrollTop = 0;
-              }
             }
 
-            setLastReadMessageId('');
-            setUnreadCount(0);
-            // messageListRef.current.scrollTop = messageListRef.current?.scrollHeight;
             onSetCooldownTime(event);
             setNoMessageTitle('');
             break;
@@ -400,103 +374,16 @@ const ChatComponent2 = () => {
         cleanup();
       };
     } else {
-      if (messageListRef.current) {
-        messageListRef.current.scrollTop = 0;
-      }
       setMessages([]);
       setUsersTyping([]);
     }
-  }, [currentChat, user_id, messageListRef]);
+  }, [currentChat, user_id]);
 
   useEffect(() => {
     if (messageIdError) {
       setMessages(prev => prev.filter(item => item.id !== messageIdError));
     }
   }, [messageIdError]);
-
-  useEffect(() => {
-    if (searchMessageId) {
-      setHighlightMsg(searchMessageId);
-      const message = messages.find(item => item.id === searchMessageId);
-      if (message) {
-        setTargetId(message.id);
-      } else {
-        queryMessages(searchMessageId);
-      }
-    }
-  }, [searchMessageId, messages]);
-
-  const fetchMoreMessages = useCallback(async () => {
-    try {
-      setLoadingMore(true);
-      const msgId = messages[0]?.id;
-
-      const response = await currentChat.queryMessagesLessThanId(msgId);
-
-      if (response && Array.isArray(response) && response.length > 0) {
-        setMessages(prev => {
-          return [...response, ...prev];
-        });
-      }
-      setLoadingMore(false);
-    } catch (error) {
-      setLoadingMore(false);
-      handleError(dispatch, error, t);
-    }
-  }, [messages, currentChat, dispatch, t]);
-
-  const queryMessages = useCallback(
-    async msgId => {
-      const channelType = currentChat.data.type;
-      const channelId = currentChat.data.id;
-      const channel = client.channel(channelType, channelId);
-
-      const response = await channel.query({
-        messages: { limit: MESSAGE_LIMIT, id_gt: msgId },
-      });
-
-      if (response) {
-        const messages = channel.state.messages;
-
-        setMessages(messages);
-        setTargetId(msgId);
-      }
-    },
-    [currentChat],
-  );
-
-  const onScrollToReplyMsg = useCallback(
-    msgId => {
-      setHighlightMsg(msgId);
-      const message = messages.find(item => item.id === msgId);
-      if (message) {
-        setTargetId(message.id);
-      } else {
-        queryMessages(msgId);
-      }
-    },
-    [messages, queryMessages],
-  );
-
-  const onDeleteUnread = useCallback(() => {
-    setShowChipUnread(false);
-    setUnreadCount(0);
-  }, []);
-
-  const onScrollToFirstUnread = useCallback(() => {
-    if (lastReadMessageId) {
-      const message = messages.find(item => item.id === lastReadMessageId);
-      if (message) {
-        setTargetId(message.id);
-      } else {
-        queryMessages(lastReadMessageId);
-      }
-
-      setTimeout(() => {
-        onDeleteUnread();
-      }, 1000);
-    }
-  }, [lastReadMessageId, messages, queryMessages, onDeleteUnread]);
 
   const onDropFiles = useCallback(
     (acceptedFiles, fileRejections, event) => {
@@ -507,40 +394,8 @@ const ChatComponent2 = () => {
     [dispatch],
   );
 
-  const addDateLabels = useCallback(
-    messages => {
-      let lastDate = null;
-      const today = dayjs().startOf('day');
-      const yesterday = today.subtract(1, 'day');
-
-      return messages.map((msg, idx) => {
-        const msgDate = dayjs(msg.created_at).startOf('day');
-        let date_label = null;
-
-        if (!lastDate || !msgDate.isSame(lastDate)) {
-          if (msgDate.isSame(today)) date_label = t('chatComponent.today');
-          else if (msgDate.isSame(yesterday)) date_label = t('chatComponent.yesterday');
-          else date_label = msgDate.format('DD/MM/YYYY');
-          lastDate = msgDate;
-        }
-
-        return date_label ? { ...msg, date_label } : msg;
-      });
-    },
-    [t],
-  );
-
   // Memoize derived values for render
   const showChatFooter = useMemo(() => !isGuest && !isBanned && !isClosedTopic, [isGuest, isBanned, isClosedTopic]);
-  const showButtonScrollToBottom = useMemo(() => !isBlocked || !isBanned, [isBlocked, isBanned]);
-  const disabledScroll = useMemo(() => isBlocked || isBanned, [isBlocked, isBanned]);
-  const showTopicPanel = useMemo(
-    () => !isGuest && !isDirect && currentChannel?.data?.topics_enabled,
-    [isGuest, isDirect, currentChannel?.data?.topics_enabled],
-  );
-
-  // Memoize processed messages with date labels
-  const messagesWithDateLabels = useMemo(() => addDateLabels(messages), [addDateLabels, messages]);
 
   return (
     <Stack direction="row" sx={{ width: '100%', height: '100%', overflow: 'hidden' }}>
@@ -560,7 +415,7 @@ const ChatComponent2 = () => {
             sx={{
               width: '100%',
               position: 'absolute',
-              top: '75px',
+              top: '65px',
               zIndex: 2,
               padding: isMobileToLg ? '4px 20px' : isLgToXl ? '4px 50px' : '4px 90px',
             }}
@@ -592,28 +447,13 @@ const ChatComponent2 = () => {
               }}
               className={`${isDragActive ? 'isDragActive' : ''}`}
             >
-              <Box
-                id="scrollableDiv"
-                className="customScrollbar"
-                ref={messageListRef}
-                width={'100%'}
-                sx={{
-                  position: 'relative',
-                  flexGrow: 1,
-                  overflowY: disabledScroll ? 'hidden' : 'auto',
-                  overflowX: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column-reverse',
-                }}
-              >
-                <ChatList messages={messagesWithDateLabels} setMessages={setMessages} />
-                {noMessageTitle && <NoMessageBox channel={currentChat} />}
-              </Box>
+              {messages.length > 0 && <ChatList messages={messages} setMessages={setMessages} />}
+
+              {noMessageTitle && <NoMessageBox channel={currentChat} />}
             </Box>
           )}
         </Dropzone>
 
-        {showButtonScrollToBottom && <ScrollToBottom messageListRef={messageListRef} />}
         {showChatFooter && (
           <Box
             sx={{

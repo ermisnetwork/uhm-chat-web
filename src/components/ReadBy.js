@@ -188,31 +188,20 @@ export default function ReadBy() {
       case MessageReadType.Read:
         return (
           <Tooltip title={`${readBy.length} ${t('readBy.tooltip')}`} placement="left">
-            <div>
-              <AnimatePresence initial={false}>
-                <StyledAvatarGroup max={5} spacing={1} onClick={() => setIsOpen(true)}>
-                  {readBy.map(item => {
-                    const userInfo = users.find(user => user.id === item.user.id);
-                    const member = {
-                      name: item.user?.name ? item.user.name : userInfo ? userInfo.name : item.user.id,
-                      avatar: item.user?.avatar ? item.user.avatar : userInfo ? userInfo.avatar : '',
-                    };
-                    return (
-                      <motion.div
-                        key={item.user.id}
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0.5, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                        style={{ display: 'flex', width: '18px', height: '18px' }}
-                      >
-                        <MemberAvatar member={member} width={18} height={18} />
-                      </motion.div>
-                    );
-                  })}
-                </StyledAvatarGroup>
-              </AnimatePresence>
-            </div>
+            <StyledAvatarGroup max={5} spacing={1} onClick={() => setIsOpen(true)}>
+              {readBy.map(item => {
+                const userInfo = users.find(user => user.id === item.user.id);
+                const member = {
+                  name: item.user?.name ? item.user.name : userInfo ? userInfo.name : item.user.id,
+                  avatar: item.user?.avatar ? item.user.avatar : userInfo ? userInfo.avatar : '',
+                };
+                return (
+                  <div key={item.user.id} style={{ display: 'flex', width: '18px', height: '18px' }}>
+                    <MemberAvatar member={member} width={18} height={18} />
+                  </div>
+                );
+              })}
+            </StyledAvatarGroup>
           </Tooltip>
         );
       default:
@@ -224,11 +213,11 @@ export default function ReadBy() {
     <Stack
       direction="row"
       justifyContent="flex-end"
-      sx={{
-        position: 'absolute',
-        right: isMobileToLg ? '20px' : isLgToXl ? '50px' : '90px',
-        bottom: 0,
-      }}
+      // sx={{
+      //   position: 'absolute',
+      //   right: isMobileToLg ? '20px' : isLgToXl ? '50px' : '90px',
+      //   bottom: 0,
+      // }}
     >
       {renderReadBy()}
 

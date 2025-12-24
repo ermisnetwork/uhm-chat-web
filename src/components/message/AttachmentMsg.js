@@ -13,7 +13,7 @@ const AttachmentMsg = ({ message }) => {
     <Box
       sx={{
         position: 'relative',
-        maxWidth: attachments.length === 1 ? '20rem' : '30rem',
+        // maxWidth: attachments.length === 1 ? '20rem' : '30rem',
         mb: 0.5,
       }}
     >
