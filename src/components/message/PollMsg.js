@@ -1,6 +1,7 @@
 import React from 'react';
 import DateLine from './DateLine';
 import PollBox from './PollBox';
+import UserMsgLayout from './UserMsgLayout';
 
 const PollMsg = React.memo(({ message, isLastInGroup }) => {
   const isEdited = message.updated_at;

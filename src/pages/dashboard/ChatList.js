@@ -257,8 +257,8 @@ const ChatList = React.memo(({ messages, setMessages }) => {
         style={{ height: '100%', overflowX: 'hidden' }}
         data={messages}
         firstItemIndex={firstItemIndex}
-        initialTopMostItemIndex={messages.length}
-        // initialTopMostItemIndex={{ index: messages.length, align: 'end' }}
+        // initialTopMostItemIndex={messages.length}
+        initialTopMostItemIndex={{ index: messages.length - 1, align: 'end' }}
         followOutput={'smooth'}
         overscan={{
           reverse: 800, // load sẵn tin nhắn cũ
