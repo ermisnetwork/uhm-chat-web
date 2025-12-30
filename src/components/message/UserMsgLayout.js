@@ -10,6 +10,7 @@ const UserMsgLayout = ({ message, isLastInGroup, isHighlighted, children }) => {
   const shouldShowAvatarAndName = !isMe && isLastInGroup;
   const mbValue = shouldShowAvatarAndName ? '30px' : '10px';
   const showMessageOption = [MessageType.Regular, MessageType.Sticker, MessageType.Poll].includes(message.type);
+  const isMsgLinkPreview = message.attachments?.[0]?.type === 'linkPreview';
 
   return (
     <Box
@@ -17,9 +18,20 @@ const UserMsgLayout = ({ message, isLastInGroup, isHighlighted, children }) => {
         display: 'flex',
         flexDirection: isMe ? 'row-reverse' : 'row',
         alignItems: 'flex-end',
-        mb: mbValue,
+        pb: mbValue,
         px: 2,
-        bgcolor: isHighlighted ? 'rgba(0, 132, 255, 0.3)' : 'transparent',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          width: '200%',
+          height: '100%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'rgba(0, 132, 255, 0.3)',
+          display: isHighlighted ? 'block' : 'none',
+        },
       }}
     >
       {shouldShowAvatarAndName && (
@@ -68,6 +80,7 @@ const UserMsgLayout = ({ message, isLastInGroup, isHighlighted, children }) => {
             borderTopRightRadius: isMe ? 4 : 20,
             borderTopLeftRadius: isMe ? 20 : 4,
             opacity: message.status === 'sending' ? 0.5 : 1,
+            maxWidth: isMsgLinkPreview ? '400px' : '100%',
           }}
         >
           {children}

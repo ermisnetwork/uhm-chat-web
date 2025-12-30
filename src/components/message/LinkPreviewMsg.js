@@ -7,15 +7,15 @@ const LinkPreviewMsg = ({ message }) => {
   const linkPreview = message.attachments[0]; // chỉ hiển thị linkPreview đầu tiên
 
   return (
-    <Stack direction="row" justifyContent={message.isMyMessage ? 'end' : 'start'} sx={{ width: '100%' }}>
+    <Stack direction="row" justifyContent={message.isMyMessage ? 'end' : 'start'}>
       <Box
-        px={1.5}
-        py={1.5}
+        // px={1.5}
+        // py={1.5}
         sx={{
-          backgroundColor: message.isMyMessage ? theme.palette.primary.main : theme.palette.background.neutral,
-          borderRadius: 1.5,
+          // backgroundColor: message.isMyMessage ? theme.palette.primary.main : theme.palette.background.neutral,
+          // borderRadius: 1.5,
           position: 'relative',
-          maxWidth: '400px',
+          // maxWidth: '400px',
         }}
       >
         <Stack spacing={1}>

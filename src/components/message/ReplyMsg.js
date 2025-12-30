@@ -138,7 +138,7 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
         </Stack>
       </Box>
       <Stack spacing={1}>
-        {linkPreviewMsg && <LinkPreview linkPreview={linkPreviewMsg} />}
+        {/* {linkPreviewMsg && <LinkPreview linkPreview={linkPreviewMsg} />} */}
         {attachmentsOfMsg && <Attachments attachments={attachmentsOfMsg} />}
         {voiceMsg && <VoiceLine voiceMsg={voiceMsg} />}
         {message.sticker_url && (

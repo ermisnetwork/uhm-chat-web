@@ -19,7 +19,7 @@ const SystemMsg = React.memo(({ message }) => {
   const msgSystem = renderSystemMessage(message.text, users, isDirect, messages, t);
 
   return (
-    <Stack direction="row" justifyContent="center">
+    <Stack direction="row" justifyContent="center" sx={{ paddingBottom: '15px' }}>
       <Typography
         variant="body2"
         color={theme.palette.grey[500]}

@@ -19,7 +19,7 @@ const DateSeparator = React.memo(({ dateString }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', pb: '15px' }}>
       <Chip size="small" label={getDateLabel(dateString)} />
     </Box>
   );

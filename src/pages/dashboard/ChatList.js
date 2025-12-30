@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { Box, Paper, styled } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { MessageType } from '../../constants/commons-const';
 import SystemMsg from '../../components/message/SystemMsg';
@@ -12,30 +12,7 @@ import { getMessageGroupingProps, shouldShowDateHeader } from '../../utils/forma
 import DateSeparator from '../../components/message/DateSeparator';
 import ReadBy from '../../components/ReadBy';
 import ScrollToBottom from '../../components/ScrollToBottom';
-
-const StyledMessageItem = styled(Box)(({ theme }) => ({
-  '&:hover': {
-    '& .messageActions': {
-      visibility: 'visible',
-    },
-
-    '& .quickReactions': {
-      visibility: 'visible',
-    },
-  },
-  '&.myMessage': {
-    '& .linkUrl': {
-      color: '#f1f1f1',
-    },
-  },
-  '& .messageActions.open': {
-    visibility: 'visible',
-  },
-
-  '& .quickReactions': {
-    visibility: 'hidden',
-  },
-}));
+import { setSearchMessageId } from '../../redux/slices/messages';
 
 const MessageItemContent = React.memo(({ message, prevMsg, nextMsg, isHighlighted, onScrollToReplyMsg }) => {
   const groupingProps = useMemo(() => getMessageGroupingProps(message, prevMsg, nextMsg), [message, prevMsg, nextMsg]);
@@ -51,10 +28,10 @@ const MessageItemContent = React.memo(({ message, prevMsg, nextMsg, isHighlighte
   };
 
   return (
-    <StyledMessageItem className={`${isMyMessage ? 'myMessage' : ''}`}>
+    <Box className={`messageItem ${isMyMessage ? 'myMessage' : ''}`}>
       {showDate && <DateSeparator dateString={message.created_at} />}
       {renderMessageContent({ ...message, isMyMessage }, contextProps)}
-    </StyledMessageItem>
+    </Box>
   );
 });
 
@@ -75,11 +52,12 @@ const renderMessageContent = (message, contextProps) => {
 };
 
 const ChatList = React.memo(({ messages, setMessages }) => {
+  const dispatch = useDispatch();
   // Lấy data từ Redux
   const { currentChannel, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
-
   const { user_id } = useSelector(state => state.auth);
   const { currentTopic } = useSelector(state => state.topic);
+  const { searchMessageId } = useSelector(state => state.messages);
 
   // State
   // const [messages, setMessages] = useState([]);
@@ -108,19 +86,28 @@ const ChatList = React.memo(({ messages, setMessages }) => {
     setShowScrollBottom(false);
   }, [currentChat]);
 
+  useEffect(() => {
+    if (searchMessageId) {
+      handleScrollToMessage(searchMessageId);
+    }
+  }, [searchMessageId]);
+
   const scrollToIndex = useCallback(
     async (index, msgId) => {
       if (!virtuosoRef.current) return;
 
-      virtuosoRef.current.scrollToIndex({
-        index,
-        align: 'center',
-        behavior: 'auto',
+      requestAnimationFrame(() => {
+        virtuosoRef.current.scrollToIndex({
+          index,
+          align: 'center',
+          behavior: 'auto',
+        });
+        setHighlightedMessageId(msgId);
+        setTimeout(() => {
+          setHighlightedMessageId(null);
+          dispatch(setSearchMessageId(''));
+        }, 1000);
       });
-      setHighlightedMessageId(msgId);
-      setTimeout(() => {
-        setHighlightedMessageId(null);
-      }, 1000);
     },
     [virtuosoRef],
   );
@@ -141,7 +128,7 @@ const ChatList = React.memo(({ messages, setMessages }) => {
 
       try {
         isScrollingToMsgRef.current = true;
-        const olderMessages = await currentChat.queryMessagesGreaterThanId(targetMessageId, 1000);
+        const olderMessages = await currentChat.queryMessagesAroundId(targetMessageId, 10000);
 
         if (olderMessages && Array.isArray(olderMessages) && olderMessages.length > 0) {
           setFirstItemIndex(INDEX_OFFSET);
@@ -164,7 +151,11 @@ const ChatList = React.memo(({ messages, setMessages }) => {
   );
 
   const queryMessagesLessThanId = useCallback(async () => {
-    if (!hasMore || messages.length === 0 || isScrollingToMsgRef.current) {
+    if (isScrollingToMsgRef.current) {
+      return;
+    }
+
+    if (!hasMore || messages.length === 0) {
       return;
     }
 
@@ -183,7 +174,7 @@ const ChatList = React.memo(({ messages, setMessages }) => {
     } catch (error) {
       console.error('Lỗi khi tải tin nhắn cũ:', error);
     }
-  }, [currentChat, messages, hasMore]);
+  }, [currentChat, messages, hasMore, isScrollingToMsgRef]);
 
   // --- HÀM XỬ LÝ SCROLL ĐẾN TIN NHẮN ---
   const handleScrollToMessage = useCallback(
@@ -205,6 +196,14 @@ const ChatList = React.memo(({ messages, setMessages }) => {
 
   const virtuosoComponents = useMemo(
     () => ({
+      List: React.forwardRef((props, ref) => (
+        <Box
+          sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: 'calc(100% - 18px)' }}
+          ref={ref}
+          {...props}
+        />
+      )),
+
       Footer: () => {
         if (isGuest || isBlocked || isBanned) return null;
         return (
@@ -248,6 +247,7 @@ const ChatList = React.memo(({ messages, setMessages }) => {
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
+        pt: '15px',
       }}
     >
       <Virtuoso
@@ -259,10 +259,11 @@ const ChatList = React.memo(({ messages, setMessages }) => {
         firstItemIndex={firstItemIndex}
         // initialTopMostItemIndex={messages.length}
         initialTopMostItemIndex={{ index: messages.length - 1, align: 'end' }}
-        followOutput={'smooth'}
+        // followOutput={() => (isScrollingToMsgRef.current ? false : 'smooth')}
+        // followOutput="smooth"
         overscan={{
-          reverse: 800, // load sẵn tin nhắn cũ
-          main: 300, // load sẵn tin nhắn mới
+          reverse: 1000, // load sẵn tin nhắn cũ
+          main: 1000, // load sẵn tin nhắn mới
         }}
         startReached={queryMessagesLessThanId}
         atBottomThreshold={200}
