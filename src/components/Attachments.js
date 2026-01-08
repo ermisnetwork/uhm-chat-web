@@ -14,6 +14,9 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
   const columnCount = medias.length === 1 ? 1 : medias.length === 2 ? 2 : 3;
   if (medias.length === 0) return null;
 
+  const width = medias.length === 1 ? '330px' : '200px';
+  const height = medias.length === 1 ? '330px' : '200px';
+
   return (
     <ImageList variant="quilted" cols={columnCount} rowHeight={200}>
       {medias.map((item, index) => (
@@ -35,8 +38,8 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
           >
             <ImageCanvas
               dataUrl={item.type === MediaType.VIDEO ? item.poster : item.src}
-              width={'200px'}
-              height={'200px'}
+              width={width}
+              height={height}
               styleCustom={{ borderRadius: '12px', objectFit: 'contain' }}
             />
             {item.type === MediaType.VIDEO && (
@@ -165,7 +168,7 @@ export default function Attachments({ attachments }) {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="flex-end">
+      <Stack direction="row" justifyContent="flex-start">
         <QuiltedMediaList medias={medias} setIsOpen={setIsOpen} setIndexMedia={setIndexMedia} />
       </Stack>
 

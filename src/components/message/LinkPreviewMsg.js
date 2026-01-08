@@ -15,6 +15,7 @@ const LinkPreviewMsg = ({ message }) => {
           // backgroundColor: message.isMyMessage ? theme.palette.primary.main : theme.palette.background.neutral,
           // borderRadius: 1.5,
           position: 'relative',
+          maxWidth: '100%',
           // maxWidth: '400px',
         }}
       >

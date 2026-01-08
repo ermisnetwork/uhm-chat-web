@@ -67,6 +67,9 @@ const ChatComponent2 = () => {
   const { currentTopic, isClosedTopic } = useSelector(state => state.topic);
   const [messages, setMessages] = useState([]);
   const [usersTyping, setUsersTyping] = useState([]);
+
+  // Ref để điều khiển scroll behavior khi có tin nhắn mới
+  const followOutputRef = useRef(null);
   const [isPendingInvite, setIsPendingInvite] = useState(false);
   const [isAlertInvitePending, setIsAlertInvitePending] = useState(false);
   const [noMessageTitle, setNoMessageTitle] = useState('');
@@ -80,7 +83,8 @@ const ChatComponent2 = () => {
 
   useEffect(() => {
     setUsersTyping([]);
-    setMessages([]);
+    // Không cần setMessages([]) vì key={chatKey} trên Virtuoso sẽ tự reset
+    // Việc clear messages gây ra unmount/remount ChatList -> scroll nhảy
 
     if (currentChat) {
       const channelName = currentChat.data.name ? currentChat.data.name : getChannelName(currentChat, users);
@@ -91,6 +95,11 @@ const ChatComponent2 = () => {
       setIsAlertInvitePending(
         isDirect && [RoleMember.PENDING, RoleMember.SKIPPED].includes(receiverInfo?.channel_role),
       );
+
+      // Set follow behavior = true để scroll xuống đáy khi load channel mới
+      if (followOutputRef.current) {
+        followOutputRef.current(true);
+      }
       setMessages(listMessage);
       setIsPendingInvite(checkPendingInvite(currentChat));
       dispatch(SetIsGuest(isGuestInPublicChannel(currentChat)));
@@ -143,13 +152,22 @@ const ChatComponent2 = () => {
         switch (event.type) {
           case ClientEvents.MessageNew:
             const messageType = event.message.type;
+            const isMyMessage =
+              user_id === event.user.id && ![MessageType.System, MessageType.Signal].includes(event.message.type);
 
             // Phát âm thanh cho tin nhắn mới (trừ tin nhắn system/signal)
             if (![MessageType.System, MessageType.Signal].includes(messageType)) {
               playNewMessageSound();
             }
 
-            if (user_id !== event.user.id || [MessageType.System, MessageType.Signal].includes(event.message.type)) {
+            // Set follow behavior TRƯỚC KHI setMessages
+            // - Tin nhắn của mình: luôn scroll xuống
+            // - Tin nhắn người khác: để Virtuoso quyết định dựa trên vị trí hiện tại
+            if (followOutputRef.current) {
+              followOutputRef.current(isMyMessage);
+            }
+
+            if (!isMyMessage) {
               setMessages(prev => {
                 return [...prev, event.message];
               });
@@ -447,7 +465,9 @@ const ChatComponent2 = () => {
               }}
               className={`${isDragActive ? 'isDragActive' : ''}`}
             >
-              {messages.length > 0 && <ChatList messages={messages} setMessages={setMessages} />}
+              {messages.length > 0 && (
+                <ChatList messages={messages} setMessages={setMessages} setFollowOutputRef={followOutputRef} />
+              )}
 
               {noMessageTitle && <NoMessageBox channel={currentChat} />}
             </Box>

@@ -363,3 +363,23 @@ a.linkUrl:last-child {
   visibility: visible;
   opacity: 1;
 }
+
+.textLine {
+  word-break: break-word;
+  white-space: pre-wrap;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.textLine .mentionHighlight {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: #212b36;
+  margin-bottom: 5px;
+}
+
+.textLine .mentionHighlight .linkUrl {
+  display: inline;
+  color: inherit !important;
+}

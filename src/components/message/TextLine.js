@@ -6,23 +6,6 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy } from 'phosphor-react';
 
-const StyledTextLine = styled(Typography)(({ theme }) => ({
-  wordBreak: 'break-word',
-  whiteSpace: 'pre-wrap',
-  fontWeight: 500,
-  '& .mentionHighlight': {
-    padding: '2px 10px',
-    borderRadius: '12px',
-    backgroundColor: '#fff',
-    color: '#212B36',
-    marginBottom: '5px',
-    '& .linkUrl': {
-      display: 'inline',
-      color: 'inherit !important',
-    },
-  },
-}));
-
 const TextLine = ({ text, isMyMessage }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -106,7 +89,12 @@ const TextLine = ({ text, isMyMessage }) => {
       const codeContent = text.slice(3, -3).trim();
       return (
         <Box sx={{ position: 'relative' }}>
-          <SyntaxHighlighter language="javascript" style={atomDark} showLineNumbers customStyle={{ width: '100%' }}>
+          <SyntaxHighlighter
+            language="javascript"
+            style={atomDark}
+            showLineNumbers
+            customStyle={{ width: '350px', height: '350px' }}
+          >
             {codeContent}
           </SyntaxHighlighter>
 
@@ -131,9 +119,9 @@ const TextLine = ({ text, isMyMessage }) => {
       );
     } else {
       return (
-        <StyledTextLine variant="body2" color={isMyMessage ? '#fff' : theme.palette.text}>
+        <Typography className="textLine" variant="body2" color={isMyMessage ? '#fff' : theme.palette.text}>
           {processMessage(text)}
-        </StyledTextLine>
+        </Typography>
       );
     }
   };

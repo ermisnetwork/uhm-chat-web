@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { Box, Paper } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,7 +51,7 @@ const renderMessageContent = (message, contextProps) => {
   return <SpecificComponent message={message} {...contextProps} />;
 };
 
-const ChatList = React.memo(({ messages, setMessages }) => {
+const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
   const dispatch = useDispatch();
   // Lấy data từ Redux
   const { currentChannel, isGuest, isBlocked, isBanned } = useSelector(state => state.channel);
@@ -65,9 +65,41 @@ const ChatList = React.memo(({ messages, setMessages }) => {
   const [hasMore, setHasMore] = useState(true);
   const [highlightedMessageId, setHighlightedMessageId] = useState(null);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const [isReady, setIsReady] = useState(true); // Mặc định true
 
   const virtuosoRef = useRef(null);
   const isScrollingToMsgRef = useRef(false);
+  const isLoadingOlderRef = useRef(false); // Track khi đang load tin nhắn cũ
+
+  // Ref để track tin nhắn cuối là của mình hay người khác
+  const isMyLastMessageRef = useRef(false);
+
+  // Expose method để parent component set trước khi gọi setMessages
+  useEffect(() => {
+    if (setFollowOutputRef) {
+      setFollowOutputRef.current = isMyMessage => {
+        isMyLastMessageRef.current = isMyMessage;
+      };
+    }
+  }, [setFollowOutputRef]);
+
+  // Callback cho followOutput - quyết định có scroll hay không
+  const handleFollowOutput = useCallback(isAtBottom => {
+    // Đang scroll đến tin nhắn cụ thể -> không auto-scroll
+    if (isScrollingToMsgRef.current) {
+      return false;
+    }
+    // Đang load tin nhắn cũ -> không scroll
+    if (isLoadingOlderRef.current) {
+      return false;
+    }
+    // Tin nhắn của mình -> luôn scroll xuống
+    if (isMyLastMessageRef.current) {
+      return 'smooth';
+    }
+    // Tin nhắn người khác -> chỉ scroll nếu đang ở đáy
+    return isAtBottom ? 'smooth' : false;
+  }, []);
 
   const currentChat = useMemo(() => (currentTopic ? currentTopic : currentChannel), [currentTopic, currentChannel]);
   const chatKey = currentChat?.id || 'default-chat';
@@ -83,8 +115,21 @@ const ChatList = React.memo(({ messages, setMessages }) => {
     // setMessages(listMessage);
 
     isScrollingToMsgRef.current = false;
+    isLoadingOlderRef.current = false;
     setShowScrollBottom(false);
   }, [currentChat]);
+
+  // Xử lý visibility khi chuyển channel - CHỈ chạy khi chatKey thay đổi
+  useLayoutEffect(() => {
+    setIsReady(false);
+
+    // Delay nhỏ để Virtuoso render xong rồi mới hiện
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [chatKey]); // CHỈ dependency là chatKey
 
   useEffect(() => {
     if (searchMessageId) {
@@ -122,7 +167,7 @@ const ChatList = React.memo(({ messages, setMessages }) => {
     }
   }, [messages.length]);
 
-  const queryMessagesGreaterThanId = useCallback(
+  const queryMessagesAroundId = useCallback(
     async targetMessageId => {
       if (!targetMessageId) return;
 
@@ -136,7 +181,10 @@ const ChatList = React.memo(({ messages, setMessages }) => {
 
           const messageIndex = olderMessages.findIndex(msg => msg.id === targetMessageId);
           if (messageIndex !== -1) {
-            scrollToIndex(messageIndex, targetMessageId);
+            // Đợi Virtuoso render xong data mới trước khi scroll
+            setTimeout(() => {
+              scrollToIndex(messageIndex, targetMessageId);
+            }, 100);
           }
         }
       } catch (error) {
@@ -147,7 +195,7 @@ const ChatList = React.memo(({ messages, setMessages }) => {
         }, 1000);
       }
     },
-    [currentChat],
+    [currentChat, scrollToIndex],
   );
 
   const queryMessagesLessThanId = useCallback(async () => {
@@ -163,6 +211,9 @@ const ChatList = React.memo(({ messages, setMessages }) => {
     if (!msgId) return;
 
     try {
+      // Set flag để ngăn scroll trong handleFollowOutput
+      isLoadingOlderRef.current = true;
+
       const olderMessages = await currentChat.queryMessagesLessThanId(msgId);
 
       if (olderMessages && Array.isArray(olderMessages) && olderMessages.length > 0) {
@@ -173,6 +224,11 @@ const ChatList = React.memo(({ messages, setMessages }) => {
       }
     } catch (error) {
       console.error('Lỗi khi tải tin nhắn cũ:', error);
+    } finally {
+      // Reset flag sau khi đã xong
+      setTimeout(() => {
+        isLoadingOlderRef.current = false;
+      }, 500);
     }
   }, [currentChat, messages, hasMore, isScrollingToMsgRef]);
 
@@ -187,11 +243,11 @@ const ChatList = React.memo(({ messages, setMessages }) => {
       if (messageIndex !== -1) {
         scrollToIndex(messageIndex, targetMessageId);
       } else {
-        queryMessagesGreaterThanId(targetMessageId);
+        queryMessagesAroundId(targetMessageId);
         console.warn('Tin nhắn không tồn tại trong danh sách đã tải (cần xử lý load thêm nếu cần)');
       }
     },
-    [messages, firstItemIndex],
+    [messages],
   );
 
   const virtuosoComponents = useMemo(
@@ -254,22 +310,27 @@ const ChatList = React.memo(({ messages, setMessages }) => {
         ref={virtuosoRef}
         key={chatKey}
         className="customScrollbar"
-        style={{ height: '100%', overflowX: 'hidden' }}
+        style={{
+          height: '100%',
+          overflowX: 'hidden',
+          visibility: isReady ? 'visible' : 'hidden',
+        }}
         data={messages}
         firstItemIndex={firstItemIndex}
-        // initialTopMostItemIndex={messages.length}
-        initialTopMostItemIndex={{ index: messages.length - 1, align: 'end' }}
-        // followOutput={() => (isScrollingToMsgRef.current ? false : 'smooth')}
-        // followOutput="smooth"
-        overscan={{
-          reverse: 1000, // load sẵn tin nhắn cũ
-          main: 1000, // load sẵn tin nhắn mới
-        }}
+        initialTopMostItemIndex={messages.length - 1}
+        followOutput={handleFollowOutput}
+        // overscan={{
+        //   reverse: 800, // load sẵn tin nhắn cũ
+        //   main: 300, // load sẵn tin nhắn mới
+        // }}
+        increaseViewportBy={{ top: 900, bottom: 200 }}
         startReached={queryMessagesLessThanId}
         atBottomThreshold={200}
         atBottomStateChange={atBottom => {
           setShowScrollBottom(!atBottom);
         }}
+        // Giúp giảm jitter khi prepend tin nhắn
+        computeItemKey={(index, message) => message.id}
         itemContent={itemContent}
         components={virtuosoComponents}
       />
