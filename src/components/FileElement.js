@@ -27,7 +27,7 @@ const FileElement = ({ file, size = 44, primaryFontSize = '14px', secondaryFontS
   };
 
   return (
-    <StyledFileItem onClick={() => onDownloadFile(file)}>
+    <StyledFileItem onClick={() => onDownloadFile(file.asset_url)}>
       <Stack direction="row" alignItems="center" gap={1} sx={{ width: '100%' }}>
         <FileTypeBadge fileName={file.title} size={size} />
 
