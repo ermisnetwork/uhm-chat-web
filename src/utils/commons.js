@@ -310,12 +310,7 @@ export function isStagingDomain() {
 }
 
 export async function processImageFile(file, isAvatarUpload = false) {
-  const isImage = file.type.startsWith('image/');
-  if (['image/svg+xml', 'image/gif'].includes(file.type) || !isImage || !isAvatarUpload) {
-    return file;
-  }
-
-  // Nếu file là HEIC, chuyển sang JPG
+  // 1. Convert HEIC/HEIF to JPEG (always)
   if (file.type === 'image/heic' || file.type === 'image/heif') {
     try {
       const jpgBlob = await heic2any({
@@ -330,18 +325,27 @@ export async function processImageFile(file, isAvatarUpload = false) {
     } catch (error) {
       return file;
     }
-  } else {
+  }
+
+  // 2. Initial checks for compression
+  const isImage = file.type.startsWith('image/');
+  const isExcluded = ['image/svg+xml', 'image/gif'].includes(file.type);
+
+  // 3. Compress if: Avatar upload, is Image, and not in excluded list
+  if (isAvatarUpload && isImage && !isExcluded) {
     const quality = 50;
     const width = 'auto'; // Original width
     const height = 'auto'; // Original height
     const format = 'jpeg';
     const resultBlob = await fromBlob(file, quality, width, height, format);
 
-    const resultFile = new File([resultBlob], file.name, {
+    return new File([resultBlob], file.name, {
       type: file.type,
     });
-    return resultFile;
   }
+
+  // 4. Default return
+  return file;
 }
 
 export function displayMessageWithMentionName(text, mentions) {
