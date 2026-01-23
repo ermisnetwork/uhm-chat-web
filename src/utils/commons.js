@@ -310,6 +310,15 @@ export function isStagingDomain() {
 }
 
 export async function processImageFile(file, isAvatarUpload = false) {
+  // 0. Normalize filename: convert Vietnamese to ASCII and replace spaces with underscores
+  const fileExtension = file.name.substring(file.name.lastIndexOf('.'));
+  const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.'));
+  const normalizedName = removeVietnameseTones(fileNameWithoutExt).replace(/\s+/g, '_') + fileExtension;
+
+  if (normalizedName !== file.name) {
+    file = new File([file], normalizedName, { type: file.type });
+  }
+
   // 1. Convert HEIC/HEIF to JPEG (always)
   if (file.type === 'image/heic' || file.type === 'image/heif') {
     try {
