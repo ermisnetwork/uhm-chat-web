@@ -156,7 +156,7 @@ const ChatComponent2 = () => {
               user_id === event.user.id && ![MessageType.System, MessageType.Signal].includes(event.message.type);
 
             // Phát âm thanh cho tin nhắn mới (trừ tin nhắn system/signal)
-            if (![MessageType.System, MessageType.Signal].includes(messageType)) {
+            if (![MessageType.System, MessageType.Signal].includes(messageType) && !isMyMessage) {
               playNewMessageSound();
             }
 
