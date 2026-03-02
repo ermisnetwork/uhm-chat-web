@@ -18,7 +18,7 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
   const height = medias.length === 1 ? '400px' : '200px';
 
   return (
-    <ImageList variant="quilted" cols={columnCount} rowHeight={height}>
+    <ImageList variant="quilted" cols={columnCount} rowHeight={parseInt(height)}>
       {medias.map((item, index) => (
         <ImageListItem key={index} cols={1} rows={1}>
           <Paper
