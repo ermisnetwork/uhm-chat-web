@@ -3,13 +3,13 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { IconButton, Stack, styled, Tabs, Typography, Tab } from '@mui/material';
 import { CaretLeft, MagnifyingGlass } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { UpdateSidebarType } from '../../redux/slices/app';
-import { ConfirmType, RoleMember, SidebarType, TabValueMembers } from '../../constants/commons-const';
-import { ProfileAddIcon } from '../../components/Icons';
-import { setChannelConfirm, SetOpenInviteFriendDialog } from '../../redux/slices/dialog';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import MemberElement from '../../components/MemberElement';
-import NoResult from '../../assets/Illustration/NoResult';
+import { UpdateSidebarType } from '@/redux/slices/app';
+import { ConfirmType, RoleMember, SidebarType, TabValueMembers } from '@/constants/commons-const';
+import { ProfileAddIcon } from '@/components/Icons';
+import { setChannelConfirm, SetOpenInviteFriendDialog } from '@/redux/slices/dialog';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
+import MemberElement from '@/components/MemberElement';
+import NoResult from '@/assets/Illustration/NoResult';
 import { useTranslation } from 'react-i18next';
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({

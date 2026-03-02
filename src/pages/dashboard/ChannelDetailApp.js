@@ -3,38 +3,36 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // Constants
-import { CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
-import { DEFAULT_PATH } from '../../config';
+import { CurrentChannelStatus, SidebarType } from '@/constants/commons-const';
+import { DEFAULT_PATH } from '@/config';
 
 // Utils
-import { splitChannelId } from '../../utils/commons';
+import { splitChannelId } from '@/utils/commons';
 
 // Redux
-import { ConnectCurrentChannel } from '../../redux/slices/channel';
+import { ConnectCurrentChannel } from '@/redux/slices/channel';
 
 // Components
-import ChatComponent from './ChatComponent';
-import ChannelNotFound from '../../sections/dashboard/ChannelNotFound';
-import SidebarPanel from './SidebarPanel';
-import BoxContainer from '../../layouts/dashboard/BoxContainer';
-import LoadingScreen from '../../components/LoadingScreen';
-import InviteFriendDialog from '../../sections/dashboard/InviteFriendDialog';
+import ChannelNotFound from '@/sections/dashboard/ChannelNotFound';
+import SidebarPanel from '@/pages/dashboard/SidebarPanel';
+import BoxContainer from '@/layouts/dashboard/BoxContainer';
+import LoadingScreen from '@/components/LoadingScreen';
+import InviteFriendDialog from '@/sections/dashboard/InviteFriendDialog';
 
 // Sidebar Components
-import SidebarChannelInfo from '../../sections/dashboard/SidebarChannelInfo';
-import SidebarChannelType from '../../sections/dashboard/SidebarChannelType';
-import SidebarMembers from '../../sections/dashboard/SidebarMembers';
-import SidebarPermissions from '../../sections/dashboard/SidebarPermissions';
-import SidebarAdministrators from '../../sections/dashboard/SidebarAdministrators';
-import SidebarBanned from '../../sections/dashboard/SidebarBanned';
-import SidebarKeywords from '../../sections/dashboard/SidebarKeywords';
-import SidebarSearchMessage from '../../sections/dashboard/SidebarSearchMessage';
-import SidebarUserInfo from '../../sections/dashboard/SidebarUserInfo';
-import SidebarChannelTopic from '../../sections/dashboard/SidebarChannelTopic';
-import SidebarTopicInfo from '../../sections/dashboard/SidebarTopicInfo';
-import { ChatHeader } from '../../components/Chat';
-import ChatList from './ChatList';
-import ChatComponent2 from './ChatComponent2';
+import SidebarChannelInfo from '@/sections/dashboard/SidebarChannelInfo';
+import SidebarChannelType from '@/sections/dashboard/SidebarChannelType';
+import SidebarMembers from '@/sections/dashboard/SidebarMembers';
+import SidebarPermissions from '@/sections/dashboard/SidebarPermissions';
+import SidebarAdministrators from '@/sections/dashboard/SidebarAdministrators';
+import SidebarBanned from '@/sections/dashboard/SidebarBanned';
+import SidebarKeywords from '@/sections/dashboard/SidebarKeywords';
+import SidebarSearchMessage from '@/sections/dashboard/SidebarSearchMessage';
+import SidebarUserInfo from '@/sections/dashboard/SidebarUserInfo';
+import SidebarChannelTopic from '@/sections/dashboard/SidebarChannelTopic';
+import SidebarTopicInfo from '@/sections/dashboard/SidebarTopicInfo';
+import { ChatHeader } from '@/components/Chat';
+import ChatComponent2 from '@/pages/dashboard/ChatComponent2';
 
 const ChannelDetailApp = () => {
   const dispatch = useDispatch();

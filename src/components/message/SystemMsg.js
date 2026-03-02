@@ -1,10 +1,10 @@
 import { Stack, Typography, useTheme } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { isChannelDirect } from '../../utils/commons';
-import { client } from '../../client';
+import { isChannelDirect } from '@/utils/commons';
+import { client } from '@/client';
 import { useTranslation } from 'react-i18next';
-import { renderSystemMessage } from '../../utils/messageSystem';
+import { renderSystemMessage } from '@/utils/messageSystem';
 
 const SystemMsg = React.memo(({ message }) => {
   const theme = useTheme();

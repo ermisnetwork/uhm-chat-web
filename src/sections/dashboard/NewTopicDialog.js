@@ -14,16 +14,16 @@ import {
 } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import FormProvider from '../../components/hook-form/FormProvider';
-import { RHFTextField } from '../../components/hook-form';
+import FormProvider from '@/components/hook-form/FormProvider';
+import { RHFTextField } from '@/components/hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { SetOpenNewTopicDialog } from '../../redux/slices/dialog';
-import { ChatPurpleIcon } from '../../components/Icons';
+import { SetOpenNewTopicDialog } from '@/redux/slices/dialog';
+import { ChatPurpleIcon } from '@/components/Icons';
 import { X } from 'phosphor-react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { handleError } from '../../utils/commons';
-import { showSnackbar } from '../../redux/slices/app';
+import { handleError } from '@/utils/commons';
+import { showSnackbar } from '@/redux/slices/app';
 import { LoadingButton } from '@mui/lab';
 import { useTranslation } from 'react-i18next';
 

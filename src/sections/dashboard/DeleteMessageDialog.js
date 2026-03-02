@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, Slide, DialogContentText, DialogActions } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { onDeleteMessage, setMessageIdError } from '../../redux/slices/messages';
-import { handleError } from '../../utils/commons';
+import { onDeleteMessage, setMessageIdError } from '@/redux/slices/messages';
+import { handleError } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

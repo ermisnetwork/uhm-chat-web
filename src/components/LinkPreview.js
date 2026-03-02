@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { Card, CardActionArea, CardMedia, CardContent, Typography, Stack } from '@mui/material';
-import NoImage from '../assets/Images/no-image.png';
+import NoImage from '@/assets/Images/no-image.png';
 
 export default function LinkPreview({ linkPreview }) {
   const theme = useTheme();

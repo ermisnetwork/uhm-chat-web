@@ -15,14 +15,14 @@ import {
 } from '@mui/material';
 import { CheckCircle, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import MemberAvatar from './MemberAvatar';
-import { fDateTime } from '../utils/formatTime';
-import { ClientEvents } from '../constants/events-const';
-import { AvatarShape, MessageReadType, MessageType } from '../constants/commons-const';
-import { setMessageReadType } from '../redux/slices/messages';
+import MemberAvatar from '@/components/MemberAvatar';
+import { fDateTime } from '@/utils/formatTime';
+import { ClientEvents } from '@/constants/events-const';
+import { AvatarShape, MessageReadType, MessageType } from '@/constants/commons-const';
+import { setMessageReadType } from '@/redux/slices/messages';
 import { FixedSizeList } from 'react-window';
-import { client } from '../client';
-import useResponsive from '../hooks/useResponsive';
+import { client } from '@/client';
+import useResponsive from '@/hooks/useResponsive';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 

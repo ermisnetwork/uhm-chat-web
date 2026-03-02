@@ -1,6 +1,6 @@
 import { alpha, Box, useTheme } from '@mui/material';
 import React from 'react';
-import { LoadingSpinner } from './animate';
+import { LoadingSpinner } from '@/components/animate';
 
 const LoadingScreen = () => {
   const theme = useTheme();

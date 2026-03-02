@@ -14,16 +14,16 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { setOpenCreatePollDialog } from '../../redux/slices/dialog';
-import FormProvider, { RHFTextField } from '../../components/hook-form';
+import { setOpenCreatePollDialog } from '@/redux/slices/dialog';
+import FormProvider, { RHFTextField } from '@/components/hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { X } from 'phosphor-react';
-import RHFCheckbox from '../../components/hook-form/RHFCheckbox';
-import { handleError } from '../../utils/commons';
-import { FlagIcon, PollIcon } from '../../components/Icons';
-import Iconify from '../../components/Iconify';
+import RHFCheckbox from '@/components/hook-form/RHFCheckbox';
+import { handleError } from '@/utils/commons';
+import { FlagIcon, PollIcon } from '@/components/Icons';
+import Iconify from '@/components/Iconify';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

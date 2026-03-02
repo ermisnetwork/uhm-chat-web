@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Box, useTheme, Drawer } from '@mui/material';
-import useResponsive from '../../hooks/useResponsive';
-import { TRANSITION, WIDTH_SIDEBAR_PANEL } from '../../config';
+import useResponsive from '@/hooks/useResponsive';
+import { TRANSITION, WIDTH_SIDEBAR_PANEL } from '@/config';
 import { useDispatch, useSelector } from 'react-redux';
-import { SetIsEditing, setSidebar, ToggleSidebar } from '../../redux/slices/app';
-import { SidebarType } from '../../constants/commons-const';
+import { SetIsEditing, setSidebar, ToggleSidebar } from '@/redux/slices/app';
+import { SidebarType } from '@/constants/commons-const';
 
 const SidebarPanel = ({ children }) => {
   const theme = useTheme();

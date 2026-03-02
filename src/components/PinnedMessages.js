@@ -14,13 +14,13 @@ import {
 } from '@mui/material';
 import { CaretDown, PushPin, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { displayMessageWithMentionName, formatString } from '../utils/commons';
-import { onUnPinMessage, setSearchMessageId } from '../redux/slices/messages';
-import UnpinMessageDialog from '../sections/dashboard/UnpinMessageDialog';
-import { SetPinnedMessages } from '../redux/slices/channel';
-import { ClientEvents } from '../constants/events-const';
-import { MessageType } from '../constants/commons-const';
-import { ChatJumpIcon } from './Icons';
+import { displayMessageWithMentionName, formatString } from '@/utils/commons';
+import { onUnPinMessage, setSearchMessageId } from '@/redux/slices/messages';
+import UnpinMessageDialog from '@/sections/dashboard/UnpinMessageDialog';
+import { SetPinnedMessages } from '@/redux/slices/channel';
+import { ClientEvents } from '@/constants/events-const';
+import { MessageType } from '@/constants/commons-const';
+import { ChatJumpIcon } from '@/components/Icons';
 import { useTranslation } from 'react-i18next';
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({

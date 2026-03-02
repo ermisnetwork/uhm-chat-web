@@ -3,13 +3,13 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import { CaretLeft } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { UpdateSidebarType, showSnackbar } from '../../redux/slices/app';
+import { UpdateSidebarType, showSnackbar } from '@/redux/slices/app';
 import { LoadingButton } from '@mui/lab';
-import RHFRadio from '../../components/hook-form/RHFRadio';
-import { handleError } from '../../utils/commons';
-import FormProvider from '../../components/hook-form';
+import RHFRadio from '@/components/hook-form/RHFRadio';
+import { handleError } from '@/utils/commons';
+import FormProvider from '@/components/hook-form';
 import { useForm } from 'react-hook-form';
-import { SidebarType } from '../../constants/commons-const';
+import { SidebarType } from '@/constants/commons-const';
 import { useTranslation } from 'react-i18next';
 
 const SidebarChannelTopic = () => {

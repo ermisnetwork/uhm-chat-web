@@ -1,5 +1,5 @@
-import { CallType } from '../constants/commons-const';
-import { LocalStorageKey } from '../constants/localStorage-const';
+import { CallType } from '@/constants/commons-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 
 export function convertMessageSignal(input, t) {
   if (!input) return null;

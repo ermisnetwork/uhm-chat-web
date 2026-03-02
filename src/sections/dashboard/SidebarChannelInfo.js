@@ -3,8 +3,8 @@ import { styled, useTheme } from '@mui/material/styles';
 import { IconButton, InputAdornment, Stack, Typography } from '@mui/material';
 import { CaretLeft, CaretRight, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SetIsEditing, ToggleSidebar, UpdateSidebarType, showSnackbar } from '../../redux/slices/app';
-import ChannelAvatar from '../../components/ChannelAvatar';
+import { SetIsEditing, ToggleSidebar, UpdateSidebarType, showSnackbar } from '@/redux/slices/app';
+import ChannelAvatar from '@/components/ChannelAvatar';
 import {
   checkDirectBlock,
   processImageFile,
@@ -12,22 +12,22 @@ import {
   isChannelDirect,
   isPublicChannel,
   myRoleInChannel,
-} from '../../utils/commons';
-import { AvatarShape, ConfirmType, RoleMember, SidebarType } from '../../constants/commons-const';
-import ClipboardCopy from '../../components/ClipboardCopy';
+} from '@/utils/commons';
+import { AvatarShape, ConfirmType, RoleMember, SidebarType } from '@/constants/commons-const';
+import ClipboardCopy from '@/components/ClipboardCopy';
 import { LoadingButton } from '@mui/lab';
-import FormProvider from '../../components/hook-form/FormProvider';
-import { RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
+import FormProvider from '@/components/hook-form/FormProvider';
+import { RHFTextField, RHFUploadAvatar } from '@/components/hook-form';
 import { useForm } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { setChannelConfirm, SetOpenInviteFriendDialog } from '../../redux/slices/dialog';
-import { ClientEvents } from '../../constants/events-const';
-import { DOMAIN_APP } from '../../config';
-import AntSwitch from '../../components/AntSwitch';
-import ChannelNotificationDialog from './ChannelNotificationDialog';
-import { AddMutedChannel, RemoveMutedChannel } from '../../redux/slices/channel';
-import useOnlineStatus from '../../hooks/useOnlineStatus';
+import { setChannelConfirm, SetOpenInviteFriendDialog } from '@/redux/slices/dialog';
+import { ClientEvents } from '@/constants/events-const';
+import { DOMAIN_APP } from '@/config';
+import AntSwitch from '@/components/AntSwitch';
+import ChannelNotificationDialog from '@/sections/dashboard/ChannelNotificationDialog';
+import { AddMutedChannel, RemoveMutedChannel } from '@/redux/slices/channel';
+import useOnlineStatus from '@/hooks/useOnlineStatus';
 import {
   AdministratorsIcon,
   BannedIcon,
@@ -45,8 +45,8 @@ import {
   TrashIcon,
   UserOctagonIcon,
   UsersIcon,
-} from '../../components/Icons';
-import ChannelInfoTab from './ChannelInfoTab';
+} from '@/components/Icons';
+import ChannelInfoTab from '@/sections/dashboard/ChannelInfoTab';
 import { useTranslation } from 'react-i18next';
 
 const StyledStackItem = styled(Stack)(({ theme }) => ({

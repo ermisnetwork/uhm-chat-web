@@ -4,15 +4,15 @@ import { useAccount, useDisconnect, useSignTypedData } from 'wagmi';
 import { useEffect, useState } from 'react';
 import { useWalletInfo, useWeb3Modal } from '@web3modal/wagmi/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logIn } from '../../redux/slices/auth';
-import { showSnackbar, UpdateIsLoading } from '../../redux/slices/app';
-import { CHAINS } from '../../constants/wallet-const';
-import { LocalStorageKey } from '../../constants/localStorage-const';
-import LogoCoinbase from '../../assets/Images/logo-coinbase.webp';
-import { BASE_URL_PROFILE } from '../../config';
-import { LoginType } from '../../constants/commons-const';
-import { isStagingDomain } from '../../utils/commons';
-import uuidv4 from '../../utils/uuidv4';
+import { logIn } from '@/redux/slices/auth';
+import { showSnackbar, UpdateIsLoading } from '@/redux/slices/app';
+import { CHAINS } from '@/constants/wallet-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
+import LogoCoinbase from '@/assets/Images/logo-coinbase.webp';
+import { BASE_URL_PROFILE } from '@/config';
+import { LoginType } from '@/constants/commons-const';
+import { isStagingDomain } from '@/utils/commons';
+import uuidv4 from '@/utils/uuidv4';
 import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------

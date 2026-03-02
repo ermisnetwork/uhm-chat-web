@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useFormContext, Controller } from 'react-hook-form';
 import { Autocomplete, Chip, Stack, TextField } from '@mui/material';
-import MemberAvatar from '../MemberAvatar';
-import { formatString } from '../../utils/commons';
+import MemberAvatar from '@/components/MemberAvatar';
+import { formatString } from '@/utils/commons';
 import { useSelector } from 'react-redux';
-import { client } from '../../client';
+import { client } from '@/client';
 
 // ----------------------------------------------------------------------
 

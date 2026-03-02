@@ -1,27 +1,27 @@
 import { Stack, Box, Typography, Chip } from '@mui/material';
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import useResponsive from '../../hooks/useResponsive';
-import AttachmentMsg from '../../components/message/AttachmentMsg';
-import LinkPreviewMsg from '../../components/message/LinkPreviewMsg';
-import PollMsg from '../../components/message/PollMsg';
-import ReplyMsg from '../../components/message/ReplyMsg';
-import SignalMsg from '../../components/message/SignalMsg';
-import TextMsg from '../../components/message/TextMsg';
-import StickerMsg from '../../components/message/StickerMsg';
+import useResponsive from '@/hooks/useResponsive';
+import AttachmentMsg from '@/components/message/AttachmentMsg';
+import LinkPreviewMsg from '@/components/message/LinkPreviewMsg';
+import PollMsg from '@/components/message/PollMsg';
+import ReplyMsg from '@/components/message/ReplyMsg';
+import SignalMsg from '@/components/message/SignalMsg';
+import TextMsg from '@/components/message/TextMsg';
+import StickerMsg from '@/components/message/StickerMsg';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { checkMyMessage, formatString } from '../../utils/commons';
-import MemberAvatar from '../../components/MemberAvatar';
-import ReadBy from '../../components/ReadBy';
-import ReactionsMessage from '../../components/ReactionsMessage';
+import { checkMyMessage, formatString } from '@/utils/commons';
+import MemberAvatar from '@/components/MemberAvatar';
+import ReadBy from '@/components/ReadBy';
+import ReactionsMessage from '@/components/ReactionsMessage';
 import { Trash, WarningCircle } from 'phosphor-react';
-import { MessageType, SidebarType } from '../../constants/commons-const';
-import { client } from '../../client';
-import { setSearchMessageId } from '../../redux/slices/messages';
-import { renderSystemMessage } from '../../utils/messageSystem';
+import { MessageType, SidebarType } from '@/constants/commons-const';
+import { client } from '@/client';
+import { setSearchMessageId } from '@/redux/slices/messages';
+import { renderSystemMessage } from '@/utils/messageSystem';
 import { AnimatePresence, motion } from 'framer-motion';
-import { setSidebar, SetUserInfo } from '../../redux/slices/app';
+import { setSidebar, SetUserInfo } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 
 const messageMotion = {

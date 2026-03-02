@@ -2,12 +2,12 @@ import React from 'react';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import Attachments from '../Attachments';
-import VoiceLine from './VoiceLine';
-import { formatString, displayMessageWithMentionName } from '../../utils/commons';
-import ImageCanvas from '../ImageCanvas';
+import Attachments from '@/components/Attachments';
+import VoiceLine from '@/components/message/VoiceLine';
+import { formatString, displayMessageWithMentionName } from '@/utils/commons';
+import ImageCanvas from '@/components/ImageCanvas';
 import { Trash } from 'phosphor-react';
-import FileTypeBadge from '../FileTypeBadge';
+import FileTypeBadge from '@/components/FileTypeBadge';
 
 const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
   const { t } = useTranslation();

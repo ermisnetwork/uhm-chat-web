@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
-import ThemeContrast from './ThemeContrast';
-import ThemeRtlLayout from './ThemeRtlLayout';
-import ThemeColorPresets from './ThemeColorPresets';
-import ThemeLocalization from './ThemeLocalization';
+import ThemeContrast from '@/components/settings/ThemeContrast';
+import ThemeRtlLayout from '@/components/settings/ThemeRtlLayout';
+import ThemeColorPresets from '@/components/settings/ThemeColorPresets';
+import ThemeLocalization from '@/components/settings/ThemeLocalization';
 
 // ----------------------------------------------------------------------
 

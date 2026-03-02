@@ -19,17 +19,17 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
-import { MessageType } from '../../constants/commons-const';
+import { MessageType } from '@/constants/commons-const';
 import {
   onDeleteMessage,
   onEditMessage,
   onForwardMessage,
   onReplyMessage,
   onUnPinMessage,
-} from '../../redux/slices/messages';
-import { ForwardIcon, QuoteDownIcon, ThreeDotsIcon } from '../Icons';
-import { checkPermissionDeleteMessage, downloadFile } from '../../utils/commons';
-import { SetCooldownTime } from '../../redux/slices/channel';
+} from '@/redux/slices/messages';
+import { ForwardIcon, QuoteDownIcon, ThreeDotsIcon } from '@/components/Icons';
+import { checkPermissionDeleteMessage, downloadFile } from '@/utils/commons';
+import { SetCooldownTime } from '@/redux/slices/channel';
 import { 
   Copy, 
   PushPin, 

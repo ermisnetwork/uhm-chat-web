@@ -19,11 +19,11 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useDispatch, useSelector } from 'react-redux';
-import { formatString } from '../../utils/commons';
-import { callClient } from '../../client';
-import { CallStatus, CallType } from '../../constants/commons-const';
-import { DisconnectCallDirect, setCallDirectStatus, StartCallDirect } from '../../redux/slices/callDirect';
-import MemberAvatar from '../../components/MemberAvatar';
+import { formatString } from '@/utils/commons';
+import { callClient } from '@/client';
+import { CallStatus, CallType } from '@/constants/commons-const';
+import { DisconnectCallDirect, setCallDirectStatus, StartCallDirect } from '@/redux/slices/callDirect';
+import MemberAvatar from '@/components/MemberAvatar';
 import {
   ChatCircleDots,
   Microphone,
@@ -36,17 +36,17 @@ import {
   X,Minus, Rectangle
 } from 'phosphor-react';
 import { Howl } from 'howler';
-import { showSnackbar } from '../../redux/slices/app';
-import avatarBefore from '../../assets/Images/bg-avatar-before.png';
-import avatarAfter from '../../assets/Images/bg-avatar-after.png';
-import  PhoneDis  from '../../assets/Images/phone-disconnect.png';
-import  PhoneConn  from '../../assets/Images/phone-connect.png';
-import  Microconnect  from '../../assets/Images/logo-micro-connect.png';
-import  MicroDisconnect  from '../../assets/Images/logo-micro-disconnect.png';
-import  VideoConnect  from '../../assets/Images/logo-video-connect.png';
-import  VideoDisconnect  from '../../assets/Images/logo-video-disconnect.png';
-import  LogoUp  from '../../assets/Images/logo-up.png';
-import  VideoCall  from '../../assets/Images/logo-VideoCall.png';
+import { showSnackbar } from '@/redux/slices/app';
+import avatarBefore from '@/assets/Images/bg-avatar-before.png';
+import avatarAfter from '@/assets/Images/bg-avatar-after.png';
+import  PhoneDis  from '@/assets/Images/phone-disconnect.png';
+import  PhoneConn  from '@/assets/Images/phone-connect.png';
+import  Microconnect  from '@/assets/Images/logo-micro-connect.png';
+import  MicroDisconnect  from '@/assets/Images/logo-micro-disconnect.png';
+import  VideoConnect  from '@/assets/Images/logo-video-connect.png';
+import  VideoDisconnect  from '@/assets/Images/logo-video-disconnect.png';
+import  LogoUp  from '@/assets/Images/logo-up.png';
+import  VideoCall  from '@/assets/Images/logo-VideoCall.png';
 import { IsRestoringProvider } from '@tanstack/react-query';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

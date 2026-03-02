@@ -2,7 +2,7 @@
 import { enUS, viVN } from '@mui/material/locale';
 
 // routes
-import { PATH_DASHBOARD } from './routes/paths';
+import { PATH_DASHBOARD } from '@/routes/paths';
 
 const apiURL = localStorage.getItem('api_url') || import.meta.env.VITE_API_URL;
 

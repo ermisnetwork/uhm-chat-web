@@ -18,7 +18,7 @@ import {
   celo,
   aurora,
 } from 'wagmi/chains';
-import { DOMAIN_APP } from '../../config';
+import { DOMAIN_APP } from '@/config';
 
 // window.global = window;
 // window.process = process;

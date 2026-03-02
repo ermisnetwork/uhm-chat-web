@@ -1,5 +1,5 @@
 import React from 'react';
-import LinkPreview from '../LinkPreview';
+import LinkPreview from '@/components/LinkPreview';
 
 const LinkPreviewMsg = React.memo(({ linkPreview }) => {
   return <LinkPreview linkPreview={linkPreview} />;

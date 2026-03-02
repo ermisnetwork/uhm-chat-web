@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
-import { SetCooldownTime } from '../redux/slices/channel';
+import { SetCooldownTime } from '@/redux/slices/channel';
 
 export default function CooldownMessage({ cooldownTime }) {
   const theme = useTheme();

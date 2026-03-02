@@ -8,25 +8,25 @@ import {
   myRoleInChannel,
   replaceMentionsWithIds,
   replaceMentionsWithNames,
-} from '../../utils/commons';
-import { onEditMessage, onFilesMessage, onReplyMessage, onSetAttachmentsMessage } from '../../redux/slices/messages';
-import ReplyMessageBox from '../../sections/dashboard/ReplyMessageBox';
-import EditMessageBox from '../../sections/dashboard/EditMessageBox';
-import { showSnackbar } from '../../redux/slices/app';
-import CooldownMessage from '../CooldownMessage';
+} from '@/utils/commons';
+import { onEditMessage, onFilesMessage, onReplyMessage, onSetAttachmentsMessage } from '@/redux/slices/messages';
+import ReplyMessageBox from '@/sections/dashboard/ReplyMessageBox';
+import EditMessageBox from '@/sections/dashboard/EditMessageBox';
+import { showSnackbar } from '@/redux/slices/app';
+import CooldownMessage from '@/components/CooldownMessage';
 import * as linkify from 'linkifyjs';
-import { RoleMember, UploadType } from '../../constants/commons-const';
-import Mentions from '../Mentions';
-import { ClientEvents } from '../../constants/events-const';
-import { AddMention, RemoveMention } from '../../redux/slices/channel';
-import useMentions from '../../hooks/useMentions';
-import useDebounce from '../../hooks/useDebounce';
-import uuidv4 from '../../utils/uuidv4';
-import { client } from '../../client';
-import ActionsChatPopover from '../ActionsChatPopover';
-import { MicrophoneIcon, PictureImageIcon, SendIcon } from '../Icons';
-import EmojiPickerPopover from '../EmojiPickerPopover';
-import RecordingAudioBox from '../../sections/dashboard/RecordingAudioBox';
+import { RoleMember, UploadType } from '@/constants/commons-const';
+import Mentions from '@/components/Mentions';
+import { ClientEvents } from '@/constants/events-const';
+import { AddMention, RemoveMention } from '@/redux/slices/channel';
+import useMentions from '@/hooks/useMentions';
+import useDebounce from '@/hooks/useDebounce';
+import uuidv4 from '@/utils/uuidv4';
+import { client } from '@/client';
+import ActionsChatPopover from '@/components/ActionsChatPopover';
+import { MicrophoneIcon, PictureImageIcon, SendIcon } from '@/components/Icons';
+import EmojiPickerPopover from '@/components/EmojiPickerPopover';
+import RecordingAudioBox from '@/sections/dashboard/RecordingAudioBox';
 import { useTranslation } from 'react-i18next';
 
 const VisuallyHiddenInput = styled('input')({

@@ -1,16 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Stack, Typography, Tabs, Tab, Chip, Button } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
-import ChatElement from '../../components/ChatElement';
+import ChatElement from '@/components/ChatElement';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChatType, TabValueChannel } from '../../constants/commons-const';
-import HomeSearch from '../../components/Search/HomeSearch';
-import SkeletonChannels from '../../components/SkeletonChannels';
+import { ChatType, TabValueChannel } from '@/constants/commons-const';
+import HomeSearch from '@/components/Search/HomeSearch';
+import SkeletonChannels from '@/components/SkeletonChannels';
 import FlipMove from 'react-flip-move';
-import NoResult from '../../assets/Illustration/NoResult';
-import { SetOpenHomeSearch } from '../../redux/slices/app';
+import NoResult from '@/assets/Illustration/NoResult';
+import { SetOpenHomeSearch } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
-import { TRANSITION } from '../../config';
+import { TRANSITION } from '@/config';
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({
   minHeight: 'auto',

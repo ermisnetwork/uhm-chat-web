@@ -1,12 +1,12 @@
 import { Stack, Typography } from '@mui/material';
-import LoginWallet from '../auth/LoginWallet';
-import CustomApiUrlForm from '../auth/CustomApiUrlForm';
-import WalletWrapper from '../../layouts/wallet';
+import LoginWallet from '@/pages/auth/LoginWallet';
+import CustomApiUrlForm from '@/pages/auth/CustomApiUrlForm';
+import WalletWrapper from '@/layouts/wallet';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { SetAuthProvider } from '../../redux/slices/app';
+import { SetAuthProvider } from '@/redux/slices/app';
 import { ErmisAuthProvider } from 'ermis-chat-js-sdk';
-import { API_KEY, BASE_URL } from '../../config';
+import { API_KEY, BASE_URL } from '@/config';
 import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------

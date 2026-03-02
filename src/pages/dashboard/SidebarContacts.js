@@ -3,11 +3,11 @@ import { Badge, Button, Stack, Typography } from '@mui/material';
 import { MagnifyingGlass } from 'phosphor-react';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { PeopleIcon, UserSupportIcon, DeviceMessageIcon } from '../../components/Icons';
-import { SetSearchQuery } from '../../redux/slices/app';
-import { ChatType, ContactType, RoleMember } from '../../constants/commons-const';
-import useResponsive from '../../hooks/useResponsive';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
+import { PeopleIcon, UserSupportIcon, DeviceMessageIcon } from '@/components/Icons';
+import { SetSearchQuery } from '@/redux/slices/app';
+import { ChatType, ContactType, RoleMember } from '@/constants/commons-const';
+import useResponsive from '@/hooks/useResponsive';
 import { useTranslation } from 'react-i18next';
 
 const SidebarContacts = () => {

@@ -2,13 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, Slide, Box, Stack, Typography, IconButton, useTheme } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { onForwardMessage } from '../../redux/slices/messages';
-import ChannelAvatar from '../../components/ChannelAvatar';
+import { onForwardMessage } from '@/redux/slices/messages';
+import ChannelAvatar from '@/components/ChannelAvatar';
 import { MagnifyingGlass, X } from 'phosphor-react';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { AvatarShape } from '../../constants/commons-const';
-import { showSnackbar } from '../../redux/slices/app';
-import { formatString } from '../../utils/commons';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
+import { AvatarShape } from '@/constants/commons-const';
+import { showSnackbar } from '@/redux/slices/app';
+import { formatString } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

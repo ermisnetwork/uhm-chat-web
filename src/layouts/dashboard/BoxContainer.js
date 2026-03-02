@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
-import useResponsive from '../../hooks/useResponsive';
+import useResponsive from '@/hooks/useResponsive';
 
 const BoxContainer = ({ children }) => {
   const theme = useTheme();

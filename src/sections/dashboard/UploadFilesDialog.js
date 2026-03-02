@@ -14,13 +14,13 @@ import {
   Chip,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { onFilesMessage, onSetAttachmentsMessage } from '../../redux/slices/messages';
+import { onFilesMessage, onSetAttachmentsMessage } from '@/redux/slices/messages';
 import { Trash, X } from 'phosphor-react';
-import { UploadType } from '../../constants/commons-const';
-import { formatFileSize, processImageFile } from '../../utils/commons';
-import FileTypeBadge from '../../components/FileTypeBadge';
-import { ChatFooter } from '../../components/Chat';
-import ImageCanvas from '../../components/ImageCanvas';
+import { UploadType } from '@/constants/commons-const';
+import { formatFileSize, processImageFile } from '@/utils/commons';
+import FileTypeBadge from '@/components/FileTypeBadge';
+import { ChatFooter } from '@/components/Chat';
+import ImageCanvas from '@/components/ImageCanvas';
 import { useTranslation } from 'react-i18next';
 
 const MAX_SIZE_MB = 100; // Giới hạn 100MB

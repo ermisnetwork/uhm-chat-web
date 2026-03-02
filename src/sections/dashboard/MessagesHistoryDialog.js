@@ -1,8 +1,8 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle, Slide, List, ListItem, ListItemText } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { SetMessagesHistoryDialog } from '../../redux/slices/dialog';
-import { fDateTime } from '../../utils/formatTime';
+import { SetMessagesHistoryDialog } from '@/redux/slices/dialog';
+import { fDateTime } from '@/utils/formatTime';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

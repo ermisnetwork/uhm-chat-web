@@ -1,11 +1,11 @@
 import { Stack, Typography, Button, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../../config';
-import NoData from '../../assets/Illustration/NoData';
+import { DEFAULT_PATH } from '@/config';
+import NoData from '@/assets/Illustration/NoData';
 import { useDispatch } from 'react-redux';
-import { setCurrentChannelStatus } from '../../redux/slices/channel';
-import { CurrentChannelStatus } from '../../constants/commons-const';
+import { setCurrentChannelStatus } from '@/redux/slices/channel';
+import { CurrentChannelStatus } from '@/constants/commons-const';
 import { useTranslation } from 'react-i18next';
 
 const ChannelNotFound = () => {

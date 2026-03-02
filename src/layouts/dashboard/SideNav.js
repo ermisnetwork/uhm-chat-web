@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { Badge, Box, IconButton, Stack, Tooltip } from '@mui/material';
-import AntSwitch from '../../components/AntSwitch';
-import useSettings from '../../hooks/useSettings';
-import { Nav_Buttons } from '../../data';
+import AntSwitch from '@/components/AntSwitch';
+import useSettings from '@/hooks/useSettings';
+import { Nav_Buttons } from '@/data';
 import { useDispatch, useSelector } from 'react-redux';
-import { UpdateTab } from '../../redux/slices/app';
-import Logo from '../../assets/Images/logo.svg';
+import { UpdateTab } from '@/redux/slices/app';
+import Logo from '@/assets/Images/logo.svg';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH, WIDTH_SIDE_NAV } from '../../config';
-import useResponsive from '../../hooks/useResponsive';
-import { setCurrentChannel, setCurrentChannelStatus } from '../../redux/slices/channel';
-import { ContactType, CurrentChannelStatus, TabType } from '../../constants/commons-const';
-import { SetOpenTopicPanel } from '../../redux/slices/topic';
+import { DEFAULT_PATH, WIDTH_SIDE_NAV } from '@/config';
+import useResponsive from '@/hooks/useResponsive';
+import { setCurrentChannel, setCurrentChannelStatus } from '@/redux/slices/channel';
+import { ContactType, CurrentChannelStatus, TabType } from '@/constants/commons-const';
+import { SetOpenTopicPanel } from '@/redux/slices/topic';
 import { useTranslation } from 'react-i18next';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({

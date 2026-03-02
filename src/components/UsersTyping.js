@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, useTheme } from '@mui/material';
 
-const UsersTyping = ({ usersTyping }) => {
+const UsersTyping = React.memo(({ usersTyping }) => {
   const theme = useTheme();
 
   return (
@@ -31,6 +31,6 @@ const UsersTyping = ({ usersTyping }) => {
       </div>
     </Box>
   );
-};
+});
 
 export default UsersTyping;

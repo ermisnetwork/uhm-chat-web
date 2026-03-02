@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
-import ForwardTo from './ForwardTo';
-import TextLine from './TextLine';
-import UserMsgLayout from './UserMsgLayout';
-import ReplyMsg from './ReplyMsg';
-import DateLine from './DateLine';
-import AttachmentMsg from './AttachmentMsg';
-import LinkPreviewMsg from './LinkPreviewMsg';
-import VoiceMsg from './VoiceMsg';
+import ForwardTo from '@/components/message/ForwardTo';
+import TextLine from '@/components/message/TextLine';
+import UserMsgLayout from '@/components/message/UserMsgLayout';
+import ReplyMsg from '@/components/message/ReplyMsg';
+import DateLine from '@/components/message/DateLine';
+import AttachmentMsg from '@/components/message/AttachmentMsg';
+import LinkPreviewMsg from '@/components/message/LinkPreviewMsg';
+import VoiceMsg from '@/components/message/VoiceMsg';
 
 const RegularMsg = React.memo(({ message, isLastInGroup, onScrollToReplyMsg, isHighlighted }) => {
   const isEdited = message?.updated_at;

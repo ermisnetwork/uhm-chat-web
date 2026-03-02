@@ -2,12 +2,12 @@ import { t } from 'i18next';
 import React, { useState } from 'react';
 import { Box, Button, Typography, Stack, Radio, LinearProgress, useTheme } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { showSnackbar } from '../../redux/slices/app';
-import { setPollResult } from '../../redux/slices/dialog';
-import { getMemberInfo } from '../../utils/commons';
-import CustomCheckbox from '../../components/CustomCheckbox';
+import { showSnackbar } from '@/redux/slices/app';
+import { setPollResult } from '@/redux/slices/dialog';
+import { getMemberInfo } from '@/utils/commons';
+import CustomCheckbox from '@/components/CustomCheckbox';
 import { useTranslation } from 'react-i18next';
-import { client } from '../../client';
+import { client } from '@/client';
 
 const PollBox = ({ message }) => {
   const { t } = useTranslation();

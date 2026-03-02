@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { ChatType, OnlineStatusUser, RoleMember } from '../constants/commons-const';
-import { ClientEvents } from '../constants/events-const';
+import { ChatType, OnlineStatusUser, RoleMember } from '@/constants/commons-const';
+import { ClientEvents } from '@/constants/events-const';
 
 export default function useOnlineStatus(userId) {
   const { activeChannels = [], pinnedChannels = [] } = useSelector(state => state.channel);

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Stack, Tabs, Tab, alpha } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { ChatType, MediaType, SidebarType, TabValueChannelInfo } from '../../constants/commons-const';
+import { ChatType, MediaType, SidebarType, TabValueChannelInfo } from '@/constants/commons-const';
 import { useDispatch, useSelector } from 'react-redux';
-import MemberElement from '../../components/MemberElement';
+import MemberElement from '@/components/MemberElement';
 import { PlayCircle } from 'phosphor-react';
-import LightboxMedia from '../../components/LightboxMedia';
-import FileElement from '../../components/FileElement';
-import NoFile from '../../assets/Illustration/NoFile';
-import LinkElement from '../../components/LinkElement';
-import { SetUserInfo, UpdateSidebarType } from '../../redux/slices/app';
-import ImageCanvas from '../../components/ImageCanvas';
+import LightboxMedia from '@/components/LightboxMedia';
+import FileElement from '@/components/FileElement';
+import NoFile from '@/assets/Illustration/NoFile';
+import LinkElement from '@/components/LinkElement';
+import { SetUserInfo, UpdateSidebarType } from '@/redux/slices/app';
+import ImageCanvas from '@/components/ImageCanvas';
 import { useTranslation } from 'react-i18next';
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({

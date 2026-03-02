@@ -4,14 +4,14 @@ import { styled, useTheme } from '@mui/material/styles';
 import { Badge, Stack, Box } from '@mui/material';
 import PropTypes from 'prop-types';
 
-import { AvatarShape, ChatType, OnlineStatusUser } from '../constants/commons-const';
-import useOnlineStatus from '../hooks/useOnlineStatus';
-import AvatarComponent from './AvatarComponent';
-import AvatarDefault from './AvatarDefault';
-import AvatarGeneralDefault from './AvatarGeneralDefault';
-import ImageCanvas from './ImageCanvas';
-import TopicAvatar from './TopicAvatar';
-import { TRANSITION } from '../config';
+import { AvatarShape, ChatType, OnlineStatusUser } from '@/constants/commons-const';
+import useOnlineStatus from '@/hooks/useOnlineStatus';
+import AvatarComponent from '@/components/AvatarComponent';
+import AvatarDefault from '@/components/AvatarDefault';
+import AvatarGeneralDefault from '@/components/AvatarGeneralDefault';
+import ImageCanvas from '@/components/ImageCanvas';
+import TopicAvatar from '@/components/TopicAvatar';
+import { TRANSITION } from '@/config';
 
 const StyledBadgeOnline = styled(Badge, {
   shouldForwardProp: prop => prop !== 'status',

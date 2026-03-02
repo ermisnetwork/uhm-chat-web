@@ -17,10 +17,10 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useDispatch, useSelector } from 'react-redux';
-import { callClient } from '../../client';
-import { CallStatus, CallType } from '../../constants/commons-const';
-import { DisconnectCallDirect, setCallDirectStatus, StartCallDirect } from '../../redux/slices/callDirect';
-import MemberAvatar from '../../components/MemberAvatar';
+import { callClient } from '@/client';
+import { CallStatus, CallType } from '@/constants/commons-const';
+import { DisconnectCallDirect, setCallDirectStatus, StartCallDirect } from '@/redux/slices/callDirect';
+import MemberAvatar from '@/components/MemberAvatar';
 import {
   ChatCircleDots,
   Microphone,
@@ -36,7 +36,7 @@ import {
   ArrowsIn,
 } from 'phosphor-react';
 import { Howl } from 'howler';
-import { showSnackbar } from '../../redux/slices/app';
+import { showSnackbar } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { Box, Stack, Paper, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
-import { downloadFile, formatFileSize } from '../utils/commons';
+import { downloadFile, formatFileSize } from '@/utils/commons';
 import { PlayCircle } from 'phosphor-react';
-import { MediaType } from '../constants/commons-const';
-import FileTypeBadge from './FileTypeBadge';
-import ImageCanvas from './ImageCanvas';
+import { MediaType } from '@/constants/commons-const';
+import FileTypeBadge from '@/components/FileTypeBadge';
+import ImageCanvas from '@/components/ImageCanvas';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
-import LightboxMedia from './LightboxMedia';
+import LightboxMedia from '@/components/LightboxMedia';
 
 const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
   const columnCount = medias.length === 1 ? 1 : 2;

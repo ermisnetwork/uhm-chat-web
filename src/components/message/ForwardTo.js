@@ -1,6 +1,6 @@
 import { Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { MessageType } from '../../constants/commons-const';
+import { MessageType } from '@/constants/commons-const';
 import { ArrowBendUpRight } from 'phosphor-react';
 
 const ForwardTo = ({ type, isMyMessage }) => {

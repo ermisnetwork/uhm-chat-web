@@ -2,18 +2,18 @@ import React, { useMemo } from 'react';
 import { Stack, Typography, Box, IconButton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChatType, ContactType } from '../../constants/commons-const';
-import ContactElement from '../../components/ContactElement';
-import BoxContainer from '../../layouts/dashboard/BoxContainer';
-import NoResult from '../../assets/Illustration/NoResult';
-import InviteElement from '../../components/InviteElement';
-import useResponsive from '../../hooks/useResponsive';
+import { ChatType, ContactType } from '@/constants/commons-const';
+import ContactElement from '@/components/ContactElement';
+import BoxContainer from '@/layouts/dashboard/BoxContainer';
+import NoResult from '@/assets/Illustration/NoResult';
+import InviteElement from '@/components/InviteElement';
+import useResponsive from '@/hooks/useResponsive';
 import { CaretLeft } from 'phosphor-react';
 import { useNavigate } from 'react-router-dom';
-import FriendList from '../../sections/dashboard/FriendList';
-import { SetSearchQuery } from '../../redux/slices/app';
-import { DEFAULT_PATH } from '../../config';
-import { removeVietnameseTones } from '../../utils/commons';
+import FriendList from '@/sections/dashboard/FriendList';
+import { SetSearchQuery } from '@/redux/slices/app';
+import { DEFAULT_PATH } from '@/config';
+import { removeVietnameseTones } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const Contacts = () => {

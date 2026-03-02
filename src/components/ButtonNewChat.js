@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTheme } from '@emotion/react';
 import { Menu, MenuItem, Button } from '@mui/material';
-import { OpenDialogCreateChannel, OpenDialogNewDirectMessage } from '../redux/slices/dialog';
+import { OpenDialogCreateChannel, OpenDialogNewDirectMessage } from '@/redux/slices/dialog';
 import { Plus, User, UsersThree } from 'phosphor-react';
 
 export default function ButtonNewChat() {

@@ -1,17 +1,17 @@
-import LogoEth from '../assets/Images/logo-eth.webp';
-import LogoPolygon from '../assets/Images/logo-polygon.webp';
-import LogoAvalanche from '../assets/Images/logo-avalanche.webp';
-import LogoArbitrum from '../assets/Images/logo-arbitrum.webp';
-import LogoBnb from '../assets/Images/logo-bnb.webp';
-import LogoOp from '../assets/Images/logo-op.webp';
-import LogoGnosis from '../assets/Images/logo-gnosis.webp';
-import LogoZkSync from '../assets/Images/logo-zksync.webp';
-import LogoZora from '../assets/Images/logo-zora.webp';
-import LogoBase from '../assets/Images/logo-base.webp';
-import LogoCelo from '../assets/Images/logo-celo.webp';
-import LogoAurora from '../assets/Images/logo-aurora.webp';
-import LogoErmis from '../assets/Images/logo.svg';
-import LogoSdk from '../assets/Images/logo-sdk.webp';
+import LogoEth from '@/assets/Images/logo-eth.webp';
+import LogoPolygon from '@/assets/Images/logo-polygon.webp';
+import LogoAvalanche from '@/assets/Images/logo-avalanche.webp';
+import LogoArbitrum from '@/assets/Images/logo-arbitrum.webp';
+import LogoBnb from '@/assets/Images/logo-bnb.webp';
+import LogoOp from '@/assets/Images/logo-op.webp';
+import LogoGnosis from '@/assets/Images/logo-gnosis.webp';
+import LogoZkSync from '@/assets/Images/logo-zksync.webp';
+import LogoZora from '@/assets/Images/logo-zora.webp';
+import LogoBase from '@/assets/Images/logo-base.webp';
+import LogoCelo from '@/assets/Images/logo-celo.webp';
+import LogoAurora from '@/assets/Images/logo-aurora.webp';
+import LogoErmis from '@/assets/Images/logo.svg';
+import LogoSdk from '@/assets/Images/logo-sdk.webp';
 
 export const CHAIN_ID = {
   Ermis: 0,

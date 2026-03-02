@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { UpdateIsLoading, showSnackbar } from './app';
-import { CloseDialogProfile } from './dialog';
-import { handleError } from '../../utils/commons';
-import { client } from '../../client';
+import { UpdateIsLoading, showSnackbar } from '@/redux/slices/app';
+import { CloseDialogProfile } from '@/redux/slices/dialog';
+import { handleError } from '@/utils/commons';
+import { client } from '@/client';
 
 const initialState = {
   all_members: [],

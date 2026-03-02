@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button, Stack, Typography, Box, useTheme } from '@mui/material';
-import NoChat from '../../assets/Illustration/NoChat';
+import NoChat from '@/assets/Illustration/NoChat';
 import { useDispatch, useSelector } from 'react-redux';
-import { OpenDialogCreateChannel, OpenDialogNewDirectMessage } from '../../redux/slices/dialog';
-import useResponsive from '../../hooks/useResponsive';
-import { NewChatIcon, PeopleIcon } from '../../components/Icons';
-import { NewChat_Menu } from '../../data';
+import { OpenDialogCreateChannel, OpenDialogNewDirectMessage } from '@/redux/slices/dialog';
+import useResponsive from '@/hooks/useResponsive';
+import { NewChatIcon, PeopleIcon } from '@/components/Icons';
+import { NewChat_Menu } from '@/data';
 import { useTranslation } from 'react-i18next';
 const GeneralApp = () => {
   const { t } = useTranslation();

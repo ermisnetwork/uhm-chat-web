@@ -1,4 +1,4 @@
-import { TreeViewCollapseIcon, TreeViewExpandIcon, TreeViewEndIcon } from './CustomIcons';
+import { TreeViewCollapseIcon, TreeViewExpandIcon, TreeViewEndIcon } from '@/theme/overrides/CustomIcons';
 
 // ----------------------------------------------------------------------
 

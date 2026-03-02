@@ -3,13 +3,13 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import FormProvider, { RHFTextField } from '../../components/hook-form';
-import { logIn } from '../../redux/slices/auth';
+import FormProvider, { RHFTextField } from '@/components/hook-form';
+import { logIn } from '@/redux/slices/auth';
 import { useDispatch } from 'react-redux';
-import uuidv4 from '../../utils/uuidv4';
-import { CHAT_PROJECT_ID } from '../../config';
-import { LoginType } from '../../constants/commons-const';
-import { LocalStorageKey } from '../../constants/localStorage-const';
+import uuidv4 from '@/utils/uuidv4';
+import { CHAT_PROJECT_ID } from '@/config';
+import { LoginType } from '@/constants/commons-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------

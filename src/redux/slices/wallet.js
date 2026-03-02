@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import axiosWalletInstance from '../../utils/axiosWallet';
-import { handleError } from '../../utils/commons';
-import { LocalStorageKey } from '../../constants/localStorage-const';
-import { signOut } from './auth';
-import { client } from '../../client';
-import { UpdateIsLoading, showSnackbar } from './app';
-import { API_KEY } from '../../config';
+import axiosWalletInstance from '@/utils/axiosWallet';
+import { handleError } from '@/utils/commons';
+import { LocalStorageKey } from '@/constants/localStorage-const';
+import { signOut } from '@/redux/slices/auth';
+import { client } from '@/client';
+import { UpdateIsLoading, showSnackbar } from '@/redux/slices/app';
+import { API_KEY } from '@/config';
 
 // ----------------------------------------------------------------------
 

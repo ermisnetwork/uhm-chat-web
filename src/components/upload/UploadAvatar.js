@@ -4,7 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import { Typography } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 //
-import AvatarPreview from './preview/AvatarPreview';
+import AvatarPreview from '@/components/upload/preview/AvatarPreview';
 import { Image } from 'phosphor-react';
 
 // ----------------------------------------------------------------------

@@ -1,7 +1,7 @@
-import { showSnackbar } from '../redux/slices/app';
-import axiosWalletInstance from './axiosWallet';
-import { ChatType, RoleMember, TabType } from '../constants/commons-const';
-import { LocalStorageKey } from '../constants/localStorage-const';
+import { showSnackbar } from '@/redux/slices/app';
+import axiosWalletInstance from '@/utils/axiosWallet';
+import { ChatType, RoleMember, TabType } from '@/constants/commons-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 import { fromBlob } from 'image-resize-compress';
 import heic2any from 'heic2any';
 

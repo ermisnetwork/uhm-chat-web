@@ -3,12 +3,12 @@ import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
 import { Stack, Card, CardContent, CardActions, Typography, Button, Divider } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../../config';
+import { DEFAULT_PATH } from '@/config';
 import { LoadingButton } from '@mui/lab';
-import { DeleteAccount, DeleteAccountNoAuth, GetChallenge, GetChallengeNoAuth } from '../../redux/slices/wallet';
+import { DeleteAccount, DeleteAccountNoAuth, GetChallenge, GetChallengeNoAuth } from '@/redux/slices/wallet';
 import { useAccount, useDisconnect, useSignTypedData } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import WalletWrapper from '../../layouts/wallet';
+import WalletWrapper from '@/layouts/wallet';
 import { useTranslation } from 'react-i18next';
 
 const CardDeleteAccount = () => {

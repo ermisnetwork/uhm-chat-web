@@ -1,6 +1,6 @@
 import { Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { fTime } from '../../utils/formatTime';
+import { fTime } from '@/utils/formatTime';
 
 const DateLine = ({ date, isEdited, isMyMessage }) => {
   const { t } = useTranslation();

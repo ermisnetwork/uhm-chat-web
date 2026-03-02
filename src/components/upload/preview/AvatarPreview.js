@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 //
-import Image from '../../Image';
+import Image from '@/components/Image';
 
 // ----------------------------------------------------------------------
 

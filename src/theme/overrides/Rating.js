@@ -1,4 +1,4 @@
-import { StarIcon } from './CustomIcons';
+import { StarIcon } from '@/theme/overrides/CustomIcons';
 
 // ----------------------------------------------------------------------
 

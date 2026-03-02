@@ -1,14 +1,14 @@
 import { Divider, Stack, Typography } from '@mui/material';
-import CustomApiUrlForm from './CustomApiUrlForm';
+import CustomApiUrlForm from '@/pages/auth/CustomApiUrlForm';
 import { Link, Link as RouterLink } from 'react-router-dom';
-import LoginWallet from './LoginWallet';
-import LoginEmail from './LoginEmail';
-import { isStagingDomain } from '../../utils/commons';
-import WalletWrapper from '../../layouts/wallet';
+import LoginWallet from '@/pages/auth/LoginWallet';
+import LoginEmail from '@/pages/auth/LoginEmail';
+import { isStagingDomain } from '@/utils/commons';
+import WalletWrapper from '@/layouts/wallet';
 import { useState } from 'react';
-import NewLogin from './NewLogin';
+import NewLogin from '@/pages/auth/NewLogin';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { GOOGLE_CLIENT_ID } from '../../config';
+import { GOOGLE_CLIENT_ID } from '@/config';
 
 // ----------------------------------------------------------------------
 

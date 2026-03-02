@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import ChannelAvatar from './ChannelAvatar';
-import { AvatarShape } from '../constants/commons-const';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import { AvatarShape } from '@/constants/commons-const';
 import { useTranslation } from 'react-i18next';
 
 const NoMessageBox = ({ channel }) => {

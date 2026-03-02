@@ -13,11 +13,11 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { CaretLeft, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
-import useResponsive from '../../hooks/useResponsive';
-import { setSidebar, showSnackbar } from '../../redux/slices/app';
+import useResponsive from '@/hooks/useResponsive';
+import { setSidebar, showSnackbar } from '@/redux/slices/app';
 import { useDispatch, useSelector } from 'react-redux';
-import ChannelAvatar from '../ChannelAvatar';
-import { handleError, isChannelDirect, myRoleInChannel } from '../../utils/commons';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import { handleError, isChannelDirect, myRoleInChannel } from '@/utils/commons';
 import {
   AvatarShape,
   CallType,
@@ -27,13 +27,13 @@ import {
   RoleMember,
   SidebarMode,
   SidebarType,
-} from '../../constants/commons-const';
+} from '@/constants/commons-const';
 import { LoadingButton } from '@mui/lab';
-import { setCurrentChannel, setCurrentChannelStatus, SetIsGuest } from '../../redux/slices/channel';
-import useOnlineStatus from '../../hooks/useOnlineStatus';
-import { callClient, client } from '../../client';
+import { setCurrentChannel, setCurrentChannelStatus, SetIsGuest } from '@/redux/slices/channel';
+import useOnlineStatus from '@/hooks/useOnlineStatus';
+import { callClient, client } from '@/client';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../../config';
+import { DEFAULT_PATH } from '@/config';
 import {
   DotsThreeIcon,
   EditIcon,
@@ -43,9 +43,9 @@ import {
   PlayCircleIcon,
   TrashIcon,
   UnPinIcon,
-} from '../Icons';
-import { setChannelConfirm } from '../../redux/slices/dialog';
-import { SetOpenTopicPanel } from '../../redux/slices/topic';
+} from '@/components/Icons';
+import { setChannelConfirm } from '@/redux/slices/dialog';
+import { SetOpenTopicPanel } from '@/redux/slices/topic';
 import { useTranslation } from 'react-i18next';
 
 const ActionsTopic = () => {

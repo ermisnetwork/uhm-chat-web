@@ -1,8 +1,8 @@
 import { Box, useTheme, Typography, Paper } from '@mui/material';
-import MemberAvatar from '../MemberAvatar';
-import ReactionsMessage from '../ReactionsMessage';
-import MessageOption from './MessageOption';
-import { MessageType } from '../../constants/commons-const';
+import MemberAvatar from '@/components/MemberAvatar';
+import ReactionsMessage from '@/components/ReactionsMessage';
+import MessageOption from '@/components/message/MessageOption';
+import { MessageType } from '@/constants/commons-const';
 
 const UserMsgLayout = ({ message, isLastInGroup, isHighlighted, children }) => {
   const theme = useTheme();

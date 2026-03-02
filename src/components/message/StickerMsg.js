@@ -1,7 +1,7 @@
 import { Stack } from '@mui/material';
 import React from 'react';
-import ImageCanvas from '../ImageCanvas';
-import UserMsgLayout from './UserMsgLayout';
+import ImageCanvas from '@/components/ImageCanvas';
+import UserMsgLayout from '@/components/message/UserMsgLayout';
 
 const StickerMsg = React.memo(({ message, isLastInGroup, isHighlighted }) => {
   return (

@@ -13,13 +13,13 @@ import {
     Tooltip,
     useTheme, 
 } from '@mui/material';
-import { showSnackbar } from '../../redux/slices/app';
-import { onDeleteMessage, onEditMessage, onReplyMessage } from '../../redux/slices/conversation';
-import { onUnPinMessage } from '../../redux/slices/channel';
-import { SetCooldownTime } from '../../redux/slices/cooldown';
-import { MessageType } from '../../constants/commons-const';
-import { ThreeDotsIcon } from '../Icons';
-import { checkPermissionDeleteMessage, downloadFile } from '../../utils/commons';
+import { showSnackbar } from '@/redux/slices/app';
+import { onDeleteMessage, onEditMessage, onReplyMessage } from '@/redux/slices/conversation';
+import { onUnPinMessage } from '@/redux/slices/channel';
+import { SetCooldownTime } from '@/redux/slices/cooldown';
+import { MessageType } from '@/constants/commons-const';
+import { ThreeDotsIcon } from '@/components/Icons';
+import { checkPermissionDeleteMessage, downloadFile } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 import { Copy, Download, PencilSimple, PushPin, PushPinSimpleSlash, Trash } from 'phosphor-react';
 

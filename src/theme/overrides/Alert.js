@@ -1,4 +1,4 @@
-import { ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from './CustomIcons';
+import { ErrorIcon, InfoIcon, SuccessIcon, WarningIcon } from '@/theme/overrides/CustomIcons';
 
 // ----------------------------------------------------------------------
 

@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { ChatType, CurrentChannelStatus, RoleMember, SidebarType } from '../../constants/commons-const';
-import { client } from '../../client';
-import { handleError, isEmptyObject, myRoleInChannel, splitChannelId } from '../../utils/commons';
-import { CapabilitiesName } from '../../constants/capabilities-const';
-import { setSidebar } from './app';
-import { FetchAllMembers } from './member';
+import { ChatType, CurrentChannelStatus, RoleMember, SidebarType } from '@/constants/commons-const';
+import { client } from '@/client';
+import { handleError, isEmptyObject, myRoleInChannel, splitChannelId } from '@/utils/commons';
+import { CapabilitiesName } from '@/constants/capabilities-const';
+import { setSidebar } from '@/redux/slices/app';
+import { FetchAllMembers } from '@/redux/slices/member';
 import {
   SetCurrentTopic,
   SetIsClosedTopic,
@@ -12,8 +12,8 @@ import {
   SetParentChannel,
   SetPinnedTopics,
   SetTopics,
-} from './topic';
-import { onEditMessage, onReplyMessage } from './messages';
+} from '@/redux/slices/topic';
+import { onEditMessage, onReplyMessage } from '@/redux/slices/messages';
 
 const initialState = {
   activeChannels: [], // channels that user has joined or created

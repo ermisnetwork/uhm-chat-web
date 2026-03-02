@@ -1,9 +1,9 @@
 import React from 'react';
 import { Stack, styled, useTheme, Typography, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import ChannelAvatar from '../../components/ChannelAvatar';
-import { handleError } from '../../utils/commons';
-import { AvatarShape, ChatType, RoleMember } from '../../constants/commons-const';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import { handleError } from '@/utils/commons';
+import { AvatarShape, ChatType, RoleMember } from '@/constants/commons-const';
 import { useTranslation } from 'react-i18next';
 
 const StyledInvitation = styled(Stack)(({ theme }) => ({

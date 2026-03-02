@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, useTheme, IconButton, Typography, styled } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { showSnackbar } from '../../redux/slices/app';
+import { showSnackbar } from '@/redux/slices/app';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy } from 'phosphor-react';

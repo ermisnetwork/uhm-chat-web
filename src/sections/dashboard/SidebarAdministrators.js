@@ -3,13 +3,13 @@ import { useTheme } from '@mui/material/styles';
 import { Button, IconButton, Stack, Typography } from '@mui/material';
 import { CaretLeft } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { showSnackbar, UpdateSidebarType } from '../../redux/slices/app';
-import { ConfirmType, RoleMember, SidebarType } from '../../constants/commons-const';
-import { handleError } from '../../utils/commons';
-import MemberElement from '../../components/MemberElement';
+import { showSnackbar, UpdateSidebarType } from '@/redux/slices/app';
+import { ConfirmType, RoleMember, SidebarType } from '@/constants/commons-const';
+import { handleError } from '@/utils/commons';
+import MemberElement from '@/components/MemberElement';
 import { LoadingButton } from '@mui/lab';
-import { setChannelConfirm } from '../../redux/slices/dialog';
-import { ProfileAddIcon } from '../../components/Icons';
+import { setChannelConfirm } from '@/redux/slices/dialog';
+import { ProfileAddIcon } from '@/components/Icons';
 import { useTranslation } from 'react-i18next';
 
 const ListMembers = ({ selectedMembers, setSelectedMembers }) => {

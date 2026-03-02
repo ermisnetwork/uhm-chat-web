@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { MessageReadType } from '../../constants/commons-const';
+import { MessageReadType } from '@/constants/commons-const';
 // ----------------------------------------------------------------------
 
 const initialState = {

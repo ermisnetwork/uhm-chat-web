@@ -1,8 +1,8 @@
 import { Stack, Box, Chip, Alert } from '@mui/material';
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { ChatHeader, ChatFooter } from '../../components/Chat';
-import useResponsive from '../../hooks/useResponsive';
+import { ChatHeader, ChatFooter } from '@/components/Chat';
+import useResponsive from '@/hooks/useResponsive';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -14,12 +14,12 @@ import {
   isGuestInPublicChannel,
   myRoleInChannel,
   splitChannelId,
-} from '../../utils/commons';
+} from '@/utils/commons';
 import dayjs from 'dayjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { LoadingSpinner } from '../../components/animate';
-import { ClientEvents } from '../../constants/events-const';
-import ChannelInvitation from '../../sections/dashboard/ChannelInvitation';
+import { LoadingSpinner } from '@/components/animate';
+import { ClientEvents } from '@/constants/events-const';
+import ChannelInvitation from '@/sections/dashboard/ChannelInvitation';
 import {
   AddActiveChannel,
   AddMention,
@@ -30,31 +30,31 @@ import {
   SetMarkReadChannel,
   SetMemberCapabilities,
   WatchCurrentChannel,
-} from '../../redux/slices/channel';
-import ScrollToBottom from '../../components/ScrollToBottom';
-import DeleteMessageDialog from '../../sections/dashboard/DeleteMessageDialog';
-import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '../../constants/commons-const';
-import BannedBackdrop from '../../components/BannedBackdrop';
-import { client } from '../../client';
-import { onFilesMessage } from '../../redux/slices/messages';
-import BlockedBackdrop from '../../components/BlockedBackdrop';
+} from '@/redux/slices/channel';
+import ScrollToBottom from '@/components/ScrollToBottom';
+import DeleteMessageDialog from '@/sections/dashboard/DeleteMessageDialog';
+import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '@/constants/commons-const';
+import BannedBackdrop from '@/components/BannedBackdrop';
+import { client } from '@/client';
+import { onFilesMessage } from '@/redux/slices/messages';
+import BlockedBackdrop from '@/components/BlockedBackdrop';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../../config';
-import MessagesHistoryDialog from '../../sections/dashboard/MessagesHistoryDialog';
-import { SetMessagesHistoryDialog } from '../../redux/slices/dialog';
-import ForwardMessageDialog from '../../sections/dashboard/ForwardMessageDialog';
-import PinnedMessages from '../../components/PinnedMessages';
-import UploadFilesDialog from '../../sections/dashboard/UploadFilesDialog';
+import { DEFAULT_PATH } from '@/config';
+import MessagesHistoryDialog from '@/sections/dashboard/MessagesHistoryDialog';
+import { SetMessagesHistoryDialog } from '@/redux/slices/dialog';
+import ForwardMessageDialog from '@/sections/dashboard/ForwardMessageDialog';
+import PinnedMessages from '@/components/PinnedMessages';
+import UploadFilesDialog from '@/sections/dashboard/UploadFilesDialog';
 import Dropzone from 'react-dropzone';
-import CreatePollDialog from '../../sections/dashboard/CreatePollDialog';
-import PollResultDialog from '../../sections/dashboard/PollResultDialog';
-import UsersTyping from '../../components/UsersTyping';
-import NoMessageBox from '../../components/NoMessageBox';
-import ClosedTopicBackdrop from '../../components/ClosedTopicBackdrop';
-import { SetIsClosedTopic } from '../../redux/slices/topic';
+import CreatePollDialog from '@/sections/dashboard/CreatePollDialog';
+import PollResultDialog from '@/sections/dashboard/PollResultDialog';
+import UsersTyping from '@/components/UsersTyping';
+import NoMessageBox from '@/components/NoMessageBox';
+import ClosedTopicBackdrop from '@/components/ClosedTopicBackdrop';
+import { SetIsClosedTopic } from '@/redux/slices/topic';
 import { useTranslation } from 'react-i18next';
-import useMessageSound from '../../hooks/useMessageSound';
-import MessageList from './MessageList';
+import useMessageSound from '@/hooks/useMessageSound';
+import MessageList from '@/pages/dashboard/MessageList';
 
 const MESSAGE_LIMIT = 25;
 

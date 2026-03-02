@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { LocalStorageKey } from '../constants/localStorage-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 
 function AutoUpdate() {
   useEffect(() => {

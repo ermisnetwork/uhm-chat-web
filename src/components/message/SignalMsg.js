@@ -1,11 +1,11 @@
 import React from 'react';
 import { Stack, Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import DateLine from './DateLine';
+import DateLine from '@/components/message/DateLine';
 import { Phone, VideoCamera } from 'phosphor-react';
-import { convertMessageSignal } from '../../utils/messageSignal';
-import { CallType } from '../../constants/commons-const';
-import UserMsgLayout from './UserMsgLayout';
+import { convertMessageSignal } from '@/utils/messageSignal';
+import { CallType } from '@/constants/commons-const';
+import UserMsgLayout from '@/components/message/UserMsgLayout';
 
 const SignalMsg = React.memo(({ message, isLastInGroup }) => {
   const theme = useTheme();

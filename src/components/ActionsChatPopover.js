@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTheme, Button, MenuList, MenuItem, ListItemIcon, ListItemText, Popover, styled } from '@mui/material';
-import Iconify from './Iconify';
-import { PollIcon, ShareFileIcon } from './Icons';
-import { onFilesMessage } from '../redux/slices/messages';
-import { UploadType } from '../constants/commons-const';
-import { setOpenCreatePollDialog } from '../redux/slices/dialog';
+import Iconify from '@/components/Iconify';
+import { PollIcon, ShareFileIcon } from '@/components/Icons';
+import { onFilesMessage } from '@/redux/slices/messages';
+import { UploadType } from '@/constants/commons-const';
+import { setOpenCreatePollDialog } from '@/redux/slices/dialog';
 import { set } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 

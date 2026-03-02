@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Stack, Typography, Box, useTheme } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChatType, RoleMember } from '../../constants/commons-const';
-import NoResult from '../../assets/Illustration/NoResult';
-import ContactElement from '../../components/ContactElement';
-import { client } from '../../client';
-import { UpdateIsLoading } from '../../redux/slices/app';
-import UserElement from '../../components/UserElement';
-import { removeVietnameseTones } from '../../utils/commons';
+import { ChatType, RoleMember } from '@/constants/commons-const';
+import NoResult from '@/assets/Illustration/NoResult';
+import ContactElement from '@/components/ContactElement';
+import { client } from '@/client';
+import { UpdateIsLoading } from '@/redux/slices/app';
+import UserElement from '@/components/UserElement';
+import { removeVietnameseTones } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const FriendList = ({

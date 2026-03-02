@@ -1,8 +1,8 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import en from './locales/en.json';
-import vi from './locales/vi.json';
-import { LocalStorageKey } from './constants/localStorage-const';
+import en from '@/locales/en.json';
+import vi from '@/locales/vi.json';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 
 const resources = {
   en: { translation: en },

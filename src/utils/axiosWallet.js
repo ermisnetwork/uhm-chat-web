@@ -1,6 +1,6 @@
 import axios from 'axios';
 // config
-import { BASE_URL_WALLET } from '../config';
+import { BASE_URL_WALLET } from '@/config';
 
 // ----------------------------------------------------------------------
 

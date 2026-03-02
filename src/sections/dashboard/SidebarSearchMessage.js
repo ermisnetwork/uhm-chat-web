@@ -3,15 +3,15 @@ import { useTheme } from '@mui/material/styles';
 import { Box, IconButton, Stack, Typography, alpha, debounce, styled } from '@mui/material';
 import { MagnifyingGlass, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSidebar } from '../../redux/slices/app';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { formatString, handleError } from '../../utils/commons';
-import MemberAvatar from '../../components/MemberAvatar';
-import { getDisplayDate } from '../../utils/formatTime';
-import { setSearchMessageId } from '../../redux/slices/messages';
-import { AvatarShape, SidebarType } from '../../constants/commons-const';
-import NoResult from '../../assets/Illustration/NoResult';
-import SkeletonChannels from '../../components/SkeletonChannels';
+import { setSidebar } from '@/redux/slices/app';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
+import { formatString, handleError } from '@/utils/commons';
+import MemberAvatar from '@/components/MemberAvatar';
+import { getDisplayDate } from '@/utils/formatTime';
+import { setSearchMessageId } from '@/redux/slices/messages';
+import { AvatarShape, SidebarType } from '@/constants/commons-const';
+import NoResult from '@/assets/Illustration/NoResult';
+import SkeletonChannels from '@/components/SkeletonChannels';
 import { useTranslation } from 'react-i18next';
 
 const StyledMessageItem = styled(Box)(({ theme }) => ({

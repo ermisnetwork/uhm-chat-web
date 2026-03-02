@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { SidebarType, TabType } from '../../constants/commons-const';
+import { SidebarType, TabType } from '@/constants/commons-const';
 // ----------------------------------------------------------------------
 
 const initialState = {

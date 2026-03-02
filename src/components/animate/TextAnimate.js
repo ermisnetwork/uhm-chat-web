@@ -3,7 +3,7 @@ import { m } from 'framer-motion';
 // @mui
 import { Box } from '@mui/material';
 //
-import { varFade } from './variants';
+import { varFade } from '@/components/animate/variants';
 
 // ----------------------------------------------------------------------
 

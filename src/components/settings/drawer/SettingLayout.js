@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { styled, alpha } from '@mui/material/styles';
 import { Grid, RadioGroup, CardActionArea, Box, Stack } from '@mui/material';
 // hooks
-import useSettings from '../../../hooks/useSettings';
+import useSettings from '@/hooks/useSettings';
 //
-import BoxMask from './BoxMask';
+import BoxMask from '@/components/settings/drawer/BoxMask';
 
 // ----------------------------------------------------------------------
 

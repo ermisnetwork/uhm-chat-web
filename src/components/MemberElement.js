@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import MemberAvatar from './MemberAvatar';
-import { AvatarShape, RoleMember } from '../constants/commons-const';
-import { CrownIcon, MinusCircleIcon } from './Icons';
+import MemberAvatar from '@/components/MemberAvatar';
+import { AvatarShape, RoleMember } from '@/constants/commons-const';
+import { CrownIcon, MinusCircleIcon } from '@/components/Icons';
 import { X } from 'phosphor-react';
-import CustomCheckbox from './CustomCheckbox';
+import CustomCheckbox from '@/components/CustomCheckbox';
 import { useSelector } from 'react-redux';
-import { myRoleInChannel } from '../utils/commons';
+import { myRoleInChannel } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const StyledMemberItem = styled(Box)(({ theme }) => ({

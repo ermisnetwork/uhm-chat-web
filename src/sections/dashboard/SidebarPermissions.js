@@ -4,13 +4,13 @@ import { Box, IconButton, Stack, Typography, styled } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { CaretLeft } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { UpdateSidebarType, showSnackbar } from '../../redux/slices/app';
-import { SidebarType } from '../../constants/commons-const';
-import { CapabilitiesName } from '../../constants/capabilities-const';
-import { SetMemberCapabilities } from '../../redux/slices/channel';
-import { handleError } from '../../utils/commons';
+import { UpdateSidebarType, showSnackbar } from '@/redux/slices/app';
+import { SidebarType } from '@/constants/commons-const';
+import { CapabilitiesName } from '@/constants/capabilities-const';
+import { SetMemberCapabilities } from '@/redux/slices/channel';
+import { handleError } from '@/utils/commons';
 import Slider from '@mui/material/Slider';
-import CustomCheckbox from '../../components/CustomCheckbox';
+import CustomCheckbox from '@/components/CustomCheckbox';
 import { useTranslation } from 'react-i18next';
 
 const StyledActionItem = styled(Stack)(({ theme }) => ({

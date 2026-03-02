@@ -1,14 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import axiosInstance from '../../utils/axios';
-import { SetUserLogin, UpdateIsLoading, setIsResetEmailSent, showSnackbar } from './app';
-import { client } from '../../client';
-import axiosWalletInstance from '../../utils/axiosWallet';
-import { handleError, isStagingDomain } from '../../utils/commons';
-import { API_KEY } from '../../config';
-import { LocalStorageKey } from '../../constants/localStorage-const';
-import { LoginType } from '../../constants/commons-const';
-import uuidv4 from '../../utils/uuidv4';
+import axiosInstance from '@/utils/axios';
+import { SetUserLogin, UpdateIsLoading, setIsResetEmailSent, showSnackbar } from '@/redux/slices/app';
+import { client } from '@/client';
+import axiosWalletInstance from '@/utils/axiosWallet';
+import { handleError, isStagingDomain } from '@/utils/commons';
+import { API_KEY } from '@/config';
+import { LocalStorageKey } from '@/constants/localStorage-const';
+import { LoginType } from '@/constants/commons-const';
+import uuidv4 from '@/utils/uuidv4';
 
 // ----------------------------------------------------------------------
 

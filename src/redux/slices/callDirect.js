@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { CallStatus } from '../../constants/commons-const';
+import { CallStatus } from '@/constants/commons-const';
 
 const initialState = {
   openCallDirectDialog: false,

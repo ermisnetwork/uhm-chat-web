@@ -7,23 +7,23 @@ import {
   RemoveUnreadChannel,
   SetMarkReadChannel,
   UpdateUnreadChannel,
-} from '../redux/slices/channel';
-import ChannelAvatar from './ChannelAvatar';
-import { isChannelDirect, myRoleInChannel } from '../utils/commons';
-import { ClientEvents } from '../constants/events-const';
+} from '@/redux/slices/channel';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import { isChannelDirect, myRoleInChannel } from '@/utils/commons';
+import { ClientEvents } from '@/constants/events-const';
 import { Play, PushPin, PushPinSlash, SignOut, Trash } from 'phosphor-react';
-import { AvatarShape, ChatType, ConfirmType, MessageType, RoleMember } from '../constants/commons-const';
-import { setChannelConfirm } from '../redux/slices/dialog';
-import { convertMessageSystem } from '../utils/messageSystem';
+import { AvatarShape, ChatType, ConfirmType, MessageType, RoleMember } from '@/constants/commons-const';
+import { setChannelConfirm } from '@/redux/slices/dialog';
+import { convertMessageSystem } from '@/utils/messageSystem';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH, TRANSITION } from '../config';
-import { convertMessageSignal } from '../utils/messageSignal';
-import { getDisplayDate } from '../utils/formatTime';
-import { client } from '../client';
-import { SpearkerOffIcon } from './Icons';
-import AvatarGeneralDefault from './AvatarGeneralDefault';
-import TopicAvatar from './TopicAvatar';
-import { SetOpenTopicPanel, SetParentChannel } from '../redux/slices/topic';
+import { DEFAULT_PATH, TRANSITION } from '@/config';
+import { convertMessageSignal } from '@/utils/messageSignal';
+import { getDisplayDate } from '@/utils/formatTime';
+import { client } from '@/client';
+import { SpearkerOffIcon } from '@/components/Icons';
+import AvatarGeneralDefault from '@/components/AvatarGeneralDefault';
+import TopicAvatar from '@/components/TopicAvatar';
+import { SetOpenTopicPanel, SetParentChannel } from '@/redux/slices/topic';
 import { useTranslation } from 'react-i18next';
 
 const StyledChatBox = styled(Box)(({ theme }) => ({
