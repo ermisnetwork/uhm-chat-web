@@ -8,7 +8,7 @@ import memberReducer from '@/redux/slices/member';
 import dialogReducer from '@/redux/slices/dialog';
 import messagesReducer from '@/redux/slices/messages';
 import callDirectReducer from '@/redux/slices/callDirect';
-import walletReducer from '@/redux/slices/wallet';
+
 import topicReducer from '@/redux/slices/topic';
 
 import { createTransform } from 'redux-persist';
@@ -27,7 +27,7 @@ const rootPersistConfig = {
   keyPrefix: 'redux-',
   transforms: [transformCircular],
   whitelist: ['auth'],
-  blacklist: ['app', 'channel', 'message', 'member', 'dialog', 'mesages', 'callDirect', 'wallet', 'topic'],
+  blacklist: ['app', 'channel', 'message', 'member', 'dialog', 'mesages', 'callDirect', 'topic'],
 };
 
 const rootReducer = combineReducers({
@@ -38,7 +38,7 @@ const rootReducer = combineReducers({
   dialog: dialogReducer,
   messages: messagesReducer,
   callDirect: callDirectReducer,
-  wallet: walletReducer,
+
   topic: topicReducer,
 });
 

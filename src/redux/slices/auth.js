@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import axiosInstance from '@/utils/axios';
 import { SetUserLogin, UpdateIsLoading, setIsResetEmailSent, showSnackbar } from '@/redux/slices/app';
 import { client } from '@/client';
-import axiosWalletInstance from '@/utils/axiosWallet';
+
 import { handleError, isStagingDomain } from '@/utils/commons';
 import { API_KEY } from '@/config';
 import { LocalStorageKey } from '@/constants/localStorage-const';
@@ -51,48 +51,6 @@ const slice = createSlice({
 export const { setOpenDialogPlatform, signOut, logIn } = slice.actions;
 export default slice.reducer;
 
-export function LoginUserByWallet(data) {
-  return async (dispatch, getState) => {
-    dispatch(UpdateIsLoading({ isLoading: true }));
-    const { address, signature, nonce } = data;
-
-    await axiosWalletInstance
-      .post('/uss/v1/wallets/auth', { address, signature, nonce, api_key: API_KEY })
-      .then(async function (response) {
-        if (response.status === 200) {
-          const { refresh_token, token, user_id, project_id } = response.data;
-          dispatch(
-            slice.actions.logIn({
-              isLoggedIn: true,
-              user_id: user_id,
-              chat_project_id: project_id,
-              openDialogPlatform: isStagingDomain(),
-              loginType: LoginType.Wallet,
-            }),
-          );
-          window.localStorage.setItem(LocalStorageKey.UserId, user_id);
-          window.localStorage.setItem(LocalStorageKey.AccessToken, token);
-          window.localStorage.setItem(LocalStorageKey.RefreshToken, refresh_token);
-          window.localStorage.setItem(LocalStorageKey.SessionId, uuidv4());
-          dispatch(UpdateIsLoading({ isLoading: false }));
-          window.location.reload();
-
-          // const userInfo = await FetchUserFirst(user_id, token);
-          // if (userInfo.name === user_id) {
-          //   // show dialog update user
-          //   setTimeout(() => {
-          //     dispatch(OpenDialogProfile());
-          //   }, 500);
-          // }
-        }
-      })
-      .catch(function (error) {
-        dispatch(UpdateIsLoading({ isLoading: false }));
-        handleError(dispatch, error, t);
-      });
-  };
-}
-
 export function LogoutUser() {
   return async (dispatch, getState) => {
     await client.disconnectUser();
@@ -113,7 +71,7 @@ export function LogoutUser() {
 export function RegisterUserByEmail(formValues, navigate) {
   return async (dispatch, getState) => {
     dispatch(UpdateIsLoading({ isLoading: true }));
-    await axiosWalletInstance
+    await axiosInstance
       .post('/uss/v1/wallets/register', {
         ...formValues,
         apikey: API_KEY,
@@ -145,7 +103,7 @@ export function LoginUserByEmail(data) {
     dispatch(UpdateIsLoading({ isLoading: true }));
     const { email, password } = data;
 
-    await axiosWalletInstance
+    await axiosInstance
       .post('/uss/v1/wallets/email_login', { email, password, apikey: API_KEY })
       .then(async function (response) {
         if (response.status === 200) {
@@ -183,7 +141,7 @@ export function ForgotPasswordByEmail(formValues) {
   return async (dispatch, getState) => {
     dispatch(UpdateIsLoading({ isLoading: true }));
 
-    await axiosWalletInstance
+    await axiosInstance
       .post('/uss/v1/wallets/forgot', {
         ...formValues,
         apikey: API_KEY,
@@ -215,7 +173,7 @@ export function ResetPasswordByEmail(formValues) {
   return async (dispatch, getState) => {
     dispatch(UpdateIsLoading({ isLoading: true }));
 
-    await axiosWalletInstance
+    await axiosInstance
       .post('/uss/v1/wallets/reset', {
         ...formValues,
       })

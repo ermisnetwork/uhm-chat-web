@@ -9,7 +9,7 @@ const apiURL = localStorage.getItem('api_url') || import.meta.env.VITE_API_URL;
 export const DOMAIN_APP = import.meta.env.VITE_DOMAIN;
 export const BASE_URL_PROFILE = apiURL;
 export const BASE_URL = apiURL;
-export const BASE_URL_WALLET = apiURL;
+
 export const API_KEY = import.meta.env.VITE_API_KEY;
 export const CHAT_PROJECT_ID = import.meta.env.VITE_CHAT_PROJECT_ID;
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
