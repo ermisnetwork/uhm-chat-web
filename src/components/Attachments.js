@@ -211,7 +211,7 @@ const Attachments = React.memo(({ attachments }) => {
       )}
 
       {attachmentsOther.length > 0 && (
-        <List>
+        <List sx={{ width: '400px' }}>
           {attachmentsOther.map((item, index) => {
             const lastItem = index === attachmentsOther.length - 1;
             return (
