@@ -31,7 +31,7 @@ export default function LinkPreview({ linkPreview }) {
   };
 
   return (
-    <Card onClick={onOpenLink}>
+    <Card onClick={onOpenLink} sx={{ width: '400px' }}>
       <CardActionArea>
         <CardMedia component="img" height="140" image={linkData.image} alt={linkData.title} />
         <CardContent>

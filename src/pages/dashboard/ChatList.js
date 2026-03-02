@@ -323,14 +323,14 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
         //   reverse: 800, // load sẵn tin nhắn cũ
         //   main: 300, // load sẵn tin nhắn mới
         // }}
-        increaseViewportBy={{ top: 900, bottom: 200 }}
+        increaseViewportBy={{ top: 600, bottom: 200 }}
         startReached={queryMessagesLessThanId}
         atBottomThreshold={200}
         atBottomStateChange={atBottom => {
           setShowScrollBottom(!atBottom);
         }}
         // Giúp giảm jitter khi prepend tin nhắn
-        computeItemKey={(index, message) => message.id}
+        computeItemKey={(index, message) => message.id + index}
         itemContent={itemContent}
         components={virtuosoComponents}
       />

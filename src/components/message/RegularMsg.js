@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import ForwardTo from './ForwardTo';
 import TextLine from './TextLine';
 import UserMsgLayout from './UserMsgLayout';
@@ -6,24 +6,41 @@ import ReplyMsg from './ReplyMsg';
 import DateLine from './DateLine';
 import AttachmentMsg from './AttachmentMsg';
 import LinkPreviewMsg from './LinkPreviewMsg';
+import VoiceMsg from './VoiceMsg';
 
 const RegularMsg = React.memo(({ message, isLastInGroup, onScrollToReplyMsg, isHighlighted }) => {
   const isEdited = message?.updated_at;
 
-  const renderAttachments = () => {
-    if (
-      message.attachments.some(attachment => ['video', 'image', 'file', 'voiceRecording'].includes(attachment.type))
-    ) {
-      return <AttachmentMsg message={message} />;
-    } else {
-      const linkPreview = message.attachments[0]; // chỉ hiển thị linkPreview đầu tiên
-      const isLinkPreview = linkPreview?.title;
+  const renderAttachments = useMemo(() => {
+    if (!message?.attachments || message?.attachments.length === 0) return null;
 
-      if (isLinkPreview) {
-        return <LinkPreviewMsg message={message} />;
-      }
+    const attachments = message?.attachments.filter(attachment => ['video', 'image', 'file'].includes(attachment.type));
+    const voiceData = message?.attachments.find(attachment => attachment.type === 'voiceRecording');
+    const linkPreview =
+      message?.attachments[0] && message?.attachments[0].type === 'linkPreview' && message?.attachments[0].title
+        ? message?.attachments[0]
+        : null;
+
+    if (attachments && attachments.length > 0) {
+      return <AttachmentMsg attachments={attachments} />;
     }
-  };
+    if (linkPreview) {
+      return <LinkPreviewMsg linkPreview={linkPreview} />;
+    }
+    if (voiceData) {
+      return <VoiceMsg voiceData={voiceData} isMyMessage={message.isMyMessage} />;
+    }
+
+    return null;
+  }, [message?.attachments]);
+
+  const widthTextLine = useMemo(() => {
+    if (!message?.attachments || message?.attachments.length === 0) {
+      return '100%';
+    }
+
+    return '400px';
+  }, [message?.attachments]);
 
   return (
     <UserMsgLayout message={message} isLastInGroup={isLastInGroup} isHighlighted={isHighlighted}>
@@ -31,9 +48,9 @@ const RegularMsg = React.memo(({ message, isLastInGroup, onScrollToReplyMsg, isH
 
       {message?.quoted_message && <ReplyMsg message={message} onScrollToReplyMsg={onScrollToReplyMsg} />}
 
-      {message.attachments && message.attachments.length > 0 && renderAttachments()}
+      {renderAttachments}
 
-      {message.text && <TextLine text={message.text} isMyMessage={message.isMyMessage} />}
+      {message.text && <TextLine text={message.text} isMyMessage={message.isMyMessage} widthTextLine={widthTextLine} />}
 
       <DateLine
         date={isEdited ? message.updated_at : message.created_at}

@@ -6,7 +6,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy } from 'phosphor-react';
 
-const TextLine = ({ text, isMyMessage }) => {
+const TextLine = React.memo(({ text, isMyMessage, widthTextLine }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { mentions } = useSelector(state => state.channel);
@@ -119,7 +119,12 @@ const TextLine = ({ text, isMyMessage }) => {
       );
     } else {
       return (
-        <Typography className="textLine" variant="body2" color={isMyMessage ? '#fff' : theme.palette.text}>
+        <Typography
+          className="textLine"
+          variant="body2"
+          color={isMyMessage ? '#fff' : theme.palette.text}
+          sx={{ maxWidth: widthTextLine }}
+        >
           {processMessage(text)}
         </Typography>
       );
@@ -127,6 +132,6 @@ const TextLine = ({ text, isMyMessage }) => {
   };
 
   return <>{renderMsg()}</>;
-};
+});
 
 export default TextLine;

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import Attachments from '../Attachments';
 import VoiceLine from './VoiceLine';
-import LinkPreview from '../LinkPreview';
 import { formatString, displayMessageWithMentionName } from '../../utils/commons';
 import ImageCanvas from '../ImageCanvas';
 import { Trash } from 'phosphor-react';
@@ -25,10 +24,6 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
   const voiceMsg = message.attachments
     ? message.attachments.find(attachment => attachment.type === 'voiceRecording')
     : null;
-  const linkPreviewMsg =
-    message.attachments && message.attachments[0]?.type === 'linkPreview' && message.attachments[0]?.title
-      ? message.attachments[0]
-      : null;
   const stickerOfQuoted = quotedMessage?.sticker_url ? quotedMessage.sticker_url : null;
 
   return (
@@ -42,6 +37,7 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
           position: 'relative',
           marginBottom: '5px',
           cursor: 'pointer',
+          maxWidth: '400px',
         }}
         onClick={() => onScrollToReplyMsg(message.quoted_message.id)}
       >
@@ -79,7 +75,7 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
                 <ImageCanvas
                   dataUrl={media.image_url}
                   width={'50px'}
-                  height={'auto'}
+                  height={'50px'}
                   styleCustom={{ borderRadius: '6px' }}
                 />
               ) : (
@@ -138,7 +134,6 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
         </Stack>
       </Box>
       <Stack spacing={1}>
-        {/* {linkPreviewMsg && <LinkPreview linkPreview={linkPreviewMsg} />} */}
         {attachmentsOfMsg && <Attachments attachments={attachmentsOfMsg} />}
         {voiceMsg && <VoiceLine voiceMsg={voiceMsg} />}
         {message.sticker_url && (

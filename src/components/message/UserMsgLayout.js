@@ -3,7 +3,6 @@ import MemberAvatar from '../MemberAvatar';
 import ReactionsMessage from '../ReactionsMessage';
 import MessageOption from './MessageOption';
 import { MessageType } from '../../constants/commons-const';
-import { useMemo } from 'react';
 
 const UserMsgLayout = ({ message, isLastInGroup, isHighlighted, children }) => {
   const theme = useTheme();
@@ -11,15 +10,6 @@ const UserMsgLayout = ({ message, isLastInGroup, isHighlighted, children }) => {
   const shouldShowAvatarAndName = !isMe && isLastInGroup;
   const mbValue = shouldShowAvatarAndName ? '30px' : '10px';
   const showMessageOption = [MessageType.Regular, MessageType.Sticker, MessageType.Poll].includes(message.type);
-  const isMsgLinkPreview = message.attachments?.[0]?.type === 'linkPreview';
-  const isMsgAttachmentsAndText = message.attachments?.length === 1 && message.text;
-
-  const maxWidthPaper = useMemo(() => {
-    if (isMsgLinkPreview || isMsgAttachmentsAndText) {
-      return '400px';
-    }
-    return '100%';
-  }, [isMsgLinkPreview, isMsgAttachmentsAndText]);
 
   return (
     <Box
@@ -89,7 +79,7 @@ const UserMsgLayout = ({ message, isLastInGroup, isHighlighted, children }) => {
             borderTopRightRadius: isMe ? 4 : 20,
             borderTopLeftRadius: isMe ? 20 : 4,
             opacity: message.status === 'sending' ? 0.5 : 1,
-            maxWidth: maxWidthPaper,
+            maxWidth: '100%',
           }}
         >
           {children}

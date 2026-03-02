@@ -11,25 +11,25 @@ import ImageListItem from '@mui/material/ImageListItem';
 import LightboxMedia from './LightboxMedia';
 
 const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
-  const columnCount = medias.length === 1 ? 1 : medias.length === 2 ? 2 : 3;
+  const columnCount = medias.length === 1 ? 1 : 2;
   if (medias.length === 0) return null;
 
-  const width = medias.length === 1 ? '330px' : '200px';
-  const height = medias.length === 1 ? '330px' : '200px';
+  const width = medias.length === 1 ? '400px' : '200px';
+  const height = medias.length === 1 ? '400px' : '200px';
 
   return (
-    <ImageList variant="quilted" cols={columnCount} rowHeight={200}>
+    <ImageList variant="quilted" cols={columnCount} rowHeight={height}>
       {medias.map((item, index) => (
         <ImageListItem key={index} cols={1} rows={1}>
           <Paper
             elevation={3}
             sx={{
               borderRadius: '12px',
-              width: '100%',
-              height: '100%',
               overflow: 'hidden',
               position: 'relative',
               cursor: 'pointer',
+              width: width,
+              height: height,
             }}
             onClick={() => {
               setIsOpen(true);
@@ -40,7 +40,7 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
               dataUrl={item.type === MediaType.VIDEO ? item.poster : item.src}
               width={width}
               height={height}
-              styleCustom={{ borderRadius: '12px', objectFit: 'contain' }}
+              styleCustom={{ borderRadius: '12px', objectFit: 'cover' }}
             />
             {item.type === MediaType.VIDEO && (
               <PlayCircle
@@ -57,7 +57,7 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
   );
 };
 
-export default function Attachments({ attachments }) {
+const Attachments = React.memo(({ attachments }) => {
   const theme = useTheme();
   const [medias, setMedias] = useState([]);
   const [pdfData, setPdfData] = useState(null);
@@ -242,4 +242,6 @@ export default function Attachments({ attachments }) {
       )}
     </Box>
   );
-}
+});
+
+export default Attachments;
