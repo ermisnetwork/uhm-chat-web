@@ -93,7 +93,7 @@ const TextLine = React.memo(({ text, isMyMessage, widthTextLine }) => {
             language="javascript"
             style={atomDark}
             showLineNumbers
-            customStyle={{ width: '350px', height: '350px' }}
+            customStyle={{ width: '400px', height: '400px' }}
           >
             {codeContent}
           </SyntaxHighlighter>

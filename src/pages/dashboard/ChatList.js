@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
+import { flushSync } from 'react-dom';
 import { Virtuoso } from 'react-virtuoso';
 import { Box, Paper } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -70,6 +71,12 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
   const virtuosoRef = useRef(null);
   const isScrollingToMsgRef = useRef(false);
   const isLoadingOlderRef = useRef(false); // Track khi đang load tin nhắn cũ
+  const messagesRef = useRef(messages);
+
+  // Keep messagesRef in sync with messages state
+  useLayoutEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   // Ref để track tin nhắn cuối là của mình hay người khác
   const isMyLastMessageRef = useRef(false);
@@ -203,11 +210,11 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
       return;
     }
 
-    if (!hasMore || messages.length === 0) {
+    if (!hasMore || messagesRef.current.length === 0) {
       return;
     }
 
-    const msgId = messages[0]?.id;
+    const msgId = messagesRef.current[0]?.id;
     if (!msgId) return;
 
     try {
@@ -217,20 +224,24 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
       const olderMessages = await currentChat.queryMessagesLessThanId(msgId);
 
       if (olderMessages && Array.isArray(olderMessages) && olderMessages.length > 0) {
-        setMessages(prev => [...olderMessages, ...prev]);
-        setFirstItemIndex(prev => prev - olderMessages.length);
+        // flushSync ensures both updates are applied in a single synchronous render,
+        // preventing the intermediate state where data changed but firstItemIndex hasn't.
+        // Update firstItemIndex FIRST so Virtuoso's scroll anchoring has the correct
+        // offset before the data array changes.
+        flushSync(() => {
+          setFirstItemIndex(prev => prev - olderMessages.length);
+          setMessages(prev => [...olderMessages, ...prev]);
+        });
       } else {
         setHasMore(false);
       }
     } catch (error) {
       console.error('Lỗi khi tải tin nhắn cũ:', error);
     } finally {
-      // Reset flag sau khi đã xong
-      setTimeout(() => {
-        isLoadingOlderRef.current = false;
-      }, 500);
+      // flushSync already ensured render completed, safe to clear immediately
+      isLoadingOlderRef.current = false;
     }
-  }, [currentChat, messages, hasMore, isScrollingToMsgRef]);
+  }, [currentChat, hasMore]);
 
   // --- HÀM XỬ LÝ SCROLL ĐẾN TIN NHẮN ---
   const handleScrollToMessage = useCallback(
@@ -330,7 +341,7 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
           setShowScrollBottom(!atBottom);
         }}
         // Giúp giảm jitter khi prepend tin nhắn
-        computeItemKey={(index, message) => message.id + index}
+        computeItemKey={(_index, message) => message.id}
         itemContent={itemContent}
         components={virtuosoComponents}
       />
