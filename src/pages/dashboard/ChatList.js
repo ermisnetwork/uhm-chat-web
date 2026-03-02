@@ -13,6 +13,7 @@ import { getMessageGroupingProps, shouldShowDateHeader } from '../../utils/forma
 import DateSeparator from '../../components/message/DateSeparator';
 import ReadBy from '../../components/ReadBy';
 import ScrollToBottom from '../../components/ScrollToBottom';
+import EndOfMessages from '../../components/message/EndOfMessages';
 import { setSearchMessageId } from '../../redux/slices/messages';
 
 const MessageItemContent = React.memo(({ message, prevMsg, nextMsg, isHighlighted, onScrollToReplyMsg }) => {
@@ -263,13 +264,12 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
 
   const virtuosoComponents = useMemo(
     () => ({
-      List: React.forwardRef((props, ref) => (
-        <Box
-          sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: 'calc(100% - 18px)' }}
-          ref={ref}
-          {...props}
-        />
-      )),
+      Header: () => {
+        if (hasMore) return null;
+        return <EndOfMessages />;
+      },
+
+      List: React.forwardRef((props, ref) => <Box ref={ref} {...props} />),
 
       Footer: () => {
         if (isGuest || isBlocked || isBanned) return null;
@@ -280,7 +280,7 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
         );
       },
     }),
-    [isGuest, isBlocked, isBanned],
+    [isGuest, isBlocked, isBanned, hasMore],
   );
 
   const itemContent = useCallback(
@@ -329,6 +329,7 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
         data={messages}
         firstItemIndex={firstItemIndex}
         initialTopMostItemIndex={messages.length - 1}
+        alignToBottom={true}
         followOutput={handleFollowOutput}
         // overscan={{
         //   reverse: 800, // load sẵn tin nhắn cũ

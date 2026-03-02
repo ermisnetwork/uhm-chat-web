@@ -432,8 +432,7 @@ const ChatComponent2 = () => {
           <Box
             sx={{
               width: '100%',
-              position: 'absolute',
-              top: '65px',
+              flexShrink: 0,
               zIndex: 2,
               padding: isMobileToLg ? '4px 20px' : isLgToXl ? '4px 50px' : '4px 90px',
             }}
