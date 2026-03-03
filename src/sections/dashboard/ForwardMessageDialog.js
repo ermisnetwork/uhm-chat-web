@@ -75,6 +75,7 @@ const ForwardMessageDialog = () => {
       const payload = {
         cid: channel.cid,
         forward_cid: message.cid,
+        forward_message_id: message.id,
       };
 
       if (

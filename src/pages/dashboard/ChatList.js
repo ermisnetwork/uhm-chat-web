@@ -39,6 +39,8 @@ const MessageItemContent = React.memo(({ message, prevMsg, nextMsg, isHighlighte
 
 const INDEX_OFFSET = 10000;
 
+const VirtuosoList = React.forwardRef((props, ref) => <Box ref={ref} {...props} />);
+
 const MessageComponentMap = {
   [MessageType.Regular]: RegularMsg,
   [MessageType.System]: SystemMsg,
@@ -269,7 +271,7 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
         return <EndOfMessages />;
       },
 
-      List: React.forwardRef((props, ref) => <Box ref={ref} {...props} />),
+      List: VirtuosoList,
 
       Footer: () => {
         if (isGuest || isBlocked || isBanned) return null;

@@ -40,7 +40,7 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
               dataUrl={item.type === MediaType.VIDEO ? item.poster : item.src}
               width={width}
               height={height}
-              styleCustom={{ borderRadius: '12px', objectFit: 'contain' }}
+              styleCustom={{ borderRadius: '12px', objectFit: 'cover' }}
             />
             {item.type === MediaType.VIDEO && (
               <PlayCircle

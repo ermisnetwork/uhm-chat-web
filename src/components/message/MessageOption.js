@@ -30,14 +30,8 @@ import {
 import { ForwardIcon, QuoteDownIcon, ThreeDotsIcon } from '@/components/Icons';
 import { checkPermissionDeleteMessage, downloadFile } from '@/utils/commons';
 import { SetCooldownTime } from '@/redux/slices/channel';
-import { 
-  Copy, 
-  PushPin, 
-  PushPinSimpleSlash, 
-  Trash, 
-  Download, 
-  PencilSimple
-} from 'phosphor-react';
+import { showSnackbar } from '@/redux/slices/app';
+import { Copy, PushPin, PushPinSimpleSlash, Trash, Download, PencilSimple } from 'phosphor-react';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.background.neutral,

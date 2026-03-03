@@ -165,10 +165,10 @@ export default function PinnedMessages() {
 
   useEffect(() => {
     if (currentChat) {
-      dispatch(SetPinnedMessages([...currentChat.state.pinnedMessages].reverse()));
+      dispatch(SetPinnedMessages([...currentChat.state.pinnedMessages]));
 
       const handlePinnedMessages = event => {
-        dispatch(SetPinnedMessages([...currentChat.state.pinnedMessages].reverse()));
+        dispatch(SetPinnedMessages([...currentChat.state.pinnedMessages]));
       };
 
       currentChat.on(ClientEvents.MessagePinned, handlePinnedMessages);
