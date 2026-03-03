@@ -10,7 +10,7 @@ import {
   TranslateIcon,
   UserOctagonIcon,
   UserSquareIcon,
-} from '../components/Icons';
+} from '@/components/Icons';
 
 const Profile_Menu = [
   {

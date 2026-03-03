@@ -1,5 +1,5 @@
-import { LocalStorageKey } from '../constants/localStorage-const';
-import { formatString, getMemberInfo } from './commons';
+import { LocalStorageKey } from '@/constants/localStorage-const';
+import { formatString, getMemberInfo } from '@/utils/commons';
 
 export function convertMessageSystem(input, all_members, isDirect, isNotify = false, t) {
   if (!input) return '';

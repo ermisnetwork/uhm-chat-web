@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Stack, Tooltip, Button } from '@mui/material';
-import { EMOJI_QUICK, MessageType } from '../constants/commons-const';
-import { handleError } from '../utils/commons';
+import { EMOJI_QUICK, MessageType } from '@/constants/commons-const';
+import { handleError } from '@/utils/commons';
 import { useDispatch, useSelector } from 'react-redux';
-import QuickReactions from './QuickReactions';
+import QuickReactions from '@/components/QuickReactions';
 
 export default function ReactionsMessage({ isMyMessage, message }) {
   const theme = useTheme();

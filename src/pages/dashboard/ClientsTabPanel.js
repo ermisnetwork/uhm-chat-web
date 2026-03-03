@@ -2,9 +2,9 @@ import React from 'react';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import useResponsive from '../../hooks/useResponsive';
-import LeftPanel from './LeftPanel';
-import { TRANSITION, WIDTH_LEFT_PANEL } from '../../config';
+import useResponsive from '@/hooks/useResponsive';
+import LeftPanel from '@/pages/dashboard/LeftPanel';
+import { TRANSITION, WIDTH_LEFT_PANEL } from '@/config';
 
 const ClientsTabPanel = () => {
   const dispatch = useDispatch();

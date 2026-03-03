@@ -2,11 +2,11 @@ import React from 'react';
 import { Box, Stack, styled, Typography, useTheme } from '@mui/material';
 import { Navigate, Outlet } from 'react-router-dom';
 
-import Logo from '../../assets/Images/uhm.svg';
+import Logo from '@/assets/Images/uhm.svg';
 import { useSelector } from 'react-redux';
-import { DEFAULT_PATH } from '../../config';
-import useResponsive from '../../hooks/useResponsive';
-import { SlideLogin1, SlideLogin2, SlideLogin3 } from '../../components/Icons';
+import { DEFAULT_PATH } from '@/config';
+import useResponsive from '@/hooks/useResponsive';
+import { SlideLogin1, SlideLogin2, SlideLogin3 } from '@/components/Icons';
 import Slider from 'react-slick';
 import { useTranslation } from 'react-i18next';
 

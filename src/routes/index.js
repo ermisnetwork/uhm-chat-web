@@ -2,12 +2,11 @@ import { Suspense, lazy } from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 
 // layouts
-import DashboardLayout from '../layouts/dashboard';
-import AuthLayout from '../layouts/auth';
+import DashboardLayout from '@/layouts/dashboard';
+import AuthLayout from '@/layouts/auth';
 
 // config
-import { DEFAULT_PATH } from '../config';
-import LoadingScreen from '../components/LoadingScreen';
+import { DEFAULT_PATH } from '@/config';
 
 const Loadable = Component => props => {
   return (
@@ -26,14 +25,11 @@ export default function Router() {
         { path: 'login', element: <LoginPage /> },
         { path: 'register', element: <RegisterPage /> },
         { path: 'forgot-password', element: <ForgotPasswordPage /> },
-        { path: 'login-wallet', element: <LoginWalletPage /> }, // path này chỉ sử dụng cho nội bộ ở internal
+
         { path: 'login-token', element: <LoginTokenPage /> },
       ],
     },
-    {
-      path: '/delete-account',
-      element: <PageDeleteAccount />,
-    },
+
     {
       path: '/',
       element: <DashboardLayout />,
@@ -52,14 +48,14 @@ export default function Router() {
   ]);
 }
 
-const GeneralApp = Loadable(lazy(() => import('../pages/dashboard/GeneralApp')));
-const ChannelDetailApp = Loadable(lazy(() => import('../pages/dashboard/ChannelDetailApp')));
-const PageDeleteAccount = Loadable(lazy(() => import('../pages/dashboard/DeleteAccount')));
-const PageContact = Loadable(lazy(() => import('../pages/dashboard/Contacts')));
-const Page404 = Loadable(lazy(() => import('../pages/Page404')));
+const GeneralApp = Loadable(lazy(() => import('@/pages/dashboard/GeneralApp')));
+const ChannelDetailApp = Loadable(lazy(() => import('@/pages/dashboard/ChannelDetailApp')));
 
-const LoginPage = Loadable(lazy(() => import('../pages/auth/Login')));
-const RegisterPage = Loadable(lazy(() => import('../pages/auth/Register')));
-const ForgotPasswordPage = Loadable(lazy(() => import('../pages/auth/ForgotPassword')));
-const LoginWalletPage = Loadable(lazy(() => import('../pages/private/LoginWalletPage')));
-const LoginTokenPage = Loadable(lazy(() => import('../pages/private/LoginTokenPage')));
+const PageContact = Loadable(lazy(() => import('@/pages/dashboard/Contacts')));
+const Page404 = Loadable(lazy(() => import('@/pages/Page404')));
+
+const LoginPage = Loadable(lazy(() => import('@/pages/auth/Login')));
+const RegisterPage = Loadable(lazy(() => import('@/pages/auth/Register')));
+const ForgotPasswordPage = Loadable(lazy(() => import('@/pages/auth/ForgotPassword')));
+
+const LoginTokenPage = Loadable(lazy(() => import('@/pages/private/LoginTokenPage')));

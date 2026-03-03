@@ -3,12 +3,12 @@ import { useTheme } from '@mui/material/styles';
 import { IconButton, Stack, Typography, Box, TextField, InputAdornment } from '@mui/material';
 import { CaretLeft, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { showSnackbar, UpdateSidebarType } from '../../redux/slices/app';
-import { SidebarType } from '../../constants/commons-const';
-import { handleError } from '../../utils/commons';
+import { showSnackbar, UpdateSidebarType } from '@/redux/slices/app';
+import { SidebarType } from '@/constants/commons-const';
+import { handleError } from '@/utils/commons';
 import { LoadingButton } from '@mui/lab';
-import { SmallCapsIcon } from '../../components/Icons';
-import { SetFilterWords } from '../../redux/slices/channel';
+import { SmallCapsIcon } from '@/components/Icons';
+import { SetFilterWords } from '@/redux/slices/channel';
 import { useTranslation } from 'react-i18next';
 
 const SidebarKeywords = () => {

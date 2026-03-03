@@ -2,7 +2,7 @@ import { IconButton } from '@mui/material';
 import { Copy } from 'phosphor-react';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { showSnackbar } from '../redux/slices/app';
+import { showSnackbar } from '@/redux/slices/app';
 
 const ClipboardCopy = ({ text, message = 'Message copied to clipboard' }) => {
   const dispatch = useDispatch();

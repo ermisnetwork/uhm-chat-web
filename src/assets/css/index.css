@@ -323,3 +323,63 @@ a.linkUrl:last-child {
 .pdf-viewer-container.pdfViewer .optionBar .title {
   display: none;
 }
+.messageItem {
+  max-width: 100%;
+  padding: 0 50px;
+  position: relative; /* Để định vị các thành phần con absolute nếu cần */
+
+  /* 1. Kích hoạt GPU cho item này khi scroll */
+  will-change: transform;
+
+  /* 2. CÔ LẬP LAYOUT (Cực kỳ quan trọng cho list dài) 
+     Nó bảo trình duyệt: "Những thay đổi layout bên trong thẻ div này 
+     sẽ KHÔNG ảnh hưởng đến những thứ bên ngoài". 
+     Trình duyệt sẽ không cần tính toán lại layout của toàn bộ ChatList 
+     khi một tin nhắn thay đổi kích thước.
+  */
+  contain: layout style;
+}
+
+/* Xử lý trạng thái hover (thay thế logic cũ của bạn) */
+.messageItem .messageActions,
+.messageItem .quickReactions {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease; /* Thêm transition cho mượt */
+}
+
+.messageItem:hover .messageActions,
+.messageItem:hover .quickReactions {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Xử lý tin nhắn của tôi */
+.messageItem.myMessage .linkUrl {
+  color: #f1f1f1;
+}
+
+.messageItem .messageActions.open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.textLine {
+  word-break: break-word;
+  white-space: pre-wrap;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.textLine .mentionHighlight {
+  padding: 2px 10px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: #212b36;
+  margin-bottom: 5px;
+}
+
+.textLine .mentionHighlight .linkUrl {
+  display: inline;
+  color: inherit !important;
+}

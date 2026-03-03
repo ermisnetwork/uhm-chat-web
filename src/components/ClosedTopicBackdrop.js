@@ -1,9 +1,9 @@
 import { Box, useTheme, Typography, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { handleError, myRoleInChannel } from '../utils/commons';
-import { RoleMember } from '../constants/commons-const';
-import { PlayCircleIcon } from './Icons';
-import { showSnackbar } from '../redux/slices/app';
+import { handleError, myRoleInChannel } from '@/utils/commons';
+import { RoleMember } from '@/constants/commons-const';
+import { PlayCircleIcon } from '@/components/Icons';
+import { showSnackbar } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 
 export default function ClosedTopicBackdrop() {

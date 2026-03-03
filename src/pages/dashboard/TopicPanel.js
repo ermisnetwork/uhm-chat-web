@@ -14,17 +14,17 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { myRoleInChannel, splitChannelId } from '../../utils/commons';
-import { AvatarShape, ChatType, RoleMember, SidebarType } from '../../constants/commons-const';
-import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '../../components/Icons';
-import ChannelAvatar from '../../components/ChannelAvatar';
-import NoTopic from '../../assets/Illustration/NoTopic';
-import GeneralElement from '../../components/GeneralElement';
-import NewTopicDialog from '../../sections/dashboard/NewTopicDialog';
-import { SetOpenInviteFriendDialog, SetOpenNewTopicDialog } from '../../redux/slices/dialog';
+import { myRoleInChannel, splitChannelId } from '@/utils/commons';
+import { AvatarShape, ChatType, RoleMember, SidebarType } from '@/constants/commons-const';
+import { DotsThreeIcon, InfoIcon, ProfileAddIcon, SearchIcon, StickyNoteIcon } from '@/components/Icons';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import NoTopic from '@/assets/Illustration/NoTopic';
+import GeneralElement from '@/components/GeneralElement';
+import NewTopicDialog from '@/sections/dashboard/NewTopicDialog';
+import { SetOpenInviteFriendDialog, SetOpenNewTopicDialog } from '@/redux/slices/dialog';
 import FlipMove from 'react-flip-move';
-import TopicElement from '../../components/TopicElement';
-import { ClientEvents } from '../../constants/events-const';
+import TopicElement from '@/components/TopicElement';
+import { ClientEvents } from '@/constants/events-const';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AddPinnedTopic,
@@ -32,12 +32,12 @@ import {
   RemovePinnedTopic,
   SetCurrentTopic,
   SetOpenTopicPanel,
-} from '../../redux/slices/topic';
-import { setSidebar } from '../../redux/slices/app';
-import { DEFAULT_PATH, TRANSITION } from '../../config';
-import SkeletonChannels from '../../components/SkeletonChannels';
-import { client } from '../../client';
-import useResponsive from '../../hooks/useResponsive';
+} from '@/redux/slices/topic';
+import { setSidebar } from '@/redux/slices/app';
+import { DEFAULT_PATH, TRANSITION } from '@/config';
+import SkeletonChannels from '@/components/SkeletonChannels';
+import { client } from '@/client';
+import useResponsive from '@/hooks/useResponsive';
 import { X } from 'phosphor-react';
 import { useTranslation } from 'react-i18next';
 

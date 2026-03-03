@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, useTheme, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { ClientEvents } from '../constants/events-const';
-import { ConfirmType } from '../constants/commons-const';
-import { setChannelConfirm } from '../redux/slices/dialog';
-import { SetIsBlocked } from '../redux/slices/channel';
+import { ClientEvents } from '@/constants/events-const';
+import { ConfirmType } from '@/constants/commons-const';
+import { setChannelConfirm } from '@/redux/slices/dialog';
+import { SetIsBlocked } from '@/redux/slices/channel';
 import { useTranslation } from 'react-i18next';
 
 export default function BlockedBackdrop() {

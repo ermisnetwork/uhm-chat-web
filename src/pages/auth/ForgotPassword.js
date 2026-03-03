@@ -2,16 +2,16 @@ import { Stack, Typography, Link, IconButton, InputAdornment } from '@mui/materi
 import { Link as RouterLink } from 'react-router-dom';
 import React, { useState } from 'react';
 import { CaretLeft } from 'phosphor-react';
-import FormProvider from '../../components/hook-form/FormProvider';
-import { RHFTextField } from '../../components/hook-form';
+import FormProvider from '@/components/hook-form/FormProvider';
+import { RHFTextField } from '@/components/hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { LoadingButton } from '@mui/lab';
-import { ForgotPasswordByEmail, ResetPasswordByEmail } from '../../redux/slices/auth';
+import { ForgotPasswordByEmail, ResetPasswordByEmail } from '@/redux/slices/auth';
 import { Eye, EyeSlash } from 'phosphor-react';
-import { setIsResetEmailSent } from '../../redux/slices/app';
+import { setIsResetEmailSent } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
 

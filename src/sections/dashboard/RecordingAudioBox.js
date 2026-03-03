@@ -1,12 +1,12 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Stack, useTheme, Typography, Box, IconButton, keyframes, Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { showSnackbar } from '../../redux/slices/app';
-import CustomAudioPlayer from '../../components/CustomAudioPlayer';
-import { LoadingSpinner } from '../../components/animate';
-import { ElipseStopRecordIcon, SendIcon } from '../../components/Icons';
-import Iconify from '../../components/Iconify';
-import { onSetAttachmentsMessage } from '../../redux/slices/messages';
+import { showSnackbar } from '@/redux/slices/app';
+import CustomAudioPlayer from '@/components/CustomAudioPlayer';
+import { LoadingSpinner } from '@/components/animate';
+import { ElipseStopRecordIcon, SendIcon } from '@/components/Icons';
+import Iconify from '@/components/Iconify';
+import { onSetAttachmentsMessage } from '@/redux/slices/messages';
 import { useTranslation } from 'react-i18next';
 
 const blink = keyframes`

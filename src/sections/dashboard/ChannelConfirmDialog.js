@@ -11,15 +11,15 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { setSidebar, showSnackbar } from '../../redux/slices/app';
-import { getChannelName, handleError } from '../../utils/commons';
-import { setChannelConfirm } from '../../redux/slices/dialog';
-import { RemoveActiveChannel } from '../../redux/slices/channel';
-import { ConfirmType, SidebarType } from '../../constants/commons-const';
+import { setSidebar, showSnackbar } from '@/redux/slices/app';
+import { getChannelName, handleError } from '@/utils/commons';
+import { setChannelConfirm } from '@/redux/slices/dialog';
+import { RemoveActiveChannel } from '@/redux/slices/channel';
+import { ConfirmType, SidebarType } from '@/constants/commons-const';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../../config';
-import { ClientEvents } from '../../constants/events-const';
-import { client } from '../../client';
+import { DEFAULT_PATH } from '@/config';
+import { ClientEvents } from '@/constants/events-const';
+import { client } from '@/client';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

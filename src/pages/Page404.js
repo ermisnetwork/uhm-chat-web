@@ -1,8 +1,8 @@
 import { Stack, Typography, Button, useTheme } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../config';
-import NotFound404 from '../assets/Illustration/NotFound404';
+import { DEFAULT_PATH } from '@/config';
+import NotFound404 from '@/assets/Illustration/NotFound404';
 
 const Page404 = () => {
   const navigate = useNavigate();

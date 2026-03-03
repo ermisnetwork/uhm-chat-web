@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, Slide, Stack, Chip, alpha, useTheme } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { SetOpenInviteFriendDialog } from '../../redux/slices/dialog';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
+import { SetOpenInviteFriendDialog } from '@/redux/slices/dialog';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
 import { MagnifyingGlass } from 'phosphor-react';
-import FriendList from './FriendList';
+import FriendList from '@/sections/dashboard/FriendList';
 import { LoadingButton } from '@mui/lab';
-import MemberAvatar from '../../components/MemberAvatar';
-import { AvatarShape } from '../../constants/commons-const';
-import { showSnackbar } from '../../redux/slices/app';
-import { handleError } from '../../utils/commons';
+import MemberAvatar from '@/components/MemberAvatar';
+import { AvatarShape } from '@/constants/commons-const';
+import { showSnackbar } from '@/redux/slices/app';
+import { handleError } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

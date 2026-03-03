@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import { AvatarShape } from '../constants/commons-const';
-import CustomCheckbox from './CustomCheckbox';
-import MemberAvatar from './MemberAvatar';
-import useOnlineStatus from '../hooks/useOnlineStatus';
+import { AvatarShape } from '@/constants/commons-const';
+import CustomCheckbox from '@/components/CustomCheckbox';
+import MemberAvatar from '@/components/MemberAvatar';
+import useOnlineStatus from '@/hooks/useOnlineStatus';
 
 const StyledContactItem = styled(Box)(({ theme }) => ({
   width: '100%',

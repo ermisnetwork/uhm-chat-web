@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, Slide, DialogContentText, DialogActions } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { onUnPinMessage } from '../../redux/slices/messages';
-import { showSnackbar } from '../../redux/slices/app';
+import { onUnPinMessage } from '@/redux/slices/messages';
+import { showSnackbar } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

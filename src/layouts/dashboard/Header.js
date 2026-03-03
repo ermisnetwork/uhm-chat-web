@@ -1,10 +1,10 @@
 import React from 'react';
 import { Divider, Stack, Typography, useTheme } from '@mui/material';
-import ProfileMenu from './ProfileMenu';
-import NewChatMenu from './NewChatMenu';
+import ProfileMenu from '@/layouts/dashboard/ProfileMenu';
+import NewChatMenu from '@/layouts/dashboard/NewChatMenu';
 import { useSelector } from 'react-redux';
-import { TabType } from '../../constants/commons-const';
-import useResponsive from '../../hooks/useResponsive';
+import { TabType } from '@/constants/commons-const';
+import useResponsive from '@/hooks/useResponsive';
 import { useTranslation } from 'react-i18next';
 
 const Header = () => {

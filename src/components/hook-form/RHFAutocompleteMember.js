@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useFormContext, Controller } from 'react-hook-form';
 import { Autocomplete, Chip, Stack, TextField, debounce, useTheme } from '@mui/material';
-import MemberAvatar from '../MemberAvatar';
-import { formatString, handleError } from '../../utils/commons';
+import MemberAvatar from '@/components/MemberAvatar';
+import { formatString, handleError } from '@/utils/commons';
 import { useDispatch } from 'react-redux';
-import { client } from '../../client';
+import { client } from '@/client';
 
 // ----------------------------------------------------------------------
 

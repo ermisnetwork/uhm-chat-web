@@ -2,16 +2,16 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, Slide, Stack } from '@mui/material';
 
 import { useForm } from 'react-hook-form';
-import FormProvider from '../../components/hook-form/FormProvider';
-import { RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
+import FormProvider from '@/components/hook-form/FormProvider';
+import { RHFTextField, RHFUploadAvatar } from '@/components/hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { CloseDialogProfile } from '../../redux/slices/dialog';
-import { UpdateUserProfile } from '../../redux/slices/member';
-import { showSnackbar } from '../../redux/slices/app';
+import { CloseDialogProfile } from '@/redux/slices/dialog';
+import { UpdateUserProfile } from '@/redux/slices/member';
+import { showSnackbar } from '@/redux/slices/app';
 import { useNavigate } from 'react-router-dom';
-import { PATH_DASHBOARD } from '../../routes/paths';
-import { processImageFile } from '../../utils/commons';
+import { PATH_DASHBOARD } from '@/routes/paths';
+import { processImageFile } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -49,11 +49,14 @@ const ProfileForm = ({ onCloseDialog, openDialogProfile }) => {
   const onSubmit = async data => {
     try {
       dispatch(
-        UpdateUserProfile({
-          name: data?.name ? data?.name : user_id,
-          about_me: data?.about_me || '',
-          avatar: file,
-        },t),
+        UpdateUserProfile(
+          {
+            name: data?.name ? data?.name : user_id,
+            about_me: data?.about_me || '',
+            avatar: file,
+          },
+          t,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -92,8 +95,8 @@ const ProfileForm = ({ onCloseDialog, openDialogProfile }) => {
 
         <RHFTextField name="name" label={t('Profile.label')} placeholder={user_id} />
         <RHFTextField multiline rows={4} name="about_me" label={t('Profile.about_me')} />
-        <Stack spacing={2} direction={'row'} alignItems="center" justifyContent="space-between">
-          <Button
+        <Stack spacing={2} direction={'row'} alignItems="center" justifyContent="flex-end">
+          {/* <Button
             onClick={() => {
               navigate(PATH_DASHBOARD.deleteAccount);
               onCloseDialog();
@@ -102,7 +105,7 @@ const ProfileForm = ({ onCloseDialog, openDialogProfile }) => {
             variant="contained"
           >
             {t('Profile.delete_profile')}
-          </Button>
+          </Button> */}
           <Stack spacing={2} direction={'row'} alignItems="center" justifyContent={'end'}>
             <Button
               onClick={() => {

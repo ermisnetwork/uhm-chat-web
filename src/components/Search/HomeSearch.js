@@ -2,18 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Box, IconButton, styled, Typography, useTheme, Stack, alpha, Divider } from '@mui/material';
 import { ArrowLeft, MagnifyingGlass } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import ChannelAvatar from '../ChannelAvatar';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
-import { DEFAULT_PATH, TRANSITION } from '../../config';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
+import { DEFAULT_PATH, TRANSITION } from '@/config';
 import { useNavigate } from 'react-router-dom';
-import { client } from '../../client';
+import { client } from '@/client';
 import { debounce } from '@mui/material/utils';
-import { LoadingSpinner } from '../animate';
-import AvatarComponent from '../AvatarComponent';
-import { removeVietnameseTones, splitChannelId } from '../../utils/commons';
-import { AvatarShape, ChatType } from '../../constants/commons-const';
-import { setSearchChannels } from '../../redux/slices/channel';
-import { SetOpenHomeSearch } from '../../redux/slices/app';
+import { LoadingSpinner } from '@/components/animate';
+import AvatarComponent from '@/components/AvatarComponent';
+import { removeVietnameseTones, splitChannelId } from '@/utils/commons';
+import { AvatarShape, ChatType } from '@/constants/commons-const';
+import { setSearchChannels } from '@/redux/slices/channel';
+import { SetOpenHomeSearch } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 
 const StyledSearchItem = styled(Box)(({ theme }) => ({

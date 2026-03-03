@@ -1,7 +1,7 @@
 import axios from 'axios';
 // config
-import { BASE_URL_PROFILE } from '../config';
-import { onRefreshToken } from './commons';
+import { BASE_URL_PROFILE } from '@/config';
+import { onRefreshToken } from '@/utils/commons';
 
 // ----------------------------------------------------------------------
 

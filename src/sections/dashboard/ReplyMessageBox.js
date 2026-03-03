@@ -2,11 +2,11 @@ import React from 'react';
 import { Stack, useTheme, Typography, Box, IconButton } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { Quotes, X } from 'phosphor-react';
-import { displayMessageWithMentionName, formatString } from '../../utils/commons';
-import { onReplyMessage } from '../../redux/slices/messages';
-import FileTypeBadge from '../../components/FileTypeBadge';
-import ImageCanvas from '../../components/ImageCanvas';
-import { MessageType } from '../../constants/commons-const';
+import { displayMessageWithMentionName, formatString } from '@/utils/commons';
+import { onReplyMessage } from '@/redux/slices/messages';
+import FileTypeBadge from '@/components/FileTypeBadge';
+import ImageCanvas from '@/components/ImageCanvas';
+import { MessageType } from '@/constants/commons-const';
 import { useTranslation } from 'react-i18next';
 
 const ReplyMessageBox = ({ quotesMessage }) => {

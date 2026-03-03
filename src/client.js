@@ -1,7 +1,7 @@
 import { ErmisChat, ErmisCallNode } from 'ermis-chat-js-sdk';
-import { API_KEY, BASE_URL } from './config';
-import { handleError } from './utils/commons';
-import { LocalStorageKey } from './constants/localStorage-const';
+import { API_KEY, BASE_URL } from '@/config';
+import { handleError } from '@/utils/commons';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 
 let client;
 let callClient;

@@ -1,7 +1,7 @@
-import { showSnackbar } from '../redux/slices/app';
-import axiosWalletInstance from './axiosWallet';
-import { ChatType, RoleMember, TabType } from '../constants/commons-const';
-import { LocalStorageKey } from '../constants/localStorage-const';
+import { showSnackbar } from '@/redux/slices/app';
+import axiosInstance from '@/utils/axios';
+import { ChatType, RoleMember, TabType } from '@/constants/commons-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 import { fromBlob } from 'image-resize-compress';
 import heic2any from 'heic2any';
 
@@ -78,7 +78,7 @@ export function getMemberInfo(memberId, all_members) {
 export async function onRefreshToken() {
   try {
     const refreshToken = localStorage.getItem('refresh_token');
-    const response = await axiosWalletInstance.post('/refresh', { refresh_token: refreshToken });
+    const response = await axiosInstance.post('/refresh', { refresh_token: refreshToken });
     if (response) {
       const newToken = response.data.token;
       const newRefreshToken = response.data.refresh_token;
@@ -418,3 +418,8 @@ export function removeVietnameseTones(str) {
 export const isEmptyObject = obj => {
   return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
 };
+
+export function isSafari() {
+  const ua = navigator.userAgent;
+  return ua.includes('Safari') && !ua.includes('Chrome') && !ua.includes('Chromium');
+}

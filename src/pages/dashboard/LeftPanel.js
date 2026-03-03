@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { client } from '../../client';
+import { client } from '@/client';
 import {
   AddActiveChannel,
   AddPendingChannel,
@@ -17,21 +17,21 @@ import {
   RemovePinnedChannel,
   RemoveSkippedChannel,
   WatchCurrentChannel,
-} from '../../redux/slices/channel';
-import { ClientEvents } from '../../constants/events-const';
-import { getChannelName, getMemberInfo, splitChannelId } from '../../utils/commons';
-import Logo from '../../assets/Images/logo.svg';
-import { DEFAULT_PATH, DOMAIN_APP } from '../../config';
-import { ChatType, EMOJI_QUICK, MessageType, TabType } from '../../constants/commons-const';
-import { convertMessageSystem } from '../../utils/messageSystem';
+} from '@/redux/slices/channel';
+import { ClientEvents } from '@/constants/events-const';
+import { getChannelName, getMemberInfo, splitChannelId } from '@/utils/commons';
+import Logo from '@/assets/Images/logo.svg';
+import { DEFAULT_PATH, DOMAIN_APP } from '@/config';
+import { ChatType, EMOJI_QUICK, MessageType, TabType } from '@/constants/commons-const';
+import { convertMessageSystem } from '@/utils/messageSystem';
 import dayjs from 'dayjs';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { convertMessageSignal } from '../../utils/messageSignal';
-import { UpdateMember } from '../../redux/slices/member';
-import Channels from './Channels';
-import SidebarContacts from './SidebarContacts';
+import { convertMessageSignal } from '@/utils/messageSignal';
+import { UpdateMember } from '@/redux/slices/member';
+import Channels from '@/pages/dashboard/Channels';
+import SidebarContacts from '@/pages/dashboard/SidebarContacts';
 import { useTranslation } from 'react-i18next';
-import { AddTopic, RemovePinnedTopic, RemoveTopic, SetCurrentTopic, UpdateTopic } from '../../redux/slices/topic';
+import { AddTopic, RemovePinnedTopic, RemoveTopic, SetCurrentTopic, UpdateTopic } from '@/redux/slices/topic';
 
 const LeftPanel = () => {
   const dispatch = useDispatch();

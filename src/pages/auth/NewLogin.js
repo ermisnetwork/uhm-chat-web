@@ -10,36 +10,36 @@ import {
   alpha,
   styled,
 } from '@mui/material';
-import Iconify from '../../components/Iconify';
+import Iconify from '@/components/Iconify';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, Outlet, Link as RouterLink } from 'react-router-dom';
-import FormProvider, { RHFTextField } from '../../components/hook-form';
+import FormProvider, { RHFTextField } from '@/components/hook-form';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import RHFCodes from '../../components/hook-form/RHFCodes';
+import RHFCodes from '@/components/hook-form/RHFCodes';
 import { CaretLeft } from 'phosphor-react';
-import { API_KEY, BASE_URL } from '../../config';
+import { API_KEY, BASE_URL } from '@/config';
 import { ErmisAuthProvider } from 'ermis-chat-js-sdk';
 import { useDispatch, useSelector } from 'react-redux';
-import { SetAuthProvider, showSnackbar } from '../../redux/slices/app';
+import { SetAuthProvider, showSnackbar } from '@/redux/slices/app';
 import { GoogleLogin } from '@react-oauth/google';
-import { logIn } from '../../redux/slices/auth';
-import { LocalStorageKey } from '../../constants/localStorage-const';
-import uuidv4 from '../../utils/uuidv4';
-import useResponsive from '../../hooks/useResponsive';
-import { LoadingSpinner } from '../../components/animate';
-import CustomCheckbox from '../../components/CustomCheckbox';
+import { logIn } from '@/redux/slices/auth';
+import { LocalStorageKey } from '@/constants/localStorage-const';
+import uuidv4 from '@/utils/uuidv4';
+import useResponsive from '@/hooks/useResponsive';
+import { LoadingSpinner } from '@/components/animate';
+import CustomCheckbox from '@/components/CustomCheckbox';
 import { useTranslation } from 'react-i18next';
-import { SlideLogin1, SlideLogin2, SlideLogin3 } from '../../components/Icons';
+import { SlideLogin1, SlideLogin2, SlideLogin3 } from '@/components/Icons';
 import Slider from 'react-slick';
-import Logo from '../../assets/Images/uhm.svg';
-import SlideMobile1 from '../../assets/Images/slider-mobile1.png';
-import SlideMobile2 from '../../assets/Images/slider-mobile2.png';
-import SlideMobile3 from '../../assets/Images/slider-mobile3.png';
-import DownloadAppStore from '../../assets/Images/download-app-store.png';
-import DownloadGooglePlay from '../../assets/Images/download-google-play.png';
-import ImageCanvas from '../../components/ImageCanvas';
+import Logo from '@/assets/Images/uhm.svg';
+import SlideMobile1 from '@/assets/Images/slider-mobile1.png';
+import SlideMobile2 from '@/assets/Images/slider-mobile2.png';
+import SlideMobile3 from '@/assets/Images/slider-mobile3.png';
+import DownloadAppStore from '@/assets/Images/download-app-store.png';
+import DownloadGooglePlay from '@/assets/Images/download-google-play.png';
+import ImageCanvas from '@/components/ImageCanvas';
 
 
 const StyledSlider = styled(Slider)(({ theme }) => ({

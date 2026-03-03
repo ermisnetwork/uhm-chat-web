@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { CurrentChannelStatus, SidebarType } from '../../constants/commons-const';
-import { client } from '../../client';
-import { handleError, isEmptyObject } from '../../utils/commons';
-import { setSidebar } from './app';
-import { setCurrentChannelStatus } from './channel';
+import { CurrentChannelStatus, SidebarType } from '@/constants/commons-const';
+import { client } from '@/client';
+import { handleError, isEmptyObject } from '@/utils/commons';
+import { setSidebar } from '@/redux/slices/app';
+import { setCurrentChannelStatus } from '@/redux/slices/channel';
 
 const initialState = {
   currentTopic: null,

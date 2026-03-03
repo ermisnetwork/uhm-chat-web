@@ -2,8 +2,8 @@ import React, { useEffect, useRef, memo } from 'react';
 import { useTheme } from '@emotion/react';
 import { Box, Fade, ListItemButton, ListItemAvatar, ListItemText, Popper, styled } from '@mui/material';
 import { FixedSizeList } from 'react-window';
-import MemberAvatar from './MemberAvatar';
-import { AvatarShape } from '../constants/commons-const';
+import MemberAvatar from '@/components/MemberAvatar';
+import { AvatarShape } from '@/constants/commons-const';
 
 const StyledMentionItem = styled(ListItemButton)(({ theme }) => ({
   cursor: 'pointer',

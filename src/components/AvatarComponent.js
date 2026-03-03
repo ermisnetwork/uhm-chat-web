@@ -4,9 +4,9 @@ import { Stack } from '@mui/material';
 import { GlobeHemisphereWest } from 'phosphor-react';
 import PropTypes from 'prop-types';
 
-import { AvatarShape } from '../constants/commons-const';
-import AvatarDefault from './AvatarDefault';
-import ImageCanvas from './ImageCanvas';
+import { AvatarShape } from '@/constants/commons-const';
+import AvatarDefault from '@/components/AvatarDefault';
+import ImageCanvas from '@/components/ImageCanvas';
 
 // Constants
 const PUBLIC_ICON_COLOR = '#4A90E2';

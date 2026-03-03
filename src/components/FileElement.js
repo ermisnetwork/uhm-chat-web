@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import { downloadFile, formatFileSize } from '../utils/commons';
-import FileTypeBadge from './FileTypeBadge';
-import { getDisplayDate } from '../utils/formatTime';
+import { downloadFile, formatFileSize } from '@/utils/commons';
+import FileTypeBadge from '@/components/FileTypeBadge';
+import { getDisplayDate } from '@/utils/formatTime';
 
 const StyledFileItem = styled(Box)(({ theme }) => ({
   width: '100%',

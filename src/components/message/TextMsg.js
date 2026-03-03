@@ -1,7 +1,7 @@
 import { Stack, Box, useTheme } from '@mui/material';
-import ForwardTo from './ForwardTo';
-import TextLine from './TextLine';
-import MessageOption from './MessageOption';
+import ForwardTo from '@/components/message/ForwardTo';
+import TextLine from '@/components/message/TextLine';
+import MessageOption from '@/components/message/MessageOption';
 
 const TextMsg = ({ message, forwardChannelName }) => {
   const theme = useTheme();

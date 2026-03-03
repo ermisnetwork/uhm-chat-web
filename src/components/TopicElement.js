@@ -2,20 +2,20 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Badge, Box, Stack, Tooltip, Typography, Menu, MenuItem } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
-import { ClientEvents } from '../constants/events-const';
-import { onEditMessage, onReplyMessage } from '../redux/slices/messages';
+import { ClientEvents } from '@/constants/events-const';
+import { onEditMessage, onReplyMessage } from '@/redux/slices/messages';
 import { Play, PushPin, PushPinSlash, Trash } from 'phosphor-react';
-import { AvatarShape, MessageType, ConfirmType, RoleMember, ChatType } from '../constants/commons-const';
-import { convertMessageSystem } from '../utils/messageSystem';
+import { AvatarShape, MessageType, ConfirmType, RoleMember, ChatType } from '@/constants/commons-const';
+import { convertMessageSystem } from '@/utils/messageSystem';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../config';
-import { convertMessageSignal } from '../utils/messageSignal';
-import { getDisplayDate } from '../utils/formatTime';
-import { client } from '../client';
-import TopicAvatar from './TopicAvatar';
-import useResponsive from '../hooks/useResponsive';
-import { handleError, myRoleInChannel } from '../utils/commons';
-import { setChannelConfirm } from '../redux/slices/dialog';
+import { DEFAULT_PATH } from '@/config';
+import { convertMessageSignal } from '@/utils/messageSignal';
+import { getDisplayDate } from '@/utils/formatTime';
+import { client } from '@/client';
+import TopicAvatar from '@/components/TopicAvatar';
+import useResponsive from '@/hooks/useResponsive';
+import { handleError, myRoleInChannel } from '@/utils/commons';
+import { setChannelConfirm } from '@/redux/slices/dialog';
 import { useTranslation } from 'react-i18next';
 
 const StyledTopicItem = styled(Box)(({ theme }) => ({
@@ -60,7 +60,7 @@ const TopicElement = ({ topic, idSelected }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobileToMd = useResponsive('down', 'md');
-  const { unreadChannels = [] } = useSelector(state => state.channel);
+  const { unreadChannels = {} } = useSelector(state => state.channel);
   const { parentChannel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
   const [isRightClick, setIsRightClick] = useState(false);
@@ -291,14 +291,8 @@ const TopicElement = ({ topic, idSelected }) => {
   }, [selectedTopic, user_id, dispatch]);
 
   const hasUnread = useMemo(() => {
-    if (!unreadChannels) return false;
-    // Tìm channel chứa topic này
-    const channel = unreadChannels.find(ch => ch.id === parentChannel?.id);
-    if (!channel || !channel.unreadTopics) return false;
-    // Tìm topic trong channel
-    const topicUnread = channel.unreadTopics.find(tp => tp.id === topicId);
-    return topicUnread && topicUnread.unreadCount > 0;
-  }, [unreadChannels, parentChannel?.id, topicId]);
+    return !!unreadChannels[topicId]?.unreadCount;
+  }, [unreadChannels, topicId]);
 
   return (
     <>

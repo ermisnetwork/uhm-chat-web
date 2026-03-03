@@ -1,71 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { Box, Stack, Paper, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
-import { downloadFile, formatFileSize } from '../utils/commons';
+import { downloadFile, formatFileSize } from '@/utils/commons';
 import { PlayCircle } from 'phosphor-react';
-import { MediaType } from '../constants/commons-const';
-import FileTypeBadge from './FileTypeBadge';
-import ImageCanvas from './ImageCanvas';
+import { MediaType } from '@/constants/commons-const';
+import FileTypeBadge from '@/components/FileTypeBadge';
+import ImageCanvas from '@/components/ImageCanvas';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
-import LightboxMedia from './LightboxMedia';
+import LightboxMedia from '@/components/LightboxMedia';
 
 const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
-  const processedImages = medias.map((item, index) => {
-    const totalImages = medias.length;
-
-    if (totalImages === 1) return { ...item, cols: 1, rows: 1 }; // Full width
-    if (totalImages === 2) return { ...item, cols: 1, rows: 1 }; // 2 ảnh chia 2 cột
-    if (totalImages >= 3) {
-      const position = index % 6; // Lặp lại logic theo nhóm 6 ảnh
-      let cols;
-      let rows;
-      if (position === 0) {
-        cols = 2;
-        rows = 2;
-      }
-      if (position === 1 || position === 2) {
-        cols = 1;
-        rows = 1;
-      }
-      if (position === 3) {
-        cols = 3;
-        rows = 1;
-      }
-      if (position === 4) {
-        cols = 2;
-        rows = 1;
-      }
-      if (position === 5) {
-        cols = 1;
-        rows = 1;
-      }
-
-      return {
-        ...item,
-        cols,
-        rows,
-      };
-    }
-  });
-
-  const columnCount = medias.length === 1 ? 1 : medias.length === 2 ? 2 : 3;
-
+  const columnCount = medias.length === 1 ? 1 : 2;
   if (medias.length === 0) return null;
 
+  const width = medias.length === 1 ? '400px' : '200px';
+  const height = medias.length === 1 ? '400px' : '200px';
+
   return (
-    <ImageList variant="quilted" cols={columnCount} rowHeight={medias.length === 1 ? 'auto' : 180}>
-      {processedImages.map((item, index) => (
-        <ImageListItem key={index} cols={item.cols} rows={item.rows}>
+    <ImageList variant="quilted" cols={columnCount} rowHeight={parseInt(height)}>
+      {medias.map((item, index) => (
+        <ImageListItem key={index} cols={1} rows={1}>
           <Paper
             elevation={3}
             sx={{
               borderRadius: '12px',
-              width: '100%',
-              height: '100%',
               overflow: 'hidden',
               position: 'relative',
               cursor: 'pointer',
+              width: width,
+              height: height,
             }}
             onClick={() => {
               setIsOpen(true);
@@ -74,9 +38,9 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
           >
             <ImageCanvas
               dataUrl={item.type === MediaType.VIDEO ? item.poster : item.src}
-              width={'100%'}
-              height={'100%'}
-              styleCustom={{ borderRadius: '12px' }}
+              width={width}
+              height={height}
+              styleCustom={{ borderRadius: '12px', objectFit: 'cover' }}
             />
             {item.type === MediaType.VIDEO && (
               <PlayCircle
@@ -93,7 +57,7 @@ const QuiltedMediaList = ({ medias, setIsOpen, setIndexMedia }) => {
   );
 };
 
-export default function Attachments({ attachments }) {
+const Attachments = React.memo(({ attachments }) => {
   const theme = useTheme();
   const [medias, setMedias] = useState([]);
   const [pdfData, setPdfData] = useState(null);
@@ -203,8 +167,8 @@ export default function Attachments({ attachments }) {
   if (!attachments.length) return null;
 
   return (
-    <Box sx={{ maxWidth: attachments.length === 1 ? '20rem' : '30rem' }}>
-      <Stack direction="row" justifyContent="flex-end">
+    <Box>
+      <Stack direction="row" justifyContent="flex-start">
         <QuiltedMediaList medias={medias} setIsOpen={setIsOpen} setIndexMedia={setIndexMedia} />
       </Stack>
 
@@ -247,7 +211,7 @@ export default function Attachments({ attachments }) {
       )}
 
       {attachmentsOther.length > 0 && (
-        <List>
+        <List sx={{ width: '400px' }}>
           {attachmentsOther.map((item, index) => {
             const lastItem = index === attachmentsOther.length - 1;
             return (
@@ -278,4 +242,6 @@ export default function Attachments({ attachments }) {
       )}
     </Box>
   );
-}
+});
+
+export default Attachments;

@@ -2,14 +2,14 @@
 import { enUS, viVN } from '@mui/material/locale';
 
 // routes
-import { PATH_DASHBOARD } from './routes/paths';
+import { PATH_DASHBOARD } from '@/routes/paths';
 
 const apiURL = localStorage.getItem('api_url') || import.meta.env.VITE_API_URL;
 
 export const DOMAIN_APP = import.meta.env.VITE_DOMAIN;
 export const BASE_URL_PROFILE = apiURL;
 export const BASE_URL = apiURL;
-export const BASE_URL_WALLET = apiURL;
+
 export const API_KEY = import.meta.env.VITE_API_KEY;
 export const CHAT_PROJECT_ID = import.meta.env.VITE_CHAT_PROJECT_ID;
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -56,4 +56,4 @@ export const DEFAULT_PATH = PATH_DASHBOARD.general.app; // as '/channels'
 export const WIDTH_LEFT_PANEL = 377;
 export const WIDTH_SIDEBAR_PANEL = 430;
 export const WIDTH_SIDE_NAV = 70;
-export const TRANSITION = 'all 0.3s';
+export const TRANSITION = 'all 0s';

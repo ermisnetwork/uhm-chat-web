@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack } from '@mui/material';
-import CustomAudioPlayer from '../CustomAudioPlayer';
+import CustomAudioPlayer from '@/components/CustomAudioPlayer';
 
 const VoiceLine = ({ voiceMsg, isMyMessage }) => {
   if (!voiceMsg) return null;

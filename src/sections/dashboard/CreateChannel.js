@@ -17,21 +17,21 @@ import {
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import FormProvider from '../../components/hook-form/FormProvider';
-import { RHFTextField } from '../../components/hook-form';
+import FormProvider from '@/components/hook-form/FormProvider';
+import { RHFTextField } from '@/components/hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { client } from '../../client';
-import { AvatarShape, ChatType } from '../../constants/commons-const';
+import { client } from '@/client';
+import { AvatarShape, ChatType } from '@/constants/commons-const';
 import { LoadingButton } from '@mui/lab';
-import { showSnackbar } from '../../redux/slices/app';
-import { CloseDialogCreateChannel } from '../../redux/slices/dialog';
-import { FetchFriends } from '../../redux/slices/member';
-import RHFRadio from '../../components/hook-form/RHFRadio';
-import { EditIcon, UsersIcon } from '../../components/Icons';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
+import { showSnackbar } from '@/redux/slices/app';
+import { CloseDialogCreateChannel } from '@/redux/slices/dialog';
+import { FetchFriends } from '@/redux/slices/member';
+import RHFRadio from '@/components/hook-form/RHFRadio';
+import { EditIcon, UsersIcon } from '@/components/Icons';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
 import { MagnifyingGlass } from 'phosphor-react';
-import FriendList from './FriendList';
-import MemberAvatar from '../../components/MemberAvatar';
+import FriendList from '@/sections/dashboard/FriendList';
+import MemberAvatar from '@/components/MemberAvatar';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

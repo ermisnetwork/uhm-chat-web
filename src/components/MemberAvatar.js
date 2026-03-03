@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Badge, styled, useTheme } from '@mui/material';
-import useOnlineStatus from '../hooks/useOnlineStatus';
-import { AvatarShape, OnlineStatusUser } from '../constants/commons-const';
-import ImageCanvas from './ImageCanvas';
-import AvatarDefault from './AvatarDefault';
+import useOnlineStatus from '@/hooks/useOnlineStatus';
+import { AvatarShape, OnlineStatusUser } from '@/constants/commons-const';
+import ImageCanvas from '@/components/ImageCanvas';
+import AvatarDefault from '@/components/AvatarDefault';
 
 const StyledBadgeOnline = styled(Badge)(({ theme, status }) => ({
   '& .MuiBadge-badge': {

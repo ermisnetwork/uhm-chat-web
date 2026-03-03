@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Stack, Button, Popover, IconButton } from '@mui/material';
-import { EMOJI_QUICK } from '../constants/commons-const';
-import { handleError } from '../utils/commons';
+import { EMOJI_QUICK } from '@/constants/commons-const';
+import { handleError } from '@/utils/commons';
 import { useDispatch, useSelector } from 'react-redux';
-import { LikeIcon } from './Icons';
+import { LikeIcon } from '@/components/Icons';
 import { useTranslation } from 'react-i18next';
 
 export default function QuickReactions({ message }) {

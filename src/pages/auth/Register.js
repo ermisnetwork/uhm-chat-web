@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeSlash } from 'phosphor-react';
-import FormProvider from '../../components/hook-form/FormProvider';
+import FormProvider from '@/components/hook-form/FormProvider';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { LoadingButton } from '@mui/lab';
-import { RHFTextField } from '../../components/hook-form';
-import { RegisterUserByEmail } from '../../redux/slices/auth';
+import { RHFTextField } from '@/components/hook-form';
+import { RegisterUserByEmail } from '@/redux/slices/auth';
 import { useTranslation } from 'react-i18next';
 
 // ----------------------------------------------------------------------

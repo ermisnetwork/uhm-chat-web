@@ -19,25 +19,19 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
-import { MessageType } from '../../constants/commons-const';
+import { MessageType } from '@/constants/commons-const';
 import {
   onDeleteMessage,
   onEditMessage,
   onForwardMessage,
   onReplyMessage,
   onUnPinMessage,
-} from '../../redux/slices/messages';
-import { ForwardIcon, QuoteDownIcon, ThreeDotsIcon } from '../Icons';
-import { checkPermissionDeleteMessage, downloadFile } from '../../utils/commons';
-import { SetCooldownTime } from '../../redux/slices/channel';
-import { 
-  Copy, 
-  PushPin, 
-  PushPinSimpleSlash, 
-  Trash, 
-  Download, 
-  PencilSimple
-} from 'phosphor-react';
+} from '@/redux/slices/messages';
+import { ForwardIcon, QuoteDownIcon, ThreeDotsIcon } from '@/components/Icons';
+import { checkPermissionDeleteMessage, downloadFile } from '@/utils/commons';
+import { SetCooldownTime } from '@/redux/slices/channel';
+import { showSnackbar } from '@/redux/slices/app';
+import { Copy, PushPin, PushPinSimpleSlash, Trash, Download, PencilSimple } from 'phosphor-react';
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backgroundColor: theme.palette.background.neutral,

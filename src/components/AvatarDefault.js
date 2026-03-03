@@ -3,10 +3,10 @@ import { useTheme } from '@mui/material';
 import { User } from 'phosphor-react';
 import PropTypes from 'prop-types';
 
-import { AvatarShape } from '../constants/commons-const';
-import getColorName from '../utils/getColorName';
-import capitalizeFirstLetter from '../utils/commons';
-import { TRANSITION } from '../config';
+import { AvatarShape } from '@/constants/commons-const';
+import getColorName from '@/utils/getColorName';
+import capitalizeFirstLetter from '@/utils/commons';
+import { TRANSITION } from '@/config';
 
 const AvatarDefault = ({ name = '', width, height, shape = AvatarShape.Circle }) => {
   const theme = useTheme();

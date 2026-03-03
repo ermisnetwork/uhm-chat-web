@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, Slide, Stack, Typography, useTheme, IconButton, Box } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { client } from '../../client';
-import { ChatType, RoleMember } from '../../constants/commons-const';
-import { showSnackbar, UpdateIsLoading } from '../../redux/slices/app';
-import { CloseAddFriendDialog } from '../../redux/slices/dialog';
+import { client } from '@/client';
+import { ChatType, RoleMember } from '@/constants/commons-const';
+import { showSnackbar, UpdateIsLoading } from '@/redux/slices/app';
+import { CloseAddFriendDialog } from '@/redux/slices/dialog';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../../config';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
+import { DEFAULT_PATH } from '@/config';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
 import { MagnifyingGlass, X } from 'phosphor-react';
-import { LoadingSpinner } from '../../components/animate';
-import NoResult from '../../assets/Illustration/NoResult';
-import UserElement from '../../components/UserElement';
+import { LoadingSpinner } from '@/components/animate';
+import NoResult from '@/assets/Illustration/NoResult';
+import UserElement from '@/components/UserElement';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

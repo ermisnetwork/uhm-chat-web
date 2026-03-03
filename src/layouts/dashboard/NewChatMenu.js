@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Button, Fade, IconButton, Menu, MenuItem, Stack, useTheme } from '@mui/material';
-import { NewChat_Menu } from '../../data';
+import { NewChat_Menu } from '@/data';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { OpenDialogCreateChannel, OpenDialogNewDirectMessage, OpenAddFriendDialog } from '../../redux/slices/dialog';
-import Iconify from '../../components/Iconify';
-import useResponsive from '../../hooks/useResponsive';
-import { NewChatIcon, ProfileAddIcon } from '../../components/Icons';
+import { OpenDialogCreateChannel, OpenDialogNewDirectMessage, OpenAddFriendDialog } from '@/redux/slices/dialog';
+import Iconify from '@/components/Iconify';
+import useResponsive from '@/hooks/useResponsive';
+import { NewChatIcon, ProfileAddIcon } from '@/components/Icons';
 
 const NewChatMenu = () => {
   const { t } = useTranslation();

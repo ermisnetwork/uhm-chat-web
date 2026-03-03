@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTheme, Button, MenuList, MenuItem, ListItemIcon, ListItemText, Popover, styled } from '@mui/material';
-import Iconify from './Iconify';
-import { PollIcon, ShareFileIcon } from './Icons';
-import { onFilesMessage } from '../redux/slices/messages';
-import { UploadType } from '../constants/commons-const';
-import { setOpenCreatePollDialog } from '../redux/slices/dialog';
-import { set } from 'react-hook-form';
+import Iconify from '@/components/Iconify';
+import { PollIcon, ShareFileIcon } from '@/components/Icons';
+import { onFilesMessage } from '@/redux/slices/messages';
+import { UploadType } from '@/constants/commons-const';
+import { setOpenCreatePollDialog } from '@/redux/slices/dialog';
 import { useTranslation } from 'react-i18next';
 
 const VisuallyHiddenInput = styled('input')({
@@ -73,7 +72,9 @@ const ActionsChatPopover = ({}) => {
             <ListItemIcon sx={{ minWidth: 'auto!important', marginRight: '8px' }}>
               <ShareFileIcon />
             </ListItemIcon>
-            <ListItemText primaryTypographyProps={{ fontSize: '14px', fontWeight: 600 }}>{t('popover.share_file')}</ListItemText>
+            <ListItemText primaryTypographyProps={{ fontSize: '14px', fontWeight: 600 }}>
+              {t('popover.share_file')}
+            </ListItemText>
             <VisuallyHiddenInput type="file" multiple onChange={event => onChangeUploadFile(event, UploadType.File)} />
           </MenuItem>
 
@@ -87,7 +88,9 @@ const ActionsChatPopover = ({}) => {
             <ListItemIcon sx={{ minWidth: 'auto!important', marginRight: '8px' }}>
               <PollIcon />
             </ListItemIcon>
-            <ListItemText primaryTypographyProps={{ fontSize: '14px', fontWeight: 600 }}>{t('popover.create_poll')}</ListItemText>
+            <ListItemText primaryTypographyProps={{ fontSize: '14px', fontWeight: 600 }}>
+              {t('popover.create_poll')}
+            </ListItemText>
           </MenuItem>
         </MenuList>
       </Popover>

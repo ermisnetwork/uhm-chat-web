@@ -1,5 +1,5 @@
-export * from './RHFUpload';
-export { default } from './FormProvider';
+export * from '@/components/hook-form/RHFUpload';
+export { default } from '@/components/hook-form/FormProvider';
 
 
-export { default as RHFTextField } from './RHFTextField';
+export { default as RHFTextField } from '@/components/hook-form/RHFTextField';

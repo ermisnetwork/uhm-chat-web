@@ -2,11 +2,11 @@ import React from 'react';
 import { alpha, Box, Button, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useDispatch } from 'react-redux';
-import ChannelAvatar from './ChannelAvatar';
-import { AvatarShape } from '../constants/commons-const';
-import { handleError, isChannelDirect } from '../utils/commons';
-import useResponsive from '../hooks/useResponsive';
-import { showSnackbar } from '../redux/slices/app';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import { AvatarShape } from '@/constants/commons-const';
+import { handleError, isChannelDirect } from '@/utils/commons';
+import useResponsive from '@/hooks/useResponsive';
+import { showSnackbar } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 
 const InviteElement = ({ channel }) => {

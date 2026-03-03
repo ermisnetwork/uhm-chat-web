@@ -1,16 +1,16 @@
 import React, { useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, IconButton, Slide, Stack } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { client } from '../../client';
-import { ChatType, RoleMember } from '../../constants/commons-const';
-import { showSnackbar } from '../../redux/slices/app';
-import { CloseDialogNewDirectMessage } from '../../redux/slices/dialog';
+import { client } from '@/client';
+import { ChatType, RoleMember } from '@/constants/commons-const';
+import { showSnackbar } from '@/redux/slices/app';
+import { CloseDialogNewDirectMessage } from '@/redux/slices/dialog';
 import { useNavigate } from 'react-router-dom';
-import { DEFAULT_PATH } from '../../config';
-import { Search, SearchIconWrapper, StyledInputBase } from '../../components/Search';
+import { DEFAULT_PATH } from '@/config';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/components/Search';
 import { MagnifyingGlass, X } from 'phosphor-react';
-import FriendList from './FriendList';
-import { LoadingSpinner } from '../../components/animate';
+import FriendList from '@/sections/dashboard/FriendList';
+import { LoadingSpinner } from '@/components/animate';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {

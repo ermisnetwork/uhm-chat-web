@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useSelector } from 'react-redux';
-import ChannelAvatar from './ChannelAvatar';
-import { AvatarShape } from '../constants/commons-const';
-import { isChannelDirect } from '../utils/commons';
-import useOnlineStatus from '../hooks/useOnlineStatus';
-import CustomCheckbox from './CustomCheckbox';
+import ChannelAvatar from '@/components/ChannelAvatar';
+import { AvatarShape } from '@/constants/commons-const';
+import { isChannelDirect } from '@/utils/commons';
+import useOnlineStatus from '@/hooks/useOnlineStatus';
+import CustomCheckbox from '@/components/CustomCheckbox';
 import { useTranslation } from 'react-i18next';
 
 const StyledContactItem = styled(Box)(({ theme }) => ({

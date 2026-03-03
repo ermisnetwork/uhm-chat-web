@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
-import { ChatPurpleIcon } from './Icons';
-import { TRANSITION } from '../config';
+import { ChatPurpleIcon } from '@/components/Icons';
+import { TRANSITION } from '@/config';
 
 const AvatarGeneralDefault = ({ size = 40 }) => {
   const getFontSizeAvatar = size => {

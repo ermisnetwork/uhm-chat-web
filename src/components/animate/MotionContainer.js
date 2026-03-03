@@ -3,7 +3,7 @@ import { m } from 'framer-motion';
 // @mui
 import { Box } from '@mui/material';
 //
-import { varContainer } from './variants';
+import { varContainer } from '@/components/animate/variants';
 
 // ----------------------------------------------------------------------
 

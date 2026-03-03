@@ -1,15 +1,15 @@
 import { combineReducers } from 'redux';
 import storage from 'redux-persist/lib/storage';
 // slices
-import appReducer from './slices/app';
-import authReducer from './slices/auth';
-import channelReducer from './slices/channel';
-import memberReducer from './slices/member';
-import dialogReducer from './slices/dialog';
-import messagesReducer from './slices/messages';
-import callDirectReducer from './slices/callDirect';
-import walletReducer from './slices/wallet';
-import topicReducer from './slices/topic';
+import appReducer from '@/redux/slices/app';
+import authReducer from '@/redux/slices/auth';
+import channelReducer from '@/redux/slices/channel';
+import memberReducer from '@/redux/slices/member';
+import dialogReducer from '@/redux/slices/dialog';
+import messagesReducer from '@/redux/slices/messages';
+import callDirectReducer from '@/redux/slices/callDirect';
+
+import topicReducer from '@/redux/slices/topic';
 
 import { createTransform } from 'redux-persist';
 import { parse, stringify } from 'flatted';
@@ -27,7 +27,7 @@ const rootPersistConfig = {
   keyPrefix: 'redux-',
   transforms: [transformCircular],
   whitelist: ['auth'],
-  blacklist: ['app', 'channel', 'message', 'member', 'dialog', 'mesages', 'callDirect', 'wallet', 'topic'],
+  blacklist: ['app', 'channel', 'message', 'member', 'dialog', 'mesages', 'callDirect', 'topic'],
 };
 
 const rootReducer = combineReducers({
@@ -38,7 +38,7 @@ const rootReducer = combineReducers({
   dialog: dialogReducer,
   messages: messagesReducer,
   callDirect: callDirectReducer,
-  wallet: walletReducer,
+
   topic: topicReducer,
 });
 

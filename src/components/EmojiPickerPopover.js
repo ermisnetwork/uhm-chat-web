@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTheme, IconButton, Popover, Tabs, Tab, Box } from '@mui/material';
-import { SmileyStickerIcon } from './Icons';
+import { SmileyStickerIcon } from '@/components/Icons';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useTranslation } from 'react-i18next';

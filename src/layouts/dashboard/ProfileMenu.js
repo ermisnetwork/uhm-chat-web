@@ -1,16 +1,16 @@
 import React from 'react';
 import { Box, Button, Fade, Menu, MenuItem, Stack, Typography, useTheme } from '@mui/material';
 
-import { Profile_Menu } from '../../data';
+import { Profile_Menu } from '@/data';
 import { useDispatch, useSelector } from 'react-redux';
-import { LogoutUser } from '../../redux/slices/auth';
-import { OpenDialogProfile } from '../../redux/slices/dialog';
-import MemberAvatar from '../../components/MemberAvatar';
-import { formatString } from '../../utils/commons';
-import Iconify from '../../components/Iconify';
-import useResponsive from '../../hooks/useResponsive';
+import { LogoutUser } from '@/redux/slices/auth';
+import { OpenDialogProfile } from '@/redux/slices/dialog';
+import MemberAvatar from '@/components/MemberAvatar';
+import { formatString } from '@/utils/commons';
+import Iconify from '@/components/Iconify';
+import useResponsive from '@/hooks/useResponsive';
 import { useTranslation } from 'react-i18next';
-import { LocalStorageKey } from '../../constants/localStorage-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 
 const ProfileMenu = () => {
   const { i18n, t } = useTranslation();

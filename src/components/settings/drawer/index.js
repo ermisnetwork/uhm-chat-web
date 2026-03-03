@@ -10,19 +10,19 @@ import {
   IconButton,
 } from "@mui/material";
 // hooks
-import useSettings from "../../../hooks/useSettings";
+import useSettings from "@/hooks/useSettings";
 // utils
-import cssStyles from "../../../utils/cssStyles";
+import cssStyles from "@/utils/cssStyles";
 // config
-import { NAVBAR, defaultSettings } from "../../../config";
+import { NAVBAR, defaultSettings } from "@/config";
 //
-import Iconify from "../../Iconify";
-import Scrollbar from "../../Scrollbar";
+import Iconify from "@/components/Iconify";
+import Scrollbar from "@/components/Scrollbar";
 //
-import ToggleButton from "./ToggleButton";
-import SettingDirection from "./SettingDirection";
-import SettingFullscreen from "./SettingFullscreen";
-import SettingColorPresets from "./SettingColorPresets";
+import ToggleButton from "@/components/settings/drawer/ToggleButton";
+import SettingDirection from "@/components/settings/drawer/SettingDirection";
+import SettingFullscreen from "@/components/settings/drawer/SettingFullscreen";
+import SettingColorPresets from "@/components/settings/drawer/SettingColorPresets";
 
 // ----------------------------------------------------------------------
 

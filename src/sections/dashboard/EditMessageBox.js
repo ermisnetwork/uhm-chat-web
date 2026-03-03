@@ -2,8 +2,8 @@ import React from 'react';
 import { Stack, useTheme, Typography, Box, IconButton } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { PencilSimple, X } from 'phosphor-react';
-import { onEditMessage } from '../../redux/slices/messages';
-import { displayMessageWithMentionName } from '../../utils/commons';
+import { onEditMessage } from '@/redux/slices/messages';
+import { displayMessageWithMentionName } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
 
 const EditMessageBox = ({ editMessage }) => {

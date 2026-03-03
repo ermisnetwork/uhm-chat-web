@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import { getDisplayDate } from '../utils/formatTime';
-import ImageCanvas from './ImageCanvas';
-import NoImage from '../assets/Images/no-image.png';
+import { getDisplayDate } from '@/utils/formatTime';
+import ImageCanvas from '@/components/ImageCanvas';
+import NoImage from '@/assets/Images/no-image.png';
 
 const StyledLinkItem = styled(Box)(({ theme }) => ({
   width: '100%',

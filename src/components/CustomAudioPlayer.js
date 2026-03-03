@@ -1,7 +1,7 @@
 import { IconButton, Stack, useTheme } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
-import Iconify from './Iconify';
+import Iconify from '@/components/Iconify';
 
 const CustomAudioPlayer = ({ src, waveColor = '#fff', progressColor = '#0C0A29', onLoaded }) => {
   const theme = useTheme();

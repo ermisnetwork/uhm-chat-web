@@ -10,9 +10,9 @@ import {
   IconButton,
 } from '@mui/material';
 import { useState } from 'react';
-import { BASE_URL } from '../../config';
+import { BASE_URL } from '@/config';
 import { Check, X } from 'phosphor-react';
-import { LocalStorageKey } from '../../constants/localStorage-const';
+import { LocalStorageKey } from '@/constants/localStorage-const';
 
 // ----------------------------------------------------------------------
 

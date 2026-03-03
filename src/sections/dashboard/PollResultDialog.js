@@ -13,10 +13,10 @@ import {
 } from '@mui/material';
 import { X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setPollResult } from '../../redux/slices/dialog';
-import MemberAvatar from '../../components/MemberAvatar';
-import { AvatarShape } from '../../constants/commons-const';
-import useOnlineStatus from '../../hooks/useOnlineStatus';
+import { setPollResult } from '@/redux/slices/dialog';
+import MemberAvatar from '@/components/MemberAvatar';
+import { AvatarShape } from '@/constants/commons-const';
+import useOnlineStatus from '@/hooks/useOnlineStatus';
 import { use } from 'react';
 import { useTranslation } from 'react-i18next';
 
