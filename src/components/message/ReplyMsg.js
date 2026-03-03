@@ -1,16 +1,11 @@
 import React from 'react';
 import { Box, Stack, Typography, useTheme } from '@mui/material';
-import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import Attachments from '@/components/Attachments';
-import VoiceLine from '@/components/message/VoiceLine';
 import { formatString, displayMessageWithMentionName } from '@/utils/commons';
 import ImageCanvas from '@/components/ImageCanvas';
-import { Trash } from 'phosphor-react';
 import FileTypeBadge from '@/components/FileTypeBadge';
 
 const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
-  const { t } = useTranslation();
   const { mentions } = useSelector(state => state.channel);
   const theme = useTheme();
   const memberInfo = message.quoted_message?.user;
@@ -18,12 +13,12 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
   const name = memberInfo ? memberInfo.name : formatString(quotedMessage.user.id);
   const attachmentsOfQuoted = quotedMessage.attachments?.filter(item => item.type !== 'linkPreview');
   const media = attachmentsOfQuoted ? attachmentsOfQuoted[0] : null;
-  const attachmentsOfMsg = message.attachments
-    ? message.attachments.filter(attachment => !['linkPreview', 'voiceRecording'].includes(attachment.type))
-    : null;
-  const voiceMsg = message.attachments
-    ? message.attachments.find(attachment => attachment.type === 'voiceRecording')
-    : null;
+  // const attachmentsOfMsg = message.attachments
+  //   ? message.attachments.filter(attachment => !['linkPreview', 'voiceRecording'].includes(attachment.type))
+  //   : null;
+  // const voiceMsg = message.attachments
+  //   ? message.attachments.find(attachment => attachment.type === 'voiceRecording')
+  //   : null;
   const stickerOfQuoted = quotedMessage?.sticker_url ? quotedMessage.sticker_url : null;
 
   return (
@@ -85,55 +80,39 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
           )}
 
           <Box sx={{ flex: 1, paddingLeft: '10px', width: 'calc(100% - 50px)' }}>
-            {message.quoted_message.deleted_at ? (
-              <Typography
-                variant="body2"
-                sx={{
-                  color: theme.palette.grey[600],
-                  fontSize: 12,
-                  display: 'flex',
-                }}
-              >
-                <Trash size={16} color={theme.palette.grey[600]} />
-                &nbsp;&nbsp;{t('conversation.message_deleted')}
+            <Typography
+              variant="body1"
+              sx={{
+                color: theme.palette.text,
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            >
+              {name}
+            </Typography>
+            {media && (
+              <Typography variant="body1" sx={{ fontSize: 12 }}>
+                {media.title}
               </Typography>
-            ) : (
-              <>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: theme.palette.text,
-                    fontSize: 12,
-                    fontWeight: 700,
-                  }}
-                >
-                  {name}
-                </Typography>
-                {media && (
-                  <Typography variant="body1" sx={{ fontSize: 12 }}>
-                    {media.title}
-                  </Typography>
-                )}
-
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: theme.palette.grey[500],
-                    fontSize: 12,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: displayMessageWithMentionName(message.quoted_message.text, mentions),
-                  }}
-                />
-              </>
             )}
+
+            <Typography
+              variant="body2"
+              sx={{
+                color: theme.palette.grey[500],
+                fontSize: 12,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+              dangerouslySetInnerHTML={{
+                __html: displayMessageWithMentionName(message.quoted_message.text, mentions),
+              }}
+            />
           </Box>
         </Stack>
       </Box>
-      <Stack spacing={1}>
+      {/* <Stack spacing={1}>
         {attachmentsOfMsg && <Attachments attachments={attachmentsOfMsg} />}
         {voiceMsg && <VoiceLine voiceMsg={voiceMsg} />}
         {message.sticker_url && (
@@ -156,7 +135,7 @@ const ReplyMsg = React.memo(({ message, onScrollToReplyMsg }) => {
             )}
           </Box>
         )}
-      </Stack>
+      </Stack> */}
     </>
   );
 });

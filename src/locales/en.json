@@ -801,5 +801,6 @@
     "no_message": "Let start this conversations with great stories!"
   },
   "online": "Online",
-  "offline": "Offline"
+  "offline": "Offline",
+  "endOfMessages": "All old messages have been loaded"
 }

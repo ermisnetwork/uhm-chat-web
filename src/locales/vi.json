@@ -797,5 +797,6 @@
     "no_message": "Hãy bắt đầu cuộc trò chuyện này bằng những câu chuyện thật hay nhé!"
   },
   "online": "Trực tuyến",
-  "offline": "Ngoại tuyến"
+  "offline": "Ngoại tuyến",
+  "endOfMessages": "Đã tải hết tin nhắn cũ"
 }
