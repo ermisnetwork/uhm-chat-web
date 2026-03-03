@@ -7,6 +7,7 @@ import useResponsive from '@/hooks/useResponsive';
 import { NewChatIcon, PeopleIcon } from '@/components/Icons';
 import { NewChat_Menu } from '@/data';
 import { useTranslation } from 'react-i18next';
+import SEOHead from '@/components/SEOHead';
 const GeneralApp = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -39,6 +40,7 @@ const GeneralApp = () => {
         flex: 1,
       }}
     >
+      <SEOHead title={t('seo.channels_title')} description={t('seo.channels_description')} path="/channels" noIndex />
       <Stack spacing={2} sx={{ height: '100%', width: '100%' }} alignItems="center" justifyContent={'center'}>
         <NoChat />
         <Typography variant="h4" sx={{ textAlign: 'center' }}>
@@ -49,10 +51,10 @@ const GeneralApp = () => {
         </Typography>
         <Stack direction="row" spacing={1} justifyContent="center" sx={{ marginTop: '15px' }}>
           {NewChat_Menu.map(item => (
-            <Button 
+            <Button
               key={item.key}
-              variant="outlined" 
-              size="large" 
+              variant="outlined"
+              size="large"
               onClick={() => handleMenuItem(item.key)}
               sx={{ gap: 1 }}
             >

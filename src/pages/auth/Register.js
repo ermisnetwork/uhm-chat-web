@@ -11,6 +11,7 @@ import { LoadingButton } from '@mui/lab';
 import { RHFTextField } from '@/components/hook-form';
 import { RegisterUserByEmail } from '@/redux/slices/auth';
 import { useTranslation } from 'react-i18next';
+import SEOHead from '@/components/SEOHead';
 
 // ----------------------------------------------------------------------
 
@@ -52,6 +53,7 @@ export default function Register() {
 
   return (
     <>
+      <SEOHead title={t('seo.register_title')} description={t('seo.register_description')} path="/register" />
       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
         <Typography variant="h4">{t('register.title')}</Typography>
 
