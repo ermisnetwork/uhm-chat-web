@@ -802,5 +802,23 @@
   },
   "online": "Online",
   "offline": "Offline",
-  "endOfMessages": "All old messages have been loaded"
+  "endOfMessages": "All old messages have been loaded",
+  "seo": {
+    "login_title": "Login",
+    "login_description": "Sign in to Uhmm...! - Your secure chat & messaging app. Connect with friends and colleagues instantly.",
+    "register_title": "Register",
+    "register_description": "Create your Uhmm...! account. Join a modern, secure chat platform to connect with people quickly and easily.",
+    "forgot_password_title": "Forgot Password",
+    "forgot_password_description": "Reset your Uhmm...! password. Enter your email to receive a password reset link.",
+    "channels_title": "Channels",
+    "channels_description": "Your channels and conversations on Uhmm...!",
+    "contacts_title": "Contacts",
+    "contacts_description": "Manage your contacts and friends on Uhmm...!"
+  },
+  "page404": {
+    "title": "PAGE NOT FOUND!",
+    "message": "Sorry, we couldn't find the page you're looking for.",
+    "message_detail": "Perhaps you've mistyped the URL? Be sure to check your spelling.",
+    "go_home": "Go to Home"
+  }
 }

@@ -798,5 +798,23 @@
   },
   "online": "Trực tuyến",
   "offline": "Ngoại tuyến",
-  "endOfMessages": "Đã tải hết tin nhắn cũ"
+  "endOfMessages": "Đã tải hết tin nhắn cũ",
+  "seo": {
+    "login_title": "Đăng nhập",
+    "login_description": "Đăng nhập vào Uhmm...! - Ứng dụng nhắn tin an toàn và bảo mật. Kết nối với bạn bè và đồng nghiệp ngay lập tức.",
+    "register_title": "Đăng ký",
+    "register_description": "Tạo tài khoản Uhmm...! Tham gia nền tảng nhắn tin an toàn, hiện đại để kết nối với mọi người nhanh chóng và dễ dàng.",
+    "forgot_password_title": "Quên mật khẩu",
+    "forgot_password_description": "Đặt lại mật khẩu Uhmm...! Nhập email để nhận liên kết đặt lại mật khẩu.",
+    "channels_title": "Kênh",
+    "channels_description": "Các kênh và cuộc trò chuyện của bạn trên Uhmm...!",
+    "contacts_title": "Liên hệ",
+    "contacts_description": "Quản lý danh bạ và bạn bè trên Uhmm...!"
+  },
+  "page404": {
+    "title": "KHÔNG TÌM THẤY TRANG!",
+    "message": "Xin lỗi, chúng tôi không tìm thấy trang bạn đang tìm.",
+    "message_detail": "Có thể bạn đã nhập sai URL? Hãy kiểm tra lại chính tả.",
+    "go_home": "Về trang chủ"
+  }
 }

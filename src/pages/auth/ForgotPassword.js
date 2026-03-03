@@ -14,6 +14,7 @@ import { Eye, EyeSlash } from 'phosphor-react';
 import { setIsResetEmailSent } from '@/redux/slices/app';
 import { useTranslation } from 'react-i18next';
 import { t } from 'i18next';
+import SEOHead from '@/components/SEOHead';
 
 const ResetPassword = () => {
   const dispatch = useDispatch();
@@ -109,14 +110,17 @@ const ForgotPassword = () => {
 
   return (
     <>
+      <SEOHead
+        title={t('seo.forgot_password_title')}
+        description={t('seo.forgot_password_description')}
+        path="/forgot-password"
+      />
       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
         <Typography variant="h3" paragraph>
           {t('forgot_password.title')}
         </Typography>
 
-        <Typography sx={{ color: 'text.secondary', mb: 5 }}>
-          {t('forgot_password.message')}
-        </Typography>
+        <Typography sx={{ color: 'text.secondary', mb: 5 }}>{t('forgot_password.message')}</Typography>
       </Stack>
 
       {isResetEmailSent ? (

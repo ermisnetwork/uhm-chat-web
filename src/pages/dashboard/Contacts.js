@@ -15,6 +15,7 @@ import { SetSearchQuery } from '@/redux/slices/app';
 import { DEFAULT_PATH } from '@/config';
 import { removeVietnameseTones } from '@/utils/commons';
 import { useTranslation } from 'react-i18next';
+import SEOHead from '@/components/SEOHead';
 
 const Contacts = () => {
   const { t } = useTranslation();
@@ -155,6 +156,7 @@ const Contacts = () => {
 
   return (
     <BoxContainer>
+      <SEOHead title={t('seo.contacts_title')} description={t('seo.contacts_description')} path="/contacts" noIndex />
       <Stack
         sx={{
           padding: isMobileToMd ? '15px' : '30px',
