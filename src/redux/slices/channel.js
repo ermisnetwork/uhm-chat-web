@@ -22,7 +22,7 @@ const initialState = {
   mutedChannels: [], // channels that user has muted
   skippedChannels: [], // channels that user has skipped invite
   searchChannels: [], // data for feature search channel
-  unreadChannels: [], // channels that have unread messages
+  unreadChannels: {}, // { [channelOrTopicId]: { unreadCount, type?, parentId? } }
   channel_id: null,
   currentChannel: null,
   allUnreadData: {},
@@ -56,7 +56,7 @@ const slice = createSlice({
       state.activeChannels = action.payload.activeChannels;
       state.pendingChannels = action.payload.pendingChannels;
       state.mutedChannels = action.payload.mutedChannels;
-      state.unreadChannels = action.payload.unreadChannels;
+      state.unreadChannels = action.payload.unreadChannels || {};
       state.skippedChannels = action.payload.skippedChannels;
       state.pinnedChannels = action.payload.pinnedChannels;
     },
@@ -176,77 +176,31 @@ const slice = createSlice({
     setIsGuest(state, action) {
       state.isGuest = action.payload;
     },
-    addUnreadChannel(state, action) {
-      const channel = action.payload;
-      const channelIdx = state.unreadChannels.findIndex(c => c.id === channel.id);
-
-      if (channelIdx === -1) {
-        // Channel chưa tồn tại, thêm mới
-        state.unreadChannels.push({
-          id: channel.id,
-          unreadCount: channel.unreadCount || 0,
-          unreadTopics: channel.unreadTopics || [],
+    // Set unread cho 1 channel hoặc topic
+    setUnread(state, action) {
+      const { id, unreadCount, parentId, type } = action.payload;
+      if (unreadCount > 0) {
+        state.unreadChannels[id] = {
+          unreadCount,
+          ...(parentId && { parentId }),
+          ...(type && { type }),
+        };
+      } else {
+        delete state.unreadChannels[id];
+      }
+    },
+    // Clear unread cho 1 channel hoặc topic
+    clearUnread(state, action) {
+      const { id, clearTopics } = action.payload;
+      delete state.unreadChannels[id];
+      // Nếu clearTopics = true, xóa tất cả topics thuộc channel này
+      if (clearTopics) {
+        Object.keys(state.unreadChannels).forEach(key => {
+          if (state.unreadChannels[key].parentId === id) {
+            delete state.unreadChannels[key];
+          }
         });
-      } else {
-        // Channel đã tồn tại, cập nhật unreadCount và merge unreadTopics nếu có
-        const existing = state.unreadChannels[channelIdx];
-        if (typeof channel.unreadCount === 'number') {
-          existing.unreadCount = channel.unreadCount;
-        }
-        if (Array.isArray(channel.unreadTopics) && channel.unreadTopics.length > 0) {
-          // Merge unreadTopics, tránh trùng lặp topic id
-          const existingTopics = existing.unreadTopics || [];
-          channel.unreadTopics.forEach(newTopic => {
-            const idx = existingTopics.findIndex(t => t.id === newTopic.id);
-            if (idx === -1) {
-              existingTopics.push(newTopic);
-            } else if (typeof newTopic.unreadCount === 'number') {
-              existingTopics[idx].unreadCount = newTopic.unreadCount;
-            }
-          });
-          existing.unreadTopics = existingTopics;
-        }
       }
-    },
-    removeUnreadChannel(state, action) {
-      // state.unreadChannels = state.unreadChannels.filter(item => item.id !== action.payload);
-      const { channelId, topicId } = action.payload;
-      if (topicId) {
-        // Xóa topic trong channel
-        state.unreadChannels = state.unreadChannels
-          .map(item => {
-            if (item.id === channelId) {
-              return {
-                ...item,
-                unreadTopics: item.unreadTopics.filter(topic => topic.id !== topicId),
-              };
-            }
-            return item;
-          })
-          .filter(item => {
-            // Nếu là channel vừa xử lý, kiểm tra điều kiện để giữ lại hay xóa
-            if (item.id === channelId) {
-              return !(item.unreadCount === 0 && (!item.unreadTopics || item.unreadTopics.length === 0));
-            }
-            return true;
-          });
-      } else {
-        // Xóa channel hoặc chỉ set unreadCount = 0 nếu còn topic
-        const channelIdx = state.unreadChannels.findIndex(item => item.id === channelId);
-        if (channelIdx === -1) return; // Không tìm thấy channel để xóa
-        const channel = state.unreadChannels[channelIdx];
-        if (channel.unreadTopics && channel.unreadTopics.length > 0) {
-          // Nếu còn topic, chỉ set unreadCount = 0
-          state.unreadChannels[channelIdx].unreadCount = 0;
-        } else {
-          // Không còn topic, xóa channel
-          state.unreadChannels = state.unreadChannels.filter(item => item.id !== channelId);
-        }
-      }
-    },
-    updateUnreadChannel(state, action) {
-      const channel = action.payload;
-      state.unreadChannels = state.unreadChannels.map(item => (item.id === channel.id ? channel : item));
     },
     setLoadingChannels(state, action) {
       state.loadingChannels = action.payload;
@@ -319,32 +273,31 @@ const categorizeChannels = (channels, userId) => {
           acc.activeChannels.push(channel);
         }
 
-        // Xử lý unread messages và topics
+        // Xử lý unread messages và topics (flat object)
         const read = channel.state.read[userId];
         if (read) {
           const unreadMessage = read.unread_messages;
-          let unreadTopics = [];
 
-          // Xử lý unread topics cho team channels
+          // Channel-level unread
+          if (unreadMessage > 0) {
+            acc.unreadChannels[channel.id] = {
+              unreadCount: unreadMessage,
+              type: channel.type,
+            };
+          }
+
+          // Topic-level unread
           if (channel.type === ChatType.TEAM && channel.data?.topics_enabled && channel.state.topics) {
             channel.state.topics.forEach(topic => {
               const topicRead = topic.state.read?.[userId];
               const topicUnread = topicRead?.unread_messages;
               if (topicUnread > 0) {
-                unreadTopics.push({
-                  id: topic.id,
+                acc.unreadChannels[topic.id] = {
                   unreadCount: topicUnread,
-                });
+                  parentId: channel.id,
+                  type: 'topic',
+                };
               }
-            });
-          }
-
-          // Thêm vào unread channels nếu có unread messages hoặc topics
-          if (unreadMessage > 0 || unreadTopics.length > 0) {
-            acc.unreadChannels.push({
-              id: channel.id,
-              unreadCount: unreadMessage,
-              unreadTopics,
             });
           }
         }
@@ -361,7 +314,7 @@ const categorizeChannels = (channels, userId) => {
       activeChannels: [],
       pendingChannels: [],
       mutedChannels: [],
-      unreadChannels: [],
+      unreadChannels: {},
       skippedChannels: [],
       pinnedChannels: [],
     },
@@ -386,7 +339,7 @@ export function FetchChannels(params) {
         activeChannels: [],
         pendingChannels: [],
         mutedChannels: [],
-        unreadChannels: [],
+        unreadChannels: {},
         skippedChannels: [],
         pinnedChannels: [],
       }),
@@ -413,7 +366,9 @@ export function FetchChannels(params) {
             activeChannels: [],
             pendingChannels: [],
             mutedChannels: [],
+            unreadChannels: {},
             skippedChannels: [],
+            pinnedChannels: [],
           }),
         );
         dispatch(slice.actions.setLoadingChannels(false));
@@ -604,7 +559,7 @@ export const RemoveActiveChannel = channelId => {
   return async (dispatch, getState) => {
     dispatch(slice.actions.removeActiveChannel(channelId));
     dispatch(slice.actions.removeMutedChannel(channelId));
-    dispatch(slice.actions.removeUnreadChannel(channelId));
+    dispatch(slice.actions.clearUnread({ id: channelId, clearTopics: true }));
     dispatch(slice.actions.setCurrentChannel(null));
   };
 };
@@ -681,21 +636,15 @@ export const RemovePinnedChannel = cid => {
   };
 };
 
-export const AddUnreadChannel = channel => {
+export const SetUnread = payload => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.addUnreadChannel(channel));
+    dispatch(slice.actions.setUnread(payload));
   };
 };
 
-export const RemoveUnreadChannel = (channelId, topicId) => {
+export const ClearUnread = payload => {
   return async (dispatch, getState) => {
-    dispatch(slice.actions.removeUnreadChannel({ channelId, topicId }));
-  };
-};
-
-export const UpdateUnreadChannel = channel => {
-  return async (dispatch, getState) => {
-    dispatch(slice.actions.updateUnreadChannel(channel));
+    dispatch(slice.actions.clearUnread(payload));
   };
 };
 

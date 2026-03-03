@@ -17,7 +17,7 @@ import useResponsive from '@/hooks/useResponsive';
 import { setSidebar, showSnackbar } from '@/redux/slices/app';
 import { useDispatch, useSelector } from 'react-redux';
 import ChannelAvatar from '@/components/ChannelAvatar';
-import { handleError, isChannelDirect, myRoleInChannel } from '@/utils/commons';
+import { handleError, isChannelDirect, isSafari, myRoleInChannel } from '@/utils/commons';
 import {
   AvatarShape,
   CallType,
@@ -263,9 +263,13 @@ const ChatHeader = () => {
 
   const onStartCall = useCallback(
     async callType => {
+      if (isSafari()) {
+        dispatch(showSnackbar({ severity: 'warning', message: t('chatHeader.safari_call_not_supported') }));
+        return;
+      }
       await callClient.createCall(callType, currentChannel.cid);
     },
-    [currentChannel?.cid],
+    [currentChannel?.cid, dispatch, t],
   );
 
   const onStartVideoCall = useCallback(() => onStartCall(CallType.VIDEO), [onStartCall]);

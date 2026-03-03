@@ -60,7 +60,7 @@ const TopicElement = ({ topic, idSelected }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobileToMd = useResponsive('down', 'md');
-  const { unreadChannels = [] } = useSelector(state => state.channel);
+  const { unreadChannels = {} } = useSelector(state => state.channel);
   const { parentChannel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
   const [isRightClick, setIsRightClick] = useState(false);
@@ -291,14 +291,8 @@ const TopicElement = ({ topic, idSelected }) => {
   }, [selectedTopic, user_id, dispatch]);
 
   const hasUnread = useMemo(() => {
-    if (!unreadChannels) return false;
-    // Tìm channel chứa topic này
-    const channel = unreadChannels.find(ch => ch.id === parentChannel?.id);
-    if (!channel || !channel.unreadTopics) return false;
-    // Tìm topic trong channel
-    const topicUnread = channel.unreadTopics.find(tp => tp.id === topicId);
-    return topicUnread && topicUnread.unreadCount > 0;
-  }, [unreadChannels, parentChannel?.id, topicId]);
+    return !!unreadChannels[topicId]?.unreadCount;
+  }, [unreadChannels, topicId]);
 
   return (
     <>

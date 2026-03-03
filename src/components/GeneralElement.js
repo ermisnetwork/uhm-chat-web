@@ -48,7 +48,7 @@ const GeneralElement = ({ idSelected }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const theme = useTheme();
-  const { unreadChannels = [] } = useSelector(state => state.channel);
+  const { unreadChannels = {} } = useSelector(state => state.channel);
   const { parentChannel } = useSelector(state => state.topic);
   const { user_id } = useSelector(state => state.auth);
 
@@ -59,7 +59,7 @@ const GeneralElement = ({ idSelected }) => {
   const users = useMemo(() => (client.state.users ? Object.values(client.state.users) : []), [client.state.users]);
 
   const hasUnread = useMemo(
-    () => unreadChannels?.some(item => item.id === parentChannel?.id && item.unreadCount > 0),
+    () => !!unreadChannels[parentChannel?.id]?.unreadCount,
     [unreadChannels, parentChannel?.id],
   );
 

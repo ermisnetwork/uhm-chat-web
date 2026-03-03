@@ -418,3 +418,8 @@ export function removeVietnameseTones(str) {
 export const isEmptyObject = obj => {
   return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
 };
+
+export function isSafari() {
+  const ua = navigator.userAgent;
+  return ua.includes('Safari') && !ua.includes('Chrome') && !ua.includes('Chromium');
+}

@@ -69,26 +69,37 @@ const Channels = () => {
 
   const [tabSeledected, setTabSelected] = useState(TabValueChannel.All);
 
+  const unreadEntries = useMemo(() => Object.entries(unreadChannels || {}), [unreadChannels]);
+
   const listTab = useMemo(
     () => [
       { label: t('channelList.all'), value: TabValueChannel.All, count: 0 },
       {
         label: t('channelList.group'),
         value: TabValueChannel.Group,
-        count: unreadChannels?.filter(c => c.type === ChatType.TEAM)?.length || 0,
+        count: unreadEntries.filter(([, v]) => v.type === ChatType.TEAM).length || 0,
       },
       {
         label: t('channelList.unread'),
         value: TabValueChannel.Unread,
-        count: unreadChannels?.length || 0,
+        count: unreadEntries.filter(([, v]) => !v.parentId).length || 0,
       },
     ],
-    [unreadChannels, t],
+    [unreadEntries, t],
   );
 
   const isEnabledTopics = useMemo(() => {
     return currentChannel?.data?.topics_enabled && openTopicPanel;
   }, [currentChannel?.data?.topics_enabled, openTopicPanel]);
+
+  // Helper: check if a channel has unread (direct entry or via topic parentId)
+  const isChannelUnread = useCallback(
+    channelId => {
+      if (unreadChannels[channelId]) return true;
+      return Object.values(unreadChannels).some(entry => entry.parentId === channelId);
+    },
+    [unreadChannels],
+  );
 
   const filteredPinnedChannels = useMemo(() => {
     switch (tabSeledected) {
@@ -97,13 +108,11 @@ const Channels = () => {
       case TabValueChannel.Group:
         return (pinnedChannels || []).filter(c => c.type === ChatType.TEAM);
       case TabValueChannel.Unread:
-        return (pinnedChannels || []).filter(c => {
-          return unreadChannels.some(item => item.id === c.id);
-        });
+        return (pinnedChannels || []).filter(c => isChannelUnread(c.id));
       default:
         return [];
     }
-  }, [pinnedChannels, tabSeledected, unreadChannels]);
+  }, [pinnedChannels, tabSeledected, isChannelUnread]);
 
   const filteredActiveChannels = useMemo(() => {
     switch (tabSeledected) {
@@ -112,13 +121,11 @@ const Channels = () => {
       case TabValueChannel.Group:
         return (activeChannels || []).filter(c => c.type === ChatType.TEAM);
       case TabValueChannel.Unread:
-        return (activeChannels || []).filter(c => {
-          return unreadChannels.some(item => item.id === c.id);
-        });
+        return (activeChannels || []).filter(c => isChannelUnread(c.id));
       default:
         return [];
     }
-  }, [activeChannels, tabSeledected, unreadChannels]);
+  }, [activeChannels, tabSeledected, isChannelUnread]);
 
   const renderedChannels = useMemo(() => {
     if (loadingChannels) {

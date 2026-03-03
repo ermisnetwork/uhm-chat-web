@@ -134,7 +134,8 @@
     "delete": "delete",
     "delete_topic": "Delete Topic",
     "snackbar_closed_success": "Topic closed successfully",
-    "snackbar_reopened_success": "Topic reopened successfully"
+    "snackbar_reopened_success": "Topic reopened successfully",
+    "safari_call_not_supported": "Call feature is not supported on Safari due to technical limitations. Please use Chrome, Edge, or Firefox instead."
   },
   "chat_element": {
     "general": "General",

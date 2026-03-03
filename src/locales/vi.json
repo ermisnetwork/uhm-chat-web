@@ -141,7 +141,8 @@
     "delete": "Xóa",
     "delete_topic": "Xóa chủ đề",
     "snackbar_closed_success": "Đã đóng chủ đề thành công",
-    "snackbar_reopened_success": "Đã mở lại chủ đề thành công"
+    "snackbar_reopened_success": "Đã mở lại chủ đề thành công",
+    "safari_call_not_supported": "Tính năng gọi điện hiện chưa được hỗ trợ trên Safari do hạn chế kỹ thuật. Vui lòng sử dụng Chrome, Edge hoặc Firefox để thực hiện cuộc gọi."
   },
   "chat_element": {
     "general": "General",

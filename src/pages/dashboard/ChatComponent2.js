@@ -142,7 +142,12 @@ const ChatComponent2 = () => {
         }
       };
 
-      if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRoleInChannel(currentChat))) {
+      // Không mark read parent channel nếu đang navigate đến topic (URL có topicId)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTopicId = urlParams.get('topicId');
+      const isWaitingForTopic = urlTopicId && !currentTopic;
+
+      if (!isWaitingForTopic && ![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRoleInChannel(currentChat))) {
         setTimeout(() => {
           dispatch(SetMarkReadChannel(currentChat));
         }, 100);
