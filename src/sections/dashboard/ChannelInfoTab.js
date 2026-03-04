@@ -177,6 +177,7 @@ const TabFiles = ({ files }) => {
 
 const ChannelInfoTab = ({ currentChat }) => {
   const { sideBar } = useSelector(state => state.app);
+  const { isBlocked } = useSelector(state => state.channel);
   const { t } = useTranslation();
   const [listTab, setListTab] = useState([
     { label: t('channelInfoTab.media'), value: TabValueChannelInfo.Media },
@@ -205,7 +206,7 @@ const ChannelInfoTab = ({ currentChat }) => {
   }, [currentChat]);
 
   useEffect(() => {
-    if (currentChat && sideBar.open) {
+    if (currentChat && sideBar.open && !isBlocked) {
       const fetchAttachmentMessages = async () => {
         const response = await currentChat.queryAttachmentMessages();
 
@@ -279,7 +280,7 @@ const ChannelInfoTab = ({ currentChat }) => {
 
       fetchAttachmentMessages();
     }
-  }, [currentChat, sideBar]);
+  }, [currentChat, sideBar, isBlocked]);
 
   const renderTabContent = () => {
     switch (tabSeledected) {

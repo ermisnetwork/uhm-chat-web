@@ -31,7 +31,14 @@ import { UpdateMember } from '@/redux/slices/member';
 import Channels from '@/pages/dashboard/Channels';
 import SidebarContacts from '@/pages/dashboard/SidebarContacts';
 import { useTranslation } from 'react-i18next';
-import { AddTopic, RemovePinnedTopic, RemoveTopic, SetCurrentTopic, UpdateTopic } from '@/redux/slices/topic';
+import {
+  AddTopic,
+  RemovePinnedTopic,
+  RemoveTopic,
+  SetCurrentTopic,
+  SetOpenTopicPanel,
+  UpdateTopic,
+} from '@/redux/slices/topic';
 
 const LeftPanel = () => {
   const dispatch = useDispatch();
@@ -523,6 +530,7 @@ const LeftPanel = () => {
         } else {
           navigate(`${DEFAULT_PATH}`);
           dispatch(RemoveActiveChannel(channelId));
+          dispatch(SetOpenTopicPanel(false));
         }
       };
 
