@@ -276,7 +276,7 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
       Footer: () => {
         if (isGuest || isBlocked || isBanned) return null;
         return (
-          <Box sx={{ pb: 0, px: 2 }}>
+          <Box sx={{ pb: 0, px: '66px' }}>
             <ReadBy />
           </Box>
         );
@@ -327,6 +327,7 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
           height: '100%',
           overflowX: 'hidden',
           visibility: isReady ? 'visible' : 'hidden',
+          overflowY: isBlocked ? 'hidden' : 'auto',
         }}
         data={messages}
         firstItemIndex={firstItemIndex}
@@ -349,7 +350,7 @@ const ChatList = React.memo(({ messages, setMessages, setFollowOutputRef }) => {
         components={virtuosoComponents}
       />
 
-      <ScrollToBottom showScrollBottom={showScrollBottom} handleScrollToBottom={handleScrollToBottom} />
+      {!isBlocked && <ScrollToBottom showScrollBottom={showScrollBottom} handleScrollToBottom={handleScrollToBottom} />}
     </Paper>
   );
 });
