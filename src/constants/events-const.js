@@ -2,6 +2,7 @@ export const ClientEvents = {
   MessageNew: 'message.new',
   MessageRead: 'message.read',
   MessageDeleted: 'message.deleted',
+  MessageDeletedForMe: 'message.deleted_for_me',
   MessageUpdated: 'message.updated',
   MessageUnpinned: 'message.unpinned',
   MessagePinned: 'message.pinned',
@@ -42,4 +43,6 @@ export const ClientEvents = {
   UserWatchingStart: 'user.watching.start',
   UserWatchingStop: 'user.watching.stop',
   PollChoiceNew: 'pollchoice.new',
+  ChatDeletedForMe: 'chat_dm.deleted_for_me',
+  ChatDeletedForEveryone: 'chat_dm.deleted_for_everyone',
 };

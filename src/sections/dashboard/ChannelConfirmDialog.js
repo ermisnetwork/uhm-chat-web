@@ -40,10 +40,9 @@ const ChannelConfirmDialog = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { openDialog, channel, userId, type } = useSelector(state => state.dialog.channelConfirm);
+  const { openDialog, channel, userId, type, deleteForMe } = useSelector(state => state.dialog.channelConfirm);
   const users = client.state.users ? Object.values(client.state.users) : [];
   const userName = users.find(user => user.id === userId)?.name || 'User';
-
   const channelId = channel.data.id;
   const channelName = channel.data.name;
   const directChannelName = getChannelName(channel, users);
@@ -77,6 +76,8 @@ const ChannelConfirmDialog = () => {
       channel.on(ClientEvents.MemberBlocked, handleChannelConfirmed);
       channel.on(ClientEvents.MemberUnblocked, handleChannelConfirmed);
       channel.on(ClientEvents.MemberUnBanned, handleChannelConfirmed);
+      channel.on(ClientEvents.ChatDeletedForMe, handleChannelConfirmed);
+      channel.on(ClientEvents.ChatDeletedForEveryone, handleChannelConfirmed);
 
       return () => {
         channel.off(ClientEvents.ChannelDeleted, handleChannelConfirmed);
@@ -86,6 +87,8 @@ const ChannelConfirmDialog = () => {
         channel.off(ClientEvents.MemberBlocked, handleChannelConfirmed);
         channel.off(ClientEvents.MemberUnblocked, handleChannelConfirmed);
         channel.off(ClientEvents.MemberUnBanned, handleChannelConfirmed);
+        channel.off(ClientEvents.ChatDeletedForMe, handleChannelConfirmed);
+        channel.off(ClientEvents.ChatDeletedForEveryone, handleChannelConfirmed);
       };
     }
   }, [channel, type]);
@@ -114,6 +117,10 @@ const ChannelConfirmDialog = () => {
         return `${t('channelConfirmDialog.snackbar_unbanned')} ${userName}`;
       case ConfirmType.DELETE_TOPIC:
         return t('channelConfirmDialog.snackbar_delete_topic');
+      case ConfirmType.DELETE_CHAT_FOR_ME:
+        return t('channelConfirmDialog.snackbar_delete_chat_for_me');
+      case ConfirmType.DELETE_CHAT_FOR_EVERYONE:
+        return t('channelConfirmDialog.snackbar_delete_chat_for_everyone');
       default:
         return '';
     }
@@ -173,6 +180,22 @@ const ChannelConfirmDialog = () => {
             {t('channelConfirmDialog.snackbar_confirm_proceed')}
           </>
         );
+      case ConfirmType.DELETE_CHAT_FOR_ME:
+        return (
+          <>
+            {t('channelConfirmDialog.snackbar_confirm_delete_chat_for_me_one')} <strong>{channelName}</strong> {t('channelConfirmDialog.snackbar_confirm_delete_chat_for_me_two')}
+            <br />
+            {t('channelConfirmDialog.snackbar_confirm_proceed')}
+          </>
+        );
+      case ConfirmType.DELETE_CHAT_FOR_EVERYONE:
+        return (
+          <>
+            {t('channelConfirmDialog.snackbar_confirm_delete_chat_for_everyone_one')} <strong>{channelName}</strong> {t('channelConfirmDialog.snackbar_confirm_delete_chat_for_everyone_two')}
+            <br />
+            {t('channelConfirmDialog.snackbar_confirm_proceed')}
+          </>
+        );
       default:
         return '';
     }
@@ -198,6 +221,10 @@ const ChannelConfirmDialog = () => {
         return t('channelConfirmDialog.dialog_title_unban_user');
       case ConfirmType.DELETE_TOPIC:
         return t('channelConfirmDialog.dialog_title_delete_topic');
+      case ConfirmType.DELETE_CHAT_FOR_ME:
+        return t('channelConfirmDialog.dialog_title_delete_chat_for_me');
+      case ConfirmType.DELETE_CHAT_FOR_EVERYONE:
+        return t('channelConfirmDialog.dialog_title_delete_chat_for_everyone');
       default:
         return '';
     }
@@ -223,6 +250,10 @@ const ChannelConfirmDialog = () => {
         return t('channelConfirmDialog.unban');
       case ConfirmType.DELETE_TOPIC:
         return t('channelConfirmDialog.delete');
+      case ConfirmType.DELETE_CHAT_FOR_ME:
+        return t('channelConfirmDialog.delete');
+      case ConfirmType.DELETE_CHAT_FOR_EVERYONE:
+        return t('channelConfirmDialog.delete');
       default:
         return t('channelConfirmDialog.yes');
     }
@@ -233,19 +264,23 @@ const ChannelConfirmDialog = () => {
       setLoadingButton(true);
       const response = [ConfirmType.LEAVE, ConfirmType.REMOVE_MEMBER].includes(type)
         ? await channel.removeMembers([userId])
-        : [ConfirmType.DELETE_CHANNEL, ConfirmType.DELETE_TOPIC].includes(type)
-          ? await channel.delete()
-          : type === ConfirmType.REMOVE_MODER
-            ? await channel.demoteModerators([userId])
-            : type === ConfirmType.TRUNCATE
-              ? await channel.truncate()
-              : type === ConfirmType.BLOCK
-                ? await channel.blockUser()
-                : type === ConfirmType.UNBLOCK
-                  ? await channel.unblockUser()
-                  : type === ConfirmType.UNBANNED
-                    ? await channel.unbanMembers([userId])
-                    : null;
+        : type === ConfirmType.DELETE_CHAT_FOR_ME
+          ? await channel.deleteChatDM(deleteForMe)
+          : type === ConfirmType.DELETE_CHAT_FOR_EVERYONE
+            ? await channel.deleteChatDM(deleteForMe)
+            : [ConfirmType.DELETE_CHANNEL, ConfirmType.DELETE_TOPIC].includes(type)
+              ? await channel.delete()
+              : type === ConfirmType.REMOVE_MODER
+                ? await channel.demoteModerators([userId])
+                : type === ConfirmType.TRUNCATE
+                  ? await channel.truncate()
+                  : type === ConfirmType.BLOCK
+                    ? await channel.blockUser()
+                    : type === ConfirmType.UNBLOCK
+                      ? await channel.unblockUser()
+                      : type === ConfirmType.UNBANNED
+                        ? await channel.unbanMembers([userId])
+                        : null;
     } catch (error) {
       onCloseDialog();
       setLoadingButton(false);
@@ -290,6 +325,13 @@ const ChannelConfirmDialog = () => {
           showSnackbar({
             severity: 'error',
             message: t('channelConfirmDialog.snackbar_error_delete_topic'),
+          }),
+        );
+      } else if (type === ConfirmType.DELETE_CHAT_FOR_ME) {
+        dispatch(
+          showSnackbar({
+            severity: 'error',
+            message: t('channelConfirmDialog.snackbar_error_delete_chat_for_me'),
           }),
         );
       } else {

@@ -29,6 +29,7 @@ import {
   WatchCurrentChannel,
 } from '@/redux/slices/channel';
 import DeleteMessageDialog from '@/sections/dashboard/DeleteMessageDialog';
+import DeleteMessageForMeDialog from '@/sections/dashboard/DeleteMessageForMeDialog';
 import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '@/constants/commons-const';
 import BannedBackdrop from '@/components/BannedBackdrop';
 import { client } from '@/client';
@@ -61,7 +62,7 @@ const ChatComponent2 = () => {
   const { playNewMessageSound, cleanup } = useMessageSound();
   const { currentChannel, isBlocked, isGuest, isBanned } = useSelector(state => state.channel);
   const { user_id } = useSelector(state => state.auth);
-  const { deleteMessage, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
+  const { deleteMessage, deleteMessageForMe, messageIdError, searchMessageId, forwardMessage, filesMessage } = useSelector(
     state => state.messages,
   );
   const { currentTopic, isClosedTopic } = useSelector(state => state.topic);
@@ -222,6 +223,23 @@ const ChatComponent2 = () => {
                 }),
             );
             break;
+          case ClientEvents.MessageDeletedForMe:
+            setMessages(prev =>
+              prev
+                .filter(item => item.id !== event.message.id) // Loại bỏ message bị xoá
+                .map(item => {
+                  // Nếu là reply tới message bị xoá thì xoá dữ liệu reply
+                  if (item.quoted_message_id === event.message.id) {
+                    return {
+                      ...item,
+                      quoted_message: undefined,
+                      quoted_message_id: undefined,
+                    };
+                  }
+                  return item;
+                }),
+            );
+            break;
           case ClientEvents.MessageUpdated:
             setMessages(prev => {
               return prev.map(item => (item.id === event.message.id ? event.message : item));
@@ -352,11 +370,20 @@ const ChatComponent2 = () => {
         dispatch(SetIsClosedTopic(false));
       };
 
+      const handleChatDeletedForMe = event => {
+        setMessages(currentChat.state.messages || []);
+      };
+
+      const handleChatDeletedForEveryone = event => {
+        setMessages(currentChat.state.messages || []);
+      };
+
       currentChat.on(ClientEvents.MessageNew, handleMessages);
       currentChat.on(ClientEvents.ReactionNew, handleMessages);
       currentChat.on(ClientEvents.ReactionDeleted, handleMessages);
       currentChat.on(ClientEvents.MessageDeleted, handleMessages);
       currentChat.on(ClientEvents.MessageUpdated, handleMessages);
+      currentChat.on(ClientEvents.MessageDeletedForMe, handleMessages);
       currentChat.on(ClientEvents.TypingStart, handleTypingStart);
       currentChat.on(ClientEvents.TypingStop, handleTypingStop);
       currentChat.on(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
@@ -371,6 +398,8 @@ const ChatComponent2 = () => {
       currentChat.on(ClientEvents.ChannelTruncate, handleChannelTruncate);
       currentChat.on(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
       currentChat.on(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+      currentChat.on(ClientEvents.ChatDeletedForMe, handleChatDeletedForMe);
+      currentChat.on(ClientEvents.ChatDeletedForEveryone, handleChatDeletedForEveryone);
 
       return () => {
         currentChat.off(ClientEvents.MessageNew, handleMessages);
@@ -378,6 +407,7 @@ const ChatComponent2 = () => {
         currentChat.off(ClientEvents.ReactionDeleted, handleMessages);
         currentChat.off(ClientEvents.MessageDeleted, handleMessages);
         currentChat.off(ClientEvents.MessageUpdated, handleMessages);
+        currentChat.off(ClientEvents.MessageDeletedForMe, handleMessages);
         currentChat.off(ClientEvents.TypingStart, handleTypingStart);
         currentChat.off(ClientEvents.TypingStop, handleTypingStop);
         currentChat.off(ClientEvents.Notification.InviteAccepted, handleInviteAccept);
@@ -392,6 +422,8 @@ const ChatComponent2 = () => {
         currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
         currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
         currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+        currentChat.off(ClientEvents.ChatDeletedForMe, handleChatDeletedForMe);
+        currentChat.off(ClientEvents.ChatDeletedForEveryone, handleChatDeletedForEveryone);
 
         // Cleanup audio khi thay đổi chat hoặc component unmount
         cleanup();
@@ -495,6 +527,7 @@ const ChatComponent2 = () => {
         <BlockedBackdrop />
       </Stack>
       {deleteMessage.openDialog && <DeleteMessageDialog />}
+      {deleteMessageForMe.openDialog && <DeleteMessageForMeDialog />}
       {forwardMessage.openDialog && <ForwardMessageDialog />}
       <MessagesHistoryDialog />
       {filesMessage.openDialog && <UploadFilesDialog setMessages={setMessages} />}

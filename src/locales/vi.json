@@ -45,6 +45,8 @@
     "delete_channel": "Xóa kênh",
     "leave_channel": "Rời khỏi kênh",
     "clear_chat_history": "Xóa lịch sử trò chuyện",
+    "delete_chat_for_me": "Xóa lịch sử trò chuyện phía tôi",
+    "delete_chat_for_everyone": "Xóa lịch sử trò chuyện cho cả hai phía",
     "you": "Bạn",
     "sticker": "Nhãn dán",
     "photo": "Ảnh",
@@ -223,7 +225,9 @@
     "message_unpinned": "đã bỏ ghim một tin nhắn",
     "seconds": "giây",
     "minutes": "phút",
-    "You": "Bạn"
+    "You": "Bạn",
+    "channel_deleted_chat_all_for_me": "đã xóa tất cả tin nhắn phía tôi trong kênh này",
+    "channel_deleted_chat_all_for_everyone": "đã xóa tất cả tin nhắn trong kênh này"
   },
   "conversation": {
     "copy_text": "Sao chép văn bản thành công!",
@@ -434,6 +438,8 @@
     "snackbar_unblocked": "Bỏ chặn thành công",
     "snackbar_unbanned": "Bỏ cấm thành công",
     "snackbar_delete_topic": "Xóa chủ đề thành công!",
+    "snackbar_delete_chat_for_me": "Xóa lịch sử trò chuyện bên phía tôi thành công",
+    "snackbar_delete_chat_for_everyone": "Xóa lịch sử trò chuyện cho tất cả mọi người thành công",
     "snackbar_confirm_leave_channel": "Bạn có chắc muốn rời kênh này không?",
     "snackbar_confirm_remove_member": "Bạn có chắc muốn xóa thành viên này không?",
     "snackbar_confirm_delete_one": "Khi kênh",
@@ -441,6 +447,10 @@
     "snackbar_confirm_delete_three": "Bạn có chắc muốn tiếp tục không?",
     "snackbar_confirm_remove_moder": "Bạn có chắc muốn gỡ vai trò quản trị viên của người dùng này không?",
     "snackbar_confirm_delete_conversation": "Toàn bộ lịch sử trò chuyện sẽ bị xóa vĩnh viễn.",
+    "snackbar_confirm_delete_chat_for_me_one": "Khi lịch sử trò chuyện cùng",
+    "snackbar_confirm_delete_chat_for_me_two": "bị xóa, toàn bộ nội dung và lịch sử trò chuyện phía bạn sẽ bị mất vĩnh viễn. Hành động này không thể hoàn tác.",
+    "snackbar_confirm_delete_chat_for_everyone_one": "Khi lịch sử trò chuyện cùng",
+    "snackbar_confirm_delete_chat_for_everyone_two": "bị xóa, toàn bộ nội dung và lịch sử trò chuyện cả hai phía sẽ bị mất vĩnh viễn. Hành động này không thể hoàn tác.",
     "snackbar_confirm_delete": "Bạn có chắc muốn xóa không?",
     "snackbar_confirm_block": "Bạn có chắc muốn chặn người này không?",
     "snackbar_confirm_block_message": "Người này sẽ không thể gửi tin nhắn cho bạn nữa",
@@ -460,6 +470,8 @@
     "dialog_title_unblock_user": "Bỏ chặn người dùng này",
     "dialog_title_unban_user": "Bỏ cấm người dùng này",
     "dialog_title_delete_topic": "Bạn có chắc muốn xóa chủ đề này không?",
+    "dialog_title_delete_chat_for_me": "Xóa lịch sử trò chuyện cùng người này",
+    "dialog_title_delete_chat_for_everyone": "Xóa lịch sử trò chuyện cho cả hai phía",
     "leave": "Rời",
     "remove": "Xóa",
     "delete": "Xóa",
@@ -474,6 +486,7 @@
     "snackbar_error_unblock_user": "Bỏ chặn người dùng thất bại. Vui lòng thử lại",
     "snackbar_error_unban_user": "Bỏ cấm người dùng thất bại. Vui lòng thử lại",
     "snackbar_error_delete_topic": "Xóa chủ đề thất bại. Vui lòng thử lại",
+    "snackbar_error_delete_chat_for_me": "Xóa trò chuyện thất bại. Vui lòng thử lại",
     "cancel": "Hủy"
   },
   "topicPanel": {

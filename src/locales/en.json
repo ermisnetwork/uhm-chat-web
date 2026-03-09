@@ -45,6 +45,8 @@
     "delete_channel": "Delete channel",
     "leave_channel": "Leave channel",
     "clear_chat_history": "Clear chat history",
+    "delete_chat_for_me": "Delete chat for me",
+    "delete_chat_for_everyone": "Delete chat for everyone",
     "you": "You",
     "sticker": "Sticker",
     "photo": "Photo",
@@ -216,7 +218,9 @@
     "message_unpinned": "unpinned a message",
     "seconds": "seconds",
     "minutes": "minutes",
-    "You": "You"
+    "You": "You",
+    "channel_deleted_chat_all_for_me": "has deleted all messages for me in this channel",
+    "channel_deleted_chat_all_for_everyone": "has deleted all messages for everyone in this channel"
   },
   "conversation": {
     "copy_text": "Message copied to clipboard!",
@@ -434,6 +438,8 @@
     "snackbar_unblocked": "'Successfully unblocked'",
     "snackbar_unbanned": "'Successfully unbanned'",
     "snackbar_delete_topic": "'Delete topic successfully!'",
+    "snackbar_delete_chat_for_me": "'Delete message for me successfully!'",
+    "snackbar_delete_chat_for_everyone": "'Delete message for everyone successfully!'",
     "snackbar_confirm_leave_channel": "'Are you sure you want to leave this channel?'",
     "snackbar_confirm_remove_member": "'Are you sure you want to remove this member?'",
     "snackbar_confirm_delete_one": "'Once the channel'",
@@ -441,6 +447,10 @@
     "snackbar_confirm_delete_three": "'Are you sure you want to proceed'",
     "snackbar_confirm_remove_moder": "Are you sure you want to remove this user as a moderator?",
     "snackbar_confirm_delete_conversation": "Whole conversation history will permanently delete.",
+    "snackbar_confirm_delete_chat_for_me_one": "Once the conversation history",
+    "snackbar_confirm_delete_chat_for_me_two": "is deleted, all content and chat history will be permanently lost. This action cannot be undone.",
+    "snackbar_confirm_delete_chat_for_everyone_one": "Once the conversation history",
+    "snackbar_confirm_delete_chat_for_everyone_two": "is deleted, all content and chat history will be permanently lost. This action cannot be undone.",
     "snackbar_confirm_delete": "Are you sure you want to delete?",
     "snackbar_confirm_block": "Are you sure you want to block",
     "snackbar_confirm_block_message": "He/she will no longer be able to send you message",
@@ -460,6 +470,8 @@
     "dialog_title_unblock_user": "Unblock this user",
     "dialog_title_unban_user": "Unban this user",
     "dialog_title_delete_topic": "Are you sure you want to delete this topic?",
+    "dialog_title_delete_chat_for_me": "Delete history chat with this user",
+    "dialog_title_delete_chat_for_everyone": "Delete history chat for everyone",
     "leave": "Leave",
     "remove": "Remove",
     "delete": "Delete",
@@ -474,6 +486,8 @@
     "snackbar_error_unblock_user": "Failed to unblock the user. Please try again",
     "snackbar_error_unban_user": "Failed to unban the user. Please try again",
     "snackbar_error_delete_topic": "Failed to delete the topic. Please try again",
+    "snackbar_error_delete_chat_for_me": "Failed to delete the chat for me. Please try again",
+    "snackbar_error_delete_chat_for_everyone": "Failed to delete the chat for everyone. Please try again",
     "cancel": "Cancel"
   },
   "topicPanel": {

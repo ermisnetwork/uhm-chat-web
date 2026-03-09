@@ -513,7 +513,30 @@ const ChatElement = ({ channel }) => {
       openDialog: true,
       channel,
       userId: user_id,
+      deleteForMe: false,
       type: ConfirmType.DELETE_CHANNEL,
+    };
+    dispatch(setChannelConfirm(payload));
+  }, [channel, user_id, dispatch]);
+
+  const onDeleteForMe = useCallback(() => {
+    const payload = {
+      openDialog: true,
+      channel,
+      userId: user_id,
+      deleteForMe: true,
+      type: ConfirmType.DELETE_CHAT_FOR_ME,
+    };
+    dispatch(setChannelConfirm(payload));
+  }, [channel, user_id, dispatch]);
+
+  const onDeleteForEveryone = useCallback(() => {
+    const payload = {
+      openDialog: true,
+      channel,
+      userId: user_id,
+      deleteForMe: false,
+      type: ConfirmType.DELETE_CHAT_FOR_EVERYONE,
     };
     dispatch(setChannelConfirm(payload));
   }, [channel, user_id, dispatch]);
@@ -717,6 +740,20 @@ const ChatElement = ({ channel }) => {
           <MenuItem sx={{ color: theme.palette.error.main }} onClick={onClearChatHistory}>
             <Trash color={theme.palette.error.main} />
             {t('chatElement.clear_chat_history')}
+          </MenuItem>
+        )}
+
+        {showItemDeleteConversation && (
+          <MenuItem sx={{ color: theme.palette.error.main }} onClick={onDeleteForMe}>
+            <Trash color={theme.palette.error.main} />
+            {t('chatElement.delete_chat_for_me')}
+          </MenuItem>
+        )}
+
+        {showItemDeleteConversation && (
+          <MenuItem sx={{ color: theme.palette.error.main }} onClick={onDeleteForEveryone}>
+            <Trash color={theme.palette.error.main} />
+            {t('chatElement.delete_chat_for_everyone')}
           </MenuItem>
         )}
       </StyledMenu>

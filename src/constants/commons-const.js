@@ -99,6 +99,8 @@ export const ConfirmType = {
   UNBLOCK: 'unblock',
   UNBANNED: 'unbanned',
   DELETE_TOPIC: 'delete_topic',
+  DELETE_CHAT_FOR_ME: 'delete_chat_for_me',
+  DELETE_CHAT_FOR_EVERYONE: 'delete_chat_for_everyone',
 };
 
 export const TabType = {

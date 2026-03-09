@@ -22,6 +22,7 @@ import { useState } from 'react';
 import { MessageType } from '@/constants/commons-const';
 import {
   onDeleteMessage,
+  onDeleteMessageForMe,
   onEditMessage,
   onForwardMessage,
   onReplyMessage,
@@ -79,9 +80,25 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
     }
 
     dispatch(
-      onDeleteMessage({
+      onDeleteMessageForMe({
         openDialog: true,
         messageId,
+        deleteForMe: false,
+      }),
+    );
+    setAnchorEl(null);
+  };
+
+  const onDeleteForMe = () => {
+    if (!canDeleteMessage) {
+      dispatch(showSnackbar({ severity: 'error', message: t('conversation.snackbar_delete') }));
+      return;
+    }
+    dispatch(
+      onDeleteMessageForMe({
+        openDialog: true,
+        messageId,
+        deleteForMe: true,
       }),
     );
     setAnchorEl(null);
@@ -248,6 +265,22 @@ const MoreOptions = ({ message, setIsOpen, orderMore, isMyMessage }) => {
                 </ListItemIcon>
                 <ListItemText
                   primary={t('conversation.delete')}
+                  primaryTypographyProps={{
+                    fontSize: '14px',
+                    color: theme.palette.error.main,
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
+          {isDelete && (
+            <ListItem disablePadding>
+              <ListItemButton onClick={onDeleteForMe}>
+                <ListItemIcon>
+                  <Trash size={18} color={theme.palette.error.main} />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Ẩn ở bên mình"
                   primaryTypographyProps={{
                     fontSize: '14px',
                     color: theme.palette.error.main,

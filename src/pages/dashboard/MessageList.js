@@ -278,7 +278,6 @@ const MessageList = React.memo(
               }
               const isMyMessage = el.user.id === user_id;
               const name = sender?.name || sender?.id;
-
               if (messageType === MessageType.System) {
                 const msgSystem = renderSystemMessage(el.text, users, isDirect, messages, t);
                 return (

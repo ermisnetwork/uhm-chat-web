@@ -5,6 +5,7 @@ import { MessageReadType } from '@/constants/commons-const';
 const initialState = {
   quotesMessage: null,
   deleteMessage: { openDialog: false, messageId: '' },
+  deleteMessageForMe: { openDialog: false, messageId: '', deleteForMe: false },
   editMessage: null,
   messageIdError: '',
   searchMessageId: '',
@@ -24,6 +25,9 @@ const slice = createSlice({
     },
     onDeleteMessage(state, action) {
       state.deleteMessage = action.payload;
+    },
+    onDeleteMessageForMe(state, action) {
+      state.deleteMessageForMe = action.payload;
     },
     onEditMessage(state, action) {
       state.editMessage = action.payload;
@@ -46,7 +50,6 @@ const slice = createSlice({
     onFilesMessage(state, action) {
       state.filesMessage = action.payload;
     },
-
     onSetAttachmentsMessage(state, action) {
       state.attachmentsMessage = action.payload;
     },
@@ -57,6 +60,7 @@ const slice = createSlice({
 export const {
   onReplyMessage,
   onDeleteMessage,
+  onDeleteMessageForMe,
   onEditMessage,
   setMessageIdError,
   setSearchMessageId,

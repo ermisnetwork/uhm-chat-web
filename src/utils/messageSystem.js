@@ -138,6 +138,12 @@ export function convertMessageSystem(input, all_members, isDirect, isNotify = fa
     case 20: // UnPinnedMessage
       message = `${name} ${t('messageSystem.message_unpinned')}`;
       break;
+    case 21: // Channel_delete_chat_for_me
+      message = `<strong>${name}</strong> ${t('messageSystem.channel_deleted_chat_all_for_me')}`;
+      break;
+    case 22: // Channel_delete_chat_for_everyone
+      message = `<strong>${name}</strong> ${t('messageSystem.channel_deleted_chat_all_for_everyone')}`;
+      break;
     default:
       message = input;
   }
@@ -269,6 +275,12 @@ export function renderSystemMessage(input, all_members, isDirect, messages = [],
       break;
     case 20: // UnPinnedMessage
       message = `<strong>${name}</strong> ${t('messageSystem.message_unpinned')} ${msgPreview ? `<strong>${formatString(msgPreview, 20, 10)}</strong>` : ''}`;
+      break;
+    case 21: // Channel_delete_chat_for_me
+      message = `<strong>${name}</strong> ${t('messageSystem.channel_deleted_chat_all_for_me')}`;
+      break;
+    case 22: // Channel_delete_chat_for_everyone
+      message = `<strong>${name}</strong> ${t('messageSystem.channel_deleted_chat_all_for_everyone')}`;
       break;
     default:
       message = input;
