@@ -86,15 +86,15 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   const debouncedOnTyping = useDebounce(onTyping, 500);
   const handleChange = (text, selectedMentions) => {
     const key = getDraftKey();
-    
-    if (selectedMentions) {
+
+    if (!text && (!selectedMentions || selectedMentions.length === 0)) {
+      localStorage.removeItem(key);
+    } else {
       const data = {
         text,
-        selectedMentions,
-      }
+        selectedMentions: selectedMentions || [],
+      };
       localStorage.setItem(key, JSON.stringify(data));
-    } else {
-      localStorage.setItem(key, text);
     }
 
     window.dispatchEvent(
@@ -154,7 +154,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   }, [value, attachmentsMessage, hasLinksError, hasFilterWordsError]);
 
 
-  
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       inputRef.current.focus();
@@ -163,15 +163,15 @@ const ChatFooter = ({ setMessages, isDialog }) => {
 
       const parsedDraft = (() => {
         try {
-          return JSON.parse(Draft);
+          return Draft ? JSON.parse(Draft) : null;
         } catch (error) {
-          return null;
+          return { text: Draft, selectedMentions: [] };
         }
       })();
 
-      if (parsedDraft){
-        setValue(parsedDraft.text);
-        setSelectedMentions(parsedDraft.selectedMentions);
+      if (parsedDraft) {
+        setValue(parsedDraft.text || '');
+        setSelectedMentions(parsedDraft.selectedMentions || []);
       } else {
         setValue('');
         setSelectedMentions([]);

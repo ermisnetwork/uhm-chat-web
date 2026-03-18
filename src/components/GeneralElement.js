@@ -232,19 +232,26 @@ const GeneralElement = ({ idSelected }) => {
     const key = `${parentChannel?.data?.id}`;
     const stored = localStorage.getItem(key);
 
-    const data = JSON.parse(stored);
+    let data = null;
+    try {
+      data = stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      data = { text: stored };
+    }
 
     if (data && data.text) {
       setDraft(`Draft: ${data.text}`);
     } else {
       setDraft('');
     }
-    
+
     const handler = (event) => {
-      if (event.detail.value && event.detail.key === key) {
-        setDraft(`Draft: ${event.detail.value}`);
-      } else {
-        setDraft('');
+      if (event.detail.key === key) {
+        if (event.detail.value) {
+          setDraft(`Draft: ${event.detail.value}`);
+        } else {
+          setDraft('');
+        }
       }
     };
     window.addEventListener("draft-changed", handler);

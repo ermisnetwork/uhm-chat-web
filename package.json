@@ -23,6 +23,7 @@
     "@web3modal/wagmi": "^4.1.11",
     "axios": "^1.2.6",
     "buffer": "^6.0.3",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.10",
     "emoji-mart": "^5.2.2",
     "env-cmd": "^10.1.0",
