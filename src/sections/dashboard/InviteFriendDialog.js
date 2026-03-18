@@ -10,6 +10,7 @@ import MemberAvatar from '@/components/MemberAvatar';
 import { AvatarShape } from '@/constants/commons-const';
 import { showSnackbar } from '@/redux/slices/app';
 import { handleError } from '@/utils/commons';
+import { mlsManager } from '@/client';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -33,10 +34,27 @@ const InviteFriendDialog = () => {
     setSelectedUsers([]);
   };
 
+  const isE2ee = currentChannel?.data?.mls_enabled === true;
+
   const onInviteMembers = async () => {
     try {
       setLoadingButton(true);
-      await currentChannel.addMembers(selectedUsers.map(user => user.id));
+      const userIds = selectedUsers.map(user => user.id);
+
+      if (isE2ee && mlsManager.initialized) {
+        // E2EE path: batch add via MLS (fetch KPs → commit + welcome → send to server)
+        const cid = currentChannel.cid || `${currentChannel.type}:${currentChannel.id}`;
+        await mlsManager.addMembers(
+          currentChannel.type,
+          currentChannel.id,
+          cid,
+          userIds,
+        );
+      } else {
+        // Standard path
+        await currentChannel.addMembers(userIds);
+      }
+
       dispatch(showSnackbar({ severity: 'success', message: t('inviteFriendDialog.snackbar_success') }));
     } catch (error) {
       handleError(dispatch, error, t);

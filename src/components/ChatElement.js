@@ -188,6 +188,7 @@ const ChatElement = ({ channel }) => {
 
   const replaceMentionsWithNames = useCallback(
     inputValue => {
+      if (!inputValue) return inputValue || '';
       users.forEach(user => {
         inputValue = inputValue.replaceAll(`@${user.id}`, `@${user.name}`);
       });
@@ -297,8 +298,11 @@ const ChatElement = ({ channel }) => {
                 break;
               }
             }
+          } else if (message.mls_ciphertext) {
+            // E2EE message — show encrypted placeholder
+            setLastMessage(`${senderName}: 🔒 Encrypted message`);
           } else {
-            const messagePreview = replaceMentionsWithNames(message.text);
+            const messagePreview = replaceMentionsWithNames(message.text || '');
             setLastMessage(`${senderName}: ${messagePreview}`);
           }
           break;
@@ -391,7 +395,7 @@ const ChatElement = ({ channel }) => {
       }
 
       if (isCurrentChannel || isTopicInChannel) {
-        if (!(event.message.type === MessageType.Signal && ['1', '4'].includes(event.message.text[0]))) {
+        if (!(event.message.type === MessageType.Signal && event.message.text && ['1', '4'].includes(event.message.text[0]))) {
           getLastMessage(event.message);
         }
       }

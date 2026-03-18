@@ -106,6 +106,7 @@ const LeftPanel = () => {
   }, []);
 
   function truncateMessage(message, maxLength) {
+    if (!message) return '';
     if (message.length > maxLength) {
       return message.substring(0, maxLength) + '...';
     }
@@ -146,6 +147,7 @@ const LeftPanel = () => {
     switch (type) {
       case ClientEvents.MessageNew:
         const replaceMentionsWithNames = inputValue => {
+          if (!inputValue) return inputValue;
           users.forEach(user => {
             inputValue = inputValue.replaceAll(`@${user.id}`, `@${user.name}`);
           });
@@ -181,6 +183,9 @@ const LeftPanel = () => {
             };
             notiText = getAttachmentMessage(message.attachments);
             // notiText = `${senderName} has sent you an attachment`;
+          } else if (message.content_type === 'mls') {
+            // E2EE message — cannot show plaintext in notification
+            notiText = `${senderName}: 🔒 Encrypted message`;
           } else {
             if (message.mentioned_all) {
               notiText = `${senderName} ${t('leftPanel.mention_all')} ${channelName}: ${message.text}`;
@@ -258,7 +263,7 @@ const LeftPanel = () => {
           // - Hoặc nếu là tin nhắn System nhưng không chứa "11 {event.user.id}"
           isPushNoti =
             event.message.type !== MessageType.Signal &&
-            !(event.message.type === MessageType.System && event.message.text.includes(`11 ${event.user.id}`));
+            !(event.message.type === MessageType.System && event.message.text?.includes(`11 ${event.user.id}`));
         }
 
         if (isPushNoti) {

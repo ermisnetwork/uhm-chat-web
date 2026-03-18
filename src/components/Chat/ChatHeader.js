@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import {
   Box,
   Button,
+  Chip,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -12,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { CaretLeft, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
+import { CaretLeft, LockSimple, MagnifyingGlass, Phone, VideoCamera } from 'phosphor-react';
 import useResponsive from '@/hooks/useResponsive';
 import { setSidebar, showSnackbar } from '@/redux/slices/app';
 import { useDispatch, useSelector } from 'react-redux';
@@ -247,6 +248,7 @@ const ChatHeader = () => {
 
   const isDirect = useMemo(() => isChannelDirect(currentChannel), [currentChannel]);
   const isEnabledTopics = useMemo(() => currentChannel?.data?.topics_enabled, [currentChannel?.data?.topics_enabled]);
+  const isE2ee = useMemo(() => currentChannel?.data?.mls_enabled === true, [currentChannel?.data?.mls_enabled]);
 
   const [loadingJoin, setLoadingJoin] = useState(false);
 
@@ -425,6 +427,25 @@ const ChatHeader = () => {
                     </Typography>
                   </Typography>
                 </Button>
+
+                {isE2ee && (
+                  <Chip
+                    icon={<LockSimple size={12} weight="fill" />}
+                    label="E2EE"
+                    size="small"
+                    sx={{
+                      height: '20px',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      backgroundColor: theme.palette.success.lighter || 'rgba(84, 214, 44, 0.16)',
+                      color: theme.palette.success.dark,
+                      '& .MuiChip-icon': {
+                        color: theme.palette.success.dark,
+                        marginLeft: '4px',
+                      },
+                    }}
+                  />
+                )}
               </Box>
             </Stack>
           ) : (

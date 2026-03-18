@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { IconButton, InputAdornment, Stack, Typography } from '@mui/material';
-import { CaretLeft, CaretRight, X } from 'phosphor-react';
+import { CaretLeft, CaretRight, LockSimple, X } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetIsEditing, ToggleSidebar, UpdateSidebarType, showSnackbar } from '@/redux/slices/app';
 import ChannelAvatar from '@/components/ChannelAvatar';
@@ -28,6 +28,7 @@ import AntSwitch from '@/components/AntSwitch';
 import ChannelNotificationDialog from '@/sections/dashboard/ChannelNotificationDialog';
 import { AddMutedChannel, RemoveMutedChannel } from '@/redux/slices/channel';
 import useOnlineStatus from '@/hooks/useOnlineStatus';
+import { mlsManager } from '@/client';
 import {
   AdministratorsIcon,
   BannedIcon,
@@ -397,6 +398,7 @@ const SidebarChannelInfo = () => {
   const [openDialogMuted, setOpenDialogMuted] = useState(false);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [e2eeLoading, setE2eeLoading] = useState(false);
   const enableTopics = currentChannel?.data?.topics_enabled;
 
   useEffect(() => {
@@ -510,6 +512,24 @@ const SidebarChannelInfo = () => {
     if (formSubmitRef.current) formSubmitRef.current();
   };
 
+  const isE2eeEnabled = currentChannel?.data?.mls_enabled === true;
+
+  const onEnableE2ee = async () => {
+    try {
+      setE2eeLoading(true);
+      const channelType = currentChannel.type;
+      const channelId = currentChannel.id;
+      const cid = currentChannel.cid;
+      const memberUserIds = Object.keys(currentChannel.state.members);
+      await mlsManager.enableE2ee(channelType, channelId, cid, memberUserIds);
+      dispatch(showSnackbar({ severity: 'success', message: t('sidebarChannelInfo.e2ee_enabled_success') }));
+    } catch (error) {
+      handleError(dispatch, error, t);
+    } finally {
+      setE2eeLoading(false);
+    }
+  };
+
   const fullUrl = `${DOMAIN_APP}/channels/${currentChannel?.cid}`;
   const showItemMembers = !isDirect && isEditing;
   const showItemAdministrators = !isDirect && myRole === RoleMember.OWNER && isEditing;
@@ -524,6 +544,7 @@ const SidebarChannelInfo = () => {
   const showItemInviteFriend = !isDirect && !isEditing;
   const showItemChannelType = !isDirect && isEditing;
   const showItemChannelTopics = !isDirect && isEditing;
+  const showItemE2ee = myRole === RoleMember.OWNER && !isEditing;
 
   if (!currentChannel) return null;
 
@@ -645,6 +666,29 @@ const SidebarChannelInfo = () => {
 
                 <AntSwitch onChange={onChangeMute} checked={isMuted} />
               </StyledStackItem>
+            )}
+
+            {/* ------------E2EE (End-to-End Encryption)--------------- */}
+            {showItemE2ee && (
+              isE2eeEnabled ? (
+                <StyledStackItem direction="row" alignItems="center" justifyContent={'space-between'}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <LockSimple size={20} weight="fill" color={theme.palette.success.main} />
+                    <Typography variant="subtitle2" color={theme.palette.success.main}>
+                      {t('sidebarChannelInfo.e2ee_enabled') || 'E2EE Enabled'}
+                    </Typography>
+                  </Stack>
+                </StyledStackItem>
+              ) : (
+                <StyledActionItem onClick={onEnableE2ee} sx={{ opacity: e2eeLoading ? 0.6 : 1, pointerEvents: e2eeLoading ? 'none' : 'auto' }}>
+                  <LockSimple size={20} color={theme.palette.text.primary} />
+                  <Typography variant="subtitle2" color={theme.palette.text.primary}>
+                    {e2eeLoading
+                      ? (t('sidebarChannelInfo.e2ee_enabling') || 'Enabling E2EE...')
+                      : (t('sidebarChannelInfo.enable_e2ee') || 'Enable E2EE')}
+                  </Typography>
+                </StyledActionItem>
+              )
             )}
 
             {/* ------------Invite Friend--------------- */}

@@ -22,12 +22,13 @@ import { AddMention, RemoveMention } from '@/redux/slices/channel';
 import useMentions from '@/hooks/useMentions';
 import useDebounce from '@/hooks/useDebounce';
 import uuidv4 from '@/utils/uuidv4';
-import { client } from '@/client';
+import { client, mlsManager } from '@/client';
 import ActionsChatPopover from '@/components/ActionsChatPopover';
 import { MicrophoneIcon, PictureImageIcon, SendIcon } from '@/components/Icons';
 import EmojiPickerPopover from '@/components/EmojiPickerPopover';
 import RecordingAudioBox from '@/sections/dashboard/RecordingAudioBox';
 import { useTranslation } from 'react-i18next';
+import { LockSimple } from 'phosphor-react';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -63,6 +64,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
   const myRole = myRoleInChannel(currentChannel);
   const isDirect = isChannelDirect(currentChannel);
   const currentChat = currentTopic ? currentTopic : currentChannel;
+  const isE2ee = currentChannel?.data?.mls_enabled === true && !currentTopic;
 
   const {
     filteredMentions,
@@ -467,7 +469,22 @@ const ChatFooter = ({ setMessages, isDialog }) => {
         setMessages(prevMessages => [...prevMessages, msgData]);
         onResetData();
 
-        await currentChat?.sendMessage(payload);
+        if (isE2ee && mlsManager.initialized) {
+          // E2EE path: encrypt and send via MLS
+          await mlsManager.sendMessage(
+            currentChannel.type,
+            currentChannel.id,
+            currentChannel.cid,
+            payload.text,
+            messageId,
+            {
+              ...(quotesMessage ? { quoted_message_id: quotesMessage.id } : {}),
+              ...(selectedMentions.length > 0 ? getMentionsPayload() : {}),
+            },
+          );
+        } else {
+          await currentChat?.sendMessage(payload);
+        }
       }
     } catch (error) {
       if (error.response.status === 400) {
@@ -631,7 +648,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
           )}
           onPaste={onPaste}
           fullWidth
-          placeholder={t('chatFooter.placeholder')}
+          placeholder={isE2ee ? `🔒 ${t('chatFooter.placeholder_e2ee') || 'Encrypted message'}` : t('chatFooter.placeholder')}
           variant="outlined"
           multiline
           maxRows={10}

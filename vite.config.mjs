@@ -37,9 +37,15 @@ export default defineConfig({
       host: 'localhost',
       protocol: 'ws',
     },
+    headers: {
+      // Required for WASM streaming compilation
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
   },
   optimizeDeps: {
     force: true,
+    exclude: ['openmls-wasm'],
     esbuildOptions: {
       loader: {
         '.js': 'jsx',

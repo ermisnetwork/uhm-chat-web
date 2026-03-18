@@ -31,7 +31,7 @@ import {
 import DeleteMessageDialog from '@/sections/dashboard/DeleteMessageDialog';
 import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '@/constants/commons-const';
 import BannedBackdrop from '@/components/BannedBackdrop';
-import { client } from '@/client';
+import { client, mlsManager } from '@/client';
 import { onFilesMessage } from '@/redux/slices/messages';
 import BlockedBackdrop from '@/components/BlockedBackdrop';
 import { useNavigate } from 'react-router-dom';
@@ -100,10 +100,31 @@ const ChatComponent2 = () => {
       if (followOutputRef.current) {
         followOutputRef.current(true);
       }
-      setMessages(listMessage);
+
+      // For E2EE channels: load message history from IndexedDB
+      if (currentChat.data?.mls_enabled) {
+        const cid = currentChat.cid || `${currentChat.type}:${currentChat.id}`;
+        mlsManager.storage.getE2eeMessages(cid, 100).then(e2eeMessages => {
+          // Map IndexedDB format to UI message format
+          const mappedMessages = e2eeMessages
+            .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+            .map(msg => ({
+              ...msg,
+              user: members.find(m => m.user_id === msg.user_id)?.user || { id: msg.user_id, name: msg.user_id },
+              status: 'received',
+            }));
+          setMessages(mappedMessages);
+          setNoMessageTitle(mappedMessages.length ? '' : t('chatComponent.no_message'));
+        }).catch(err => {
+          console.warn('[E2EE] Failed to load message history:', err);
+          setMessages([]);
+        });
+      } else {
+        setMessages(listMessage);
+        setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
+      }
       setIsPendingInvite(checkPendingInvite(currentChat));
       dispatch(SetIsGuest(isGuestInPublicChannel(currentChat)));
-      setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
 
       const read = currentChat.state.read[user_id];
       let lastSend = (read && read?.last_send) || DefaultLastSend;
@@ -183,8 +204,20 @@ const ChatComponent2 = () => {
                 }, 100);
               }
             } else {
+              // For E2EE own messages: the optimistic message already has plaintext,
+              // so keep it instead of overwriting with the server's encrypted version
+              const isE2eeMsg = event.message.content_type === 'mls';
               setMessages(prev => {
-                if (prev.some(item => item.id === event.message.id)) {
+                const existing = prev.find(item => item.id === event.message.id);
+                if (existing) {
+                  if (isE2eeMsg && existing.text) {
+                    // Keep optimistic message that already has plaintext text
+                    return prev.map(item =>
+                      item.id === event.message.id
+                        ? { ...item, status: 'received', created_at: event.message.created_at || item.created_at }
+                        : item,
+                    );
+                  }
                   return prev.map(item => (item.id === event.message.id ? event.message : item));
                 } else {
                   return [...prev, event.message];
@@ -372,6 +405,19 @@ const ChatComponent2 = () => {
       currentChat.on(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
       currentChat.on(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
 
+      // E2EE: listen for decrypted messages to update plaintext in state
+      const handleE2eeDecrypted = (event) => {
+        if (!event.message?.id) return;
+        setMessages(prev =>
+          prev.map(item =>
+            item.id === event.message.id
+              ? { ...item, text: event.message.text }
+              : item,
+          ),
+        );
+      };
+      client.on('e2ee.message_decrypted', handleE2eeDecrypted);
+
       return () => {
         currentChat.off(ClientEvents.MessageNew, handleMessages);
         currentChat.off(ClientEvents.ReactionNew, handleMessages);
@@ -392,6 +438,7 @@ const ChatComponent2 = () => {
         currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
         currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
         currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+        client.off('e2ee.message_decrypted', handleE2eeDecrypted);
 
         // Cleanup audio khi thay đổi chat hoặc component unmount
         cleanup();
