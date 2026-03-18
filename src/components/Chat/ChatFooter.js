@@ -143,6 +143,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
         setValue(replaceMentionsWithNames(editMessage.text, mentions));
       } else if (currentChat || quotesMessage) {
         setValue('');
+        setSelectedMentions([]);
       }
     }, 100);
 

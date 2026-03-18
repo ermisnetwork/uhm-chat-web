@@ -28,21 +28,9 @@ export default function useMentions(value, inputRef) {
 
       if (match) {
         const query = match[2] ? match[2].toLowerCase() : '';
-        let filtered;
-
-        if (selectedMentions.length > 0) {
-          const selectedIds = new Set(selectedMentions.map(m => m.id));
-          filtered = mentions.filter(
-            mention =>
-              mention.mentionName.toLowerCase().includes(query) &&
-              !selectedIds.has(mention.id) &&
-              mention.id !== user_id,
-          );
-        } else {
-          filtered = mentions.filter(
-            mention => mention.mentionName.toLowerCase().includes(query) && mention.id !== user_id,
-          );
-        }
+        const filtered = mentions.filter(
+          mention => mention.mentionName.toLowerCase().includes(query) && mention.id !== user_id,
+        );
 
         setFilteredMentions(filtered);
         setAnchorElMention(inputRef.current);
@@ -53,7 +41,7 @@ export default function useMentions(value, inputRef) {
         setHighlightedIndex(0);
       }
     }, 50),
-    [mentions, selectedMentions, user_id],
+    [mentions, user_id],
   );
 
   // Cập nhật danh sách mentions khi `value` thay đổi
