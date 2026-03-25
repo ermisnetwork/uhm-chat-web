@@ -471,6 +471,7 @@ const ChatFooter = ({ setMessages, isDialog }) => {
 
         if (isE2ee && mlsManager.initialized) {
           // E2EE path: encrypt and send via MLS
+          // attachments + sticker_url go inside encrypted payload
           await mlsManager.sendMessage(
             currentChannel.type,
             currentChannel.id,
@@ -480,6 +481,8 @@ const ChatFooter = ({ setMessages, isDialog }) => {
             {
               ...(quotesMessage ? { quoted_message_id: quotesMessage.id } : {}),
               ...(selectedMentions.length > 0 ? getMentionsPayload() : {}),
+              ...(attachments.length > 0 ? { attachments } : {}),
+              ...(stickerUrl ? { sticker_url: stickerUrl } : {}),
             },
           );
         } else {

@@ -167,43 +167,21 @@ function debugString(val) {
     return className;
 }
 
-function takeFromExternrefTable0(idx) {
-    const value = wasm.__wbindgen_export_2.get(idx);
-    wasm.__externref_table_dealloc(idx);
-    return value;
-}
-
 function getArrayU8FromWasm0(ptr, len) {
     ptr = ptr >>> 0;
     return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
-}
-
-function passArray8ToWasm0(arg, malloc) {
-    const ptr = malloc(arg.length * 1, 1) >>> 0;
-    getUint8ArrayMemory0().set(arg, ptr / 1);
-    WASM_VECTOR_LEN = arg.length;
-    return ptr;
-}
-/**
- * Initialize the WASM module
- *
- * Call this once at startup to set up panic hooks for better error messages.
- */
-export function init() {
-    wasm.init();
-}
-
-/**
- * Test function to verify the module is working
- */
-export function greet() {
-    wasm.greet();
 }
 
 function _assertClass(instance, klass) {
     if (!(instance instanceof klass)) {
         throw new Error(`expected instance of ${klass.name}`);
     }
+}
+
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_export_2.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
 }
 
 function passArrayJsValueToWasm0(array, malloc) {
@@ -228,6 +206,13 @@ function getUint32ArrayMemory0() {
 function passArray32ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 4, 4) >>> 0;
     getUint32ArrayMemory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function passArray8ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 1, 1) >>> 0;
+    getUint8ArrayMemory0().set(arg, ptr / 1);
     WASM_VECTOR_LEN = arg.length;
     return ptr;
 }
@@ -267,6 +252,22 @@ export function validate_key_package_bytes(bytes) {
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.validate_key_package_bytes(ptr0, len0);
     return ret !== 0;
+}
+
+/**
+ * Initialize the WASM module
+ *
+ * Call this once at startup to set up panic hooks for better error messages.
+ */
+export function init() {
+    wasm.init();
+}
+
+/**
+ * Test function to verify the module is working
+ */
+export function greet() {
+    wasm.greet();
 }
 
 /**
@@ -1164,6 +1165,45 @@ export class Group {
             throw takeFromExternrefTable0(ret[1]);
         }
         return Group.__wrap(ret[0]);
+    }
+    /**
+     * Load a group from the Provider's storage by CID
+     *
+     * After restoring a Provider from bytes (IndexedDB), call this to reopen
+     * a group that was previously created or joined.
+     *
+     * # Arguments
+     * * `provider` - Crypto provider (restored from bytes)
+     * * `cid` - Channel ID (e.g., "team:channel_abc123")
+     * @param {Provider} provider
+     * @param {string} cid
+     * @returns {Group}
+     */
+    static load(provider, cid) {
+        _assertClass(provider, Provider);
+        const ptr0 = passStringToWasm0(cid, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.group_load(provider.__wbg_ptr, ptr0, len0);
+        if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+        }
+        return Group.__wrap(ret[0]);
+    }
+    /**
+     * Persist the group's current state to the Provider's storage.
+     *
+     * MUST be called after processing application messages (decrypt) to save
+     * the updated ratchet/secret tree state. Without this, a Provider restore
+     * (e.g., on page reload) will load stale ratchet state, causing
+     * SecretReuseError for messages that were already decrypted.
+     * @param {Provider} provider
+     */
+    save_state(provider) {
+        _assertClass(provider, Provider);
+        const ret = wasm.group_save_state(this.__wbg_ptr, provider.__wbg_ptr);
+        if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+        }
     }
     /**
      * Create a new group (legacy API, uses group_id string directly)

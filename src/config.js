@@ -5,10 +5,11 @@ import { enUS, viVN } from '@mui/material/locale';
 import { PATH_DASHBOARD } from '@/routes/paths';
 
 const apiURL = localStorage.getItem('api_url') || import.meta.env.VITE_API_URL;
-
+const ussURL = localStorage.getItem('uss_url') || import.meta.env.VITE_API_URL_USS;
 export const DOMAIN_APP = import.meta.env.VITE_DOMAIN;
 export const BASE_URL_PROFILE = apiURL;
 export const BASE_URL = apiURL;
+export const BASE_URL_USS = ussURL;
 
 export const API_KEY = import.meta.env.VITE_API_KEY;
 export const CHAT_PROJECT_ID = import.meta.env.VITE_CHAT_PROJECT_ID;

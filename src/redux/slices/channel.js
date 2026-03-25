@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { ChatType, CurrentChannelStatus, RoleMember, SidebarType } from '@/constants/commons-const';
-import { client } from '@/client';
+import { client, mlsManager } from '@/client';
 import { handleError, isEmptyObject, myRoleInChannel, splitChannelId } from '@/utils/commons';
 import { CapabilitiesName } from '@/constants/capabilities-const';
 import { setSidebar } from '@/redux/slices/app';
@@ -477,6 +477,23 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
     dispatch(setSidebar({ type: SidebarType.Channel, open: false }));
     dispatch(slice.actions.setCurrentChannel(channel));
     loadDataChannel(channel, dispatch, user_id);
+
+    // E2EE: auto external join if channel has MLS enabled but no local group
+    if (channel.data?.mls_enabled && mlsManager?.initialized) {
+      const cid = channel.cid;
+      if (cid && !mlsManager.getGroup(cid)) {
+        mlsManager
+          .joinExternal(channelType, channelId, cid)
+          .then(() => {
+            console.log('[MLS] Auto external join completed:', cid);
+            // Sync and decrypt existing MLS messages for this channel.
+            // Uses syncAfterExternalJoin (no early-return guard) so it runs even
+            // though the group was just added to mlsManager.groups by joinExternal.
+            return mlsManager.syncAfterExternalJoin(channelType, channelId, cid);
+          })
+          .catch(err => console.warn('[MLS] Auto external join / sync failed:', cid, err));
+      }
+    }
   };
 };
 

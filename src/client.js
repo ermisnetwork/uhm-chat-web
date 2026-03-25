@@ -1,6 +1,6 @@
 import { ErmisChat, ErmisCallNode, MlsManager, IndexedDBMlsStorage } from 'ermis-chat-js-sdk';
 import * as openmlsWasm from 'ermis-chat-js-sdk/src/wasm/openmls_wasm.js';
-import { API_KEY, BASE_URL, BASE_URL_PROFILE } from '@/config';
+import { API_KEY, BASE_URL, BASE_URL_USS } from '@/config';
 import { handleError } from '@/utils/commons';
 import { LocalStorageKey } from '@/constants/localStorage-const';
 
@@ -36,9 +36,11 @@ const customConfig = {
 };
 
 const connectUser = async (projectId, user_id, token, dispatch) => {
+  console.log('BASE_URL_USS', BASE_URL_USS);
   client = ErmisChat.getInstance(API_KEY, projectId, {
     // timeout: 6000,
     baseURL: BASE_URL,
+    ussBaseURL: BASE_URL_USS,
     // timeout: 6000,
     // logger: (type, msg) => console.log(type, msg),
   });

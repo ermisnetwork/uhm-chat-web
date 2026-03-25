@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, IconButton, Slide, Stack } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, Slide, Stack, Switch, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { client } from '@/client';
 import { ChatType, RoleMember } from '@/constants/commons-const';
@@ -26,6 +26,7 @@ const NewDirectMessage = () => {
   const { user_id } = useSelector(state => state.auth);
   const { activeChannels = [], skippedChannels = [], pendingChannels = [] } = useSelector(state => state.channel);
   const [searchQuery, setSearchQuery] = useState('');
+  const [e2eeEnabled, setE2eeEnabled] = useState(false);
 
   // invitedChannels: các channel direct mà bạn đã gửi lời mời, đối phương chưa xác nhận tham gia.
   const invitedChannels = useMemo(() => {
@@ -51,11 +52,26 @@ const NewDirectMessage = () => {
 
   const onCreateDirectChannel = async user => {
     try {
-      const channel = await client.channel(ChatType.MESSAGING, {
-        members: [user.id, user_id],
-      });
+      const members = [user.id, user_id];
+      const payload = {
+        members,
+        mls_enabled: e2eeEnabled,
+      };
+      const channel = await client.channel(ChatType.MESSAGING, payload);
+
+      if (e2eeEnabled) {
+        const mlsManager = client.mlsManager;
+        if (!mlsManager) throw new Error('MLS manager not initialized');
+        const channelId = channel.id;
+        const cid = `${ChatType.MESSAGING}:${channelId}`;
+        const bundle = await mlsManager.createE2eeChannel(
+          ChatType.MESSAGING, channelId, cid, members,
+        );
+        channel._data = { ...channel._data, ...bundle };
+      }
 
       await channel.create();
+      setE2eeEnabled(false);
       dispatch(showSnackbar({ severity: 'success', message: t('new_message.snackbar_success') }));
       onCloseDialogNewDirectMessage();
     } catch (error) {
@@ -98,6 +114,25 @@ const NewDirectMessage = () => {
 
       <DialogContent sx={{ mt: 4 }}>
         <Stack spacing={3}>
+          {/* E2EE Toggle */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              border: theme => `1px solid ${theme.palette.divider}`,
+              borderRadius: '16px',
+              p: '10px 15px',
+            }}
+          >
+            <Typography sx={{ fontSize: '15px' }}>🔒 End-to-End Encrypted</Typography>
+            <Switch
+              checked={e2eeEnabled}
+              onChange={e => setE2eeEnabled(e.target.checked)}
+              color="primary"
+            />
+          </Box>
+
           <Search>
             <SearchIconWrapper>
               {isLoading ? <LoadingSpinner size={18} /> : <MagnifyingGlass size={18} />}

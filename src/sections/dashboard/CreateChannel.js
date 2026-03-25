@@ -9,6 +9,7 @@ import {
   InputAdornment,
   Slide,
   Stack,
+  Switch,
   Typography,
   useTheme,
   Chip,
@@ -46,6 +47,7 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [e2eeEnabled, setE2eeEnabled] = useState(false);
 
   useEffect(() => {
     dispatch(FetchFriends());
@@ -77,15 +79,34 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
       try {
         const channel_name = data.name;
         const memberIds = selectedUsers.map(member => member.id);
+        const allMemberIds = [...memberIds, user_id];
         const payload = {
           name: channel_name,
           description: data.description,
-          members: [...memberIds, user_id],
-          public: data.public === 'true',
+          members: allMemberIds,
+          public: e2eeEnabled ? false : data.public === 'true',
+          mls_enabled: e2eeEnabled,
         };
 
         setIsLoading(true);
         const channel = await client.channel(ChatType.TEAM, payload);
+
+        if (e2eeEnabled) {
+          const mlsManager = client.mlsManager;
+          if (!mlsManager) throw new Error('MLS manager not initialized');
+          // channel.cid is not yet known — derive it from channel object
+          // Note: for team channels the id is set server-side; we get it after create.
+          // Strategy: create channel first (no MLS bundle), then enable E2EE via createE2eeChannel.
+          // Actually for Optimistic Inclusion we need the cid before create.
+          // channel.id is a pre-generated UUID already in channel._data — access it:
+          const channelId = channel.id;
+          const cid = `${ChatType.TEAM}:${channelId}`;
+          const bundle = await mlsManager.createE2eeChannel(
+            ChatType.TEAM, channelId, cid, allMemberIds,
+          );
+          Object.assign(payload, bundle);
+          channel._data = { ...channel._data, ...bundle };
+        }
 
         const response = await channel.create();
 
@@ -94,6 +115,7 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
           setIsLoading(false);
           setSearchQuery('');
           setSelectedUsers([]);
+          setE2eeEnabled(false);
           onCloseDialogCreateChannel();
           dispatch(showSnackbar({ severity: 'success', message: t('create_channel.create_success') }));
         }
@@ -170,11 +192,41 @@ const CreateGroupForm = ({ onCloseDialogCreateChannel, step, setStep }) => {
                   marginTop: '5px',
                 }}
               >
-                {methods.watch('public') === 'true'
+                {methods.watch('public') === 'true' && !e2eeEnabled
                   ? t('create_channel.message_public')
                   : t('create_channel.message_private')
                 }
               </Typography>
+
+              {/* E2EE Toggle */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  border: theme => `1px solid ${theme.palette.divider}`,
+                  borderRadius: '16px',
+                  p: '10px 15px',
+                  mt: 1,
+                }}
+              >
+                <Box>
+                  <Typography sx={{ fontSize: '16px' }}>🔒 End-to-End Encrypted</Typography>
+                  {e2eeEnabled && (
+                    <Typography sx={{ fontSize: '12px', color: 'text.secondary', mt: 0.5 }}>
+                      Messages are encrypted — only members can read them
+                    </Typography>
+                  )}
+                </Box>
+                <Switch
+                  checked={e2eeEnabled}
+                  onChange={e => {
+                    setE2eeEnabled(e.target.checked);
+                    if (e.target.checked) methods.setValue('public', 'false');
+                  }}
+                  color="primary"
+                />
+              </Box>
             </Box>
 
             <Box>

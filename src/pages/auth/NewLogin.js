@@ -19,7 +19,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import RHFCodes from '@/components/hook-form/RHFCodes';
 import { CaretLeft } from 'phosphor-react';
-import { API_KEY, BASE_URL } from '@/config';
+import { API_KEY, BASE_URL, BASE_URL_USS } from '@/config';
 import { ErmisAuthProvider } from 'ermis-chat-js-sdk';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetAuthProvider, showSnackbar } from '@/redux/slices/app';
@@ -114,7 +114,7 @@ export default function NewLogin() {
 
 
   useEffect(() => {
-    dispatch(SetAuthProvider(new ErmisAuthProvider(API_KEY, { baseURL: BASE_URL })));
+    dispatch(SetAuthProvider(new ErmisAuthProvider(API_KEY, { baseURL: BASE_URL_USS })));
   }, []);
 
   useEffect(() => {
@@ -326,22 +326,22 @@ export default function NewLogin() {
             ))}
           </StyledSlider>
           <Box gap={2} sx={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center', mt: 5 }}>
-              <Link component={RouterLink} to="https://apps.apple.com/vn/app/uhm-chat-video/id6747392894?l=vi" variant="body2" color="inherit" underline="always">
-                <ImageCanvas
-                  dataUrl={DownloadAppStore}
-                  width={'100%'}
-                  height={'auto'}
-                  styleCustom={{ borderRadius: '6px' }}
-                />
-              </Link>
-              <Link component={RouterLink} to="https://play.google.com/store/apps/details?id=network.ermis.uhm" variant="body2" color="inherit" underline="always">
-                <ImageCanvas
-                  dataUrl={DownloadGooglePlay}
-                  width={'100%'}
-                  height={'auto'}
-                  styleCustom={{ borderRadius: '6px' }}
-                />
-              </Link>
+            <Link component={RouterLink} to="https://apps.apple.com/vn/app/uhm-chat-video/id6747392894?l=vi" variant="body2" color="inherit" underline="always">
+              <ImageCanvas
+                dataUrl={DownloadAppStore}
+                width={'100%'}
+                height={'auto'}
+                styleCustom={{ borderRadius: '6px' }}
+              />
+            </Link>
+            <Link component={RouterLink} to="https://play.google.com/store/apps/details?id=network.ermis.uhm" variant="body2" color="inherit" underline="always">
+              <ImageCanvas
+                dataUrl={DownloadGooglePlay}
+                width={'100%'}
+                height={'auto'}
+                styleCustom={{ borderRadius: '6px' }}
+              />
+            </Link>
           </Box>
         </Stack>
         {/* ---------------------RIGHT--------------------- */}
@@ -528,116 +528,116 @@ export default function NewLogin() {
     }
     return null;
   };
-  
+
 
   const otherMethods = LOGIN_METHODS.filter(method => method.key !== loginType);
 
   return (
-    isMobileToMd ? 
+    isMobileToMd ?
       <>
         {InstallMobileApp()}
       </>
-    : 
-    <Stack
-      spacing={4}
-      sx={{
-        backgroundColor: 'background.default',
-        padding: '20px',
-        borderRadius: '30px',
-        width: isMobileToLg ? '100%' : '500px',
-        margin: '0px auto',
-        boxShadow: theme.shadows[18],
-        position: 'relative',
-      }}
-    >
-      {isLoading && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: alpha(theme.palette.background.default, 0.5),
-            zIndex: 9999,
-            backdropFilter: 'blur(4px)',
-            borderRadius: '30px',
-          }}
-        >
-          <LoadingSpinner />
-        </Box>
-      )}
-
-      <Stack spacing={2}>{renderLoginForm()}</Stack>
-
-      {!showOtp && (
-        <>
-          <Divider
+      :
+      <Stack
+        spacing={4}
+        sx={{
+          backgroundColor: 'background.default',
+          padding: '20px',
+          borderRadius: '30px',
+          width: isMobileToLg ? '100%' : '500px',
+          margin: '0px auto',
+          boxShadow: theme.shadows[18],
+          position: 'relative',
+        }}
+      >
+        {isLoading && (
+          <Box
             sx={{
-              '&::before, ::after': {
-                border: 'none',
-              },
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: alpha(theme.palette.background.default, 0.5),
+              zIndex: 9999,
+              backdropFilter: 'blur(4px)',
+              borderRadius: '30px',
             }}
           >
-            {t('new_login.or_sign_in')}
-          </Divider>
+            <LoadingSpinner />
+          </Box>
+        )}
 
-          <Stack direction="row" spacing={2} justifyContent="center">
-            {otherMethods.map(method => {
-              if (method.key === 'google') {
-                return (
-                  <Box key={method.key} sx={{ position: 'relative', cursor: 'pointer' }}>
-                    <Button
-                      variant="outlined"
-                      color="inherit"
-                      sx={{ minWidth: 80, width: 80, height: 80, display: 'block' }}
-                    >
-                      <Iconify icon={method.icon} width={32} height={32} sx={{ margin: 'auto' }} />
-                      <span style={{ display: 'block', width: '100%' }}>{method.label}</span>
-                    </Button>
-                    <GoogleLogin
-                      onSuccess={async credentialResponse => {
-                        setIsLoading(true);
-                        const response = await authProvider.loginWithGoogle(credentialResponse.credential);
-                        if (response) {
-                          onLoginSuccess(response);
+        <Stack spacing={2}>{renderLoginForm()}</Stack>
+
+        {!showOtp && (
+          <>
+            <Divider
+              sx={{
+                '&::before, ::after': {
+                  border: 'none',
+                },
+              }}
+            >
+              {t('new_login.or_sign_in')}
+            </Divider>
+
+            <Stack direction="row" spacing={2} justifyContent="center">
+              {otherMethods.map(method => {
+                if (method.key === 'google') {
+                  return (
+                    <Box key={method.key} sx={{ position: 'relative', cursor: 'pointer' }}>
+                      <Button
+                        variant="outlined"
+                        color="inherit"
+                        sx={{ minWidth: 80, width: 80, height: 80, display: 'block' }}
+                      >
+                        <Iconify icon={method.icon} width={32} height={32} sx={{ margin: 'auto' }} />
+                        <span style={{ display: 'block', width: '100%' }}>{method.label}</span>
+                      </Button>
+                      <GoogleLogin
+                        onSuccess={async credentialResponse => {
+                          setIsLoading(true);
+                          const response = await authProvider.loginWithGoogle(credentialResponse.credential);
+                          if (response) {
+                            onLoginSuccess(response);
+                            setIsLoading(false);
+                          }
+                        }}
+                        onError={() => {
+                          dispatch(
+                            showSnackbar({
+                              severity: 'error',
+                              message: t('new_login.snackbar_google_login_failed'),
+                            }),
+                          );
                           setIsLoading(false);
-                        }
-                      }}
-                      onError={() => {
-                        dispatch(
-                          showSnackbar({
-                            severity: 'error',
-                            message: t('new_login.snackbar_google_login_failed'),
-                          }),
-                        );
-                        setIsLoading(false);
-                      }}
-                      containerProps={{ className: 'googleLoginBtn' }}
-                    />
-                  </Box>
-                );
-              }
+                        }}
+                        containerProps={{ className: 'googleLoginBtn' }}
+                      />
+                    </Box>
+                  );
+                }
 
-              return (
-                <Button
-                  key={method.key}
-                  variant="outlined"
-                  color="inherit"
-                  sx={{ minWidth: 80, width: 80, height: 80, display: 'block' }}
-                  onClick={() => onMethodClick(method)}
-                >
-                  <Iconify icon={method.icon} width={32} height={32} sx={{ margin: 'auto' }} />
-                  <span style={{ display: 'block', width: '100%' }}>{method.label}</span>
-                </Button>
-              );
-            })}
-          </Stack>
-        </>
-      )}
-    </Stack>
+                return (
+                  <Button
+                    key={method.key}
+                    variant="outlined"
+                    color="inherit"
+                    sx={{ minWidth: 80, width: 80, height: 80, display: 'block' }}
+                    onClick={() => onMethodClick(method)}
+                  >
+                    <Iconify icon={method.icon} width={32} height={32} sx={{ margin: 'auto' }} />
+                    <span style={{ display: 'block', width: '100%' }}>{method.label}</span>
+                  </Button>
+                );
+              })}
+            </Stack>
+          </>
+        )}
+      </Stack>
   );
 }

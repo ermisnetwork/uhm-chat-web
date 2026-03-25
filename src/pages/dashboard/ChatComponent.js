@@ -408,6 +408,24 @@ const ChatComponent = () => {
     }
   }, [currentChat, user_id, messageListRef]);
 
+  // E2EE: reload message list after external join + sync completes.
+  // syncAfterExternalJoin patches channel.state.messages with decrypted content,
+  // then dispatches 'e2ee.post_join_sync' on the client so we can re-render here.
+  useEffect(() => {
+    if (!client || !currentChat) return;
+
+    const handlePostJoinSync = event => {
+      if (event.cid !== currentChat.cid) return;
+      const listMessage = currentChat.state.messages || [];
+      console.log('[UI] e2ee.post_join_sync: reloading', listMessage.length, 'messages for', event.cid);
+      setMessages([...listMessage]);
+      setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
+    };
+
+    const unsub = client.on('e2ee.post_join_sync', handlePostJoinSync);
+    return () => unsub?.unsubscribe?.();
+  }, [client, currentChat, t]);
+
   useEffect(() => {
     if (messageIdError) {
       setMessages(prev => prev.filter(item => item.id !== messageIdError));

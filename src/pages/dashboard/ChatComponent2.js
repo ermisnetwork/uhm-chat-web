@@ -195,6 +195,10 @@ const ChatComponent2 = () => {
 
             if (!isMyMessage) {
               setMessages(prev => {
+                // Prevent duplicate from WS event if message already loaded from storage
+                if (prev.some(item => item.id === event.message.id)) {
+                  return prev.map(item => item.id === event.message.id ? event.message : item);
+                }
                 return [...prev, event.message];
               });
               const myRole = myRoleInChannel(currentChat);

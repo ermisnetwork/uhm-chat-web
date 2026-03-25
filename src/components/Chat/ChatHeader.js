@@ -32,7 +32,7 @@ import {
 import { LoadingButton } from '@mui/lab';
 import { setCurrentChannel, setCurrentChannelStatus, SetIsGuest } from '@/redux/slices/channel';
 import useOnlineStatus from '@/hooks/useOnlineStatus';
-import { callClient, client } from '@/client';
+import { callClient, client, mlsManager } from '@/client';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '@/config';
 import {
@@ -429,22 +429,61 @@ const ChatHeader = () => {
                 </Button>
 
                 {isE2ee && (
-                  <Chip
-                    icon={<LockSimple size={12} weight="fill" />}
-                    label="E2EE"
-                    size="small"
-                    sx={{
-                      height: '20px',
-                      fontSize: '10px',
-                      fontWeight: 600,
-                      backgroundColor: theme.palette.success.lighter || 'rgba(84, 214, 44, 0.16)',
-                      color: theme.palette.success.dark,
-                      '& .MuiChip-icon': {
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <Chip
+                      icon={<LockSimple size={12} weight="fill" />}
+                      label="E2EE"
+                      size="small"
+                      sx={{
+                        height: '20px',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        backgroundColor: theme.palette.success.lighter || 'rgba(84, 214, 44, 0.16)',
                         color: theme.palette.success.dark,
-                        marginLeft: '4px',
-                      },
-                    }}
-                  />
+                        '& .MuiChip-icon': {
+                          color: theme.palette.success.dark,
+                          marginLeft: '4px',
+                        },
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: '10px',
+                        color: theme.palette.text.disabled,
+                        fontFamily: 'monospace',
+                      }}
+                    >
+                      epoch:{mlsManager?.getEpoch?.(currentChannel?.cid) ?? '?'}
+                    </Typography>
+                    <Chip
+                      label="🔑 Rotate"
+                      size="small"
+                      clickable
+                      onClick={async () => {
+                        try {
+                          const cid = currentChannel?.cid;
+                          if (!cid || !mlsManager) return;
+                          const result = await mlsManager.keyRotation(cid);
+                          dispatch(showSnackbar({ severity: 'success', message: `Key rotated! New epoch: ${result.epoch}` }));
+                        } catch (err) {
+                          console.error('[KeyRotation] Failed:', err);
+                          dispatch(showSnackbar({ severity: 'error', message: `Key rotation failed: ${err.message}` }));
+                        }
+                      }}
+                      sx={{
+                        height: '20px',
+                        fontSize: '10px',
+                        fontWeight: 600,
+                        backgroundColor: theme.palette.warning.lighter || 'rgba(255, 193, 7, 0.16)',
+                        color: theme.palette.warning.dark,
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: theme.palette.warning.light || 'rgba(255, 193, 7, 0.32)',
+                        },
+                      }}
+                    />
+                  </Stack>
                 )}
               </Box>
             </Stack>
