@@ -199,7 +199,11 @@ const ChatComponent2 = () => {
                 if (prev.some(item => item.id === event.message.id)) {
                   return prev.map(item => item.id === event.message.id ? event.message : item);
                 }
-                return [...prev, event.message];
+                // E2EE: for MLS messages with no text yet, mark as 'decrypting'
+                const msg = event.message.content_type === 'mls' && !event.message.text
+                  ? { ...event.message, e2ee_status: 'decrypting' }
+                  : event.message;
+                return [...prev, msg];
               });
               const myRole = myRoleInChannel(currentChat);
               if (![RoleMember.PENDING, RoleMember.SKIPPED].includes(myRole)) {
@@ -415,7 +419,14 @@ const ChatComponent2 = () => {
         setMessages(prev =>
           prev.map(item =>
             item.id === event.message.id
-              ? { ...item, text: event.message.text }
+              ? {
+                  ...item,
+                  text: event.message.text || item.text,
+                  e2ee_status: event.message.e2ee_status ?? null,
+                  content_type: event.message.content_type || item.content_type,
+                  attachments: event.message.attachments || item.attachments,
+                  sticker_url: event.message.sticker_url || item.sticker_url,
+                }
               : item,
           ),
         );

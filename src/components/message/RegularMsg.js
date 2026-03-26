@@ -50,7 +50,13 @@ const RegularMsg = React.memo(({ message, isLastInGroup, onScrollToReplyMsg, isH
 
       {renderAttachments}
 
-      {message.text && <TextLine text={message.text} isMyMessage={message.isMyMessage} widthTextLine={widthTextLine} />}
+      {message.text ? (
+        <TextLine text={message.text} isMyMessage={message.isMyMessage} widthTextLine={widthTextLine} />
+      ) : message.content_type === 'mls' ? (
+        <span style={{ opacity: 0.6, fontStyle: 'italic', fontSize: '14px' }}>
+          {message.e2ee_status === 'decrypting' ? '🔐 Decrypting...' : '🔒 Encrypted message'}
+        </span>
+      ) : null}
 
       <DateLine
         date={isEdited ? message.updated_at : message.created_at}

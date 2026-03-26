@@ -19,7 +19,7 @@ import { ConfirmType, SidebarType } from '@/constants/commons-const';
 import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH } from '@/config';
 import { ClientEvents } from '@/constants/events-const';
-import { client } from '@/client';
+import { client, mlsManager } from '@/client';
 import { useTranslation } from 'react-i18next';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -231,8 +231,18 @@ const ChannelConfirmDialog = () => {
   const onSubmit = async () => {
     try {
       setLoadingButton(true);
-      const response = [ConfirmType.LEAVE, ConfirmType.REMOVE_MEMBER].includes(type)
-        ? await channel.removeMembers([userId])
+      const isE2ee = channel.data?.mls_enabled === true;
+      const isRemoveAction = [ConfirmType.LEAVE, ConfirmType.REMOVE_MEMBER].includes(type);
+
+      const response = isRemoveAction
+        ? isE2ee && mlsManager?.initialized
+          ? await mlsManager.evictMember(
+              channel.type,
+              channel.id,
+              channel.cid || `${channel.type}:${channel.id}`,
+              userId,
+            )
+          : await channel.removeMembers([userId])
         : [ConfirmType.DELETE_CHANNEL, ConfirmType.DELETE_TOPIC].includes(type)
           ? await channel.delete()
           : type === ConfirmType.REMOVE_MODER
