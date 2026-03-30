@@ -34,11 +34,11 @@ const EmojiPickerPopover = ({ inputRef, value, setValue, setStickerUrl }) => {
 
   useEffect(() => {
     function handleStickerMessage(event) {
-      if (event.data) {
-        const sticker = event.data.data.content.url || '';
-        setStickerUrl(`https://sticker.ermis.network/${sticker}`);
-        setAnchorEl(null);
-      }
+      if (event.origin !== 'https://sticker.ermis.network') return;
+      const sticker = event.data?.data?.content?.url;
+      if (!sticker) return;
+      setStickerUrl(`https://sticker.ermis.network/${sticker}`);
+      setAnchorEl(null);
     }
     window.addEventListener('message', handleStickerMessage);
     return () => window.removeEventListener('message', handleStickerMessage);

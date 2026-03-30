@@ -232,18 +232,22 @@ const ChannelConfirmDialog = () => {
     try {
       setLoadingButton(true);
       const isE2ee = channel.data?.mls_enabled === true;
-      const isRemoveAction = [ConfirmType.LEAVE, ConfirmType.REMOVE_MEMBER].includes(type);
+      const cid = channel.cid || `${channel.type}:${channel.id}`;
 
-      const response = isRemoveAction
-        ? isE2ee && mlsManager?.initialized
-          ? await mlsManager.evictMember(
-              channel.type,
-              channel.id,
-              channel.cid || `${channel.type}:${channel.id}`,
-              userId,
-            )
-          : await channel.removeMembers([userId])
-        : [ConfirmType.DELETE_CHANNEL, ConfirmType.DELETE_TOPIC].includes(type)
+      let response;
+      if (type === ConfirmType.LEAVE) {
+        // Self-leave: send self_remove=true (no MLS commit needed)
+        // The designated evictor will remove our leaf nodes via member.removed event
+        response = isE2ee && mlsManager?.initialized
+          ? await channel.leaveChannelE2ee(userId)
+          : await channel.removeMembers([userId]);
+      } else if (type === ConfirmType.REMOVE_MEMBER) {
+        // Kick: caller generates MLS commit to remove target user's leaf nodes
+        response = isE2ee && mlsManager?.initialized
+          ? await mlsManager.evictMember(channel.type, channel.id, cid, userId)
+          : await channel.removeMembers([userId]);
+      } else {
+        response = [ConfirmType.DELETE_CHANNEL, ConfirmType.DELETE_TOPIC].includes(type)
           ? await channel.delete()
           : type === ConfirmType.REMOVE_MODER
             ? await channel.demoteModerators([userId])
@@ -256,6 +260,7 @@ const ChannelConfirmDialog = () => {
                   : type === ConfirmType.UNBANNED
                     ? await channel.unbanMembers([userId])
                     : null;
+      }
     } catch (error) {
       onCloseDialog();
       setLoadingButton(false);

@@ -237,13 +237,21 @@ const ChatComponent2 = () => {
             setNoMessageTitle('');
             break;
           case ClientEvents.ReactionDeleted:
-            setMessages(prev => {
-              return prev.map(item => (item.id === event.message.id ? event.message : item));
-            });
-            break;
           case ClientEvents.ReactionNew:
             setMessages(prev => {
-              return prev.map(item => (item.id === event.message.id ? event.message : item));
+              return prev.map(item => {
+                if (item.id !== event.message.id) return item;
+                // E2EE guard: preserve decrypted text, only update reaction fields
+                if (item.content_type === 'mls' || event.message.content_type === 'mls') {
+                  return {
+                    ...item,
+                    latest_reactions: event.message.latest_reactions ?? item.latest_reactions,
+                    reaction_counts: event.message.reaction_counts ?? item.reaction_counts,
+                    own_reactions: event.message.own_reactions ?? item.own_reactions,
+                  };
+                }
+                return event.message;
+              });
             });
             break;
           case ClientEvents.MessageDeleted:
