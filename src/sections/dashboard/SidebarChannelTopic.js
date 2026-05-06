@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
-import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
-import { CaretLeft } from 'phosphor-react';
+import { Alert, Box, Button, IconButton, Stack, Typography } from '@mui/material';
+import { CaretLeft, Lock } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { UpdateSidebarType, showSnackbar } from '@/redux/slices/app';
 import { LoadingButton } from '@mui/lab';
@@ -20,6 +20,7 @@ const SidebarChannelTopic = () => {
   const { currentChannel } = useSelector(state => state.channel);
   const [saveDisabled, setSaveDisabled] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
+  const isParentE2ee = currentChannel?.data?.mls_enabled || false;
 
   const defaultValues = {
     topicEnabled: String(currentChannel?.data?.topics_enabled),
@@ -166,6 +167,16 @@ const SidebarChannelTopic = () => {
               </Box>
             </FormProvider>
           </Stack>
+
+          {isParentE2ee && (
+            <Alert
+              severity="info"
+              icon={<Lock size={18} weight="fill" />}
+              sx={{ borderRadius: '12px' }}
+            >
+              {t('sidebarChannelTopic.e2ee_info', 'This channel has E2EE enabled. All new topics will inherit end-to-end encryption automatically.')}
+            </Alert>
+          )}
         </Stack>
       </Stack>
     </>

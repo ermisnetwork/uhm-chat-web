@@ -26,7 +26,13 @@
   "Homesearch": {
     "search": "Tìm kiếm",
     "your_channel": "Kênh của bạn",
-    "public_channel": "Kênh công khai"
+    "public_channel": "Kênh công khai",
+    "tab_channels": "Kênh",
+    "tab_users": "Người dùng",
+    "tab_messages": "Tin nhắn",
+    "no_user_found": "Không tìm thấy người dùng",
+    "no_message_found": "Không tìm thấy tin nhắn",
+    "in_channel": "trong"
   },
   "chatComponent": {
     "today": "Hôm nay",

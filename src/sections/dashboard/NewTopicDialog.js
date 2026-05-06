@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import * as Yup from 'yup';
 import {
   Box,
+  Chip,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -19,7 +20,7 @@ import { RHFTextField } from '@/components/hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { SetOpenNewTopicDialog } from '@/redux/slices/dialog';
 import { ChatPurpleIcon } from '@/components/Icons';
-import { X } from 'phosphor-react';
+import { Lock, X } from 'phosphor-react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { handleError } from '@/utils/commons';
@@ -38,6 +39,7 @@ const NewTopicDialog = () => {
   const { openNewTopicDialog } = useSelector(state => state.dialog);
   const { currentChannel } = useSelector(state => state.channel);
   const [loadingButton, setLoadingButton] = useState(false);
+  const isParentE2ee = currentChannel?.data?.mls_enabled || false;
 
   const onCloseDialog = () => {
     dispatch(SetOpenNewTopicDialog(false));
@@ -100,7 +102,12 @@ const NewTopicDialog = () => {
         onClose={onCloseDialog}
       >
         <DialogTitle sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {t('newTopicDialog.title')}
+          <Stack direction="row" alignItems="center" spacing={1}>
+            {t('newTopicDialog.title')}
+            {isParentE2ee && (
+              <Lock size={18} weight="fill" color="#4caf50" />
+            )}
+          </Stack>
           <IconButton onClick={onCloseDialog}>
             <X />
           </IconButton>
@@ -109,6 +116,16 @@ const NewTopicDialog = () => {
         <DialogContent className="new-topic-dialog">
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Stack spacing={3}>
+              {isParentE2ee && (
+                <Chip
+                  icon={<Lock size={14} weight="fill" />}
+                  label={t('newTopicDialog.e2ee_inherited', 'End-to-end encrypted')}
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                  sx={{ alignSelf: 'flex-start' }}
+                />
+              )}
               <Box>
                 <Typography
                   sx={{

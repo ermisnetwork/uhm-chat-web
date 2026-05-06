@@ -62,10 +62,10 @@ const NewDirectMessage = () => {
       if (e2eeEnabled) {
         const mlsManager = client.mlsManager;
         if (!mlsManager) throw new Error('MLS manager not initialized');
-        const channelId = channel.id;
-        const cid = `${ChatType.MESSAGING}:${channelId}`;
+        // For messaging, SDK computes channelId via hash_channel_id(projectId, members).
+        // Pass null for channelId/cid — SDK handles everything internally.
         const bundle = await mlsManager.createE2eeChannel(
-          ChatType.MESSAGING, channelId, cid, members,
+          ChatType.MESSAGING, null, null, members,
         );
         channel._data = { ...channel._data, ...bundle };
       }

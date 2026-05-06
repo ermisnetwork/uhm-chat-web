@@ -24,9 +24,15 @@
     "message_small": "This space is waiting for your words — spark a conversation and build something great together."
   },
   "Homesearch": {
-    "search": "Search Channel",
+    "search": "Search",
     "your_channel": "Your Channel",
-    "public_channel": "Public Channel"
+    "public_channel": "Public Channel",
+    "tab_channels": "Channels",
+    "tab_users": "Users",
+    "tab_messages": "Messages",
+    "no_user_found": "No users found",
+    "no_message_found": "No messages found",
+    "in_channel": "in"
   },
   "chatComponent": {
     "today": "Today",

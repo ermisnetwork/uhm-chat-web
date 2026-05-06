@@ -7,7 +7,6 @@ import { LocalStorageKey } from '@/constants/localStorage-const';
 let client;
 let callClient;
 
-const mlsStorage = new IndexedDBMlsStorage();
 const mlsManager = new MlsManager();
 
 // Pre-load and init WASM module (once, at import time)
@@ -45,8 +44,9 @@ const connectUser = async (projectId, user_id, token, dispatch) => {
     // logger: (type, msg) => console.log(type, msg),
   });
 
-  // Set device ID before connecting (for WS device_id param and E2EE X-Device-ID header)
-  const deviceId = await mlsStorage.getDeviceId();
+  // Set device ID before connecting (reads from localStorage — global, per-browser)
+  const tempStorage = new IndexedDBMlsStorage();
+  const deviceId = await tempStorage.getDeviceId();
   client.deviceId = deviceId;
 
   try {
@@ -66,10 +66,10 @@ const connectUser = async (projectId, user_id, token, dispatch) => {
     callClient = new ErmisCallNode(client, sessionID, wasmPath, relayUrl);
 
     // Initialize MLS (E2EE) manager and WebSocket event handlers
+    // MlsManager creates user-scoped IndexedDBMlsStorage(user_id) internally
     try {
       const wasmModule = await loadWasm();
       await mlsManager.initialize(client, user_id, {
-        storage: mlsStorage,
         wasmModule,
       });
       // MLS event handlers are now integrated directly in SDK's _handleClientEvent / _handleChannelEvent

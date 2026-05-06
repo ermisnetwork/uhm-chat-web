@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Box, IconButton, styled, Typography, useTheme, Stack, alpha, Divider } from '@mui/material';
+import { Box, IconButton, styled, Typography, useTheme, Stack, alpha, Divider, Tabs, Tab } from '@mui/material';
 import { ArrowLeft, MagnifyingGlass } from 'phosphor-react';
 import { useDispatch, useSelector } from 'react-redux';
 import ChannelAvatar from '@/components/ChannelAvatar';
@@ -10,10 +10,11 @@ import { client } from '@/client';
 import { debounce } from '@mui/material/utils';
 import { LoadingSpinner } from '@/components/animate';
 import AvatarComponent from '@/components/AvatarComponent';
-import { removeVietnameseTones, splitChannelId } from '@/utils/commons';
+import { removeVietnameseTones, splitChannelId, formatString, getChannelName } from '@/utils/commons';
 import { AvatarShape, ChatType } from '@/constants/commons-const';
 import { setSearchChannels } from '@/redux/slices/channel';
 import { SetOpenHomeSearch } from '@/redux/slices/app';
+import { setSearchMessageId } from '@/redux/slices/messages';
 import { useTranslation } from 'react-i18next';
 
 const StyledSearchItem = styled(Box)(({ theme }) => ({
@@ -25,6 +26,14 @@ const StyledSearchItem = styled(Box)(({ theme }) => ({
     backgroundColor:
       theme.palette.mode === 'light' ? alpha(theme.palette.primary.main, 0.5) : theme.palette.primary.main,
   },
+}));
+
+const StyledTab = styled(Tab)(({ theme }) => ({
+  textTransform: 'none',
+  fontWeight: 600,
+  fontSize: '13px',
+  minHeight: '36px',
+  padding: '6px 12px',
 }));
 
 const HomeSearch = () => {
@@ -39,7 +48,10 @@ const HomeSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredLocalChannels, setFilteredLocalChannels] = useState([]);
   const [publicChannels, setPublicChannels] = useState([]);
+  const [searchUsers, setSearchUsers] = useState([]);
+  const [searchMessages, setSearchMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
   const users = client.state.users ? Object.values(client.state.users) : [];
 
   useEffect(() => {
@@ -72,7 +84,7 @@ const HomeSearch = () => {
     }
   }, [activeChannels, user_id]);
 
-  function removeVietnameseTones(str) {
+  function removeVietnameseTonesLocal(str) {
     return str
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -83,21 +95,49 @@ const HomeSearch = () => {
   const debouncedSearch = useCallback(
     debounce(async term => {
       if (term) {
-        const response = await client.searchPublicChannel(term);
-        if (response) {
-          setPublicChannels(response.search_result.channels);
+        try {
+          // Search channels (existing)
+          const channelResponse = await client.searchPublicChannel(term);
+          if (channelResponse) {
+            setPublicChannels(channelResponse.search_result.channels);
+          }
 
-          const searchTerm = removeVietnameseTones(term.toLowerCase());
+          const searchTerm = removeVietnameseTonesLocal(term.toLowerCase());
           const results =
-            searchChannels.filter(channel => removeVietnameseTones(channel.name.toLowerCase()).includes(searchTerm)) ||
-            [];
+            searchChannels.filter(channel =>
+              removeVietnameseTonesLocal(channel.name.toLowerCase()).includes(searchTerm),
+            ) || [];
           setFilteredLocalChannels(results);
-          setLoading(false);
+
+          // Search users
+          try {
+            const usersResponse = await client.searchUsers(1, 20, term);
+            const userData = usersResponse?.data || usersResponse?.users || [];
+            // Filter out self
+            setSearchUsers(userData.filter(u => u.id !== user_id));
+          } catch (err) {
+            console.warn('[HomeSearch] User search failed:', err);
+            setSearchUsers([]);
+          }
+
+          // Search messages (global - across all channels)
+          try {
+            const msgResponse = await client.searchGlobalMessages(term, 0, 20);
+            setSearchMessages(msgResponse?.messages || []);
+          } catch (err) {
+            console.warn('[HomeSearch] Message search failed:', err);
+            setSearchMessages([]);
+          }
+        } catch (err) {
+          console.warn('[HomeSearch] Search failed:', err);
         }
+        setLoading(false);
       } else {
         setLoading(false);
         setPublicChannels([]);
         setFilteredLocalChannels([]);
+        setSearchUsers([]);
+        setSearchMessages([]);
       }
     }, 300),
     [searchChannels],
@@ -119,14 +159,351 @@ const HomeSearch = () => {
     setSearchQuery('');
     setFilteredLocalChannels([]);
     setPublicChannels([]);
+    setSearchUsers([]);
+    setSearchMessages([]);
     setLoading(false);
+    setTabValue(0);
     dispatch(SetOpenHomeSearch(false));
   };
 
-  const onSelectItem = (channelId, channelType) => {
+  const onSelectChannel = (channelId, channelType) => {
     navigate(`${DEFAULT_PATH}/${channelType}:${channelId}`);
     onCloseSearch();
   };
+
+  const onSelectUser = user => {
+    // Navigate to DM with user, or open user info
+    const existingDm = activeChannels.find(ch => {
+      if (ch.data?.type !== ChatType.MESSAGING) return false;
+      const members = ch.data?.members || [];
+      return members.length === 2 && members.some(m => m.user_id === user.id);
+    });
+
+    if (existingDm) {
+      navigate(`${DEFAULT_PATH}/${existingDm.data.type}:${existingDm.data.id}`);
+    }
+    onCloseSearch();
+  };
+
+  const onSelectMessage = msg => {
+    const cid = msg.cid;
+    if (cid) {
+      const splitCID = splitChannelId(cid);
+      navigate(`${DEFAULT_PATH}/${splitCID.channelType}:${splitCID.channelId}`);
+      // Scroll to message after navigation
+      setTimeout(() => {
+        dispatch(setSearchMessageId(msg.id));
+      }, 500);
+    }
+    onCloseSearch();
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  const getDisplayName = user => {
+    return user?.name || formatString(user?.id || '');
+  };
+
+  // Highlight matching text in search results
+  const highlightText = (text, query) => {
+    if (!text || !query) return text;
+    const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+    return parts.map((part, i) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <span key={i} style={{ backgroundColor: alpha(theme.palette.primary.main, 0.3), fontWeight: 600 }}>
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    );
+  };
+
+  const renderChannelsTab = () => (
+    <Stack spacing={2}>
+      {/* Your channels */}
+      <Box>
+        <Typography
+          variant="subtitle2"
+          sx={{ color: theme.palette.text.secondary, marginBottom: '10px', fontWeight: 600 }}
+        >
+          {t('Homesearch.your_channel')}
+        </Typography>
+        {filteredLocalChannels.length ? (
+          <Stack spacing={1}>
+            {filteredLocalChannels.map(channel => {
+              const dataChannel = activeChannels.find(it => it.data.id === channel.id);
+              const channelId = channel.id;
+              const channelType = channel.type;
+              return (
+                <StyledSearchItem
+                  key={channel.id}
+                  sx={{
+                    backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.background.paper,
+                  }}
+                  onClick={() => onSelectChannel(channelId, channelType)}
+                >
+                  <Stack direction="row" alignItems={'center'} justifyContent="space-between" sx={{ padding: '12px' }}>
+                    <ChannelAvatar channel={dataChannel} width={40} height={40} shape={AvatarShape.Round} />
+                    <Stack sx={{ width: 'calc(100% - 40px)', paddingLeft: '15px' }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          width: '100%',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {channel.name}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </StyledSearchItem>
+              );
+            })}
+          </Stack>
+        ) : (
+          <Typography
+            variant="subtitle2"
+            sx={{
+              textAlign: 'center',
+              fontStyle: 'italic',
+              fontSize: '14px',
+              color: theme.palette.text.secondary,
+              fontWeight: 400,
+            }}
+          >
+            {t('noResult')}
+          </Typography>
+        )}
+      </Box>
+
+      <Divider />
+
+      {/* Public channels */}
+      <Box>
+        <Typography
+          variant="subtitle2"
+          sx={{ color: theme.palette.text.secondary, marginBottom: '10px', fontWeight: 600 }}
+        >
+          {t('Homesearch.public_channel')}
+        </Typography>
+        {publicChannels.length ? (
+          <Stack spacing={1}>
+            {publicChannels.map(channel => {
+              const splitCID = splitChannelId(channel.cid);
+              const channelId = splitCID.channelId;
+              const channelType = splitCID.channelType;
+              return (
+                <StyledSearchItem
+                  key={channel.cid}
+                  sx={{
+                    backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.background.paper,
+                  }}
+                  onClick={() => onSelectChannel(channelId, channelType)}
+                >
+                  <Stack direction="row" alignItems={'center'} justifyContent="space-between" sx={{ padding: '12px' }}>
+                    <AvatarComponent
+                      name={channel.name}
+                      url={channel.image}
+                      width={40}
+                      height={40}
+                      isPublic={true}
+                      shape={AvatarShape.Round}
+                    />
+                    <Stack sx={{ width: 'calc(100% - 40px)', paddingLeft: '15px' }}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          width: '100%',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {channel.name}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                </StyledSearchItem>
+              );
+            })}
+          </Stack>
+        ) : (
+          <Typography
+            variant="subtitle2"
+            sx={{
+              textAlign: 'center',
+              fontStyle: 'italic',
+              fontSize: '14px',
+              color: theme.palette.text.secondary,
+              fontWeight: 400,
+            }}
+          >
+            {t('noResult')}
+          </Typography>
+        )}
+      </Box>
+    </Stack>
+  );
+
+  const renderUsersTab = () => (
+    <Stack spacing={1}>
+      {searchUsers.length ? (
+        searchUsers.map(user => (
+          <StyledSearchItem
+            key={user.id}
+            sx={{
+              backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.background.paper,
+            }}
+            onClick={() => onSelectUser(user)}
+          >
+            <Stack direction="row" alignItems={'center'} sx={{ padding: '12px' }}>
+              <AvatarComponent
+                name={user.name || user.id}
+                url={user.image}
+                width={40}
+                height={40}
+                shape={AvatarShape.Round}
+              />
+              <Stack sx={{ width: 'calc(100% - 40px)', paddingLeft: '15px' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    width: '100%',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {getDisplayName(user)}
+                </Typography>
+                {user.name && (
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {formatString(user.id)}
+                  </Typography>
+                )}
+              </Stack>
+            </Stack>
+          </StyledSearchItem>
+        ))
+      ) : (
+        <Typography
+          variant="subtitle2"
+          sx={{
+            textAlign: 'center',
+            fontStyle: 'italic',
+            fontSize: '14px',
+            color: theme.palette.text.secondary,
+            fontWeight: 400,
+            paddingTop: '20px',
+          }}
+        >
+          {t('Homesearch.no_user_found')}
+        </Typography>
+      )}
+    </Stack>
+  );
+
+  const renderMessagesTab = () => (
+    <Stack spacing={1}>
+      {searchMessages.length ? (
+        searchMessages.map(msg => {
+          const channelName = msg.channel_name || '';
+          const senderName = msg.user?.name || formatString(msg.user_id || msg.user?.id || '');
+          const msgText = msg.text || '';
+          const truncatedText = msgText.length > 80 ? msgText.substring(0, 80) + '...' : msgText;
+
+          return (
+            <StyledSearchItem
+              key={msg.id}
+              sx={{
+                backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.background.paper,
+              }}
+              onClick={() => onSelectMessage(msg)}
+            >
+              <Stack sx={{ padding: '12px' }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: '70%',
+                    }}
+                  >
+                    {senderName}
+                  </Typography>
+                  {channelName && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '30%',
+                      }}
+                    >
+                      {t('Homesearch.in_channel')} {channelName}
+                    </Typography>
+                  )}
+                </Stack>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    marginTop: '4px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {highlightText(truncatedText, searchQuery)}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: theme.palette.text.disabled,
+                    marginTop: '2px',
+                  }}
+                >
+                  {msg.created_at ? new Date(msg.created_at).toLocaleString() : ''}
+                </Typography>
+              </Stack>
+            </StyledSearchItem>
+          );
+        })
+      ) : (
+        <Typography
+          variant="subtitle2"
+          sx={{
+            textAlign: 'center',
+            fontStyle: 'italic',
+            fontSize: '14px',
+            color: theme.palette.text.secondary,
+            fontWeight: 400,
+            paddingTop: '20px',
+          }}
+        >
+          {t('Homesearch.no_message_found')}
+        </Typography>
+      )}
+    </Stack>
+  );
 
   return (
     <>
@@ -181,145 +558,31 @@ const HomeSearch = () => {
           display: openHomeSearch ? 'block' : 'none',
         }}
       >
-        <Stack
-          sx={{ flexGrow: 1, overflowY: 'auto', marginTop: '63px', height: 'calc(100% - 63px)' }}
-          className="customScrollbar"
-        >
-          <Stack spacing={2}>
-            {/* -------------------------------------------Your channels---------------------------------- */}
-            <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{ color: theme.palette.text.secondary, marginBottom: '10px', fontWeight: 600 }}
-              >
-                {t('Homesearch.your_channel')}
-              </Typography>
-              {filteredLocalChannels.length ? (
-                <Stack spacing={1}>
-                  {filteredLocalChannels.map(channel => {
-                    const dataChannel = activeChannels.find(it => it.data.id === channel.id);
-                    const channelId = channel.id;
-                    const channelType = channel.type;
-                    return (
-                      <StyledSearchItem
-                        key={channel.id}
-                        sx={{
-                          backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.background.paper,
-                        }}
-                        onClick={() => onSelectItem(channelId, channelType)}
-                      >
-                        <Stack
-                          direction="row"
-                          alignItems={'center'}
-                          justifyContent="space-between"
-                          sx={{ padding: '12px' }}
-                        >
-                          <ChannelAvatar channel={dataChannel} width={40} height={40} shape={AvatarShape.Round} />
-                          <Stack sx={{ width: 'calc(100% - 40px)', paddingLeft: '15px' }}>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                width: '100%',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                              }}
-                            >
-                              {channel.name}
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      </StyledSearchItem>
-                    );
-                  })}
-                </Stack>
-              ) : (
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    textAlign: 'center',
-                    fontStyle: 'italic',
-                    fontSize: '14px',
-                    color: theme.palette.text.secondary,
-                    fontWeight: 400,
-                  }}
-                >
-                  {t('noResult')}
-                </Typography>
-              )}
-            </Box>
+        <Stack sx={{ marginTop: '63px', height: 'calc(100% - 63px)' }}>
+          {/* Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: '8px' }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              variant="fullWidth"
+              sx={{
+                minHeight: '36px',
+                '& .MuiTabs-indicator': {
+                  height: '2px',
+                },
+              }}
+            >
+              <StyledTab label={t('Homesearch.tab_channels')} />
+              <StyledTab label={t('Homesearch.tab_users')} />
+              <StyledTab label={t('Homesearch.tab_messages')} />
+            </Tabs>
+          </Box>
 
-            <Divider />
-
-            {/* -------------------------------------------Public channels---------------------------------- */}
-            <Box>
-              <Typography
-                variant="subtitle2"
-                sx={{ color: theme.palette.text.secondary, marginBottom: '10px', fontWeight: 600 }}
-              >
-                {t('Homesearch.public_channel')}
-              </Typography>
-              {publicChannels.length ? (
-                <Stack spacing={1}>
-                  {publicChannels.map(channel => {
-                    const splitCID = splitChannelId(channel.cid);
-                    const channelId = splitCID.channelId;
-                    const channelType = splitCID.channelType;
-                    return (
-                      <StyledSearchItem
-                        key={channel.cid}
-                        sx={{
-                          backgroundColor: theme.palette.mode === 'light' ? '#fff' : theme.palette.background.paper,
-                        }}
-                        onClick={() => onSelectItem(channelId, channelType)}
-                      >
-                        <Stack
-                          direction="row"
-                          alignItems={'center'}
-                          justifyContent="space-between"
-                          sx={{ padding: '12px' }}
-                        >
-                          <AvatarComponent
-                            name={channel.name}
-                            url={channel.image}
-                            width={40}
-                            height={40}
-                            isPublic={true}
-                            shape={AvatarShape.Round}
-                          />
-                          <Stack sx={{ width: 'calc(100% - 40px)', paddingLeft: '15px' }}>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                width: '100%',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                              }}
-                            >
-                              {channel.name}
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      </StyledSearchItem>
-                    );
-                  })}
-                </Stack>
-              ) : (
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    textAlign: 'center',
-                    fontStyle: 'italic',
-                    fontSize: '14px',
-                    color: theme.palette.text.secondary,
-                    fontWeight: 400,
-                  }}
-                >
-                  {t('noResult')}
-                </Typography>
-              )}
-            </Box>
+          {/* Tab Content */}
+          <Stack sx={{ flexGrow: 1, overflowY: 'auto' }} className="customScrollbar">
+            {tabValue === 0 && renderChannelsTab()}
+            {tabValue === 1 && renderUsersTab()}
+            {tabValue === 2 && renderMessagesTab()}
           </Stack>
         </Stack>
       </Box>
