@@ -75,6 +75,7 @@ const NewDirectMessage = () => {
       dispatch(showSnackbar({ severity: 'success', message: t('new_message.snackbar_success') }));
       onCloseDialogNewDirectMessage();
     } catch (error) {
+      console.error('[E2EE DM] Creation failed:', error);
       dispatch(showSnackbar({ severity: 'error', message: t('new_message.snackbar_failed') }));
     }
   };
