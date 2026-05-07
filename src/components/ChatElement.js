@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { Badge, Box, Stack, Typography, Menu, MenuItem } from '@mui/material';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { DEFAULT_PATH, TRANSITION } from '@/config';
 import { convertMessageSignal } from '@/utils/messageSignal';
 import { getDisplayDate } from '@/utils/formatTime';
-import { client } from '@/client';
+import { client, mlsManager } from '@/client';
 import { SpearkerOffIcon } from '@/components/Icons';
 import AvatarGeneralDefault from '@/components/AvatarGeneralDefault';
 import TopicAvatar from '@/components/TopicAvatar';
@@ -167,6 +167,9 @@ const ChatElement = ({ channel }) => {
   const [isRightClick, setIsRightClick] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [lastMessageAt, setLastMessageAt] = useState('');
+  const lastMessageReqId = useRef(0);
+  const lastPreviewedMessageRef = useRef(null);
+  const latestNewMessageIdRef = useRef(null);
 
   const showItemLeaveChannel = !isDirect && [RoleMember.MOD, RoleMember.MEMBER].includes(myRole);
   const showItemDeleteChannel = !isDirect && [RoleMember.OWNER].includes(myRole);
@@ -197,30 +200,58 @@ const ChatElement = ({ channel }) => {
     [users],
   );
 
+  const resolveE2eePreview = useCallback(async message => {
+    if (!message) return null;
+    const isE2ee = message.content_type === 'mls' || message.mls_ciphertext;
+    if (!isE2ee || message.text) return message;
+    if (!mlsManager?.storage?.loadE2eeMessage) return message;
+
+    try {
+      const cached = await mlsManager.storage.loadE2eeMessage(message.id);
+      if (cached) {
+        return { ...message, ...cached };
+      }
+    } catch (err) {
+      console.warn('[E2EE] Failed to load message preview from IndexedDB:', err);
+    }
+    return message;
+  }, []);
+
   const getLastMessage = useCallback(
-    message => {
+    async message => {
+      const reqId = ++lastMessageReqId.current;
+
       if (!message) {
         setLastMessageAt(getDisplayDate(channel.data.created_at));
         setLastMessage(t('chatElement.no_message'));
         return;
       }
 
-      const date = message.updated_at ? message.updated_at : message.created_at;
-      const sender = message.user;
-      const senderId = sender?.id;
+      const resolvedMessage = await resolveE2eePreview(message);
+      if (reqId !== lastMessageReqId.current) return;
+
+      const previewMessage = resolvedMessage || message;
+      lastPreviewedMessageRef.current = previewMessage;
+
+      const date = previewMessage.updated_at ? previewMessage.updated_at : previewMessage.created_at;
+      const senderFromUsers = previewMessage.user_id
+        ? users.find(user => user.id === previewMessage.user_id)
+        : undefined;
+      const sender = previewMessage.user || senderFromUsers;
+      const senderId = sender?.id || previewMessage.user_id;
       const isMe = user_id === senderId;
       const senderName = isMe ? t('chatElement.you') : sender?.name || senderId;
       setLastMessageAt(getDisplayDate(date));
 
-      switch (message.type) {
+      switch (previewMessage.type) {
         case MessageType.System: {
-          const messageSystem = convertMessageSystem(message.text, users, isDirect, false, t);
+          const messageSystem = convertMessageSystem(previewMessage.text, users, isDirect, false, t);
           setLastMessage(`${senderName}: ${messageSystem}`);
           break;
         }
 
         case MessageType.Signal: {
-          const messageSignal = convertMessageSignal(message.text, t);
+          const messageSignal = convertMessageSignal(previewMessage.text, t);
           setLastMessage(messageSignal.text || '');
           break;
         }
@@ -232,8 +263,8 @@ const ChatElement = ({ channel }) => {
 
         default: {
           // MessageType.Regular
-          if (message.attachments) {
-            const attachmentLast = message.attachments[message.attachments.length - 1];
+          if (previewMessage.attachments) {
+            const attachmentLast = previewMessage.attachments[previewMessage.attachments.length - 1];
             const { type: attachmentType } = attachmentLast;
 
             switch (attachmentType) {
@@ -298,18 +329,23 @@ const ChatElement = ({ channel }) => {
                 break;
               }
             }
-          } else if (message.mls_ciphertext) {
-            // E2EE message — show encrypted placeholder
-            setLastMessage(`${senderName}: 🔒 Encrypted message`);
+          } else if (previewMessage.mls_ciphertext || previewMessage.content_type === 'mls') {
+            // E2EE message — show encrypted placeholder if no plaintext yet
+            if (previewMessage.text) {
+              const messagePreview = replaceMentionsWithNames(previewMessage.text || '');
+              setLastMessage(`${senderName}: ${messagePreview}`);
+            } else {
+              setLastMessage(`${senderName}: 🔒 Encrypted message`);
+            }
           } else {
-            const messagePreview = replaceMentionsWithNames(message.text || '');
+            const messagePreview = replaceMentionsWithNames(previewMessage.text || '');
             setLastMessage(`${senderName}: ${messagePreview}`);
           }
           break;
         }
       }
     },
-    [user_id, users, isDirect, t, replaceMentionsWithNames, channel.data.created_at],
+    [user_id, users, isDirect, t, replaceMentionsWithNames, channel.data.created_at, resolveE2eePreview],
   );
 
   // Hàm tối ưu để tìm tin nhắn mới nhất
@@ -396,6 +432,7 @@ const ChatElement = ({ channel }) => {
 
       if (isCurrentChannel || isTopicInChannel) {
         if (!(event.message.type === MessageType.Signal && event.message.text && ['1', '4'].includes(event.message.text[0]))) {
+          latestNewMessageIdRef.current = event.message.id;
           getLastMessage(event.message);
         }
       }
@@ -418,6 +455,32 @@ const ChatElement = ({ channel }) => {
       if (isCurrentChannel || isTopicInChannel) {
         const updatedLastMsg = getOptimizedLastMessage(channel);
         getLastMessage(updatedLastMsg);
+      }
+    };
+
+    const handleE2eeDecrypted = event => {
+      const eventMessage = event?.message;
+      if (!eventMessage?.id) return;
+
+      const optimizedLastMsg = getOptimizedLastMessage(channel);
+      const lastMsg = lastPreviewedMessageRef.current;
+
+      if (
+        (optimizedLastMsg && optimizedLastMsg.id === eventMessage.id) ||
+        (lastMsg && lastMsg.id === eventMessage.id) ||
+        (latestNewMessageIdRef.current === eventMessage.id)
+      ) {
+        const baseMsg = optimizedLastMsg?.id === eventMessage.id ? optimizedLastMsg : lastMsg;
+        const senderFromUsers = eventMessage.user_id
+          ? users.find(user => user.id === eventMessage.user_id)
+          : undefined;
+        const merged = {
+          ...baseMsg,
+          ...eventMessage,
+          user: baseMsg?.user || senderFromUsers || eventMessage.user,
+          text: eventMessage.text || baseMsg?.text,
+        };
+        getLastMessage(merged);
       }
     };
 
@@ -452,6 +515,7 @@ const ChatElement = ({ channel }) => {
     client.on(ClientEvents.MessageRead, handleMessageRead);
     client.on(ClientEvents.MemberBlocked, handleMemberBlocked);
     client.on(ClientEvents.MemberUnblocked, handleMemberUnBlocked);
+    client.on(ClientEvents.E2eeDecrypted, handleE2eeDecrypted);
     return () => {
       client.off(ClientEvents.MessageNew, handleMessageNew);
       client.off(ClientEvents.MessageUpdated, handleMessageUpdated);
@@ -459,8 +523,9 @@ const ChatElement = ({ channel }) => {
       client.off(ClientEvents.MessageRead, handleMessageRead);
       client.off(ClientEvents.MemberBlocked, handleMemberBlocked);
       client.off(ClientEvents.MemberUnblocked, handleMemberUnBlocked);
+      client.off(ClientEvents.E2eeDecrypted, handleE2eeDecrypted);
     };
-  }, [channel, user_id, getOptimizedLastMessage, getLastMessage, dispatch]);
+  }, [channel, user_id, users, getOptimizedLastMessage, getLastMessage, dispatch]);
 
   // const onLeftClick = useCallback(() => {
   //   if (!isRightClick) {

@@ -273,7 +273,13 @@ const ChatComponent2 = () => {
             break;
           case ClientEvents.MessageUpdated:
             setMessages(prev => {
-              return prev.map(item => (item.id === event.message.id ? event.message : item));
+              if (event.message?.content_type === 'mls' && event.message?.mls_ciphertext) {
+                return prev;
+              }
+              const targetId =
+                event.message?.replaces_message_id ??
+                event.message?.id;
+              return prev.map(item => (item.id === targetId ? event.message : item));
             });
             dispatch(SetMessagesHistoryDialog({ openDialog: false, messages: event.message?.old_texts || [] }));
             break;
@@ -423,7 +429,7 @@ const ChatComponent2 = () => {
 
       // E2EE: listen for decrypted messages to update plaintext in state
       const handleE2eeDecrypted = (event) => {
-        if (!event.message?.id) return;
+        if (!event.message?.id || event.cid !== currentChat?.cid) return;
         setMessages(prev =>
           prev.map(item =>
             item.id === event.message.id
@@ -434,6 +440,8 @@ const ChatComponent2 = () => {
                   content_type: event.message.content_type || item.content_type,
                   attachments: event.message.attachments || item.attachments,
                   sticker_url: event.message.sticker_url || item.sticker_url,
+                  updated_at: event.message.updated_at || item.updated_at,
+                  status: null,
                 }
               : item,
           ),

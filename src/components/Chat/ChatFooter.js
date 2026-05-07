@@ -427,7 +427,43 @@ const ChatFooter = ({ setMessages, isDialog }) => {
             });
           });
           onResetData();
-          await currentChat?.editMessage(editMessage.id, payloadEdit);
+          if (isE2ee && mlsManager?.initialized) {
+            console.log('[UI] E2EE edit: sending update', {
+              cid: currentChannel?.cid,
+              message_id: editMessage.id,
+            });
+            await mlsManager.updateMessage(
+              currentChannel.type,
+              currentChannel.id,
+              currentChannel.cid,
+              editMessage.id,
+              payloadEdit.text,
+              {
+                mentioned_all: payloadEdit.mentioned_all,
+                mentioned_users: payloadEdit.mentioned_users,
+              },
+            );
+            setMessages(prev =>
+              prev.map(item =>
+                item.id === editMessage.id
+                  ? { ...item, status: null, updated_at: new Date() }
+                  : item,
+              ),
+            );
+            console.log('[UI] E2EE edit: update sent', {
+              cid: currentChannel?.cid,
+              message_id: editMessage.id,
+            });
+          } else {
+            await currentChat?.editMessage(editMessage.id, payloadEdit);
+            setMessages(prev =>
+              prev.map(item =>
+                item.id === editMessage.id
+                  ? { ...item, status: null, updated_at: new Date() }
+                  : item,
+              ),
+            );
+          }
         } else {
           dispatch(onEditMessage(null));
         }

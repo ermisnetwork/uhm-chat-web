@@ -42,4 +42,6 @@ export const ClientEvents = {
   UserWatchingStart: 'user.watching.start',
   UserWatchingStop: 'user.watching.stop',
   PollChoiceNew: 'pollchoice.new',
+  E2eeDecrypted: 'e2ee.message_decrypted',
+  E2eeEncrypted: 'e2ee.message_encrypted',
 };

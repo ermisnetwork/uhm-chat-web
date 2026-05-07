@@ -235,7 +235,13 @@ const ChatComponent = () => {
             break;
           case ClientEvents.MessageUpdated:
             setMessages(prev => {
-              return prev.map(item => (item.id === event.message.id ? event.message : item));
+              if (event.message?.content_type === 'mls' && event.message?.mls_ciphertext) {
+                return prev;
+              }
+              const targetId =
+                event.message?.replaces_message_id ??
+                event.message?.id;
+              return prev.map(item => (item.id === targetId ? event.message : item));
             });
             dispatch(SetMessagesHistoryDialog({ openDialog: false, messages: event.message?.old_texts || [] }));
             break;
@@ -383,6 +389,28 @@ const ChatComponent = () => {
       currentChat.on(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
       currentChat.on(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
 
+      // E2EE: listen for decrypted messages to update plaintext in state
+      const handleE2eeDecrypted = (event) => {
+        if (!event.message?.id || event.cid !== currentChat?.cid) return;
+        setMessages(prev =>
+          prev.map(item =>
+            item.id === event.message.id
+              ? {
+                  ...item,
+                  text: event.message.text || item.text,
+                  e2ee_status: event.message.e2ee_status ?? null,
+                  content_type: event.message.content_type || item.content_type,
+                  attachments: event.message.attachments || item.attachments,
+                  sticker_url: event.message.sticker_url || item.sticker_url,
+                  updated_at: event.message.updated_at || item.updated_at,
+                  status: null,
+                }
+              : item,
+          ),
+        );
+      };
+      client.on('e2ee.message_decrypted', handleE2eeDecrypted);
+
       return () => {
         currentChat.off(ClientEvents.MessageNew, handleMessages);
         currentChat.off(ClientEvents.ReactionNew, handleMessages);
@@ -403,6 +431,7 @@ const ChatComponent = () => {
         currentChat.off(ClientEvents.ChannelTruncate, handleChannelTruncate);
         currentChat.off(ClientEvents.ChannelTopicClosed, handleChannelTopicClosed);
         currentChat.off(ClientEvents.ChannelTopicReopen, handleChannelTopicReopen);
+        client.off('e2ee.message_decrypted', handleE2eeDecrypted);
 
         // Cleanup audio khi thay đổi chat hoặc component unmount
         cleanup();
