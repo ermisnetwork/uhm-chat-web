@@ -481,17 +481,13 @@ export const ConnectCurrentChannel = (channelId, channelType) => {
     // E2EE: auto external join if channel has MLS enabled but no local group
     if (channel.data?.mls_enabled && mlsManager?.initialized) {
       const cid = channel.cid;
-      if (cid && !mlsManager.getGroup(cid)) {
+      if (cid) {
         mlsManager
-          .joinExternal(channelType, channelId, cid)
-          .then(() => {
-            console.log('[MLS] Auto external join completed:', cid);
-            // Sync and decrypt existing MLS messages for this channel.
-            // Uses syncAfterExternalJoin (no early-return guard) so it runs even
-            // though the group was just added to mlsManager.groups by joinExternal.
-            return mlsManager.syncAfterExternalJoin(channelType, channelId, cid);
+          .ensureChannelReady(channelType, channelId, cid, { source: 'open' })
+          .then(result => {
+            console.log('[MLS] Channel ready check completed:', cid, result?.status);
           })
-          .catch(err => console.warn('[MLS] Auto external join / sync failed:', cid, err));
+          .catch(err => console.warn('[MLS] Channel ready check failed:', cid, err));
       }
     }
   };

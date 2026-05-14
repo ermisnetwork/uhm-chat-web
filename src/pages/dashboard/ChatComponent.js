@@ -35,7 +35,7 @@ import ScrollToBottom from '@/components/ScrollToBottom';
 import DeleteMessageDialog from '@/sections/dashboard/DeleteMessageDialog';
 import { ChatType, DefaultLastSend, MessageType, RoleMember, UploadType } from '@/constants/commons-const';
 import BannedBackdrop from '@/components/BannedBackdrop';
-import { client } from '@/client';
+import { client, mlsManager } from '@/client';
 import { onFilesMessage } from '@/redux/slices/messages';
 import BlockedBackdrop from '@/components/BlockedBackdrop';
 import { useNavigate } from 'react-router-dom';
@@ -82,6 +82,7 @@ const ChatComponent = () => {
   const [showChipUnread, setShowChipUnread] = useState(false);
   const [highlightMsg, setHighlightMsg] = useState('');
   const [noMessageTitle, setNoMessageTitle] = useState('');
+  const [e2eeSyncState, setE2eeSyncState] = useState(null);
 
   // Memoize derived values
   const isDirect = useMemo(() => isChannelDirect(currentChannel), [currentChannel]);
@@ -93,6 +94,7 @@ const ChatComponent = () => {
   useEffect(() => {
     setUsersTyping([]);
     setMessages([]);
+    setE2eeSyncState(null);
 
     if (currentChat) {
       const channelName = currentChat.data.name ? currentChat.data.name : getChannelName(currentChat, users);
@@ -464,6 +466,30 @@ const ChatComponent = () => {
   }, [client, currentChat, t]);
 
   useEffect(() => {
+    if (!client || !currentChat) return;
+
+    const handleSyncState = event => {
+      if (event.cid !== currentChat.cid) return;
+      setE2eeSyncState(event.sync_state || null);
+    };
+
+    const handleChannelReady = event => {
+      if (event.cid !== currentChat.cid) return;
+      setE2eeSyncState(null);
+      const listMessage = currentChat.state.messages || [];
+      setMessages([...listMessage]);
+      setNoMessageTitle(listMessage.length ? '' : t('chatComponent.no_message'));
+    };
+
+    const syncUnsub = client.on('e2ee.sync_state', handleSyncState);
+    const readyUnsub = client.on('e2ee.channel_ready', handleChannelReady);
+    return () => {
+      syncUnsub?.unsubscribe?.();
+      readyUnsub?.unsubscribe?.();
+    };
+  }, [client, currentChat, t]);
+
+  useEffect(() => {
     if (messageIdError) {
       setMessages(prev => prev.filter(item => item.id !== messageIdError));
     }
@@ -562,6 +588,13 @@ const ChatComponent = () => {
     [dispatch],
   );
 
+  const retryE2eeSync = useCallback(() => {
+    if (!currentChat?.data?.mls_enabled || !currentChat.cid || !mlsManager?.initialized) return;
+    mlsManager
+      .ensureChannelReady(currentChat.type, currentChat.id, currentChat.cid, { source: 'ui_retry' })
+      .catch(err => console.warn('[MLS] UI retry failed:', currentChat.cid, err));
+  }, [currentChat]);
+
   const addDateLabels = useCallback(
     messages => {
       let lastDate = null;
@@ -625,6 +658,20 @@ const ChatComponent = () => {
                 <Alert severity="info" sx={{ fontWeight: 400 }}>
                   <strong>{formatString(currentChat?.data.name)}</strong>
                   &nbsp;{t('chatComponent.message')}
+                </Alert>
+              </Box>
+            )}
+
+            {e2eeSyncState?.needs_retry && currentChat?.data?.mls_enabled && (
+              <Box sx={{ width: '100%', mb: 0.5 }}>
+                <Alert
+                  severity={e2eeSyncState.status === 'stale_group_info' ? 'warning' : 'info'}
+                  sx={{ fontWeight: 400 }}
+                  action={<Chip size="small" label="Retry" color="primary" onClick={retryE2eeSync} />}
+                >
+                  {e2eeSyncState.status === 'stale_group_info'
+                    ? 'Encrypted chat keys are not ready yet.'
+                    : 'Encrypted messages are still syncing.'}
                 </Alert>
               </Box>
             )}
